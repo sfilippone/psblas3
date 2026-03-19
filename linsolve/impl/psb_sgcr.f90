@@ -130,14 +130,13 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_s_vect_type)   ::  r
   
   real(psb_dpk_) :: r_norm, b_norm, a_norm, derr
-  integer(psb_ipk_) :: n_col, naux, err_act
+  integer(psb_ipk_) :: n_col, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
   integer(psb_ipk_) ::  i, j, it, itx, istop_, itmax_, itrace_, nl, m, nrst
   real(psb_spk_) :: hjj
-  real(psb_spk_), allocatable, target   :: aux(:)
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
   character(len=*), parameter :: methdname='GCR'
@@ -223,17 +222,9 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   endif
   
-  naux=4*n_col 
-  allocate(aux(naux),h(nl+1,nl+1),&
-       &c_scale(nl+1),c(nl+1),z(nl+1), alpha(nl+1), stat=info)
   
   h = szero
-  if (info /= psb_success_) then 
-    info=psb_err_from_subroutine_non_ 
-    call psb_errpush(info,name)
-    goto 9999
-  end if
-  
+
   call psb_geasb(r, desc_a,info, scratch=.true.,mold=x%v)
   
   do i =1,nl+1
@@ -261,7 +252,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
     
     
     call psb_geaxpby(sone, b, szero, r, desc_a, info) 
-    call psb_spmm(-sone,a,x,sone,r,desc_a,info,work=aux)
+    call psb_spmm(-sone,a,x,sone,r,desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
@@ -278,9 +269,9 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
       it = it + 1
       j = it    
       !Apply preconditioner
-      call prec%apply(r,z(j),desc_a,info,work=aux)  
+      call prec%apply(r,z(j),desc_a,info)  
       
-      call psb_spmm(sone,a,z(j),szero,c(1),desc_a,info,work=aux)
+      call psb_spmm(sone,a,z(j),szero,c(1),desc_a,info)
       do i =1, j - 1
         
         h(i,j) = psb_gedot(c_scale(i), c(i), desc_a, info)   
@@ -347,7 +338,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
     if (info == psb_success_) call psb_gefree(c(i),desc_a,info)   
   end do
   
-  if (info == psb_success_) deallocate(aux,h,c_scale,z,c,alpha,stat=info)
+  if (info == psb_success_) deallocate(h,c_scale,z,c,alpha,stat=info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)

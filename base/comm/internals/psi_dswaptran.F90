@@ -80,7 +80,6 @@
 !    beta     - real                  Choose overwrite or sum. 
 !    y        - type(psb_d_vect_type) The data area                        
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
-!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -94,7 +93,7 @@
 submodule (psi_d_comm_v_mod)  psi_d_swaptran_impl
   use psb_base_mod
 contains
-  module subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_dswaptran_vect(flag,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -104,13 +103,12 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_d_base_vect_type) :: y
-    real(psb_dpk_)           :: beta
-    real(psb_dpk_), target   :: work(:)
-    type(psb_desc_type),target  :: desc_a
-    integer(psb_ipk_), optional    :: data
+    integer(psb_ipk_), intent(in)               :: flag
+    real(psb_dpk_), intent(in)                  :: beta
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    type(psb_desc_type),target                  :: desc_a
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), optional                 :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -119,8 +117,8 @@ contains
     class(psb_i_base_vect_type), pointer :: d_vidx
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_tranv'
+    info = psb_success_
+    name = 'psi_dswaptran_vect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
@@ -150,7 +148,7 @@ contains
       goto 9999
     end if
 
-    call  psi_swaptran(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+    call psi_swaptran(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
     if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -175,7 +173,7 @@ contains
   !   
   ! 
   module subroutine psi_dtran_vidx_vect(ctxt,flag,beta,y,idx,&
-       & totxch,totsnd,totrcv,work,info)
+       & totxch,totsnd,totrcv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -185,14 +183,13 @@ contains
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in)    :: ctxt
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    class(psb_d_base_vect_type) :: y
-    real(psb_dpk_)         :: beta
-    real(psb_dpk_), target :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    real(psb_dpk_), intent(in)                  :: beta
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
+    integer(psb_ipk_), intent(out)              :: info
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n
@@ -206,8 +203,8 @@ contains
     logical, parameter :: usersend=.false., debug=.false.
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_tran'
+    info = psb_success_
+    name = 'psi_dtran_vidx_vect'
     call psb_erractionsave(err_act)
     call psb_info(ctxt,me,np) 
     if (np == -1) then
@@ -430,7 +427,7 @@ contains
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_dswaptran_multivect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_dswaptran_multivect(flag,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -440,13 +437,12 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_d_base_multivect_type) :: y
-    real(psb_dpk_)           :: beta
-    real(psb_dpk_), target   :: work(:)
-    type(psb_desc_type),target  :: desc_a
-    integer(psb_ipk_), optional    :: data
+    integer(psb_ipk_), intent(in)                   :: flag
+    real(psb_dpk_), intent(in)                      :: beta
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    type(psb_desc_type),target                      :: desc_a
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_), optional                     :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -486,7 +482,7 @@ contains
       goto 9999
     end if
 
-    call  psi_swaptran(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+    call psi_swaptran(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
     if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -512,7 +508,7 @@ contains
   !   
   ! 
   module subroutine psi_dtran_vidx_multivect(ctxt,flag,beta,y,idx,&
-       & totxch,totsnd,totrcv,work,info)
+       & totxch,totsnd,totrcv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -522,14 +518,13 @@ contains
     include 'mpif.h'
 #endif
 
-    type(psb_ctxt_type), intent(in) :: ctxt
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    class(psb_d_base_multivect_type) :: y
-    real(psb_dpk_)         :: beta
-    real(psb_dpk_), target :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)      :: totxch,totsnd, totrcv
+    type(psb_ctxt_type), intent(in)                 :: ctxt
+    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_ipk_), intent(out)                  :: info
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    real(psb_dpk_), intent(in)                      :: beta
+    class(psb_i_base_vect_type), intent(inout)      :: idx
+    integer(psb_ipk_), intent(in)                   :: totxch,totsnd, totrcv
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n
@@ -543,8 +538,8 @@ contains
     logical, parameter :: usersend=.false., debug=.false.
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_tran'
+    info = psb_success_
+    name = 'psi_dtran_vidx_multivect'
     call psb_erractionsave(err_act)
     call psb_info(ctxt,me,np) 
     if (np == -1) then

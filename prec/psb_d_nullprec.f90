@@ -51,7 +51,7 @@ module psb_d_nullprec
   
 
   interface
-    subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    subroutine psb_d_null_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_d_null_prec_type, psb_d_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)       :: desc_data
       class(psb_d_null_prec_type), intent(inout)  :: prec
@@ -60,7 +60,6 @@ module psb_d_nullprec
       type(psb_d_vect_type),intent(inout)  :: y
       integer(psb_ipk_), intent(out)                 :: info
       character(len=1), optional           :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_null_apply_vect
   end interface
   

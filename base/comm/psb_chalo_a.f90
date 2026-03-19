@@ -29,7 +29,7 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-! File:  psb_chalo.f90
+! File:  psb_chalo_a.f90
 !
 ! Subroutine: psb_chalom
 !   This subroutine performs the exchange of the halo elements in a 
@@ -52,7 +52,7 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
+subroutine psb_chalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_chalom
   use psi_mod
   implicit none

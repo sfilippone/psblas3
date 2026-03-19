@@ -77,8 +77,6 @@
 !    beta     - complex                  Choose overwrite or sum. 
 !    y        - type(psb_@x@_vect_type) The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - complex                  Buffer space. If not sufficient, will do 
-!                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
 !                                       default psb_comm_halo_
@@ -92,7 +90,7 @@
 submodule (psi_z_comm_v_mod)  psi_z_swapdata_impl
   use psb_base_mod
 contains
-  subroutine psi_zswapdata_vect(flag,beta,y,desc_a,work,info,data)
+  subroutine psi_zswapdata_vect(flag,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -106,7 +104,6 @@ contains
     integer(psb_ipk_), intent(out)        :: info
     class(psb_z_base_vect_type) :: y
     complex(psb_dpk_)           :: beta
-    complex(psb_dpk_), target   :: work(:)
     type(psb_desc_type), target  :: desc_a
     integer(psb_ipk_), optional           :: data
 
@@ -148,7 +145,7 @@ contains
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
     if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -174,7 +171,7 @@ contains
   !   
   ! 
   module subroutine psi_zswap_vidx_vect(ctxt,flag,beta,y,idx, &
-       & totxch,totsnd,totrcv,work,info)
+       & totxch,totsnd,totrcv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -189,7 +186,6 @@ contains
     integer(psb_ipk_), intent(out)   :: info
     class(psb_z_base_vect_type) :: y
     complex(psb_dpk_)           :: beta
-    complex(psb_dpk_), target   :: work(:)
     class(psb_i_base_vect_type), intent(inout) :: idx
     integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 
@@ -420,7 +416,7 @@ contains
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_zswapdata_multivect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_zswapdata_multivect(flag,beta,y,desc_a,info,data)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
@@ -433,7 +429,6 @@ contains
     integer(psb_ipk_), intent(out)        :: info
     class(psb_z_base_multivect_type) :: y
     complex(psb_dpk_)           :: beta
-    complex(psb_dpk_), target   :: work(:)
     type(psb_desc_type), target  :: desc_a
     integer(psb_ipk_), optional           :: data
 
@@ -475,7 +470,7 @@ contains
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
+    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
     if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -501,7 +496,7 @@ contains
   !   
   ! 
   module subroutine psi_zswap_vidx_multivect(ctxt,flag,beta,y,idx, &
-       & totxch,totsnd,totrcv,work,info)
+       & totxch,totsnd,totrcv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -516,7 +511,6 @@ contains
     integer(psb_ipk_), intent(out)     :: info
     class(psb_z_base_multivect_type) :: y
     complex(psb_dpk_)         :: beta
-    complex(psb_dpk_), target :: work(:)
     class(psb_i_base_vect_type), intent(inout) :: idx
     integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
 

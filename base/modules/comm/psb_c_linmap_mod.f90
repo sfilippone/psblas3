@@ -73,7 +73,7 @@ module psb_c_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
     end subroutine psb_c_map_U2V_a
-    subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
+    subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,vtx,vty)
       use psb_c_vect_mod, only : psb_c_vect_type
       import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
@@ -81,7 +81,6 @@ module psb_c_linmap_mod
       complex(psb_spk_), intent(in)     :: alpha,beta
       type(psb_c_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
-      complex(psb_spk_), optional       :: work(:)
       type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_c_map_U2V_v
   end interface
@@ -97,7 +96,7 @@ module psb_c_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       complex(psb_spk_), optional       :: work(:)
     end subroutine psb_c_map_V2U_a
-    subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
+    subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,vtx,vty)
       use psb_c_vect_mod, only : psb_c_vect_type
       import :: psb_ipk_, psb_spk_, psb_clinmap_type
       implicit none 
@@ -105,7 +104,6 @@ module psb_c_linmap_mod
       complex(psb_spk_), intent(in)     :: alpha,beta
       type(psb_c_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
-      complex(psb_spk_), optional       :: work(:)
       type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_c_map_V2U_v
   end interface

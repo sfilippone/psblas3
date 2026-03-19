@@ -40,23 +40,21 @@ module psi_d_comm_v_mod
     ! Wrapper that calls different communications schemes depending on 
     ! flag variable using communication buff obtained from desc_a%get_list_p
     ! ---------------------------------------------------------------
-    module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,info,data,work)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_vect_type)           :: y
-      real(psb_dpk_)                        :: beta 
-      type(psb_desc_type), target           :: desc_a
-      integer(psb_ipk_), optional           :: data
-      real(psb_dpk_), optional, target      :: work(:)
+    module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)               :: flag
+      real(psb_dpk_), intent(in)                  :: beta 
+      class(psb_d_base_vect_type), intent(inout)  :: y
+      type(psb_desc_type), target                 :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), optional                 :: data
     end subroutine psi_dswapdata_vect
-    module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,info,data,work)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_multivect_type)      :: y
-      real(psb_dpk_)                        :: beta 
-      type(psb_desc_type), target           :: desc_a
-      integer(psb_ipk_), optional           :: data
-      real(psb_dpk_), optional, target      :: work(:)
+    module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                   :: flag
+      real(psb_dpk_), intent(in)                      :: beta 
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      type(psb_desc_type), target                     :: desc_a
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), optional                     :: data
     end subroutine psi_dswapdata_multivect
   end interface psi_swapdata
 
@@ -65,23 +63,21 @@ module psi_d_comm_v_mod
     ! ---------------------------------------------------------------
     ! Upper call in order to populate idx using desc_a%get_list_p
     ! ---------------------------------------------------------------
-    module subroutine psi_dswaptran_vect(flag,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_vect_type) :: y
-      real(psb_dpk_)           :: beta
-      real(psb_dpk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
+    module subroutine psi_dswaptran_vect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)               :: flag
+      real(psb_dpk_), intent(in)                  :: beta
+      class(psb_d_base_vect_type), intent(inout)  :: y
+      type(psb_desc_type), target                 :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), optional                 :: data
     end subroutine psi_dswaptran_vect
-    module subroutine psi_dswaptran_multivect(flag,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_multivect_type) :: y
-      real(psb_dpk_)           :: beta
-      real(psb_dpk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
+    module subroutine psi_dswaptran_multivect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                   :: flag
+      real(psb_dpk_), intent(in)                      :: beta
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      type(psb_desc_type), target                     :: desc_a
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), optional                     :: data
     end subroutine psi_dswaptran_multivect
 
     ! ---------------------------------------------------------------
@@ -91,24 +87,22 @@ module psi_d_comm_v_mod
     ! flag variable
     ! ---------------------------------------------------------------
     module subroutine psi_dtran_vidx_vect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
+         & totxch,totsnd,totrcv,info)
       type(psb_ctxt_type), intent(in)       :: ctxt
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_vect_type)          :: y
-      real(psb_dpk_)                       :: beta
-      real(psb_dpk_), target               :: work(:)
+      class(psb_d_base_vect_type), intent(inout)  :: y
+      real(psb_dpk_), intent(in)                      :: beta
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_dtran_vidx_vect
     module subroutine psi_dtran_vidx_multivect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
+         & totxch,totsnd,totrcv,info)
       type(psb_ctxt_type), intent(in)       :: ctxt
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      class(psb_d_base_multivect_type)      :: y
-      real(psb_dpk_)                       :: beta
-      real(psb_dpk_), target               :: work(:)
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      real(psb_dpk_), intent(in)                      :: beta
       class(psb_i_base_vect_type), intent(inout) :: idx
       integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
     end subroutine psi_dtran_vidx_multivect

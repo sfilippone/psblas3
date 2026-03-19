@@ -432,7 +432,7 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_dspmv
     subroutine psb_dspmv_vect(alpha, a, x, beta, y,&
-         & desc_a, info, trans, work,doswap)
+         & desc_a, info, trans,doswap)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
       type(psb_dspmat_type), intent(in)    :: a
@@ -441,7 +441,6 @@ module psb_d_psblas_mod
       real(psb_dpk_), intent(in)        :: alpha, beta
       type(psb_desc_type), intent(in)      :: desc_a
       character, optional, intent(in)      :: trans
-      real(psb_dpk_), optional, intent(inout),target :: work(:)
       logical, optional, intent(in)        :: doswap
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_dspmv_vect
@@ -483,7 +482,7 @@ module psb_d_psblas_mod
     end subroutine psb_dspsv
     subroutine psb_dspsv_vect(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,&
-         & diag, work)
+         & diag)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, &
            & psb_d_vect_type, psb_dspmat_type
       type(psb_dspmat_type), intent(inout)   :: t
@@ -494,7 +493,6 @@ module psb_d_psblas_mod
       character, optional, intent(in)        :: trans, scale
       integer(psb_ipk_), optional, intent(in)          :: choice
       type(psb_d_vect_type), intent(inout), optional :: diag
-      real(psb_dpk_), optional, intent(inout), target :: work(:)
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_dspsv_vect
   end interface

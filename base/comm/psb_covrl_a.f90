@@ -30,7 +30,7 @@
 !   
 !    
 !
-! File:  psb_covrl.f90
+! File:  psb_covrl_a.f90
 !
 ! Subroutine: psb_covrlm
 !   This subroutine performs the exchange of the overlap elements in a 

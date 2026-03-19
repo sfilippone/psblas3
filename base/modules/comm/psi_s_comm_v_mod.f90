@@ -36,68 +36,62 @@ module psi_s_comm_v_mod
   use psb_s_base_multivect_mod, only : psb_s_base_multivect_type 
 
   interface psi_swapdata
-    module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,info,data,work)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_vect_type)           :: y
-      real(psb_spk_), intent(in)            :: beta 
-      type(psb_desc_type), target           :: desc_a
-      integer(psb_ipk_), optional           :: data
-      real(psb_spk_),target, optional       :: work(:)
+    module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)               :: flag
+      real(psb_spk_), intent(in)                  :: beta 
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      type(psb_desc_type), target                 :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), optional                 :: data
     end subroutine psi_sswapdata_vect
-    module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,info,data,work)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_multivect_type)      :: y
-      real(psb_spk_), intent(in)            :: beta 
-      type(psb_desc_type), target           :: desc_a
-      integer(psb_ipk_), optional           :: data
-      real(psb_spk_),target, optional       :: work(:)
+    module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                   :: flag
+      real(psb_spk_), intent(in)                      :: beta 
+      class(psb_s_base_multivect_type), intent(inout) :: y
+      type(psb_desc_type), target                     :: desc_a
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), optional                     :: data
     end subroutine psi_sswapdata_multivect
   end interface psi_swapdata
 
 
 
   interface psi_swaptran
-    module subroutine psi_sswaptran_vect(flag,beta,y,desc_a,info,data,work)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_vect_type)           :: y
-      real(psb_spk_), intent(in)            :: beta
-      type(psb_desc_type), target           :: desc_a
-      integer(psb_ipk_), optional           :: data
-      real(psb_spk_),target, optional       :: work(:) 
+    module subroutine psi_sswaptran_vect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)               :: flag
+      integer(psb_ipk_), intent(out)              :: info
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      real(psb_spk_), intent(in)                  :: beta
+      type(psb_desc_type), target                 :: desc_a
+      integer(psb_ipk_), optional                 :: data
     end subroutine psi_sswaptran_vect
-    module subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,info,data,work)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_multivect_type)      :: y
-      real(psb_spk_), intent(in)            :: beta
-      type(psb_desc_type), target           :: desc_a
-      integer(psb_ipk_), optional           :: data
-      real(psb_spk_),target, optional       :: work(:) 
+    module subroutine psi_sswaptran_multivect(flag,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                   :: flag
+      class(psb_s_base_multivect_type), intent(inout) :: y
+      real(psb_spk_), intent(in)                      :: beta
+      type(psb_desc_type), target                     :: desc_a
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), optional                     :: data
     end subroutine psi_sswaptran_multivect
     module subroutine psi_stran_vidx_vect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)       :: ctxt
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_vect_type)          :: y
-      real(psb_spk_), intent(in)               :: beta
-      real(psb_spk_), target, optional               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+         & totxch,totsnd,totrcv,info)
+      type(psb_ctxt_type), intent(in)             :: ctxt
+      integer(psb_ipk_), intent(in)               :: flag
+      real(psb_spk_), intent(in)                  :: beta
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_i_base_vect_type), intent(inout)  :: idx
+      integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_stran_vidx_vect
     module subroutine psi_stran_vidx_multivect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)       :: ctxt
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_s_base_multivect_type)      :: y
-      real(psb_spk_), intent(in)               :: beta
-      real(psb_spk_), target, optional               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+         & totxch,totsnd,totrcv,info)
+      type(psb_ctxt_type), intent(in)                 :: ctxt
+      integer(psb_ipk_), intent(in)                   :: flag
+      real(psb_spk_), intent(in)                      :: beta
+      class(psb_s_base_multivect_type), intent(inout) :: y
+      class(psb_i_base_vect_type), intent(inout)      :: idx
+      integer(psb_ipk_), intent(in)                   :: totxch,totsnd, totrcv
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psi_stran_vidx_multivect
   end interface psi_swaptran
 

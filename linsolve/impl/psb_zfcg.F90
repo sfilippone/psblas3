@@ -125,12 +125,11 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
   complex(psb_dpk_) :: alpha, beta, delta, gamma, theta
   real(psb_dpk_) :: derr
   integer(psb_ipk_) ::  i, idx, nc2l, it, itx, istop_, itmax_, itrace_
-  integer(psb_ipk_) :: n_col, naux, err_act
+  integer(psb_ipk_) :: n_col, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
-  complex(psb_dpk_), allocatable, target   :: aux(:)
   complex(psb_dpk_)   :: vres(3)
   character(len=20)           :: name
   type(psb_itconv_type)       :: stopdat
@@ -176,10 +175,6 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name,a_err='psb_chkvect on X/B')
     goto 9999
   end if
-
-  naux=4*n_col
-  allocate(aux(naux), stat=info)
-
 
   if (present(itmax)) then 
     itmax_ = itmax
@@ -234,7 +229,7 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
     ! Apply the preconditioner v=Pr
     ! Compute w = Av  
-    call prec%apply(r,v,desc_a,info,work=aux)  
+    call prec%apply(r,v,desc_a,info)  
     if (info == psb_success_) call psb_spmm(zone,a,v,zzero,w,desc_a,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_internal_error_,name,&
@@ -289,7 +284,7 @@ subroutine psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
       ! Apply the preconditioner v = Pr
       ! Compute w = Av  
-      call prec%apply(r,v,desc_a,info,work=aux)  
+      call prec%apply(r,v,desc_a,info)  
       if (info == psb_success_) call psb_spmm(zone,a,v,zzero,w,desc_a,info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_,name,&

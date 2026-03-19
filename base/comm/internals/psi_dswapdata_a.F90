@@ -97,13 +97,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_mpk_), intent(in)      :: n
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-real(psb_dpk_)         :: y(:,:), beta
-real(psb_dpk_), target :: work(:)
-    type(psb_desc_type),target      :: desc_a
-    integer(psb_ipk_), optional        :: data
+    integer(psb_ipk_), intent(in)     :: flag
+    integer(psb_mpk_), intent(in)     :: n
+    real(psb_dpk_), intent(in)        :: beta
+    real(psb_dpk_), intent(inout)     :: y(:,:)
+    type(psb_desc_type),target        :: desc_a
+    real(psb_dpk_), target            :: work(:)
+    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), optional       :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -165,12 +166,13 @@ real(psb_dpk_), target :: work(:)
 #endif
 
     type(psb_ctxt_type), intent(in) :: ctxt
-    integer(psb_mpk_), intent(in)   :: n
     integer(psb_ipk_), intent(in)   :: flag
+    integer(psb_mpk_), intent(in)   :: n
     integer(psb_ipk_), intent(out)  :: info
-real(psb_dpk_)         :: y(:,:), beta
-real(psb_dpk_), target :: work(:)
-    integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
+    real(psb_dpk_), intent(in)      :: beta
+    real(psb_dpk_), intent(inout)   :: y(:,:)
+    real(psb_dpk_), target          :: work(:)
+    integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd, totrcv
 
     ! locals
 
@@ -565,12 +567,13 @@ real(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    real(psb_dpk_)         :: y(:), beta
-    real(psb_dpk_), target :: work(:)
-    type(psb_desc_type),target      :: desc_a
-    integer(psb_ipk_), optional        :: data
+    integer(psb_ipk_), intent(in)       :: flag
+    real(psb_dpk_), intent(in)          :: beta
+    real(psb_dpk_), intent(inout)       :: y(:)
+    type(psb_desc_type),target          :: desc_a
+    real(psb_dpk_), target              :: work(:)
+    integer(psb_ipk_), intent(out)      :: info
+    integer(psb_ipk_), optional         :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -648,7 +651,8 @@ real(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)   :: flag
     integer(psb_ipk_), intent(out)  :: info
-    real(psb_dpk_)         :: y(:), beta
+    real(psb_dpk_), intent(in)      :: beta
+    real(psb_dpk_), intent(inout)   :: y(:) 
     real(psb_dpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 

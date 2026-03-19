@@ -108,27 +108,25 @@ module psb_c_prec_type
   end interface
 
   interface
-    subroutine psb_c_apply2_vect(prec,x,y,desc_data,info,trans,work)
+    subroutine psb_c_apply2_vect(prec,x,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
-      type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_cprec_type), intent(inout) :: prec
-      type(psb_c_vect_type),intent(inout)  :: x
-      type(psb_c_vect_type),intent(inout)  :: y
-      integer(psb_ipk_), intent(out)                 :: info
-      character(len=1), optional           :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
+      type(psb_desc_type),intent(in)        :: desc_data
+      class(psb_cprec_type), intent(inout)  :: prec
+      type(psb_c_vect_type),intent(inout)   :: x
+      type(psb_c_vect_type),intent(inout)   :: y
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional            :: trans
     end subroutine psb_c_apply2_vect
   end interface
 
   interface
-    subroutine psb_c_apply1_vect(prec,x,desc_data,info,trans,work)
+    subroutine psb_c_apply1_vect(prec,x,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_cprec_type, psb_c_vect_type, psb_spk_
-        type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_cprec_type), intent(inout) :: prec
-      type(psb_c_vect_type),intent(inout)  :: x
-      integer(psb_ipk_), intent(out)                 :: info
-      character(len=1), optional           :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
+      type(psb_desc_type),intent(in)        :: desc_data
+      class(psb_cprec_type), intent(inout)  :: prec
+      type(psb_c_vect_type),intent(inout)   :: x
+      integer(psb_ipk_), intent(out)        :: info
+      character(len=1), optional            :: trans
     end subroutine psb_c_apply1_vect
   end interface
 

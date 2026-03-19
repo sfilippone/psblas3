@@ -77,7 +77,6 @@
 !    beta     - real                  Choose overwrite or sum. 
 !    y        - type(psb_@x@_vect_type) The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -93,7 +92,7 @@ submodule (psi_s_comm_v_mod)  psi_s_swapdata_impl
   use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
 contains
-  module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,info,data,work)
+  module subroutine psi_sswapdata_vect(flag,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -103,13 +102,12 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_s_base_vect_type)           :: y
-    real(psb_spk_), intent(in)            :: beta
-    type(psb_desc_type), target           :: desc_a
-    real(psb_spk_), target, optional      :: work(:)
-    integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    real(psb_spk_), intent(in)                  :: beta
+    type(psb_desc_type), target                 :: desc_a
+    integer(psb_ipk_), optional                 :: data
 
     ! locals
     type(psb_ctxt_type)                   :: ctxt
@@ -127,8 +125,8 @@ contains
     character(len=30)                     :: name
 
 
-    info=psb_success_
-    name='psi_sswapdata_vect'
+    info = psb_success_
+    name = 'psi_sswapdata_vect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
@@ -223,8 +221,8 @@ subroutine psi_sswap_baseline_vect(ctxt,flag,beta,y,idx, &
     type(psb_ctxt_type), intent(in)             :: ctxt
     integer(psb_ipk_), intent(in)               :: flag
     integer(psb_ipk_), intent(out)              :: info
-    class(psb_s_base_vect_type)                 :: y
-    real(psb_spk_)                              :: beta
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    real(psb_spk_), intent(in)                  :: beta
     class(psb_i_base_vect_type), intent(inout)  :: idx
     integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
 
@@ -464,7 +462,7 @@ subroutine psi_sswap_neighbor_topology_vect(ctxt,flag,beta,y,idx, &
   integer(psb_mpk_)                           :: icomm
   integer(psb_ipk_), intent(in)               :: flag
   integer(psb_ipk_), intent(out)              :: info
-  class(psb_s_base_vect_type)                 :: y
+  class(psb_s_base_vect_type), intent(inout)  :: y
   real(psb_spk_), intent(in)                  :: beta
   class(psb_i_base_vect_type), intent(inout)  :: idx
   integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
@@ -620,7 +618,7 @@ end subroutine psi_sswap_neighbor_topology_vect
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,info,data,work)
+  module subroutine psi_sswapdata_multivect(flag,beta,y,desc_a,info,data)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
@@ -629,13 +627,12 @@ end subroutine psi_sswap_neighbor_topology_vect
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_s_base_multivect_type)      :: y
-    real(psb_spk_), intent(in)            :: beta
-    type(psb_desc_type), target           :: desc_a
-    real(psb_spk_), target, optional      :: work(:)
-    integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_ipk_), intent(out)                  :: info
+    class(psb_s_base_multivect_type), intent(inout) :: y
+    real(psb_spk_), intent(in)                      :: beta
+    type(psb_desc_type), target                     :: desc_a
+    integer(psb_ipk_), optional                     :: data
 
     ! locals
     type(psb_ctxt_type)                   :: ctxt

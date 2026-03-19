@@ -51,11 +51,10 @@
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. Default:  'N' 
-!    work(:) -  real,(optional).    Working area.
 !    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
-subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
-     & trans, work, doswap)   
+subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
+     & trans, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmv_vect
   use psi_mod
   implicit none
@@ -66,7 +65,6 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
-  real(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
@@ -74,10 +72,10 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, ib, ip, idx
+       & iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter       :: nb=4
-  real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), pointer :: xp(:), yp(:)
   real(psb_dpk_), allocatable :: xvsave(:)
   character                :: trans_
   character(len=20)        :: name, ch_err
@@ -87,8 +85,8 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), save  :: mv_phase1=-1, mv_phase2=-1, mv_phase3=-1, mv_phase4=-1
   integer(psb_ipk_), save  :: mv_phase11=-1, mv_phase12=-1
 
-  name='psb_dspmv'
-  info=psb_success_
+  name = 'psb_dspmv_vect'
+  info = psb_success_
   call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
@@ -96,7 +94,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -157,37 +155,11 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
 
   if (psb_errstatus_fatal()) then 
-    info=psb_err_from_subroutine_
+    info = psb_err_from_subroutine_
     ch_err='reall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-
-  iwork => null()
-  ! check for presence/size of a work area
-  liwork= 2*ncol
-
-  if (present(work)) then
-    if (size(work) >= liwork) then
-      aliw =.false.
-    else
-      aliw=.true.
-    endif
-  else
-    aliw=.true.
-  end if
-
-  if (aliw) then
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='Allocate'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  else
-    iwork => work
-  endif
 
   if (debug_level >= psb_debug_comp_) &
        & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
@@ -202,14 +174,12 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if (do_timings) call psb_barrier(ctxt)
         if (do_timings) call psb_tic(mv_phase1)
-        if (doswap_) call psi_swapdata(flag=psb_swap_send_, beta=dzero, y=x%v, desc_a=desc_a, &
-          & data=psb_comm_halo_, info=info, work=iwork)
+        if (doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase1)
         if (do_timings) call psb_tic(mv_phase2)          
         call a%ad%spmm(alpha,x%v,beta,y%v,info)
         if (do_timings) call psb_tic(mv_phase3)
-        if (doswap_) call psi_swapdata(flag=psb_swap_recv_, beta=dzero, y=x%v, desc_a=desc_a, &
-          & data=psb_comm_halo_, info=info, work=iwork)
+        if (doswap_) call psi_swapdata(psb_swap_recv_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase3)
         if (do_timings) call psb_tic(mv_phase4)          
         call a%and%spmm(alpha,x%v,done,y%v,info)
@@ -224,8 +194,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         
         if (do_timings) call psb_tic(mv_phase11)          
           if (doswap_) then
-            call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=dzero, y=x%v, desc_a=desc_a, &
-              & data=psb_comm_halo_, info=info, work=iwork)
+            call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_), dzero, x%v, desc_a, info, data=psb_comm_halo_)
           end if
         if (do_timings) call psb_toc(mv_phase11)
         if (do_timings) call psb_tic(mv_phase12)          
@@ -267,10 +236,11 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
 
-     if (doswap_) then
-     call psi_swaptran(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, y=y%v, desc_a=desc_a, info=info, work=iwork)
-    if (info == psb_success_) call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, y=y%v, desc_a=desc_a, &
-    &      data=psb_comm_ovr_, info=info, work=iwork)
+    if (doswap_) then
+      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_), done, y%v, desc_a, info)
+      if (info == psb_success_) then 
+        call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_), done, y%v, desc_a, info, data=psb_comm_ovr_)
+      end if
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
@@ -283,18 +253,6 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
   end if
-
-  if (aliw) deallocate(iwork,stat=info)
-  if (debug_level >= psb_debug_comp_) &
-       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
-  if(info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    ch_err='Deallocate iwork'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then 
@@ -339,7 +297,7 @@ end subroutine psb_dspmv_vect
 !    work(:) -  real,(optional).    Working area.
 !    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
-subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
+subroutine psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmm
   use psi_mod
@@ -370,8 +328,8 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
   logical                          :: aliw, doswap_
   integer(psb_ipk_) :: debug_level, debug_unit
 
-  name='psb_dspmm'
-  info=psb_success_
+  name = 'psb_dspmm'
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
@@ -506,9 +464,9 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     if (doswap_.and.(np>1)) then 
       ib1=min(nb,lik)
       xp => x(iix:lldx,jjx:jjx+ib1-1)
-      if (doswap_)&
-           & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & ib1,dzero,xp,desc_a,iwork,info)
+      if (doswap_) & 
+        & call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+            & ib1,dzero,xp,desc_a,iwork,info)
 
 
       blk: do i=1, lik, nb
@@ -594,18 +552,18 @@ subroutine  psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
+
     if (info == psb_success_) call psi_ovrl_restore(x,xvsave,desc_a,info)
 
-          if (doswap_) then
-            call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=dzero, &
-        &         y=x(:,1:lik), desc_a=desc_a, data=psb_comm_halo_, info=info, work=iwork)
-          end if
-         call psi_swaptran(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, &
-        &        y=y(:,1:ik), desc_a=desc_a, info=info, work=iwork)
-         if (info == psb_success_) then
-           call psi_swapdata(flag=ior(psb_swap_send_,psb_swap_recv_), beta=done, &
-        &         y=y(:,1:ik), desc_a=desc_a, data=psb_comm_ovr_, info=info, work=iwork)
-         end if
+
+  
+    if (doswap_)then
+      ik = lik ! This should not be an issue, we are expecting the values
+      ! to be small, within PSB_IPK
+      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
+           & ik,done,y(:,1:ik),desc_a,iwork,info)
+      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & ik,done,y(:,1:ik),desc_a,iwork,info,data=psb_comm_ovr_)
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
@@ -691,7 +649,7 @@ end subroutine psb_dspmm
 !    work(:) -  real,(optional).    Working area.
 !    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
-subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
+subroutine psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmv
   use psi_mod
@@ -721,8 +679,8 @@ subroutine  psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
   logical                      :: aliw, doswap_
   integer(psb_ipk_) :: debug_level, debug_unit
 
-  name='psb_dspmv'
-  info=psb_success_
+  name = 'psb_dspmv'
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999

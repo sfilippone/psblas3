@@ -30,7 +30,7 @@
 !   
 !    
 !
-! File: psi_dswaptran.F90
+! File: psi_dswaptran_a.F90
 !
 ! Subroutine: psi_dswaptranm
 !   Implements the data exchange among processes. This is similar to Xswapdata, but
@@ -101,13 +101,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_mpk_), intent(in)      :: n
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    real(psb_dpk_)         :: y(:,:), beta
-    real(psb_dpk_), target :: work(:)
-    type(psb_desc_type),target       :: desc_a
-    integer(psb_ipk_), optional         :: data
+    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_mpk_), intent(in)                   :: n
+    real(psb_dpk_), intent(in)                      :: beta
+    real(psb_dpk_), intent(inout)                   :: y(:,:)
+    type(psb_desc_type),target                      :: desc_a
+    real(psb_dpk_), target                          :: work(:)
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_), optional                     :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -149,7 +150,7 @@ contains
       goto 9999
     end if
 
-    call  psi_swaptran(ctxt,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
+    call psi_swaptran(ctxt,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
     if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -174,7 +175,8 @@ contains
     integer(psb_mpk_), intent(in)     :: n
     integer(psb_ipk_), intent(in)     :: flag
     integer(psb_ipk_), intent(out)    :: info
-    real(psb_dpk_)         :: y(:,:), beta
+    real(psb_dpk_), intent(inout)     :: y(:,:)
+    real(psb_dpk_), intent(in)        :: beta
     real(psb_dpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
@@ -579,12 +581,13 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    real(psb_dpk_)         :: y(:), beta
-    real(psb_dpk_), target :: work(:)
-    type(psb_desc_type),target  :: desc_a
-    integer(psb_ipk_), optional    :: data
+    integer(psb_ipk_), intent(in)   :: flag
+    real(psb_dpk_), intent(in)      :: beta
+    real(psb_dpk_), intent(inout)   :: y(:)
+    type(psb_desc_type),target      :: desc_a
+    real(psb_dpk_), target          :: work(:)
+    integer(psb_ipk_), intent(out)  :: info
+    integer(psb_ipk_), optional     :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -659,7 +662,8 @@ contains
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)   :: flag
     integer(psb_ipk_), intent(out)  :: info
-    real(psb_dpk_)         :: y(:), beta
+    real(psb_dpk_), intent(inout)   :: y(:)
+    real(psb_dpk_), intent(in)      :: beta
     real(psb_dpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 

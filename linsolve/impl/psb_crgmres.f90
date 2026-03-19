@@ -124,13 +124,12 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
 ! =   local data
-  complex(psb_spk_), allocatable   :: aux(:)
   complex(psb_spk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
   type(psb_c_vect_type), allocatable :: v(:)
   type(psb_c_vect_type)              :: w, w1, xt
   real(psb_spk_) :: tmp 
   complex(psb_spk_) :: scal, gm, rti, rti1
-  integer(psb_ipk_) ::litmax, naux, it, k, itrace_,&
+  integer(psb_ipk_) ::litmax, it, k, itrace_,&
        & n_row, n_col, nl
   integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
@@ -230,10 +229,6 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   end if
 
 
-  naux=4*n_col 
-  allocate(aux(naux),h(nl+1,nl+1),&
-       &c(nl+1),s(nl+1),rs(nl+1), rst(nl+1),stat=info)
-
   if (info == psb_success_) call psb_geall(v,desc_a,info,n=nl+1)
   if (info == psb_success_) call psb_geall(w,desc_a,info)
   if (info == psb_success_) call psb_geall(w1,desc_a,info)
@@ -266,7 +261,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
     
-    call psb_spmm(-cone,a,x,cone,v(1),desc_a,info,work=aux)
+    call psb_spmm(-cone,a,x,cone,v(1),desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
@@ -301,7 +296,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
 
-    call psb_spmm(-cone,a,x,cone,v(1),desc_a,info,work=aux)
+    call psb_spmm(-cone,a,x,cone,v(1),desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
@@ -358,7 +353,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       itx  = itx + 1
 
       call prec%apply(v(i),w1,desc_a,info)
-      call psb_spmm(cone,a,w1,czero,w,desc_a,info,work=aux)
+      call psb_spmm(cone,a,w1,czero,w,desc_a,info)
       !
 
       do k = 1, i
@@ -397,7 +392,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
         call prec%apply(xt,desc_a,info)
         call psb_geaxpby(cone,x,cone,xt,desc_a,info)
         call psb_geaxpby(cone,b,czero,w1,desc_a,info)
-        call psb_spmm(-cone,a,xt,cone,w1,desc_a,info,work=aux)
+        call psb_spmm(-cone,a,xt,cone,w1,desc_a,info)
         rni = psb_geamax(w1,desc_a,info)
         xni = psb_geamax(xt,desc_a,info)
         errnum = rni
@@ -490,7 +485,6 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   if (info == psb_success_) call psb_gefree(w,desc_a,info)
   if (info == psb_success_) call psb_gefree(w1,desc_a,info)
   if (info == psb_success_) call psb_gefree(xt,desc_a,info)
-  if (info == psb_success_) deallocate(aux,h,c,s,rs,rst, stat=info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)

@@ -75,7 +75,6 @@ subroutine psb_z_apply2_vect(prec,x,y,desc_data,info,trans,work)
   complex(psb_dpk_),intent(inout), optional, target :: work(:)
 
   character     :: trans_
-  complex(psb_dpk_), pointer :: work_(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
@@ -94,36 +93,13 @@ subroutine psb_z_apply2_vect(prec,x,y,desc_data,info,trans,work)
     trans_='N'
   end if
 
-  if (present(work)) then
-    work_ => work
-  else
-    allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='Allocate')
-      goto 9999
-    end if
-
-  end if
-
   if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
 
-  call prec%prec%apply(zone,x,zzero,y,desc_data,info,&
-       & trans=trans_,work=work_)
-
-  if (present(work)) then
-  else
-    deallocate(work_,stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999
-    end if
-  end if
+  call prec%prec%apply(zone,x,zzero,y,desc_data,info,trans=trans_)
 
   call psb_erractionrestore(err_act)
   return
@@ -146,7 +122,6 @@ subroutine psb_z_apply1_vect(prec,x,desc_data,info,trans,work)
 
   type(psb_z_vect_type)       :: ww
   character     :: trans_
-  complex(psb_dpk_), pointer :: work_(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
@@ -165,18 +140,6 @@ subroutine psb_z_apply1_vect(prec,x,desc_data,info,trans,work)
     trans_='N'
   end if
 
-  if (present(work)) then
-    work_ => work
-  else
-    allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='Allocate')
-      goto 9999
-    end if
-
-  end if
-
   if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
@@ -184,19 +147,9 @@ subroutine psb_z_apply1_vect(prec,x,desc_data,info,trans,work)
   end if
 
   call psb_geasb(ww,desc_data,info,mold=x%v,scratch=.true.)
-  if (info == 0) call prec%prec%apply(zone,x,zzero,ww,desc_data,info,&
-       & trans=trans_,work=work_)
+  if (info == 0) call prec%prec%apply(zone,x,zzero,ww,desc_data,info,trans=trans_)
   if (info == 0) call psb_geaxpby(zone,ww,zzero,x,desc_data,info)
   call psb_gefree(ww,desc_data,info)
-  if (present(work)) then
-  else
-    deallocate(work_,stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999
-    end if
-  end if
 
   call psb_erractionrestore(err_act)
   return

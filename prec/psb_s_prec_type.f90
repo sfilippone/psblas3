@@ -108,7 +108,7 @@ module psb_s_prec_type
   end interface
 
   interface
-    subroutine psb_s_apply2_vect(prec,x,y,desc_data,info,trans,work)
+    subroutine psb_s_apply2_vect(prec,x,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_sprec_type, psb_s_vect_type, psb_spk_
       type(psb_desc_type),intent(in)       :: desc_data
       class(psb_sprec_type), intent(inout) :: prec
@@ -116,19 +116,17 @@ module psb_s_prec_type
       type(psb_s_vect_type),intent(inout)  :: y
       integer(psb_ipk_), intent(out)                 :: info
       character(len=1), optional           :: trans
-      real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_apply2_vect
   end interface
 
   interface
-    subroutine psb_s_apply1_vect(prec,x,desc_data,info,trans,work)
+    subroutine psb_s_apply1_vect(prec,x,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_sprec_type, psb_s_vect_type, psb_spk_
         type(psb_desc_type),intent(in)       :: desc_data
       class(psb_sprec_type), intent(inout) :: prec
       type(psb_s_vect_type),intent(inout)  :: x
       integer(psb_ipk_), intent(out)                 :: info
       character(len=1), optional           :: trans
-      real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_apply1_vect
   end interface
 

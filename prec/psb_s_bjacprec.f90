@@ -77,7 +77,7 @@ module psb_s_bjacprec
   end interface
 
   interface
-    subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_s_bjac_prec_type, psb_s_vect_type, psb_spk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_s_bjac_prec_type), intent(inout)  :: prec
@@ -85,8 +85,7 @@ module psb_s_bjacprec
       type(psb_s_vect_type),intent(inout)   :: x
       type(psb_s_vect_type),intent(inout)   :: y
       integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
-      real(psb_spk_),intent(inout), optional, target :: work(:)
+        character(len=1), optional        :: trans
     end subroutine psb_s_bjac_apply_vect
   end interface
 

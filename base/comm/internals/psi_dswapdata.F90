@@ -91,7 +91,7 @@ submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
 contains
-  module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,info,data,work)
+  module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -101,13 +101,12 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_d_base_vect_type)           :: y
-    real(psb_dpk_)                        :: beta
-    type(psb_desc_type), target           :: desc_a
-    real(psb_dpk_), optional, target      :: work(:)
-    integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), intent(in)               :: flag
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    real(psb_dpk_), intent(in)                  :: beta
+    type(psb_desc_type), target                 :: desc_a ! TODO: should this be intent(in)?
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), optional                 :: data
 
     ! locals
     type(psb_ctxt_type)                   :: ctxt
@@ -209,15 +208,15 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)             :: ctxt
-    integer(psb_mpk_)                           :: icomm
     integer(psb_ipk_), intent(in)               :: flag
-    integer(psb_ipk_), intent(out)              :: info
-    class(psb_d_base_vect_type)                 :: y
     real(psb_dpk_), intent(in)                  :: beta
+    class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
-    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
+    integer(psb_ipk_), intent(in)               :: num_neighbors, total_send, total_recv
+    integer(psb_ipk_), intent(out)              :: info
 
     ! locals
+    integer(psb_mpk_)                           :: icomm
     integer(psb_mpk_) :: np, me
     integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
         & iret, nesd, nerv
@@ -449,15 +448,15 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)             :: ctxt
-    integer(psb_mpk_)                           :: icomm
-    integer(psb_ipk_), intent(in)               :: flag
-    integer(psb_ipk_), intent(out)              :: info
-    class(psb_d_base_vect_type)                 :: y
     real(psb_dpk_), intent(in)                  :: beta
+    integer(psb_ipk_), intent(in)               :: flag
+    class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
     integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+    integer(psb_ipk_), intent(out)              :: info
 
     ! locals
+    integer(psb_mpk_)                           :: icomm
     integer(psb_mpk_)                           :: np, me
     integer(psb_mpk_)                           :: iret, p2pstat(mpi_status_size)
     integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
@@ -606,7 +605,7 @@ contains
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,info,data,work)
+  module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,info,data)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
@@ -615,13 +614,12 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_d_base_multivect_type)      :: y
-    real(psb_dpk_)                        :: beta
-    type(psb_desc_type), target           :: desc_a
-    real(psb_dpk_), optional, target      :: work(:)
-    integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), intent(in)                   :: flag
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    real(psb_dpk_), intent(in)                      :: beta
+    type(psb_desc_type), target                     :: desc_a
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_), optional                     :: data
 
     ! local variables used to detect the communication scheme
     logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
@@ -722,16 +720,16 @@ subroutine psi_dswap_baseline_multivect(ctxt,flag,beta,y,comm_indexes, &
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)             :: ctxt
-  integer(psb_mpk_)                           :: icomm
-  integer(psb_ipk_), intent(in)               :: flag
-  integer(psb_ipk_), intent(out)              :: info
-  class(psb_d_base_multivect_type)            :: y
-  real(psb_dpk_), intent(in)                  :: beta
-  class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
-  integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
+  type(psb_ctxt_type), intent(in)                 :: ctxt
+  integer(psb_ipk_), intent(in)                   :: flag
+  real(psb_dpk_), intent(in)                      :: beta
+  class(psb_d_base_multivect_type), intent(inout) :: y
+  class(psb_i_base_vect_type), intent(inout)      :: comm_indexes
+  integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send, total_recv
+  integer(psb_ipk_), intent(out)                  :: info
 
   ! locals
+  integer(psb_mpk_)                           :: icomm
   integer(psb_mpk_)                           :: np, me, nesd, nerv, n
   integer(psb_mpk_)                           :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
   integer(psb_mpk_), allocatable              :: prcid(:)
@@ -964,26 +962,27 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,n
   include 'mpif.h'
 #endif
 
-  type(psb_ctxt_type), intent(in)             :: ctxt
-  integer(psb_mpk_)                           :: icomm
-  integer(psb_ipk_), intent(in)               :: flag
-  integer(psb_ipk_), intent(out)              :: info
-  class(psb_d_base_multivect_type)            :: y
-  real(psb_dpk_), intent(in)                  :: beta
-  class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
-  integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
+  type(psb_ctxt_type), intent(in)                 :: ctxt
+  integer(psb_ipk_), intent(in)                   :: flag
+  real(psb_dpk_), intent(in)                      :: beta
+  class(psb_d_base_multivect_type), intent(inout) :: y
+  class(psb_i_base_vect_type), intent(inout)      :: comm_indexes
+  integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send, total_recv
+  integer(psb_ipk_), intent(out)                  :: info
+
 
   ! locals
-  integer(psb_mpk_)                           :: np, me
-  integer(psb_mpk_)                           :: iret, p2pstat(mpi_status_size)
-  integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
-  logical                                     :: do_start, do_wait
-  logical, parameter                          :: debug = .false.
-  character(len=30)                           :: name
+  integer(psb_mpk_)                               :: icomm
+  integer(psb_mpk_)                               :: np, me
+  integer(psb_mpk_)                               :: iret, p2pstat(mpi_status_size)
+  integer(psb_ipk_)                               :: err_act, topology_total_send, topology_total_recv, buffer_size
+  logical                                         :: do_start, do_wait
+  logical, parameter                              :: debug = .false.
+  character(len=30)                               :: name
 
 
   info = psb_success_
-  name = 'psi_dswap_nbr_vect'
+  name = 'psi_dswap_neighbor_topology_multivect'
   call psb_erractionsave(err_act)
   call psb_info(ctxt,me,np) 
   if (np == -1) then

@@ -30,7 +30,7 @@
 !   
 !    
 !
-! File: psi_sswaptran.F90
+! File: psi_sswaptran_a.F90
 !
 ! Subroutine: psi_sswaptranm
 !   Implements the data exchange among processes. This is similar to Xswapdata, but

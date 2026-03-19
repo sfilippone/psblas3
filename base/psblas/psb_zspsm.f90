@@ -64,10 +64,9 @@
 !                                      the diagonal matrix D.
 !    choice  -  integer(optional).     The kind of update to perform on overlap elements.
 !    d(:)    -  complex, optional      Matrix for diagonal scaling.
-!    work(:) -  complex, optional      Working area.
 ! 
-subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
-     & trans, scale, choice, diag, work)   
+subroutine psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
+     & trans, scale, choice, diag)   
   use psb_base_mod, psb_protect_name => psb_zspsv_vect
   use psi_mod
   implicit none 
@@ -79,7 +78,6 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_desc_type), intent(in)         :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
   type(psb_z_vect_type), intent(inout), optional  :: diag
-  complex(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional         :: trans, scale
   integer(psb_ipk_), intent(in), optional           :: choice
 
@@ -88,23 +86,24 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_) :: np, me, &
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
-       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
+       & m, nrow, ncol, iiy, jjy, idx, ndm
 
   character                :: lscale
   integer(psb_ipk_), parameter       :: nb=4
-  complex(psb_dpk_),pointer :: iwork(:), xp(:), yp(:)
+  complex(psb_dpk_),pointer :: xp(:), yp(:)
   character                :: itrans
   character(len=20)        :: name, ch_err
   logical                  :: aliw
 
-  name='psb_zspsv_vect'
-  info=psb_success_
+  name = 'psb_zspsv_vect'
+  info = psb_success_
   call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+    info = psb_err_internal_error_ 
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
   if (np == -1) then
@@ -159,39 +158,11 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
 
   if (psb_errstatus_fatal()) then 
-    info=psb_err_from_subroutine_
-    ch_err='reall'
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-
-  iwork => null()
-  ! check for presence/size of a work area
-  liwork= 2*ncol
-
-  if (present(work)) then     
-    if (size(work) >= liwork) then 
-      aliw =.false.
-    else 
-      aliw=.true.
-    endif
-  else
-    aliw=.true.
-  end if
-
-  if (aliw) then 
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  else
-    iwork => work
-  endif
-
-  iwork(1)=0.d0
 
   ! Perform local triangular system solve
   if (present(diag)) then 
@@ -208,8 +179,7 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
 
   ! update overlap elements
   if (choice_ > 0) then
-    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-         & zone,y%v,desc_a,iwork,info,data=psb_comm_ovr_)
+    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),zone,y%v,desc_a,info,data=psb_comm_ovr_)
 
 
     if (info == psb_success_) call psi_ovrl_upd(y%v,desc_a,choice_,info)
@@ -218,8 +188,6 @@ subroutine  psb_zspsv_vect(alpha,a,x,beta,y,desc_a,info,&
       goto 9999
     end if
   end if
-
-  if (aliw) deallocate(iwork)
 
   call psb_erractionrestore(err_act)
   return  

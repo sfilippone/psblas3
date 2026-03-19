@@ -78,7 +78,7 @@ module psb_c_base_prec_mod
        & psb_c_base_get_nzeros
 
   abstract interface 
-    subroutine psb_c_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    subroutine psb_c_base_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
       import psb_ipk_, psb_spk_, psb_desc_type, psb_c_vect_type, &
            & psb_c_base_vect_type, psb_cspmat_type, psb_c_base_prec_type,&
            & psb_c_base_sparse_mat
@@ -90,7 +90,6 @@ module psb_c_base_prec_mod
       type(psb_c_vect_type),intent(inout)   :: y
       integer(psb_ipk_), intent(out)                  :: info
       character(len=1), optional            :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
 
     end subroutine psb_c_base_apply_vect
   end interface

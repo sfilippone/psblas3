@@ -71,7 +71,7 @@ subroutine psb_s_map_U2V_a(alpha,x,beta,y,map,info,work)
     nr2   = map%p_desc_V%get_global_rows()
     nc2   = map%p_desc_V%get_local_cols() 
     allocate(yt(nc2),stat=info) 
-    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work=work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work)
     if (info == psb_success_) call psb_csmm(sone,map%mat_U2V,x,szero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_V)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -91,7 +91,7 @@ subroutine psb_s_map_U2V_a(alpha,x,beta,y,map,info,work)
     nc2   = map%desc_V%get_local_cols() 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == psb_success_) call psb_halo(xt,map%desc_U,info,work=work)
+    if (info == psb_success_) call psb_halo(xt,map%desc_U,info,work)
     if (info == psb_success_) call psb_csmm(sone,map%mat_U2V,xt,szero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_V)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -112,14 +112,13 @@ subroutine psb_s_map_U2V_a(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_s_map_U2V_a
 
-subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
+subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_s_map_U2V_v
   implicit none 
   class(psb_slinmap_type), intent(in)   :: map
   real(psb_spk_), intent(in)        :: alpha,beta
   type(psb_s_vect_type), intent(inout) :: x,y
   integer(psb_ipk_), intent(out)                 :: info 
-  real(psb_spk_), optional          :: work(:)
   type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
   type(psb_s_vect_type), target  :: xt, yt
@@ -152,7 +151,7 @@ subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
       call psb_geasb(yt,map%p_desc_V,info,scratch=.true.,mold=x%v)
       pty => yt
     end if
-    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work=work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info)
     if (info == psb_success_) call psb_csmm(sone,map%mat_U2V,x,szero,pty,info)
     if ((info == psb_success_) .and. map%p_desc_V%is_repl().and.(np>1)) then
       yta = pty%get_vect()
@@ -186,7 +185,7 @@ subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     end if
 
     call psb_geaxpby(sone,x,szero,ptx,map%desc_U,info)
-    if (info == psb_success_) call psb_halo(ptx,map%desc_U,info,work=work)
+    if (info == psb_success_) call psb_halo(ptx,map%desc_U,info)
     if (info == psb_success_) call psb_csmm(sone,map%mat_U2V,ptx,szero,pty,info)
     if ((info == psb_success_) .and. map%desc_V%is_repl().and.(np>1)) then
       yta = pty%get_vect()
@@ -254,7 +253,7 @@ subroutine psb_s_map_V2U_a(alpha,x,beta,y,map,info,work)
     nr2   = map%p_desc_U%get_global_rows()
     nc2   = map%p_desc_U%get_local_cols() 
     allocate(yt(nc2),stat=info) 
-    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work=work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work)
     if (info == psb_success_) call psb_csmm(sone,map%mat_V2U,x,szero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_U)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -274,7 +273,7 @@ subroutine psb_s_map_V2U_a(alpha,x,beta,y,map,info,work)
     nc2   = map%desc_U%get_local_cols() 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == psb_success_) call psb_halo(xt,map%desc_V,info,work=work)
+    if (info == psb_success_) call psb_halo(xt,map%desc_V,info,work)
     if (info == psb_success_) call psb_csmm(sone,map%mat_V2U,xt,szero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_U)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -294,14 +293,13 @@ subroutine psb_s_map_V2U_a(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_s_map_V2U_a
 
-subroutine psb_s_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
+subroutine psb_s_map_V2U_v(alpha,x,beta,y,map,info,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_s_map_V2U_v
   implicit none 
   class(psb_slinmap_type), intent(in)   :: map
   real(psb_spk_), intent(in)        :: alpha,beta
   type(psb_s_vect_type), intent(inout) :: x,y
   integer(psb_ipk_), intent(out)                 :: info 
-  real(psb_spk_), optional          :: work(:)
   type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
   type(psb_s_vect_type), target  :: xt, yt
@@ -334,7 +332,7 @@ subroutine psb_s_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
       call psb_geasb(yt,map%p_desc_U,info,scratch=.true.,mold=x%v)
       pty => yt
     end if
-    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work=work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info)
     if (info == psb_success_) call psb_csmm(sone,map%mat_V2U,x,szero,pty,info)
     if ((info == psb_success_) .and. map%p_desc_U%is_repl().and.(np>1)) then
       yta = pty%get_vect()
@@ -369,7 +367,7 @@ subroutine psb_s_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
 
     call psb_geaxpby(sone,x,szero,ptx,map%desc_V,info)
 
-    if (info == psb_success_) call psb_halo(ptx,map%desc_V,info,work=work)
+    if (info == psb_success_) call psb_halo(ptx,map%desc_V,info)
     if (info == psb_success_) call psb_csmm(sone,map%mat_V2U,ptx,szero,pty,info)
     if ((info == psb_success_) .and. map%desc_U%is_repl().and.(np>1)) then
       yta = pty%get_vect()

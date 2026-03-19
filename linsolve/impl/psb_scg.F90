@@ -113,12 +113,12 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err,cond
 ! =   Local data
-  real(psb_spk_), allocatable, target   :: aux(:),td(:),tu(:),eig(:),ewrk(:)
+  real(psb_spk_), allocatable, target   :: td(:),tu(:),eig(:),ewrk(:)
   integer(psb_mpk_), allocatable :: ibl(:), ispl(:), iwrk(:)
   type(psb_s_vect_type), allocatable, target :: wwrk(:)
   type(psb_s_vect_type), pointer  :: q, p, r, z, w
   real(psb_spk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
-  integer(psb_ipk_) :: itmax_, istop_, naux, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, it, itx, itrace_,&
        &  n_col, n_row,err_act, ieg,nspl, istebz
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -171,8 +171,6 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  naux=4*n_col
-  allocate(aux(naux), stat=info)
   if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
   if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)  
   if (info /= psb_success_) then 
@@ -223,7 +221,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
 
     it = 0
     call psb_geaxpby(sone,b,szero,r,desc_a,info)
-    if (info == psb_success_) call psb_spmm(-sone,a,x,sone,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-sone,a,x,sone,r,desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -243,7 +241,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
       it   = it + 1
       itx = itx + 1
 
-      call prec%apply(r,z,desc_a,info,work=aux)
+      call prec%apply(r,z,desc_a,info)
       rho_old = rho
       rho     = psb_gedot(r,z,desc_a,info)
 
@@ -260,7 +258,7 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
         call psb_geaxpby(sone,z,beta,p,desc_a,info)
       end if
 
-      call psb_spmm(sone,a,p,szero,q,desc_a,info,work=aux)
+      call psb_spmm(sone,a,p,szero,q,desc_a,info)
       sigma = psb_gedot(p,q,desc_a,info)
       if (sigma == szero) then
           if (debug_level >= psb_debug_ext_)&
@@ -318,7 +316,6 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(err)) err = derr
 
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
-  if (info == psb_success_) deallocate(aux,stat=info)
   if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999

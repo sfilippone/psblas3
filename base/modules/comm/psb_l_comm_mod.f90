@@ -36,46 +36,42 @@ module psb_l_comm_mod
   use psb_l_multivect_mod, only : psb_l_multivect_type, psb_l_base_multivect_type
 
   interface psb_ovrl
-    subroutine psb_lovrl_vect(x,desc_a,info,work,update,mode)
+    subroutine psb_lovrl_vect(x,desc_a,info,update,mode)
       import
       implicit none
       type(psb_l_vect_type), intent(inout)    :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_lpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: update,mode
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: update,mode
     end subroutine psb_lovrl_vect
-    subroutine psb_lovrl_multivect(x,desc_a,info,work,update,mode)
+    subroutine psb_lovrl_multivect(x,desc_a,info,update,mode)
       import
       implicit none
-      type(psb_l_multivect_type), intent(inout)    :: x
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_lpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: update,mode
+      type(psb_l_multivect_type), intent(inout) :: x
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: update,mode
     end subroutine psb_lovrl_multivect
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine psb_lhalo_vect(x,desc_a,info,work,tran,mode,data)
+    subroutine psb_lhalo_vect(x,desc_a,info,tran,mode,data)
       import
       implicit none
-      type(psb_l_vect_type), intent(inout)   :: x
+      type(psb_l_vect_type), intent(inout)    :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_lpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,data
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_lhalo_vect
-    subroutine psb_lhalo_multivect(x,desc_a,info,work,tran,mode,data)
+    subroutine psb_lhalo_multivect(x,desc_a,info,tran,mode,data)
       import
       implicit none
-      type(psb_l_multivect_type), intent(inout)   :: x
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_lpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,data
-      character, intent(in), optional         :: tran
+      type(psb_l_multivect_type), intent(inout) :: x
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional   :: mode,data
+      character, intent(in), optional           :: tran
     end subroutine psb_lhalo_multivect
   end interface psb_halo
 

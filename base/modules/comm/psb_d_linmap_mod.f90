@@ -73,7 +73,7 @@ module psb_d_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_U2V_a
-    subroutine psb_d_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
+    subroutine psb_d_map_U2V_v(alpha,x,beta,y,map,info,vtx,vty)
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_dpk_, psb_dlinmap_type
       implicit none 
@@ -81,7 +81,6 @@ module psb_d_linmap_mod
       real(psb_dpk_), intent(in)     :: alpha,beta
       type(psb_d_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
-      real(psb_dpk_), optional       :: work(:)
       type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_d_map_U2V_v
   end interface
@@ -97,7 +96,7 @@ module psb_d_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_dpk_), optional       :: work(:)
     end subroutine psb_d_map_V2U_a
-    subroutine psb_d_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
+    subroutine psb_d_map_V2U_v(alpha,x,beta,y,map,info,vtx,vty)
       use psb_d_vect_mod, only : psb_d_vect_type
       import :: psb_ipk_, psb_dpk_, psb_dlinmap_type
       implicit none 
@@ -105,7 +104,6 @@ module psb_d_linmap_mod
       real(psb_dpk_), intent(in)     :: alpha,beta
       type(psb_d_vect_type), intent(inout)  :: x,y
       integer(psb_ipk_), intent(out)           :: info 
-      real(psb_dpk_), optional       :: work(:)
       type(psb_d_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_d_map_V2U_v
   end interface

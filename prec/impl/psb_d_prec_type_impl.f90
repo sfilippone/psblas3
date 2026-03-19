@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -45,7 +45,7 @@
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -62,7 +62,7 @@
 !!$
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
+subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply2_vect
   implicit none
@@ -72,10 +72,8 @@ subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
   type(psb_d_vect_type),intent(inout)  :: y
   integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
-  real(psb_dpk_),intent(inout), optional, target :: work(:)
 
   character     :: trans_
-  real(psb_dpk_), pointer :: work_(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
@@ -94,36 +92,13 @@ subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
     trans_='N'
   end if
 
-  if (present(work)) then
-    work_ => work
-  else
-    allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='Allocate')
-      goto 9999
-    end if
-
-  end if
-
   if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
 
-  call prec%prec%apply(done,x,dzero,y,desc_data,info,&
-       & trans=trans_,work=work_)
-
-  if (present(work)) then
-  else
-    deallocate(work_,stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999
-    end if
-  end if
+  call prec%prec%apply(done,x,dzero,y,desc_data,info,trans=trans_)
 
   call psb_erractionrestore(err_act)
   return
@@ -133,7 +108,7 @@ subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans,work)
 
 end subroutine psb_d_apply2_vect
 
-subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
+subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply1_vect
   implicit none
@@ -142,11 +117,9 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
   type(psb_d_vect_type),intent(inout)  :: x
   integer(psb_ipk_), intent(out)                 :: info
   character(len=1), optional           :: trans
-  real(psb_dpk_),intent(inout), optional, target :: work(:)
 
   type(psb_d_vect_type)       :: ww
   character     :: trans_
-  real(psb_dpk_), pointer :: work_(:)
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
   integer(psb_ipk_) :: err_act
@@ -165,18 +138,6 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
     trans_='N'
   end if
 
-  if (present(work)) then
-    work_ => work
-  else
-    allocate(work_(4*desc_data%get_local_cols()),stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='Allocate')
-      goto 9999
-    end if
-
-  end if
-
   if (.not.allocated(prec%prec)) then
     info = 1124
     call psb_errpush(info,name,a_err="preconditioner")
@@ -184,19 +145,9 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans,work)
   end if
 
   call psb_geasb(ww,desc_data,info,mold=x%v,scratch=.true.)
-  if (info == 0) call prec%prec%apply(done,x,dzero,ww,desc_data,info,&
-       & trans=trans_,work=work_)
+  if (info == 0) call prec%prec%apply(done,x,dzero,ww,desc_data,info,trans=trans_)
   if (info == 0) call psb_geaxpby(done,ww,dzero,x,desc_data,info)
   call psb_gefree(ww,desc_data,info)
-  if (present(work)) then
-  else
-    deallocate(work_,stat=info)
-    if (info /= psb_success_) then
-      info = psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='DeAllocate')
-      goto 9999
-    end if
-  end if
 
   call psb_erractionrestore(err_act)
   return

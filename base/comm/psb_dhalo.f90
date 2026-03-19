@@ -41,7 +41,6 @@
 !   info      -  integer.                      Return code
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
-!   work      -  real(optional).             Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
 !   data     - integer                 Which index list in desc_a should be used
@@ -52,7 +51,7 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
+subroutine psb_dhalo_vect(x,desc_a,info,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalo_vect
   use psi_mod
   implicit none
@@ -60,16 +59,14 @@ subroutine psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   type(psb_d_vect_type), intent(inout)              :: x
   type(psb_desc_type), intent(in)                   :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
-  real(psb_dpk_), target, optional, intent(inout)   :: work(:)
-  integer(psb_ipk_), intent(in), optional           :: mode,data
   character, intent(in), optional                   :: tran
+  integer(psb_ipk_), intent(in), optional           :: mode,data
 
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, iix, jjx, &
-       & nrow, ncol, lldx, imode, liwork,data_
+       & nrow, ncol, lldx, imode,data_
   integer(psb_lpk_) :: m, n, ix, ijx
-  real(psb_dpk_),pointer :: iwork(:)
   character                 :: tran_
   character(len=20)         :: name, ch_err
   logical                   :: aliw
@@ -129,38 +126,12 @@ subroutine psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
     goto 9999
   end if
 
-  liwork=nrow
-  if (present(work)) then
-    if(size(work) >= liwork) then
-      iwork => work
-      aliw=.false.
-    else
-      aliw=.true.
-      allocate(iwork(liwork),stat=info)
-      if(info /= psb_success_) then
-        info=psb_err_from_subroutine_
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    end if
-  else
-    aliw=.true.
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  end if
 
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(flag=imode, info=info, y=x%v, beta=dzero, desc_a=desc_a, &
-     &      data=data_, work=iwork)
+    call psi_swapdata(imode,dzero,x%v,desc_a,info,data=data_)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
-    call psi_swaptran(imode,done,x%v,desc_a,iwork,info)
+    call psi_swaptran(imode,done,x%v,desc_a,info)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
@@ -168,13 +139,10 @@ subroutine psb_dhalo_vect(x,desc_a,info,work,tran,mode,data)
   end if
 
   if (info /= psb_success_) then
-    ch_err='PSI_swapdata'
+    ch_err = 'PSI_swapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
-
-  if (aliw) deallocate(iwork)
-  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  
@@ -195,7 +163,6 @@ end subroutine psb_dhalo_vect
 !   info      -  integer.                      Return code
 !   jx        -  integer(optional).            The starting column of the global matrix. 
 !   ik        -  integer(optional).            The number of columns to gather. 
-!   work      -  real(optional).             Work  area.
 !   tran      -  character(optional).          Transpose exchange.
 !   mode      -  integer(optional).            Communication mode (see Swapdata)
 !   data     - integer                 Which index list in desc_a should be used
@@ -206,36 +173,34 @@ end subroutine psb_dhalo_vect
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
+subroutine psb_dhalo_multivect(x,desc_a,info,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalo_multivect
   use psi_mod
   implicit none
 
-  type(psb_d_multivect_type), intent(inout)    :: x
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer(psb_ipk_), intent(out)                    :: info
-  real(psb_dpk_), target, optional, intent(inout)  :: work(:)
-  integer(psb_ipk_), intent(in), optional           :: mode,data
-  character, intent(in), optional         :: tran
+  type(psb_d_multivect_type), intent(inout)       :: x
+  type(psb_desc_type), intent(in)                 :: desc_a
+  integer(psb_ipk_), intent(out)                  :: info
+  character, intent(in), optional                 :: tran
+  integer(psb_ipk_), intent(in), optional         :: mode,data
 
   ! locals
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me, err_act, iix, jjx, &
-       & nrow, ncol, lldx, imode, liwork,data_
+       & nrow, ncol, lldx, imode, data_
   integer(psb_lpk_) :: m, n, ix, ijx
-  real(psb_dpk_),pointer :: iwork(:)
   character                 :: tran_
   character(len=20)         :: name, ch_err
   logical                   :: aliw
 
-  name='psb_dhalov'
-  info=psb_success_
+  name = 'psb_dhalo_multivect'
+  info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ctxt, me, np)
@@ -284,38 +249,11 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
     goto 9999
   end if
 
-  liwork=nrow
-  if (present(work)) then
-    if(size(work) >= liwork) then
-      iwork => work
-      aliw=.false.
-    else
-      aliw=.true.
-      allocate(iwork(liwork),stat=info)
-      if(info /= psb_success_) then
-        info=psb_err_from_subroutine_
-        ch_err='psb_realloc'
-        call psb_errpush(info,name,a_err=ch_err)
-        goto 9999
-      end if
-    end if
-  else
-    aliw=.true.
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  end if
-
   ! exchange halo elements
   if(tran_ == 'N') then
-    call psi_swapdata(flag=imode, info=info, y=x%v, beta=dzero, desc_a=desc_a, data=data_, work=iwork)
+    call psi_swapdata(imode,dzero,x%v,desc_a,info,data=data_)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
-    call psi_swaptran(imode,done,x%v,&
-         & desc_a,iwork,info)
+    call psi_swaptran(imode,done,x%v,desc_a,info)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
@@ -327,9 +265,6 @@ subroutine  psb_dhalo_multivect(x,desc_a,info,work,tran,mode,data)
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if
-
-  if (aliw) deallocate(iwork)
-  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   return  

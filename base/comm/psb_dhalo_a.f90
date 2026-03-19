@@ -52,7 +52,7 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_dhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
+subroutine psb_dhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalom
   use psi_mod
   implicit none

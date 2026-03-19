@@ -71,7 +71,7 @@ subroutine psb_d_bjac_dump(prec,info,prefix,head)
 
 end subroutine psb_d_bjac_dump
 
-subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
   use psb_base_mod
   use psb_d_bjacprec, psb_protect_name => psb_d_bjac_apply_vect
   implicit none
@@ -82,11 +82,10 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   type(psb_d_vect_type),intent(inout)   :: y
   integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
-  real(psb_dpk_),intent(inout), optional, target :: work(:)
 
   ! Local variables
   integer(psb_ipk_) :: n_row,n_col
-  real(psb_dpk_), pointer :: ww(:), aux(:)
+  real(psb_dpk_), pointer :: ww(:)
   type(psb_d_vect_type) :: wv, wv1
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me
@@ -140,17 +139,7 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   end if
 
 
-  if (n_col <= size(work)) then
-    ww => work(1:n_col)
-    if ((4*n_col+n_col) <= size(work)) then
-      aux => work(n_col+1:)
-    else
-      allocate(aux(4*n_col),stat=info)
-
-    endif
-  else
-    allocate(ww(n_col),aux(4*n_col),stat=info)
-  endif
+  allocate(ww(n_col),stat=info)
 
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -168,28 +157,28 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       select case(trans_)
       case('N')
         call psb_spsm(done,prec%av(psb_l_pr_),x,dzero,wv,desc_data,info,&
-             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_,work=aux)
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_)
         if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),wv,&
              & beta,y,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_, work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
       case('T')
         call psb_spsm(done,prec%av(psb_u_pr_),x,dzero,wv,desc_data,info,&
-             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_)
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
              & beta,y,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
       case('C')
 
         call psb_spsm(done,prec%av(psb_u_pr_),x,dzero,wv,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_, work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
         call wv1%mlt(done,prec%dv,wv,dzero,info,conjgx=trans_)
 
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
              & beta,y,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
       end select
       if (info /= psb_success_) then
@@ -203,20 +192,20 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       select case(trans_)
       case('N')
         call psb_spmm(done,prec%av(psb_l_pr_),x,dzero,wv,desc_data,info,&
-             & trans=trans_,work=aux,doswap=.false.)
+             & trans=trans_,doswap=.false.)
 
         if (info == psb_success_) call wv1%mlt(done,prec%dv,wv,dzero,info)
         if(info == psb_success_) &
              & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1,&
-             & beta,y,desc_data,info, trans=trans_, work=aux,doswap=.false.)
+             & beta,y,desc_data,info, trans=trans_,doswap=.false.)
 
        case('T','C')
          call psb_spmm(done,prec%av(psb_l_pr_),x,dzero,wv,desc_data,info,&
-              & trans=trans_,work=aux,doswap=.false.)
+              & trans=trans_,doswap=.false.)
          if (info == psb_success_) call wv1%mlt(done,prec%dv,wv,dzero,info)
          if (info == psb_success_) &
               & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1, &
-              & beta,y,desc_data,info,trans=trans_,work=aux,doswap=.false.)
+              & beta,y,desc_data,info,trans=trans_,doswap=.false.)
 
       end select
       if (info /= psb_success_) then
@@ -234,16 +223,7 @@ subroutine psb_d_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
   call psb_halo(y,desc_data,info,data=psb_comm_mov_)
 
-  if (do_alloc_wrk) call prec%free_wrk(info)
-  if (n_col <= size(work)) then
-    if ((4*n_col+n_col) <= size(work)) then
-    else
-      deallocate(aux)
-    endif
-  else
-    deallocate(ww,aux)
-  endif
-
+  deallocate(ww)
 
   call psb_erractionrestore(err_act)
   return
@@ -350,7 +330,7 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
     select case(trans_)
     case('N')
       call psb_spsm(done,prec%av(psb_l_pr_),x,dzero,ww,desc_data,info,&
-           & trans=trans_,scale='L',diag=prec%dv%v%v,choice=psb_none_,work=aux)
+           & trans=trans_,scale='L',diag=prec%dv%v%v,choice=psb_none_, work=aux)
       if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),ww,&
            & beta,y,desc_data,info,&
            & trans=trans_,scale='U',choice=psb_none_, work=aux)
@@ -360,7 +340,7 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
            & trans=trans_,scale='L',diag=prec%dv%v%v,choice=psb_none_, work=aux)
       if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,&
            & beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+           & trans=trans_,scale='U',choice=psb_none_, work=aux)
 
     case('C')
 
@@ -369,7 +349,7 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
       ww(1:n_row) = ww(1:n_row)*(prec%dv%v%v(1:n_row))
       if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),ww,&
            & beta,y,desc_data,info,&
-           & trans=trans_,scale='U',choice=psb_none_,work=aux)
+           & trans=trans_,scale='U',choice=psb_none_, work=aux)
 
     end select
     if (info /= psb_success_) then
@@ -384,27 +364,26 @@ subroutine psb_d_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
 
       case('N')
         call psb_spmm(done,prec%av(psb_l_pr_),x,dzero,ww,desc_data,info,&
-            & trans=trans_,work=aux,doswap=.false.)
+            & trans=trans_,doswap=.false., work=aux)
         ww(1:n_row) = ww(1:n_row) * prec%dv%v%v(1:n_row)
         if (info == psb_success_) &
             & call psb_spmm(alpha,prec%av(psb_u_pr_),ww,beta,y,desc_data,info,&
-            & trans=trans_,work=aux,doswap=.false.)
+            & trans=trans_,doswap=.false., work=aux)
 
       case('T')
         call psb_spmm(done,prec%av(psb_u_pr_),x,dzero,ww,desc_data,info,&
-            & trans=trans_,work=aux,doswap=.false.)
+            & trans=trans_,doswap=.false., work=aux)
         ww(1:n_row) = ww(1:n_row) * prec%dv%v%v(1:n_row)
         if (info == psb_success_) &
             & call psb_spmm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
-            & trans=trans_,work=aux,doswap=.false.)
-
+            & trans=trans_,doswap=.false., work=aux)
       case('C')
         call psb_spmm(done,prec%av(psb_u_pr_),x,dzero,ww,desc_data,info,&
-             & trans=trans_,work=aux,doswap=.false.)
+             & trans=trans_,doswap=.false., work=aux)
         ww(1:n_row) = ww(1:n_row) * (prec%dv%v%v(1:n_row))
         if (info == psb_success_) &
              & call psb_spmm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
-             & trans=trans_,work=aux,doswap=.false.)
+             & trans=trans_,doswap=.false., work=aux)
 
     end select
 

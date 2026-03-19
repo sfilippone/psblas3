@@ -52,7 +52,7 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_ehalom(x,desc_a,info,jx,ik,work,tran,mode,data)
+subroutine psb_ehalom(x,desc_a,info,jx,ik,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_ehalom
   use psi_mod
   implicit none
@@ -174,7 +174,7 @@ subroutine  psb_ehalom(x,desc_a,info,jx,ik,work,tran,mode,data)
          & desc_a,iwork,info,data=data_)
   else if((tran_ == 'T').or.(tran_ == 'C')) then
     call psi_swaptran(imode,k,eone,xp,&
-         &desc_a,iwork,info)
+         & desc_a,iwork,info)
   else
     info = psb_err_internal_error_
     call psb_errpush(info,name,a_err='invalid tran')
@@ -254,7 +254,7 @@ end subroutine psb_ehalom
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_ehalov(x,desc_a,info,work,tran,mode,data)
+subroutine psb_ehalov(x,desc_a,info,work,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_ehalov
   use psi_mod
   implicit none
