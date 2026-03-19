@@ -302,8 +302,9 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_invalid_cd_state_=1122
   integer(psb_ipk_), parameter, public :: psb_err_invalid_a_and_cd_state_=1123
   integer(psb_ipk_), parameter, public :: psb_err_invalid_vect_state_=1124
-  integer(psb_ipk_), parameter, public :: psb_err_invalid_mvect_state_=1125
-  integer(psb_ipk_), parameter, public :: psb_err_invalid_mvect_size_=1126
+  integer(psb_ipk_), parameter, public :: psb_err_invalid_vect_size_=1125
+  integer(psb_ipk_), parameter, public :: psb_err_invalid_mvect_state_=1126
+  integer(psb_ipk_), parameter, public :: psb_err_invalid_mvect_size_=1127
   integer(psb_ipk_), parameter, public :: psb_err_context_error_=2010
   integer(psb_ipk_), parameter, public :: psb_err_initerror_neugh_procs_=2011
   integer(psb_ipk_), parameter, public :: psb_err_invalid_matrix_input_state_=2231
