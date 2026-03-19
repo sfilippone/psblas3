@@ -7,7 +7,7 @@
 
 
 Make.inc	export-ignore
-config 		export-ignore
+config/		export-ignore
 configure.ac	export-ignore
 config.log      export-ignore
 config.status	export-ignore
