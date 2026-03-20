@@ -550,37 +550,19 @@ set(CMAKE_EXTRA_INCLUDE_FILES "")
 
 # Mismatch Logic Below 
 if(LPK_SIZE STREQUAL "4" AND METIS_INDEX EQUAL 64)
-    message(WARNING "Mismatch: Metis is 64-bit but PSBLAS LPK is 32-bit")
+    message(WARNING "Mismatch: Metis IDX  is 64-bit but PSBLAS LPK is 32-bit")
     set(METIS_FOUND FALSE)
-    set(CREALMETIS "") 
-endif()
-
-if(LPK_SIZE STREQUAL "8" AND METIS_INDEX EQUAL 32)
-    set(METIS_FOUND FALSE) 
     set(CREALMETIS "")
-    message(WARNING "Mismatch: Metis is 32-bit but PSBLAS LPK is 64-bit")
+    set(CINTMETIS "") 
+elseif(LPK_SIZE STREQUAL "8" AND METIS_INDEX EQUAL 32)
+    set(METIS_FOUND FALSE) 
+    message(WARNING "Mismatch: Metis IDX is 32-bit but PSBLAS LPK is    64-bit")
+    set(CREALMETIS "")
+    set(CINTMETIS "") 
 endif() 
- 
-#[=====[ 
 
-   # Check conditions for LPK_SIZE and METIS_INDEX
-  if(LPK_SIZE STREQUAL "4")
-    if(METIS_INDEX STREQUAL "64")
-        # Mismatch between METIS size and PSBLAS LPK
-      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    set(METIS_FOUND  FALSE)  
-    endif()
-  endif()
 
-  if(LPK_SIZE STREQUAL "8")
-    if(METIS_INDEX STREQUAL "32")
-        # Mismatch between METIS size and PSBLAS LPK
-            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    set(METIS_FOUND  FALSE)
-    endif()
-  endif()
-#]=====]
- if(METIS_FOUND)
+if(METIS_FOUND)
 
     # Make sure this path is correct
   set(METISINCFILE "metis.h")  # Adjust this to your actual path
@@ -599,7 +581,7 @@ endif()
 
    
   set(CHAVEMETIS "#define PSB_HAVE_METIS")
-  set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
+#  set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
 #  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
   # Configure the header file
   configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
