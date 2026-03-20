@@ -516,7 +516,20 @@ set(CMAKE_EXTRA_INCLUDE_FILES "${METIS_INCLUDES}/metis.h")
 # 2. Check the size of Metis's own type: real_t
 # This replaces checking 'float' and 'double' separately
 check_type_size("real_t" METIS_REAL_SIZE)
+check_type_size("idx_t" METIS_IDX_SIZE)
 
+# 3. Handle the result
+if(METIS_IDX_SIZE)
+    if(METIS_IDX_SIZE EQUAL 4)
+        set(CINTMETIS "#define PSB_METIS_32")
+        message(STATUS "Metis detected as 32-bit (idx_t is 4 bytes)")
+    elseif(METIS_IDX_SIZE EQUAL 8)
+        set(CINTMETIS "#define PSB_METIS_64")
+        message(STATUS "Metis detected as 64-bit (idx_t is 8 bytes)")
+    endif()
+else()
+    message(WARNING "Could not determine size of idx_t from metis.h. Check METIS_INCLUDES.")
+endif()
 # 3. Handle the result
 if(METIS_REAL_SIZE)
     if(METIS_REAL_SIZE EQUAL 4)
