@@ -7,7 +7,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, itmax, iter, err, 
 
   implicit none
   type(psb_dspmat_type), intent(in)     :: a
-  type(psb_dprec_type), intent(inout)   :: prec
+  class(psb_dprec_type), intent(inout)  :: prec
   type(psb_d_vect_type), intent(inout)  :: b, x
   integer(psb_ipk_), intent(in)         :: s
   real(psb_dpk_), intent(in)            :: eps

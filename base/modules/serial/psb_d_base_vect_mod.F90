@@ -4008,7 +4008,7 @@ contains
 
     ncx = x%get_ncols()
 
-    call dgemv('T', ncx, nrx, done, x%v, nrx, y%v, 1, dzero, res, 1)
+    call dgemv('T', nrx, ncx, done, x%v, nrx, y%v, 1, dzero, res, 1)
   end subroutine d_base_mvect_dot_mv
 
 
