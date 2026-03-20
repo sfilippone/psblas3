@@ -1,0 +1,36 @@
+*.a             export-ignore
+*.o             export-ignore
+*.mod           export-ignore
+*.smod          export-ignore
+*~              export-ignore
+.git*		export-ignore
+rsb		export-ignore
+rsb/		export-ignore
+rsb/**		export-ignore
+
+
+Make.inc	export-ignore
+config		export-ignore
+config/		export-ignore
+config/**	export-ignore
+configure.ac	export-ignore
+config.log      export-ignore
+config.status	export-ignore
+aclocal.m4  	export-ignore
+autogen.sh	export-ignore
+autom4te.cache	export-ignore
+Dockerfile	export-ignore
+.travis.yml	export-ignore
+# generated folder
+./include/**	export-ignore
+./modules/**	export-ignore
+docs/src	export-ignore
+docs/doxypsb	export-ignore
+docs/Makefile	export-ignore
+
+# the executable from tests
+test/computational_routines	export-ignore
+test/computational_routines	export-ignore
+test/omp			export-ignore
+test/openacc			export-ignore
+test/torture			export-ignore
