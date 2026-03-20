@@ -426,8 +426,6 @@ contains
     integer(psb_ipk_), intent(out)              :: info
     logical, intent(in), optional               :: clear
     logical :: clear_
-  
-    info = 0
 
     if (present(clear)) then
       clear_ = clear

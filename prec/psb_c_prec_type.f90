@@ -85,7 +85,7 @@ module psb_c_prec_type
            & psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type, &
            & psb_cprec_type, psb_i_base_vect_type
       implicit none
-      type(psb_cspmat_type), intent(in), target    :: a
+      type(psb_cspmat_type), intent(inout), target :: a
       type(psb_desc_type), intent(inout), target     :: desc_a
       class(psb_cprec_type), intent(inout), target :: prec
       integer(psb_ipk_), intent(out)               :: info
