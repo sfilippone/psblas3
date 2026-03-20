@@ -434,6 +434,7 @@ contains
     logical, intent(in), optional               :: clear
     logical :: clear_
 
+    info =  0
     if (present(clear)) then
       clear_ = clear
     else
@@ -2907,6 +2908,7 @@ contains
     class(psb_s_base_multivect_type), intent(out)    :: x
     integer(psb_ipk_), intent(out)              :: info
 
+    info = 0
     if (allocated(x%v)) then 
       call x%sync()
       x%v(:,:) = szero
