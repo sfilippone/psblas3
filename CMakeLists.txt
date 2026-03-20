@@ -523,9 +523,11 @@ if(METIS_IDX_SIZE)
     if(METIS_IDX_SIZE EQUAL 4)
         set(CINTMETIS "#define PSB_METIS_32")
         message(STATUS "Metis detected as 32-bit (idx_t is 4 bytes)")
+	set(METIS_INDEX 32)
     elseif(METIS_IDX_SIZE EQUAL 8)
         set(CINTMETIS "#define PSB_METIS_64")
         message(STATUS "Metis detected as 64-bit (idx_t is 8 bytes)")
+        set(METIS_INDEX 64)	
     endif()
 else()
     message(WARNING "Could not determine size of idx_t from metis.h. Check METIS_INCLUDES.")
@@ -560,19 +562,6 @@ if(LPK_SIZE STREQUAL "8" AND METIS_INDEX EQUAL 32)
 endif() 
  
 #[=====[ 
-  # Determine METIS_INDEX based on real type sizes
- if(METIS_IDX_SIZE EQUAL 4)
-
-    set(METIS_INDEX 32)
-    message(WARNING "Metis 32: ${METIS_INDEX}")
-  elseif(METIS_IDX_SIZE EQUAL 8)
-    set(METIS_INDEX 64)
-    message(STATUS "Metis 64: ${METIS_INDEX}")
-  else()
-    message(STATUS "Neither METIS_REAL_32 nor METIS_REAL_64 is defined.")
-    set(METIS_INDEX 64)  # Default to 64 if not defined
-  endif()
-
 
    # Check conditions for LPK_SIZE and METIS_INDEX
   if(LPK_SIZE STREQUAL "4")
