@@ -533,11 +533,9 @@ endif()
 # 3. Handle the result
 if(METIS_REAL_SIZE)
     if(METIS_REAL_SIZE EQUAL 4)
-        set(METIS_INDEX 32)
         set(CREALMETIS "#define PSB_METIS_REAL_32")
         message(STATUS "Metis detected as 32-bit (real_t is 4 bytes)")
     elseif(METIS_REAL_SIZE EQUAL 8)
-        set(METIS_INDEX 64)
         set(CREALMETIS "#define PSB_METIS_REAL_64")
         message(STATUS "Metis detected as 64-bit (real_t is 8 bytes)")
     endif()
@@ -563,10 +561,11 @@ endif()
  
 #[=====[ 
   # Determine METIS_INDEX based on real type sizes
-  if(DEFINED PSB_METIS_REAL_32)
+ if(METIS_IDX_SIZE EQUAL 4)
+
     set(METIS_INDEX 32)
     message(WARNING "Metis 32: ${METIS_INDEX}")
-  elseif(DEFINED PSB_METIS_REAL_64)
+  elseif(METIS_IDX_SIZE EQUAL 8)
     set(METIS_INDEX 64)
     message(STATUS "Metis 64: ${METIS_INDEX}")
   else()
