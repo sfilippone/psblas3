@@ -15,7 +15,7 @@ LIBNAME=$(METHDLIBNAME)
 
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 
-objs: mods $(OBJS)  impld
+objs: mods $(OBJS) impld
 
 mods: $(MODOBJS)
 	$(INSTALL) -p $(CPUPDFLAG) *$(.mod) $(MODDIR)

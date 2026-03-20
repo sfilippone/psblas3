@@ -3,10 +3,11 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, itmax, iter, err, 
   use psb_prec_mod
   use psb_d_linsolve_conv_mod
   use psb_linsolve_mod
+  use psb_pMPK_mod
 
   implicit none
   type(psb_dspmat_type), intent(in)     :: a
-  type(psb_dprec_type), intent(inout)  :: prec
+  type(psb_dprec_type), intent(inout)   :: prec
   type(psb_d_vect_type), intent(inout)  :: b, x
   integer(psb_ipk_), intent(in)         :: s
   real(psb_dpk_), intent(in)            :: eps
@@ -186,11 +187,11 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, itmax, iter, err, 
     ! Solve for beta
     call dgetrs('N', s, 1, W, s, pW, -beta, s, info)
 
-    ! Update P and V. Use of temp in needed because dgemm internal constraint
+    ! Update P and V. Use of temp in needed because internal dgemm constraint
     call psb_geaxpby(P, beta, temp, desc_a, info, .false.)
-    call psb_geaxpby(done, Z, done, temp, P, desc_a, info)  !TO DO: axpby mv 2 term with output
+    call psb_geaxpby(done, Z, done, temp, P, desc_a, info)
     call psb_geaxpby(V, beta, temp, desc_a, info, .false.)
-    call psb_geaxpby(done, Q, done, temp, V, desc_a, info)  !TO DO: axpby mv 2 term with output
+    call psb_geaxpby(done, Q, done, temp, V, desc_a, info)
   end do
 
   call psb_end_conv(methdname, itidx, desc_a, stopdat, info, derr, iter)

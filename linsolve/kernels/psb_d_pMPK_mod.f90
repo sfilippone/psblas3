@@ -8,7 +8,7 @@ module psb_d_pMPK_mod
                         & psb_ipk_, psb_dpk_, psb_desc_type 
             implicit none
             type(psb_dspmat_type), intent(in)           :: spmat
-            class(psb_dprec_type), intent(in)           :: prec
+            class(psb_dprec_type), intent(inout)        :: prec
             type(psb_d_vect_type), intent(inout)        :: vec_in
             type(psb_d_multivect_type), intent(inout)   :: mvec_out
             integer(psb_ipk_), intent(in)               :: s
@@ -23,7 +23,7 @@ module psb_d_pMPK_mod
                         & psb_ipk_, psb_dpk_, psb_desc_type 
             implicit none
             type(psb_dspmat_type), intent(in)           :: spmat
-            class(psb_dprec_type), intent(in)           :: prec
+            class(psb_dprec_type), intent(inout)        :: prec
             type(psb_d_vect_type), intent(inout)        :: vec_in
             type(psb_d_multivect_type), intent(inout)   :: Z, Q
             integer(psb_ipk_), intent(in)               :: s
