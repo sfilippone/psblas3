@@ -444,6 +444,14 @@ Module psb_z_tools_mod
       integer(psb_ipk_), intent(out)         :: info
       complex(psb_dpk_)                        :: res
     end function
+    function psb_z_getmatelem(a,rowindex,colindex,desc_a,info) result(res)
+      import
+      type(psb_zspmat_type), intent(inout)   :: a
+      integer(psb_lpk_), intent(in)          :: rowindex, colindex
+      type(psb_desc_type), intent(inout)     :: desc_a
+      integer(psb_ipk_), intent(out)         :: info
+      complex(psb_dpk_)                        :: res
+    end function
   end interface
 
   interface psb_remap
