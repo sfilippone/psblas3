@@ -3921,7 +3921,8 @@ contains
       return
     end if
 
-    call dgemv('N', m, nc, done, x%v, m, coeff, 1, beta, y%v, 1)
+    ! BUG? Why ONLY here needs size as leading dimension?
+    call dgemv('N', m, nc, done, x%v, size(x%v, 1), coeff, 1, beta, y%v, 1)
 
   end subroutine d_base_mvect_colspan1D
 
@@ -3949,7 +3950,8 @@ contains
       return
     end if
 
-    call dgemm('N', 'N', m, nco, nci, done, x%v, m, coeff, nci, beta, y%v, m)
+    ! BUG? Why ONLY here needs size as leading dimension?
+    call dgemm('N', 'N', m, nco, nci, done, x%v, size(x%v, 1), coeff, nci, beta, y%v, size(y%v, 1))
   end subroutine d_base_mvect_colspan2D
 
   subroutine d_base_mvect_dot_mm(m, x, y, res, info)

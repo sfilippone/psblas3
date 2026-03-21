@@ -161,12 +161,12 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, itmax, iter, err, 
 
   ! Loop until convergence (or maxiter)
   do itidx = 1, itmax_
-    ! Compute matrix W and factor matrix W
-    call psb_gedots(P, V, W, desc_a, info)
+    ! Compute and factor matrix W
+    call psb_gedots(P, V, W, desc_a, info, .true.)
     call dgetrf(s, s, W, s, pW, info)
 
     ! Compute rhs for alpha
-    call psb_gedots(P, r, alpha, desc_a, info)
+    call psb_gedots(P, r, alpha, desc_a, info, .true.)
 
     ! Solve for alpha
     call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
@@ -177,15 +177,16 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, itmax, iter, err, 
 
     ! Check convergence. 
     if(psb_check_conv(methdname, itidx, x, r, desc_a, stopdat, info)) exit
-
+    
     ! Matrix power kernel
     call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info)
 
     ! Compute rhs for beta
-    call psb_gedots(P, Q, beta, desc_a, info)
+    call psb_gedots(P, Q, beta, desc_a, info, .true.)
 
     ! Solve for beta
-    call dgetrs('N', s, 1, W, s, pW, -beta, s, info)
+    beta = -beta;
+    call dgetrs('N', s, s, W, s, pW, beta, s, info)
 
     ! Update P and V. Use of temp in needed because internal dgemm constraint
     call psb_geaxpby(P, beta, temp, desc_a, info, .false.)

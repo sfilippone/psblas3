@@ -1274,9 +1274,7 @@ subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
-
 end subroutine psb_daxpby_vect_out
 
 !
@@ -1396,7 +1394,6 @@ subroutine psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
 end subroutine psb_daxpby
 
@@ -1520,7 +1517,6 @@ subroutine psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
 end subroutine psb_daxpbyv
 
@@ -1651,7 +1647,6 @@ subroutine psb_daxpbyvout(alpha, x, beta,y, z, desc_a, info)
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
 end subroutine psb_daxpbyvout
 
@@ -1737,9 +1732,7 @@ subroutine psb_daddconst_vect(x,b,z,desc_a,info)
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
-
 end subroutine psb_daddconst_vect
 
 
@@ -1819,8 +1812,6 @@ subroutine psb_d_upd_xyz_vect(alpha, beta, gamma, delta, x, y, z,&
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
-
 end subroutine psb_d_upd_xyz_vect
 
