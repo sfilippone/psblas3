@@ -109,18 +109,17 @@ contains
     integer(psb_ipk_), optional                 :: data
 
     ! locals
-    type(psb_ctxt_type)                   :: ctxt
-    integer(psb_ipk_)                     :: np, me, total_send, total_recv, num_neighbors, data_, err_act
-    class(psb_i_base_vect_type), pointer  :: comm_indexes
+    type(psb_ctxt_type)                         :: ctxt
+    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer        :: comm_indexes
 
     ! local variables used to detect the communication scheme
-    logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
-    logical                               :: baseline, neighbor_a2av
+    logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                                     :: baseline, neighbor_a2av
 
     ! error handling variables
-    integer(psb_ipk_)                     :: err_act
-    integer(psb_mpk_)                     :: me, np
-    character(len=30)                     :: name
+    integer(psb_ipk_)                           :: err_act
+    character(len=30)                           :: name
 
     info = psb_success_
     name = 'psi_dswapdata_vect'
@@ -448,8 +447,8 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)             :: ctxt
-    real(psb_dpk_), intent(in)                  :: beta
     integer(psb_ipk_), intent(in)               :: flag
+    real(psb_dpk_), intent(in)                  :: beta
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
     integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
@@ -466,7 +465,7 @@ contains
 
 
     info = psb_success_
-    name = 'psi_dswap_nbr_vect'
+    name = 'psi_dswap_neighbor_topology_vect'
     call psb_erractionsave(err_act)
     call psb_info(ctxt,me,np) 
     if (np == -1) then
@@ -622,16 +621,17 @@ contains
     integer(psb_ipk_), optional                     :: data
 
     ! local variables used to detect the communication scheme
-    logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
-    logical                               :: baseline, neighbor_a2av
+    logical                                       :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                                       :: baseline, neighbor_a2av
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, total_send, total_recv, num_neighbors, data_, err_act
-    class(psb_i_base_vect_type), pointer :: comm_indexes
-    character(len=30)  :: name
+    type(psb_ctxt_type)                             :: ctxt
+    integer(psb_mpk_)                               :: icomm
+    integer(psb_ipk_)                               :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer            :: comm_indexes
+    character(len=30)                               :: name
 
+    
     info = psb_success_
     name = 'psi_dswapdata_multivect'
     call psb_erractionsave(err_act)

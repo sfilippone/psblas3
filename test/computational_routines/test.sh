@@ -39,35 +39,35 @@ echo -e "${BLUE}[INFO]\t  Starting environment check for required modules...${RE
 
 
 # Check and load required modules
-required_modules=("gnu/12.2.1-sys" "mpich/4.2.2" "cuda/12.5")
+# required_modules=("gnu/12.2.1-sys" "mpich/4.2.2" "cuda/12.5")
 
-for module in "${required_modules[@]}"; do
-    if ! module list 2>&1 | grep -q "$module"; then
-        echo -e "${YELLOW}[WARNING] Module not found, loading $module${RESET}"
-        module load "$module"
-        flag=1
-        if ! grep -q "module load $module" "$HOME/.bashrc"; then
-            echo -e "[INFO]\t  Adding 'module load $module' to $bashrc..."
-            echo "module load $module" >> "$HOME/.bashrc"
-        # else
-        #     echo "'module load $module' is already present in $bashrc."
-        fi
-    else
-        echo -e "[INFO]\t  Found module $module."
-    fi
-done
-
-# Update .bashrc if necessary
-if [ $flag -eq 1 ]; then
-    echo -e "[INFO]\t  Reloading $HOME/.bashrc..."
-    source ~/.bashrc
-fi
-
-# Inform the user about environment persistence
-if [ "$$" -eq "$PPID" ]; then
-    echo -e "${YELLOW}[WARNING] Modules loaded in this script will not persist after the script finishes.${RESET}"
-    echo -e "${YELLOW}[WARNING] Run the script using 'source autotest.sh' to make the changes persist.${RESET}"
-fi
+# for module in "${required_modules[@]}"; do
+#     if ! module list 2>&1 | grep -q "$module"; then
+#         echo -e "${YELLOW}[WARNING] Module not found, loading $module${RESET}"
+#         module load "$module"
+#         flag=1
+#         if ! grep -q "module load $module" "$HOME/.bashrc"; then
+#             echo -e "[INFO]\t  Adding 'module load $module' to $bashrc..."
+#             echo "module load $module" >> "$HOME/.bashrc"
+#         # else
+#         #     echo "'module load $module' is already present in $bashrc."
+#         fi
+#     else
+#         echo -e "[INFO]\t  Found module $module."
+#     fi
+# done
+# 
+# # Update .bashrc if necessary
+# if [ $flag -eq 1 ]; then
+#     echo -e "[INFO]\t  Reloading $HOME/.bashrc..."
+#     source ~/.bashrc
+# fi
+# 
+# # Inform the user about environment persistence
+# if [ "$$" -eq "$PPID" ]; then
+#     echo -e "${YELLOW}[WARNING] Modules loaded in this script will not persist after the script finishes.${RESET}"
+#     echo -e "${YELLOW}[WARNING] Run the script using 'source autotest.sh' to make the changes persist.${RESET}"
+# fi
 
 echo -e "${BLUE}[INFO]\t  Environment check for required modules completed.${RESET}"
 echo ""

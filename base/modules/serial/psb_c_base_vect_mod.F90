@@ -49,6 +49,7 @@ module psb_c_base_vect_mod
   use psb_realloc_mod
   use psb_i_base_vect_mod
   use psb_l_base_vect_mod
+  use psb_neighbor_topology_mod
 
   !> \namespace  psb_base_mod  \class psb_c_base_vect_type
   !! The psb_c_base_vect_type
@@ -65,6 +66,7 @@ module psb_c_base_vect_mod
     complex(psb_spk_), allocatable :: v(:)
     complex(psb_spk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
+    integer(psb_mpk_)                 :: communication_handle ! This is used only for Isend/Irecv scheme, to store the communication handle for the whole halo exchange
     !> vector bldstate:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -77,6 +79,8 @@ module psb_c_base_vect_mod
     integer(psb_ipk_), private :: dupl     = psb_dupl_null_
     integer(psb_ipk_), private :: ncfs     = 0
     integer(psb_ipk_), allocatable :: iv(:)
+
+    type(psb_neighbor_topology_type)  :: neighbor_topology
   contains
     !
     !  Constructors/allocators
@@ -240,6 +244,10 @@ module psb_c_base_vect_mod
     procedure, pass(z) :: addconst_a2   => c_base_addconst_a2
     procedure, pass(z) :: addconst_v2   => c_base_addconst_v2
     generic, public    :: addconst      => addconst_a2,addconst_v2
+
+    ! Methods used to handle topology in neighbor_alltoallv communication scheme
+    procedure, pass(x) :: init_topology => c_base_init_topology
+    procedure, pass(x) :: free_topology => c_base_free_topology
 
 
   end type psb_c_base_vect_type
@@ -2430,6 +2438,35 @@ contains
     if (x%is_dev()) call x%sync()
     call z%addconst(x%v,b,info)
   end subroutine c_base_addconst_v2
+
+
+  ! --------------------------------------------------------------------
+  ! Implementation of methods used for neighbor alltoallv communication
+  ! --------------------------------------------------------------------
+  subroutine c_base_init_topology(x, halo_index, num_exchanges, &
+       & total_send_elems, total_recv_elems, ctxt, icomm, info)
+    implicit none
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: halo_index(:)
+    integer(psb_ipk_), intent(in)               :: num_exchanges, total_send_elems, total_recv_elems
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_mpk_), intent(in)               :: icomm
+    integer(psb_ipk_), intent(out)              :: info
+
+    call x%neighbor_topology%init(halo_index, num_exchanges, &
+         & total_send_elems, total_recv_elems, ctxt, icomm, info)
+
+  end subroutine c_base_init_topology
+
+  subroutine c_base_free_topology(x, info)
+    implicit none
+    class(psb_c_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out) :: info
+
+    call x%neighbor_topology%free(info)
+
+  end subroutine c_base_free_topology
+  ! --------------------------------------------------------------------
 end module psb_c_base_vect_mod
 
 
@@ -2439,6 +2476,7 @@ module psb_c_base_multivect_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_c_base_vect_mod
+  use psb_neighbor_topology_mod
 
   !> \namespace  psb_base_mod  \class psb_c_base_vect_type
   !! The psb_c_base_vect_type
@@ -2458,6 +2496,7 @@ module psb_c_base_multivect_mod
     complex(psb_spk_), allocatable :: v(:,:)
     complex(psb_spk_), allocatable :: combuf(:)
     integer(psb_mpk_), allocatable :: comid(:,:)
+    integer(psb_mpk_)                 :: communication_handle ! This is used only for Isend/Irecv scheme, to store the communication handle for the whole halo exchange
     !> vector bldstate:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -2470,6 +2509,8 @@ module psb_c_base_multivect_mod
     integer(psb_ipk_), private :: dupl     = psb_dupl_null_
     integer(psb_ipk_), private :: ncfs     = 0
     integer(psb_ipk_), allocatable :: iv(:)
+
+    type(psb_neighbor_topology_type)  :: neighbor_topology
   contains
     !
     !  Constructors/allocators
@@ -2595,6 +2636,10 @@ module psb_c_base_multivect_mod
     procedure, pass(y) :: sctb_x   => c_base_mlv_sctb_x
     procedure, pass(y) :: sctb_buf => c_base_mlv_sctb_buf
     generic, public    :: sct      => sctb, sctbr2, sctb_x, sctb_buf
+
+    ! Neighbor alltoallv communication topology handling
+    procedure, pass(x) :: init_topology => c_base_mlv_init_topology
+    procedure, pass(x) :: free_topology => c_base_mlv_free_topology
   end type psb_c_base_multivect_type
 
   interface psb_c_base_multivect
@@ -4117,5 +4162,34 @@ contains
     implicit none
 
   end subroutine c_base_mlv_device_wait
+
+
+  ! --------------------------------------------------------------------
+  ! Implementation of methods used for neighbor alltoallv communication
+  ! --------------------------------------------------------------------
+  subroutine c_base_mlv_init_topology(x, halo_index, num_exchanges, &
+       & total_send_elems, total_recv_elems, ctxt, icomm, info)
+    implicit none
+    class(psb_c_base_multivect_type), intent(inout)   :: x
+    integer(psb_ipk_), intent(in)                     :: halo_index(:)
+    integer(psb_ipk_), intent(in)                     :: num_exchanges, total_send_elems, total_recv_elems
+    type(psb_ctxt_type), intent(in)                   :: ctxt
+    integer(psb_mpk_), intent(in)                     :: icomm
+    integer(psb_ipk_), intent(out)                    :: info
+
+    call x%neighbor_topology%init(halo_index, num_exchanges, &
+         & total_send_elems, total_recv_elems, ctxt, icomm, info)
+
+  end subroutine c_base_mlv_init_topology
+
+  subroutine c_base_mlv_free_topology(x, info)
+    implicit none
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)                  :: info
+
+    call x%neighbor_topology%free(info)
+
+  end subroutine c_base_mlv_free_topology
+  ! --------------------------------------------------------------------
 
 end module psb_c_base_multivect_mod

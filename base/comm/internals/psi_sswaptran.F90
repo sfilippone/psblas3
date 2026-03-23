@@ -80,7 +80,6 @@
 !    beta     - real                  Choose overwrite or sum. 
 !    y        - type(psb_s_vect_type) The data area                        
 !    desc_a   - type(psb_desc_type).    The communication descriptor.        
-!                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
 !                                       default psb_comm_halo_
@@ -111,11 +110,15 @@ contains
     integer(psb_ipk_), optional                 :: data
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, err_act, data_
-    class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    type(psb_ctxt_type)                         :: ctxt
+    integer(psb_mpk_)                           :: icomm
+    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, err_act, data_
+    class(psb_i_base_vect_type), pointer        :: comm_indexes
+    character(len=20)                           :: name
+
+    ! local variables used to detect the communication scheme
+    logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                                     :: baseline, neighbor_a2av
 
     info = psb_success_
     name = 'psi_sswaptran_vect'
@@ -131,7 +134,7 @@ contains
     endif
 
     if (.not.psb_is_asb_desc(desc_a)) then 
-      info=psb_err_invalid_cd_state_
+      info = psb_err_invalid_cd_state_
       call psb_errpush(info,name)
       goto 9999
     endif
@@ -142,14 +145,45 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
+    call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info) 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
       goto 9999
     end if
 
-    call  psi_swaptran(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
-    if (info /= psb_success_) goto 9999
+    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
+    swap_sync   = iand(flag,psb_swap_sync_) /= 0
+    swap_send   = iand(flag,psb_swap_send_) /= 0
+    swap_recv   = iand(flag,psb_swap_recv_) /= 0
+    swap_start  = iand(flag,psb_swap_start_) /= 0
+    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+
+    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
+    neighbor_a2av = swap_start .or. swap_wait 
+
+    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      goto 9999
+    end if
+
+    if (baseline) then 
+      call psi_stran_baseline_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='baseline swap')
+        goto 9999
+      end if
+    else if (neighbor_a2av) then 
+      call psi_stran_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='neighbor a2av swap')
+        goto 9999
+      end if
+    else 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      goto 9999
+    end if
 
     call psb_erractionrestore(err_act)
     return
@@ -159,21 +193,9 @@ contains
     return
   end subroutine psi_sswaptran_vect
 
-  !
-  !
-  ! Subroutine: psi_stran_vidx_vect
-  !   Data exchange among processes.
-  !
-  !   Takes care of Y an encapsulated vector. Relies on the gather/scatter methods
-  !   of vectors. 
-  !   
-  !   The real workhorse: the outer routine will only choose the index list
-  !   this one takes the index list and does the actual exchange. 
-  !   
-  !   
-  ! 
-  module subroutine psi_stran_vidx_vect(ctxt,flag,beta,y,idx,&
-       & totxch,totsnd,totrcv,info)
+
+  module subroutine psi_stran_baseline_vect(ctxt,flag,beta,y,comm_indexes,&
+       & num_neighbors,total_send,total_recv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -185,18 +207,18 @@ contains
 
     type(psb_ctxt_type), intent(in)             :: ctxt
     integer(psb_ipk_), intent(in)               :: flag
-    integer(psb_ipk_), intent(out)              :: info
+    real(psb_spk_), intent(in)                  :: beta
     class(psb_s_base_vect_type), intent(inout)  :: y
-      real(psb_spk_), intent(in)                :: beta
-    class(psb_i_base_vect_type), intent(inout)  :: idx
-    integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
+    class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+    integer(psb_ipk_), intent(out)              :: info
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n
     integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
-    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+    integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
          & snd_pt, rcv_pt, pnti
     logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
          & albf,do_send,do_recv
@@ -204,7 +226,7 @@ contains
     character(len=20)  :: name
 
     info=psb_success_
-    name='psi_swap_tran'
+    name='psi_stran_baseline_vect'
     call psb_erractionsave(err_act)
     call psb_info(ctxt,me,np) 
     if (np == -1) then
@@ -222,10 +244,10 @@ contains
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-    totrcv_ = totrcv * n
-    totsnd_ = totsnd * n
+    total_recv_ = total_recv * n
+    total_send_ = total_send * n
 
-    call idx%sync()
+    call comm_indexes%sync()
 
     if (debug) write(*,*) me,'Internal buffer'
     if (do_send) then 
@@ -240,17 +262,17 @@ contains
         end if
       end if
       if (debug) write(*,*) me,'do_send start'
-      call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(totxch,info)
+      call y%new_buffer(ione*size(comm_indexes%v),info)
+      call y%new_comid(num_neighbors,info)
       y%comid = mpi_request_null
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
       pnti   = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
 
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
@@ -270,14 +292,14 @@ contains
       !    
       pnti   = 1
       snd_pt = 1
-      do i=1, totxch
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
 
         idx_pt = rcv_pt
-        call y%gth(idx_pt,nerv,idx)
+        call y%gth(idx_pt,nerv,comm_indexes)
 
         pnti   = pnti + nerv + nesd + 3
       end do
@@ -296,10 +318,10 @@ contains
       snd_pt = 1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
 
@@ -329,15 +351,15 @@ contains
         call psb_errpush(info,name,m_err=(/-2/))
         goto 9999
       end if
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
 
       if (debug) write(*,*) me,' wait'
       pnti   = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
 
@@ -373,17 +395,17 @@ contains
       pnti   = 1
       snd_pt = 1
       rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         idx_pt = 1+pnti+psb_n_elem_recv_
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
 
         if (debug) write(0,*)me,' Received from: ',prcid(i),&
              & y%combuf(snd_pt:snd_pt+nesd-1)        
-        call y%sct(snd_pt,nesd,idx,beta)
+        call y%sct(snd_pt,nesd,comm_indexes,beta)
         pnti   = pnti + nerv + nesd + 3
       end do
       !
@@ -414,7 +436,155 @@ contains
 
     return
 
-  end subroutine psi_stran_vidx_vect
+  end subroutine psi_stran_baseline_vect
+
+
+
+  subroutine psi_stran_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes, &
+       & num_neighbors,total_send,total_recv,info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    real(psb_spk_), intent(in)                  :: beta
+    class(psb_s_base_vect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+    integer(psb_ipk_), intent(out)              :: info
+
+    ! locals
+    integer(psb_mpk_)                           :: icomm
+    integer(psb_mpk_)                           :: np, me
+    integer(psb_mpk_)                           :: iret, p2pstat(mpi_status_size)
+    integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
+    logical                                     :: do_start, do_wait
+    logical, parameter                          :: debug = .false.
+    character(len=30)                           :: name
+
+
+    info = psb_success_
+    name = 'psi_stran_neighbor_topology_vect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,me,np)
+    if (np == -1) then
+      info=psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    icomm = ctxt%get_mpic()
+
+    do_start = iand(flag,psb_swap_start_) /= 0
+    do_wait  = iand(flag,psb_swap_wait_)  /= 0
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      if(debug) write(*,*) me,' nbr_tran_vect: starting data exchange'
+      if (.not. y%neighbor_topology%is_initialized) then
+        if (debug) write(*,*) me,' nbr_tran_vect: building topology'
+        call y%neighbor_topology%init(comm_indexes%v, num_neighbors, total_send, total_recv, &
+            & ctxt, icomm, info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_, name, &
+              & a_err='neighbor_topology_init')
+          goto 9999
+        end if
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+      buffer_size = topology_total_send + topology_total_recv
+
+      call y%new_buffer(buffer_size, info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      y%communication_handle = mpi_request_null
+
+      if (debug) write(*,*) me,' nbr_tran_vect: gathering (recv) data,', topology_total_recv,' elems'
+      call y%gth(int(topology_total_recv,psb_mpk_), &
+          & y%neighbor_topology%recv_indexes, &
+          & y%combuf(1:topology_total_recv))
+
+      call y%device_wait()
+
+      if (debug) write(*,*) me,' nbr_tran_vect: posting MPI_Ineighbor_alltoallv (swapped)'
+      call mpi_ineighbor_alltoallv( &
+          & y%combuf(1),                           &
+          & y%neighbor_topology%recv_counts,       &
+          & y%neighbor_topology%recv_displs,       &
+          & psb_mpi_r_spk_,                        &
+          & y%combuf(topology_total_recv + 1),     &
+          & y%neighbor_topology%send_counts,       &
+          & y%neighbor_topology%send_displs,       &
+          & psb_mpi_r_spk_,                        &
+          & y%neighbor_topology%graph_comm,        &
+          & y%communication_handle, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+    end if
+
+    if (do_wait) then
+
+      if (y%communication_handle == mpi_request_null) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/-2/))
+        goto 9999
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+
+      if (debug) write(*,*) me,' nbr_tran_vect: waiting on MPI request'
+      call mpi_wait(y%communication_handle, p2pstat, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+      if (debug) write(*,*) me,' nbr_tran_vect: scattering (send) data,', topology_total_send,' elems'
+      call y%sct(int(topology_total_send,psb_mpk_), &
+          & y%neighbor_topology%send_indexes, &
+          & y%combuf(topology_total_recv+1:topology_total_recv+topology_total_send), &
+          & beta)
+
+      y%communication_handle = mpi_request_null
+      call y%device_wait()
+      call y%maybe_free_buffer(info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      if (debug) write(*,*) me,' nbr_tran_vect: done'
+
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_stran_neighbor_topology_vect
+
+
+
+
+
+
 
 
   !
@@ -445,11 +615,15 @@ contains
     integer(psb_ipk_), optional                     :: data
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, err_act, data_
-    class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    type(psb_ctxt_type)                             :: ctxt
+    integer(psb_mpk_)                               :: icomm
+    integer(psb_ipk_)                               :: np, me, total_send, total_recv, num_neighbors, err_act, data_
+    class(psb_i_base_vect_type), pointer            :: comm_indexes
+    character(len=20)                               :: name
+
+    ! local variables used to detect the communication scheme
+    logical                                         :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                                         :: baseline, neighbor_a2av
 
     info = psb_success_
     name = 'psi_sswaptran_multivect'
@@ -476,14 +650,45 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
+    call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info) 
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
       goto 9999
     end if
 
-    call  psi_swaptran(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
-    if (info /= psb_success_) goto 9999
+    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
+    swap_sync   = iand(flag,psb_swap_sync_) /= 0
+    swap_send   = iand(flag,psb_swap_send_) /= 0
+    swap_recv   = iand(flag,psb_swap_recv_) /= 0
+    swap_start  = iand(flag,psb_swap_start_) /= 0
+    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+
+    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
+    neighbor_a2av = swap_start .or. swap_wait 
+
+    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      goto 9999
+    end if
+
+    if (baseline) then 
+      call psi_stran_baseline_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='baseline swap')
+        goto 9999
+      end if
+    else if (neighbor_a2av) then 
+      call psi_stran_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then 
+        call psb_errpush(info,name,a_err='neighbor a2av swap')
+        goto 9999
+      end if
+    else 
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      goto 9999
+    end if
 
     call psb_erractionrestore(err_act)
     return
@@ -494,21 +699,8 @@ contains
   end subroutine psi_sswaptran_multivect
 
 
-  !
-  !
-  ! Subroutine: psi_stran_vidx_multivect
-  !   Data exchange among processes.
-  !
-  !   Takes care of Y an encapsulated multivector. Relies on the gather/scatter methods
-  !   of multivectors. 
-  !   
-  !   The real workhorse: the outer routine will only choose the index list
-  !   this one takes the index list and does the actual exchange. 
-  !   
-  !   
-  ! 
-  module subroutine psi_stran_vidx_multivect(ctxt,flag,beta,y,idx,&
-       & totxch,totsnd,totrcv,info)
+  subroutine psi_stran_baseline_multivect(ctxt,flag,beta,y,comm_indexes,&
+       & num_neighbors,total_send,total_recv,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -522,8 +714,8 @@ contains
     integer(psb_ipk_), intent(in)                   :: flag
     real(psb_spk_), intent(in)                      :: beta
     class(psb_s_base_multivect_type), intent(inout) :: y
-    class(psb_i_base_vect_type), intent(inout)      :: idx
-    integer(psb_ipk_), intent(in)                   :: totxch,totsnd,totrcv
+    class(psb_i_base_vect_type), intent(inout)      :: comm_indexes
+    integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send,total_recv
     integer(psb_ipk_), intent(out)                  :: info
 
 
@@ -532,7 +724,7 @@ contains
     integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
-    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
+    integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
          & snd_pt, rcv_pt, pnti
     logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
          & albf,do_send,do_recv
@@ -559,10 +751,10 @@ contains
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
-    totrcv_ = totrcv * n
-    totsnd_ = totsnd * n
+    total_recv_ = total_recv * n
+    total_send_ = total_send * n
 
-    call idx%sync()
+    call comm_indexes%sync()
 
     if (debug) write(*,*) me,'Internal buffer'
     if (do_send) then 
@@ -577,19 +769,19 @@ contains
         end if
       end if
       if (debug) write(*,*) me,'do_send start'
-      call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(totxch,info)
+      call y%new_buffer(ione*size(comm_indexes%v),info)
+      call y%new_comid(num_neighbors,info)
       y%comid = mpi_request_null
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           if (debug) write(*,*) me,'Posting receive from',prcid(i),snd_pt
@@ -607,13 +799,13 @@ contains
       ! Then gather for sending.
       !    
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
-      do i=1, totxch
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         idx_pt = 1+pnti+psb_n_elem_recv_
-        call y%gth(idx_pt,rcv_pt,nerv,idx)
+        call y%gth(idx_pt,rcv_pt,nerv,comm_indexes)
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
         pnti   = pnti + nerv + nesd + 3
@@ -630,13 +822,13 @@ contains
       !
 
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         idx_pt = 1+pnti+psb_n_elem_recv_
 
         if ((nerv>0).and.(proc_to_comm /= me)) then 
@@ -666,17 +858,17 @@ contains
         call psb_errpush(info,name,m_err=(/-2/))
         goto 9999
       end if
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(num_neighbors,prcid,info)
 
       if (debug) write(*,*) me,' wait'
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
       p2ptag = psb_real_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         if (proc_to_comm /= me)then 
           if (nerv>0) then 
             call mpi_wait(y%comid(i,1),p2pstat,iret)
@@ -709,17 +901,17 @@ contains
 
       if (debug) write(*,*) me,' scatter'      
       pnti   = 1
-      snd_pt = totrcv_+1
+      snd_pt = total_recv_+1
       rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i=1, num_neighbors
+        proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
+        nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
+        nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
         idx_pt = 1+pnti+nerv+psb_n_elem_send_
 
         if (debug) write(0,*)me,' Received from: ',prcid(i),&
              & y%combuf(snd_pt:snd_pt+n*nesd-1)        
-        call y%sct(idx_pt,snd_pt,nesd,idx,beta)
+        call y%sct(idx_pt,snd_pt,nesd,comm_indexes,beta)
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
         pnti   = pnti + nerv + nesd + 3
@@ -754,6 +946,150 @@ contains
 
     return
 
-  end subroutine psi_stran_vidx_multivect
+  end subroutine psi_stran_baseline_multivect
+
+
+
+  subroutine psi_stran_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes, &
+       & num_neighbors,total_send,total_recv,info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)                 :: ctxt
+    integer(psb_ipk_), intent(in)                   :: flag
+    real(psb_spk_), intent(in)                      :: beta
+    class(psb_s_base_multivect_type), intent(inout) :: y
+    class(psb_i_base_vect_type), intent(inout)      :: comm_indexes
+    integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send,total_recv
+    integer(psb_ipk_), intent(out)                  :: info
+
+    ! locals
+    integer(psb_mpk_)                               :: icomm
+    integer(psb_mpk_)                               :: np, me
+    integer(psb_mpk_)                               :: iret, p2pstat(mpi_status_size)
+    integer(psb_ipk_)                               :: err_act, topology_total_send, topology_total_recv, buffer_size
+    logical                                         :: do_start, do_wait
+    logical, parameter                              :: debug = .false.
+    character(len=30)                               :: name
+
+
+    info = psb_success_
+    name = 'psi_stran_neighbor_topology_vect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,me,np)
+    if (np == -1) then
+      info=psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    icomm = ctxt%get_mpic()
+
+    do_start = iand(flag,psb_swap_start_) /= 0
+    do_wait  = iand(flag,psb_swap_wait_)  /= 0
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      if(debug) write(*,*) me,' nbr_tran_vect: starting data exchange'
+      if (.not. y%neighbor_topology%is_initialized) then
+        if (debug) write(*,*) me,' nbr_tran_vect: building topology'
+        call y%neighbor_topology%init(comm_indexes%v, num_neighbors, total_send, total_recv, &
+            & ctxt, icomm, info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_, name, &
+              & a_err='neighbor_topology_init')
+          goto 9999
+        end if
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+      buffer_size = topology_total_send + topology_total_recv
+
+      call y%new_buffer(buffer_size, info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      y%communication_handle = mpi_request_null
+
+      if (debug) write(*,*) me,' nbr_tran_vect: gathering (recv) data,', topology_total_recv,' elems'
+      call y%gth(int(topology_total_recv,psb_mpk_), &
+          & y%neighbor_topology%recv_indexes, &
+          & y%combuf(1:topology_total_recv))
+
+      call y%device_wait()
+
+      if (debug) write(*,*) me,' nbr_tran_vect: posting MPI_Ineighbor_alltoallv (swapped)'
+      call mpi_ineighbor_alltoallv( &
+          & y%combuf(1),                           &
+          & y%neighbor_topology%recv_counts,       &
+          & y%neighbor_topology%recv_displs,       &
+          & psb_mpi_r_spk_,                        &
+          & y%combuf(topology_total_recv + 1),     &
+          & y%neighbor_topology%send_counts,       &
+          & y%neighbor_topology%send_displs,       &
+          & psb_mpi_r_spk_,                        &
+          & y%neighbor_topology%graph_comm,        &
+          & y%communication_handle, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+    end if
+
+    if (do_wait) then
+
+      if (y%communication_handle == mpi_request_null) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/-2/))
+        goto 9999
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+
+      if (debug) write(*,*) me,' nbr_tran_vect: waiting on MPI request'
+      call mpi_wait(y%communication_handle, p2pstat, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+      if (debug) write(*,*) me,' nbr_tran_vect: scattering (send) data,', topology_total_send,' elems'
+      call y%sct(int(topology_total_send,psb_mpk_), &
+          & y%neighbor_topology%send_indexes, &
+          & y%combuf(topology_total_recv+1:topology_total_recv+topology_total_send), &
+          & beta)
+
+      y%communication_handle = mpi_request_null
+      call y%device_wait()
+      call y%maybe_free_buffer(info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      if (debug) write(*,*) me,' nbr_tran_vect: done'
+
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_stran_neighbor_topology_multivect
+
+
 
 end submodule psi_s_swaptran_impl

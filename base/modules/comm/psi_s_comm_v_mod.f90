@@ -73,26 +73,6 @@ module psi_s_comm_v_mod
       integer(psb_ipk_), intent(out)                  :: info
       integer(psb_ipk_), optional                     :: data
     end subroutine psi_sswaptran_multivect
-    module subroutine psi_stran_vidx_vect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,info)
-      type(psb_ctxt_type), intent(in)             :: ctxt
-      integer(psb_ipk_), intent(in)               :: flag
-      real(psb_spk_), intent(in)                  :: beta
-      class(psb_s_base_vect_type), intent(inout)  :: y
-      class(psb_i_base_vect_type), intent(inout)  :: idx
-      integer(psb_ipk_), intent(in)               :: totxch,totsnd, totrcv
-      integer(psb_ipk_), intent(out)              :: info
-    end subroutine psi_stran_vidx_vect
-    module subroutine psi_stran_vidx_multivect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,info)
-      type(psb_ctxt_type), intent(in)                 :: ctxt
-      integer(psb_ipk_), intent(in)                   :: flag
-      real(psb_spk_), intent(in)                      :: beta
-      class(psb_s_base_multivect_type), intent(inout) :: y
-      class(psb_i_base_vect_type), intent(inout)      :: idx
-      integer(psb_ipk_), intent(in)                   :: totxch,totsnd, totrcv
-      integer(psb_ipk_), intent(out)                  :: info
-    end subroutine psi_stran_vidx_multivect
   end interface psi_swaptran
 
   interface psi_ovrl_upd

@@ -103,26 +103,26 @@ contains
 #endif
 
     integer(psb_ipk_), intent(in)               :: flag
-    integer(psb_ipk_), intent(out)              :: info
-    class(psb_s_base_vect_type), intent(inout)  :: y
     real(psb_spk_), intent(in)                  :: beta
+    class(psb_s_base_vect_type), intent(inout)  :: y
     type(psb_desc_type), target                 :: desc_a
+    integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_), optional                 :: data
 
     ! locals
-    type(psb_ctxt_type)                   :: ctxt
-    integer(psb_ipk_)                     :: np, me, total_send, total_recv, num_neighbors, data_, err_act
-    class(psb_i_base_vect_type), pointer  :: comm_indexes
+    type(psb_ctxt_type)                         :: ctxt
+    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer        :: comm_indexes
 
 
     ! local variables used to detect the communication scheme
-    logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
-    logical                               :: baseline, neighbor_a2av
+    logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                                     :: baseline, neighbor_a2av
 
     ! error handling variables
-    integer(psb_ipk_)                     :: err_act
-    integer(psb_mpk_)                     :: me, np
-    character(len=30)                     :: name
+    integer(psb_ipk_)                           :: err_act
+    integer(psb_mpk_)                           :: me, np
+    character(len=30)                           :: name
 
 
     info = psb_success_

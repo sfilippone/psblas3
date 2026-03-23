@@ -88,9 +88,10 @@
 !
 ! 
 submodule (psi_z_comm_v_mod)  psi_z_swapdata_impl
+  use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
 contains
-  subroutine psi_zswapdata_vect(flag,beta,y,desc_a,info,data)
+  module subroutine psi_zswapdata_vect(flag,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -100,34 +101,37 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_z_base_vect_type) :: y
-    complex(psb_dpk_)           :: beta
-    type(psb_desc_type), target  :: desc_a
-    integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), intent(in)               :: flag
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    complex(psb_dpk_), intent(in)               :: beta
+    type(psb_desc_type), target                 :: desc_a
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), optional                 :: data
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
-    class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    type(psb_ctxt_type)                         :: ctxt
+    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer        :: comm_indexes
+    character(len=30)                           :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    ! local variables used to detect the communication scheme
+    logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                                     :: baseline, neighbor_a2av
+
+    info = psb_success_
+    name = 'psi_zswapdata_vect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
-    icomm = ctxt%get_mpic()
-    call psb_info(ctxt,me,np) 
+
+    call psb_info(ctxt,me,np)
     if (np == -1) then
       info=psb_err_context_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
-    if (.not.psb_is_asb_desc(desc_a)) then 
+    if (.not.psb_is_asb_desc(desc_a)) then
       info=psb_err_invalid_cd_state_
       call psb_errpush(info,name)
       goto 9999
@@ -139,14 +143,45 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
+    call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err='desc_a%get_list_p')
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
-    if (info /= psb_success_) goto 9999
+    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
+    swap_sync   = iand(flag,psb_swap_sync_) /= 0
+    swap_send   = iand(flag,psb_swap_send_) /= 0
+    swap_recv   = iand(flag,psb_swap_recv_) /= 0
+    swap_start  = iand(flag,psb_swap_start_) /= 0
+    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+
+    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
+    neighbor_a2av = swap_start .or. swap_wait
+
+    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      goto 9999
+    end if
+
+    if (baseline) then
+      call psi_zswap_baseline_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='baseline swap')
+        goto 9999
+      end if
+    else if (neighbor_a2av) then
+      call psi_zswap_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='neighbor a2av swap')
+        goto 9999
+      end if
+    else
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      goto 9999
+    end if
 
     call psb_erractionrestore(err_act)
     return
@@ -155,6 +190,163 @@ contains
 
     return
   end subroutine psi_zswapdata_vect
+
+
+  subroutine psi_zswap_baseline_vect(ctxt,flag,beta,y,idx, &
+       & num_neighbors,total_send,total_recv,info)
+    implicit none
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    complex(psb_dpk_), intent(in)               :: beta
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+    integer(psb_ipk_), intent(out)              :: info
+
+    call psi_zswap_vidx_vect(ctxt,flag,beta,y,idx,num_neighbors,total_send,total_recv,info)
+  end subroutine psi_zswap_baseline_vect
+
+
+  subroutine psi_zswap_neighbor_topology_vect(ctxt,flag,beta,y,idx, &
+       & num_neighbors,total_send,total_recv,info)
+
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_mpk_)                           :: icomm
+    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    complex(psb_dpk_), intent(in)               :: beta
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+
+    ! locals
+    integer(psb_mpk_)                           :: np, me
+    integer(psb_mpk_)                           :: iret, p2pstat(mpi_status_size)
+    integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
+    logical                                     :: do_start, do_wait
+    logical, parameter                          :: debug = .false.
+    character(len=30)                           :: name
+
+
+    info = psb_success_
+    name = 'psi_zswap_nbr_vect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,me,np)
+    if (np == -1) then
+      info=psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    icomm = ctxt%get_mpic()
+
+    do_start = iand(flag,psb_swap_start_) /= 0
+    do_wait  = iand(flag,psb_swap_wait_)  /= 0
+
+    call idx%sync()
+
+    if (do_start) then
+      if(debug) write(*,*) me,' nbr_vect: starting data exchange'
+      if (.not. y%neighbor_topology%is_initialized) then
+        if (debug) write(*,*) me,' nbr_vect: building topology'
+        call y%neighbor_topology%init(idx%v, num_neighbors, total_send, total_recv, &
+            & ctxt, icomm, info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_, name, &
+              & a_err='neighbor_topology_init')
+          goto 9999
+        end if
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+      buffer_size = topology_total_send + topology_total_recv
+
+      call y%new_buffer(buffer_size, info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      y%communication_handle = mpi_request_null
+
+      if (debug) write(*,*) me,' nbr_vect: gathering send data,', topology_total_send,' elems'
+      call y%gth(int(topology_total_send,psb_mpk_), &
+          & y%neighbor_topology%send_indexes, &
+          & y%combuf(1:topology_total_send))
+
+      call y%device_wait()
+
+      if (debug) write(*,*) me,' nbr_vect: posting MPI_Ineighbor_alltoallv'
+      call mpi_ineighbor_alltoallv( &
+          & y%combuf(1),                            &
+          & y%neighbor_topology%send_counts,       &
+          & y%neighbor_topology%send_displs,       &
+          & psb_mpi_c_dpk_,                        &
+          & y%combuf(topology_total_send + 1),     &
+          & y%neighbor_topology%recv_counts,       &
+          & y%neighbor_topology%recv_displs,       &
+          & psb_mpi_c_dpk_,                        &
+          & y%neighbor_topology%graph_comm,        &
+          & y%communication_handle, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+    end if
+
+    if (do_wait) then
+
+      if (y%communication_handle == mpi_request_null) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/-2/))
+        goto 9999
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+
+      if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
+      call mpi_wait(y%communication_handle, p2pstat, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+      if (debug) write(*,*) me,' nbr_vect: scattering recv data,', topology_total_recv,' elems'
+      call y%sct(int(topology_total_recv,psb_mpk_), &
+          & y%neighbor_topology%recv_indexes, &
+          & y%combuf(topology_total_send+1:topology_total_send+topology_total_recv), &
+          & beta)
+
+      y%communication_handle = mpi_request_null
+      call y%device_wait()
+      call y%maybe_free_buffer(info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      if (debug) write(*,*) me,' nbr_vect: done'
+
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_zswap_neighbor_topology_vect
 
 
   !
@@ -425,34 +617,36 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_z_base_multivect_type) :: y
-    complex(psb_dpk_)           :: beta
-    type(psb_desc_type), target  :: desc_a
-    integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), intent(in)                   :: flag
+    class(psb_z_base_multivect_type), intent(inout) :: y
+    complex(psb_dpk_), intent(in)                   :: beta
+    type(psb_desc_type), target                     :: desc_a
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_), optional                     :: data
+
+    ! local variables used to detect the communication scheme
+    logical                               :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
+    logical                               :: baseline, neighbor_a2av
 
     ! locals
-    type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
-    class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    type(psb_ctxt_type)                   :: ctxt
+    integer(psb_ipk_)                     :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    class(psb_i_base_vect_type), pointer  :: comm_indexes
+    character(len=30)                     :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    info = psb_success_
+    name = 'psi_zswapdata_multivect'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
-    icomm = ctxt%get_mpic()
-    call psb_info(ctxt,me,np) 
+    call psb_info(ctxt,me,np)
     if (np == -1) then
       info=psb_err_context_error_
       call psb_errpush(info,name)
       goto 9999
     endif
 
-    if (.not.psb_is_asb_desc(desc_a)) then 
+    if (.not.psb_is_asb_desc(desc_a)) then
       info=psb_err_invalid_cd_state_
       call psb_errpush(info,name)
       goto 9999
@@ -464,14 +658,45 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
+    call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info)
+    if (info /= psb_success_) then
+      call psb_errpush(psb_err_internal_error_,name,a_err='desc_a%get_list_p')
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,info)
-    if (info /= psb_success_) goto 9999
+    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
+    swap_sync   = iand(flag,psb_swap_sync_) /= 0
+    swap_send   = iand(flag,psb_swap_send_) /= 0
+    swap_recv   = iand(flag,psb_swap_recv_) /= 0
+    swap_start  = iand(flag,psb_swap_start_) /= 0
+    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+
+    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
+    neighbor_a2av = swap_start .or. swap_wait
+
+    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then
+      info=psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      goto 9999
+    end if
+
+    if (baseline) then
+      call psi_zswap_baseline_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='baseline swap')
+        goto 9999
+      end if
+    else if (neighbor_a2av) then
+      call psi_zswap_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='neighbor a2av swap')
+        goto 9999
+      end if
+    else
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      goto 9999
+    end if
 
     call psb_erractionrestore(err_act)
     return
@@ -480,6 +705,163 @@ contains
 
     return
   end subroutine psi_zswapdata_multivect
+
+
+  subroutine psi_zswap_baseline_multivect(ctxt,flag,beta,y,idx, &
+       & num_neighbors,total_send,total_recv,info)
+    implicit none
+    type(psb_ctxt_type), intent(in)                  :: ctxt
+    integer(psb_ipk_), intent(in)                    :: flag
+    complex(psb_dpk_), intent(in)                    :: beta
+    class(psb_z_base_multivect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)       :: idx
+    integer(psb_ipk_), intent(in)                    :: num_neighbors,total_send,total_recv
+    integer(psb_ipk_), intent(out)                   :: info
+
+    call psi_zswap_vidx_multivect(ctxt,flag,beta,y,idx,num_neighbors,total_send,total_recv,info)
+  end subroutine psi_zswap_baseline_multivect
+
+
+  subroutine psi_zswap_neighbor_topology_multivect(ctxt,flag,beta,y,idx, &
+       & num_neighbors,total_send,total_recv,info)
+
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)                  :: ctxt
+    integer(psb_mpk_)                                :: icomm
+    integer(psb_ipk_), intent(in)                    :: flag
+    integer(psb_ipk_), intent(out)                   :: info
+    class(psb_z_base_multivect_type), intent(inout)  :: y
+    complex(psb_dpk_), intent(in)                    :: beta
+    class(psb_i_base_vect_type), intent(inout)       :: idx
+    integer(psb_ipk_), intent(in)                    :: num_neighbors,total_send,total_recv
+
+    ! locals
+    integer(psb_mpk_)                           :: np, me
+    integer(psb_mpk_)                           :: iret, p2pstat(mpi_status_size)
+    integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
+    logical                                     :: do_start, do_wait
+    logical, parameter                          :: debug = .false.
+    character(len=30)                           :: name
+
+
+    info = psb_success_
+    name = 'psi_zswap_neighbor_topology_multivect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,me,np)
+    if (np == -1) then
+      info=psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    icomm = ctxt%get_mpic()
+
+    do_start = iand(flag,psb_swap_start_) /= 0
+    do_wait  = iand(flag,psb_swap_wait_)  /= 0
+
+    call idx%sync()
+
+    if (do_start) then
+      if(debug) write(*,*) me,' nbr_vect: starting data exchange'
+      if (.not. y%neighbor_topology%is_initialized) then
+        if (debug) write(*,*) me,' nbr_vect: building topology'
+        call y%neighbor_topology%init(idx%v, num_neighbors, total_send, total_recv, &
+            & ctxt, icomm, info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_, name, &
+              & a_err='neighbor_topology_init')
+          goto 9999
+        end if
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+      buffer_size = topology_total_send + topology_total_recv
+
+      call y%new_buffer(buffer_size, info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      y%communication_handle = mpi_request_null
+
+      if (debug) write(*,*) me,' nbr_vect: gathering send data,', topology_total_send,' elems'
+      call y%gth(int(topology_total_send,psb_mpk_), &
+          & y%neighbor_topology%send_indexes, &
+          & y%combuf(1:topology_total_send))
+
+      call y%device_wait()
+
+      if (debug) write(*,*) me,' nbr_vect: posting MPI_Ineighbor_alltoallv'
+      call mpi_ineighbor_alltoallv( &
+          & y%combuf(1),                            &
+          & y%neighbor_topology%send_counts,       &
+          & y%neighbor_topology%send_displs,       &
+          & psb_mpi_c_dpk_,                        &
+          & y%combuf(topology_total_send + 1),     &
+          & y%neighbor_topology%recv_counts,       &
+          & y%neighbor_topology%recv_displs,       &
+          & psb_mpi_c_dpk_,                        &
+          & y%neighbor_topology%graph_comm,        &
+          & y%communication_handle, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+    end if
+
+    if (do_wait) then
+
+      if (y%communication_handle == mpi_request_null) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/-2/))
+        goto 9999
+      end if
+
+      topology_total_send = y%neighbor_topology%total_send
+      topology_total_recv = y%neighbor_topology%total_recv
+
+      if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
+      call mpi_wait(y%communication_handle, p2pstat, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/iret/))
+        goto 9999
+      end if
+
+      if (debug) write(*,*) me,' nbr_vect: scattering recv data,', topology_total_recv,' elems'
+      call y%sct(int(topology_total_recv,psb_mpk_), &
+          & y%neighbor_topology%recv_indexes, &
+          & y%combuf(topology_total_send+1:topology_total_send+topology_total_recv), &
+          & beta)
+
+      y%communication_handle = mpi_request_null
+      call y%device_wait()
+      call y%maybe_free_buffer(info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_alloc_dealloc_, name)
+        goto 9999
+      end if
+      if (debug) write(*,*) me,' nbr_vect: done'
+
+    end if
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_zswap_neighbor_topology_multivect
 
 
   !
