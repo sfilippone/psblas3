@@ -31,9 +31,11 @@
 !    
 module psi_i_mod
 
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, psb_epk_, psb_lpk_
+   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, psb_epk_, &
+        & psb_lpk_, psb_i2pk_
   use psi_m_comm_a_mod
   use psi_e_comm_a_mod
+  use psi_i2_comm_a_mod
   use psb_i_base_vect_mod, only : psb_i_base_vect_type 
   use psb_i_base_multivect_mod, only : psb_i_base_multivect_type 
   use psi_i_comm_v_mod
