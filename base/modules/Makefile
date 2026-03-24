@@ -247,6 +247,7 @@ auxil/psb_s_ip_reord_mod.o auxil/psb_d_ip_reord_mod.o \
 auxil/psb_c_ip_reord_mod.o auxil/psb_z_ip_reord_mod.o  : psb_realloc_mod.o  psb_const_mod.o
 
 
+auxil/psb_i2_hsort_x_mod.o: auxil/psb_m_hsort_mod.o auxil/psb_e_hsort_mod.o auxil/psb_i2_hsort_mod.o
 auxil/psb_i_hsort_x_mod.o: auxil/psb_m_hsort_mod.o auxil/psb_e_hsort_mod.o auxil/psb_i2_hsort_mod.o
 auxil/psb_i_hsort_x_mod.o: auxil/psb_m_hsort_mod.o auxil/psb_e_hsort_mod.o
 auxil/psb_l_hsort_x_mod.o: auxil/psb_m_hsort_mod.o auxil/psb_e_hsort_mod.o
