@@ -37,13 +37,7 @@ lib: objs
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 $(FOBJS) $(FBOJS2): $(MODDIR)/psi_mod.o
-mpfobjs: $(MODDIR)/comm/psi_m_comm_a_mod.o \
-	$(MODDIR)/comm/psi_s_comm_a_mod.o \
-	$(MODDIR)/comm/psi_d_comm_a_mod.o \
-	$(MODDIR)/comm/psi_c_comm_a_mod.o \
-	$(MODDIR)/comm/psi_z_comm_a_mod.o \
-	$(MODDIR)/comm/psi_e_comm_a_mod.o \
-	$(MODDIR)/comm/psi_i2_comm_a_mod.o
+mpfobjs:  $(MODDIR)/psi_mod.o
 	(make $(MPFOBJS) FC="$(MPFC)" )
 
 clean:
