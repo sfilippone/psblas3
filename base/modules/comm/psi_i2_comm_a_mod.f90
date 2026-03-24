@@ -31,7 +31,7 @@
 !    
 module psi_i2_comm_a_mod
   use psi_penv_mod, only : psb_ctxt_type
-  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, psb_epk_
+  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, psb_epk_, psb_i2pk_
 
   interface psi_swapdata
     module subroutine psi_i2swapdatam(flag,n,beta,y,desc_a,work,info,data)
