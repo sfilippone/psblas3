@@ -37,6 +37,7 @@
 !
 !
 module psb_ip_reord_mod 
+  use psb_i2_ip_reord_mod
   use psb_m_ip_reord_mod
   use psb_e_ip_reord_mod
   use psb_s_ip_reord_mod

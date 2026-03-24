@@ -31,6 +31,7 @@
 !    
 module psb_tools_mod
   use psb_cd_tools_mod
+  use psb_i2_tools_a_mod
   use psb_e_tools_a_mod
   use psb_m_tools_a_mod
   use psb_s_tools_a_mod

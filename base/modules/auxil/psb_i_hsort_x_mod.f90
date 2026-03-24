@@ -44,6 +44,7 @@ module psb_i_hsort_x_mod
   use psb_const_mod
   use psb_e_hsort_mod
   use psb_m_hsort_mod
+  use psb_i2_hsort_mod
 
   type psb_i_heap
     integer(psb_ipk_) :: dir

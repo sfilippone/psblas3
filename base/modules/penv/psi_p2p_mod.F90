@@ -33,6 +33,7 @@
 module psi_p2p_mod
   use psi_penv_mod
 
+  use psi_i2_p2p_mod
   use psi_m_p2p_mod
   use psi_e_p2p_mod
   use psi_s_p2p_mod

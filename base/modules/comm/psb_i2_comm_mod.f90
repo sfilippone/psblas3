@@ -29,89 +29,89 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-module psb_i_comm_mod
+module psb_i2_comm_mod
   use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_epk_, psb_mpk_, psb_i2pk_
   
-  use psb_i_vect_mod, only : psb_i_vect_type, psb_i_base_vect_type
-  use psb_i_multivect_mod, only : psb_i_multivect_type, psb_i_base_multivect_type
+  use psb_i2_vect_mod, only : psb_i2_vect_type, psb_i2_base_vect_type
+  use psb_i2_multivect_mod, only : psb_i2_multivect_type, psb_i2_base_multivect_type
 
   interface psb_ovrl
-    subroutine psb_iovrl_vect(x,desc_a,info,work,update,mode)
+    subroutine psb_i2ovrl_vect(x,desc_a,info,work,update,mode)
       import
       implicit none
-      type(psb_i_vect_type), intent(inout)    :: x
+      type(psb_i2_vect_type), intent(inout)    :: x
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), intent(inout), optional, target :: work(:)
+      integer(psb_i2pk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional           :: update,mode
-    end subroutine psb_iovrl_vect
-    subroutine psb_iovrl_multivect(x,desc_a,info,work,update,mode)
+    end subroutine psb_i2ovrl_vect
+    subroutine psb_i2ovrl_multivect(x,desc_a,info,work,update,mode)
       import
       implicit none
-      type(psb_i_multivect_type), intent(inout)    :: x
+      type(psb_i2_multivect_type), intent(inout)    :: x
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), intent(inout), optional, target :: work(:)
+      integer(psb_i2pk_), intent(inout), optional, target :: work(:)
       integer(psb_ipk_), intent(in), optional           :: update,mode
-    end subroutine psb_iovrl_multivect
+    end subroutine psb_i2ovrl_multivect
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine psb_ihalo_vect(x,desc_a,info,work,tran,mode,data)
+    subroutine psb_i2halo_vect(x,desc_a,info,work,tran,mode,data)
       import
       implicit none
-      type(psb_i_vect_type), intent(inout)   :: x
+      type(psb_i2_vect_type), intent(inout)   :: x
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), target, optional, intent(inout) :: work(:)
+      integer(psb_i2pk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
-    end subroutine psb_ihalo_vect
-    subroutine psb_ihalo_multivect(x,desc_a,info,work,tran,mode,data)
+    end subroutine psb_i2halo_vect
+    subroutine psb_i2halo_multivect(x,desc_a,info,work,tran,mode,data)
       import
       implicit none
-      type(psb_i_multivect_type), intent(inout)   :: x
+      type(psb_i2_multivect_type), intent(inout)   :: x
       type(psb_desc_type), intent(in)         :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
-      integer(psb_ipk_), target, optional, intent(inout) :: work(:)
+      integer(psb_i2pk_), target, optional, intent(inout) :: work(:)
       integer(psb_ipk_), intent(in), optional           :: mode,data
       character, intent(in), optional         :: tran
-    end subroutine psb_ihalo_multivect
+    end subroutine psb_i2halo_multivect
   end interface psb_halo
 
 
   interface psb_scatter
-    subroutine  psb_iscatter_vect(globx, locx, desc_a, info, root, mold)
+    subroutine  psb_i2scatter_vect(globx, locx, desc_a, info, root, mold)
       import
       implicit none
-      type(psb_i_vect_type), intent(inout) :: locx
-      integer(psb_ipk_), intent(in)  :: globx(:)
+      type(psb_i2_vect_type), intent(inout) :: locx
+      integer(psb_i2pk_), intent(in)  :: globx(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)             :: info
       integer(psb_ipk_), intent(in), optional    :: root
-      class(psb_i_base_vect_type), intent(in), optional :: mold  
-    end subroutine psb_iscatter_vect
+      class(psb_i2_base_vect_type), intent(in), optional :: mold  
+    end subroutine psb_i2scatter_vect
   end interface psb_scatter
 
   interface psb_gather
-    subroutine psb_igather_vect(globx, locx, desc_a, info, root)
+    subroutine psb_i2gather_vect(globx, locx, desc_a, info, root)
       import
       implicit none
-      type(psb_i_vect_type), intent(inout) :: locx
-      integer(psb_ipk_), intent(out), allocatable :: globx(:)
+      type(psb_i2_vect_type), intent(inout) :: locx
+      integer(psb_i2pk_), intent(out), allocatable :: globx(:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root
-    end subroutine psb_igather_vect
-    subroutine psb_igather_multivect(globx, locx, desc_a, info, root)
+    end subroutine psb_i2gather_vect
+    subroutine psb_i2gather_multivect(globx, locx, desc_a, info, root)
       import
       implicit none
-      type(psb_i_multivect_type), intent(inout) :: locx
-      integer(psb_ipk_), intent(out), allocatable :: globx(:,:)
+      type(psb_i2_multivect_type), intent(inout) :: locx
+      integer(psb_i2pk_), intent(out), allocatable :: globx(:,:)
       type(psb_desc_type), intent(in) :: desc_a
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), intent(in), optional   :: root
-    end subroutine psb_igather_multivect
+    end subroutine psb_i2gather_multivect
   end interface psb_gather
 
-end module psb_i_comm_mod
+end module psb_i2_comm_mod

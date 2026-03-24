@@ -31,6 +31,7 @@
 !    
 module psb_comm_mod
 
+  use psb_i2_comm_a_mod
   use psb_m_comm_a_mod
   use psb_e_comm_a_mod
   use psb_s_comm_a_mod

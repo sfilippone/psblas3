@@ -30,6 +30,7 @@
 !   
 !    
 module psi_serial_mod
+  use psi_i2_serial_mod
   use psi_m_serial_mod
   use psi_e_serial_mod
   use psi_s_serial_mod

@@ -30,7 +30,7 @@
 !   
 !    
 module psb_l_comm_mod
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_epk_, psb_mpk_
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_lpk_, psb_epk_, psb_mpk_, psb_i2pk_
   
   use psb_l_vect_mod, only : psb_l_vect_type, psb_l_base_vect_type
   use psb_l_multivect_mod, only : psb_l_multivect_type, psb_l_base_multivect_type

@@ -30,12 +30,12 @@
 !
 !
 module psi_m_serial_mod
-  use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_
+  use psb_const_mod, only : psb_ipk_, psb_lpk_, psb_mpk_, psb_epk_, psb_i2pk_
 
   interface psb_gelp 
     ! 2-D version
     subroutine psb_m_mgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_), intent(inout)     ::  x(:,:)
       integer(psb_mpk_), intent(in)      ::  iperm(:)
@@ -43,7 +43,7 @@ module psi_m_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_mgelp
     subroutine psb_m_mgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_), intent(inout)     ::  x(:)
       integer(psb_mpk_), intent(in)      ::  iperm(:)
@@ -51,7 +51,7 @@ module psi_m_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_mgelpv
     subroutine psb_e_mgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_), intent(inout)     ::  x(:,:)
       integer(psb_epk_), intent(in)      ::  iperm(:)
@@ -59,7 +59,7 @@ module psi_m_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_e_mgelp
     subroutine psb_e_mgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_), intent(inout)     ::  x(:)
       integer(psb_epk_), intent(in)      ::  iperm(:)
@@ -70,7 +70,7 @@ module psi_m_serial_mod
 
   interface psb_geaxpby
     subroutine psi_maxpby(m,n,alpha, x, beta, y, info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m, n
       integer(psb_mpk_), intent (in)       ::  x(:,:)
@@ -79,7 +79,7 @@ module psi_m_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_maxpby
     subroutine psi_maxpbyv(m,alpha, x, beta, y, info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_mpk_), intent (in)       ::  x(:)
@@ -88,7 +88,7 @@ module psi_m_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_maxpbyv
     subroutine psi_maxpbyv2(m,alpha, x, beta, y, z, info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_mpk_), intent (in)       ::  x(:)
@@ -101,7 +101,7 @@ module psi_m_serial_mod
 
   interface psi_upd_xyz
     subroutine psi_m_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_mpk_), intent (in)       ::  x(:)
@@ -114,7 +114,7 @@ module psi_m_serial_mod
   
   interface psi_xyzw
     subroutine psi_mxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       integer(psb_mpk_), intent (in)       :: x(:)
@@ -128,21 +128,21 @@ module psi_m_serial_mod
   
   interface psi_gth
     subroutine psi_mgthmv(n,k,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       integer(psb_mpk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_mgthmv
     subroutine psi_mgthv(n,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       integer(psb_mpk_) :: x(:), y(:),alpha,beta
     end subroutine psi_mgthv
     subroutine psi_mgthzmv(n,k,idx,x,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -150,7 +150,7 @@ module psi_m_serial_mod
 
     end subroutine psi_mgthzmv
     subroutine psi_mgthzmm(n,k,idx,x,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -158,8 +158,7 @@ module psi_m_serial_mod
 
     end subroutine psi_mgthzmm
     subroutine psi_mgthzv(n,idx,x,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
-      implicit none
+      import
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       integer(psb_mpk_) :: x(:), y(:)
@@ -168,21 +167,21 @@ module psi_m_serial_mod
 
   interface psi_sct
     subroutine psi_msctmm(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       integer(psb_mpk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_msctmm
     subroutine psi_msctmv(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       integer(psb_mpk_) :: beta, x(:), y(:,:)
     end subroutine psi_msctmv
     subroutine psi_msctv(n,idx,x,beta,y)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
 
       integer(psb_mpk_) :: n
@@ -193,7 +192,7 @@ module psi_m_serial_mod
 
   interface psi_exscan
     subroutine psi_m_exscanv(n,x,info,shift)
-      import :: psb_ipk_, psb_lpk_,psb_mpk_, psb_epk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: n
       integer(psb_mpk_), intent (inout)    :: x(:)

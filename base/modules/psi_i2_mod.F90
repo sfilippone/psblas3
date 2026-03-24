@@ -29,65 +29,16 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
 !    
-!
-!  The merge-sort and quicksort routines are implemented in the
-!  serial/aux directory
-!  References:
-!  D. Knuth
-!  The Art of Computer Programming, vol. 3
-!  Addison-Wesley
-!  
-!  Aho, Hopcroft, Ullman
-!  Data Structures and Algorithms
-!  Addison-Wesley
-!
+module psi_i2_mod
 
-module psb_sort_mod
-  use psb_const_mod
-  use psb_ip_reord_mod
-  use psi_serial_mod
-   
-  use psb_i2_hsort_mod
-  use psb_i2_isort_mod
-  use psb_i2_msort_mod
-  use psb_i2_qsort_mod
-   
-  use psb_m_hsort_mod
-  use psb_m_isort_mod
-  use psb_m_msort_mod
-  use psb_m_qsort_mod
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, psb_epk_, &
+        & psb_lpk_, psb_i2pk_
+  use psi_m_comm_a_mod
+  use psi_e_comm_a_mod
+  use psi_i2_comm_a_mod
+  use psb_i2_base_vect_mod, only : psb_i2_base_vect_type 
+  use psb_i2_base_multivect_mod, only : psb_i2_base_multivect_type 
+  use psi_i2_comm_v_mod
   
-  use psb_e_hsort_mod
-  use psb_e_isort_mod
-  use psb_e_msort_mod
-  use psb_e_qsort_mod
-  
-  use psb_s_hsort_mod
-  use psb_s_isort_mod
-  use psb_s_msort_mod
-  use psb_s_qsort_mod
-  
-  use psb_d_hsort_mod
-  use psb_d_isort_mod
-  use psb_d_msort_mod
-  use psb_d_qsort_mod
-  
-  use psb_c_hsort_mod
-  use psb_c_isort_mod
-  use psb_c_msort_mod
-  use psb_c_qsort_mod
-  
-  use psb_z_hsort_mod
-  use psb_z_isort_mod
-  use psb_z_msort_mod
-  use psb_z_qsort_mod
+end module psi_i2_mod
 
-  use psb_i2_hsort_x_mod
-  use psb_i_hsort_x_mod
-  use psb_l_hsort_x_mod
-  use psb_s_hsort_x_mod
-  use psb_d_hsort_x_mod
-  use psb_c_hsort_x_mod
-  use psb_z_hsort_x_mod
-  
-end module psb_sort_mod

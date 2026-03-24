@@ -35,7 +35,7 @@ module psi_c_serial_mod
   interface psb_gelp 
     ! 2-D version
     subroutine psb_m_cgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       complex(psb_spk_), intent(inout)     ::  x(:,:)
       integer(psb_mpk_), intent(in)      ::  iperm(:)
@@ -43,7 +43,7 @@ module psi_c_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_cgelp
     subroutine psb_m_cgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_mpk_,psb_spk_
+      import
       implicit none
       complex(psb_spk_), intent(inout)     ::  x(:)
       integer(psb_mpk_), intent(in)      ::  iperm(:)
@@ -51,7 +51,7 @@ module psi_c_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_cgelpv
     subroutine psb_e_cgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_epk_, psb_spk_
+      import
       implicit none
       complex(psb_spk_), intent(inout)     ::  x(:,:)
       integer(psb_epk_), intent(in)      ::  iperm(:)
@@ -59,7 +59,7 @@ module psi_c_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_e_cgelp
     subroutine psb_e_cgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_epk_, psb_spk_
+      import
       implicit none
       complex(psb_spk_), intent(inout)     ::  x(:)
       integer(psb_epk_), intent(in)      ::  iperm(:)
@@ -70,7 +70,7 @@ module psi_c_serial_mod
 
   interface psb_geaxpby
     subroutine psi_caxpby(m,n,alpha, x, beta, y, info)
-      import :: psb_ipk_, psb_spk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m, n
       complex(psb_spk_), intent (in)       ::  x(:,:)
@@ -79,7 +79,7 @@ module psi_c_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_caxpby
     subroutine psi_caxpbyv(m,alpha, x, beta, y, info)
-      import :: psb_ipk_, psb_spk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_spk_), intent (in)       ::  x(:)
@@ -88,7 +88,7 @@ module psi_c_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_caxpbyv
     subroutine psi_caxpbyv2(m,alpha, x, beta, y, z, info)
-      import :: psb_ipk_, psb_spk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_spk_), intent (in)       ::  x(:)
@@ -101,7 +101,7 @@ module psi_c_serial_mod
 
   interface psi_upd_xyz
     subroutine psi_c_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
-      import :: psb_ipk_, psb_spk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_spk_), intent (in)       ::  x(:)
@@ -114,7 +114,7 @@ module psi_c_serial_mod
   
   interface psi_xyzw
     subroutine psi_cxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
-      import :: psb_ipk_, psb_spk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_spk_), intent (in)       :: x(:)
@@ -128,21 +128,21 @@ module psi_c_serial_mod
   
   interface psi_gth
     subroutine psi_cgthmv(n,k,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_cgthmv
     subroutine psi_cgthv(n,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:), y(:),alpha,beta
     end subroutine psi_cgthv
     subroutine psi_cgthzmv(n,k,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -150,7 +150,7 @@ module psi_c_serial_mod
 
     end subroutine psi_cgthzmv
     subroutine psi_cgthzmm(n,k,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -158,8 +158,7 @@ module psi_c_serial_mod
 
     end subroutine psi_cgthzmm
     subroutine psi_cgthzv(n,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
-      implicit none
+      import
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: x(:), y(:)
@@ -168,21 +167,21 @@ module psi_c_serial_mod
 
   interface psi_sct
     subroutine psi_csctmm(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_csctmm
     subroutine psi_csctmv(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       complex(psb_spk_) :: beta, x(:), y(:,:)
     end subroutine psi_csctmv
     subroutine psi_csctv(n,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
 
       integer(psb_mpk_) :: n
@@ -193,7 +192,7 @@ module psi_c_serial_mod
 
   interface psi_exscan
     subroutine psi_c_exscanv(n,x,info,shift)
-      import :: psb_ipk_, psb_mpk_, psb_spk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: n
       complex(psb_spk_), intent (inout)    :: x(:)
