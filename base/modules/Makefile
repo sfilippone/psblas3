@@ -305,9 +305,9 @@ desc/psb_desc_mod.o: psb_penv_mod.o psb_realloc_mod.o\
 	  desc/psb_indx_map_mod.o serial/psb_i_vect_mod.o
 
 psi_i_mod.o: desc/psb_desc_mod.o serial/psb_i_vect_mod.o comm/psi_e_comm_a_mod.o \
-	comm/psi_m_comm_a_mod.o comm/psi_i_comm_v_mod.o
+	comm/psi_m_comm_a_mod.o comm/psi_i_comm_v_mod.o comm/psi_i2_comm_a_mod.o 
 psi_l_mod.o: desc/psb_desc_mod.o serial/psb_l_vect_mod.o comm/psi_e_comm_a_mod.o \
-	comm/psi_m_comm_a_mod.o comm/psi_l_comm_v_mod.o
+	comm/psi_m_comm_a_mod.o comm/psi_l_comm_v_mod.o comm/psi_i2_comm_a_mod.o 
 psi_s_mod.o: desc/psb_desc_mod.o serial/psb_s_vect_mod.o comm/psi_s_comm_a_mod.o \
 	comm/psi_s_comm_v_mod.o
 psi_d_mod.o: desc/psb_desc_mod.o serial/psb_d_vect_mod.o comm/psi_d_comm_a_mod.o \
