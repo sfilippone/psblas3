@@ -434,7 +434,7 @@ set(PSB_base_source_files
   modules/comm/psb_m_comm_a_mod.f90
   modules/comm/psb_z_linmap_mod.f90
   modules/comm/psi_s_comm_a_mod.f90
-#  modules/comm/psi_i2_comm_a_mod.f90
+  modules/comm/psi_i2_comm_a_mod.f90
   modules/comm/psi_m_comm_a_mod.f90
   modules/comm/psi_l_comm_v_mod.f90
   modules/comm/psb_comm_mod.f90
