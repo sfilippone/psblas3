@@ -430,11 +430,9 @@ set(PSB_base_source_files
   psblas/psb_cinv_vect.f90
   psblas/psb_zasum.f90
   modules/comm/psi_z_comm_v_mod.f90
-#  modules/comm/psb_i2_comm_a_mod.f90
   modules/comm/psb_m_comm_a_mod.f90
   modules/comm/psb_z_linmap_mod.f90
   modules/comm/psi_s_comm_a_mod.f90
-#  modules/comm/psi_i2_comm_a_mod.f90
   modules/comm/psi_m_comm_a_mod.f90
   modules/comm/psi_l_comm_v_mod.f90
   modules/comm/psb_comm_mod.f90
@@ -459,6 +457,7 @@ set(PSB_base_source_files
   modules/comm/psb_d_comm_mod.f90
   modules/comm/psi_e_comm_a_mod.f90
   modules/comm/psb_c_comm_a_mod.f90
+  modules/comm/psi_i2_comm_a_mod.f90
   modules/comm/psb_linmap_mod.f90
   modules/comm/psb_z_comm_a_mod.f90
   modules/comm/psi_c_comm_a_mod.f90
