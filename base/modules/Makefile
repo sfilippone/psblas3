@@ -101,6 +101,7 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 	comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
 	comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o \
 	comm/psi_e_comm_a_mod.o comm/psi_m_comm_a_mod.o \
+	comm/psi_i2_comm_a_mod.o  \
 	comm/psi_s_comm_a_mod.o comm/psi_d_comm_a_mod.o \
 	comm/psi_c_comm_a_mod.o comm/psi_z_comm_a_mod.o \
 	comm/psi_i_comm_v_mod.o comm/psi_l_comm_v_mod.o \
@@ -364,7 +365,7 @@ comm/psi_d_comm_v_mod.o:  serial/psb_d_vect_mod.o comm/psi_d_comm_a_mod.o
 comm/psi_c_comm_v_mod.o:  serial/psb_c_vect_mod.o comm/psi_c_comm_a_mod.o 
 comm/psi_z_comm_v_mod.o:  serial/psb_z_vect_mod.o comm/psi_z_comm_a_mod.o 
 
-comm/psi_e_comm_a_mod.o comm/psi_m_comm_a_mod.o \
+comm/psi_e_comm_a_mod.o comm/psi_m_comm_a_mod.o comm/psi_i2_comm_a_mod.o \
 comm/psi_s_comm_a_mod.o comm/psi_d_comm_a_mod.o \
 comm/psi_c_comm_a_mod.o comm/psi_z_comm_a_mod.o:  desc/psb_desc_mod.o
 
