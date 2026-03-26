@@ -434,6 +434,8 @@ set(PSB_base_source_files
   modules/comm/psb_z_linmap_mod.f90
   modules/comm/psi_s_comm_a_mod.f90
   modules/comm/psb_i2_comm_a_mod.f90
+  modules/comm/psi_i2_comm_a_mod.f90
+  modules/comm/psi_i2_comm_v_mod.f90
   modules/comm/psi_m_comm_a_mod.f90
   modules/comm/psi_l_comm_v_mod.f90
   modules/comm/psb_comm_mod.f90
@@ -618,6 +620,7 @@ set(PSB_base_source_files
   modules/psb_penv_mod.F90
   modules/psb_error_mod.F90
   modules/psb_timers_mod.f90
+  modules/psi_i2_mod.F90
   modules/psi_i_mod.F90
   modules/psi_z_mod.F90
   modules/desc/psb_desc_const_mod.f90
