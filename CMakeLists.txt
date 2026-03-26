@@ -848,11 +848,12 @@ endif()
 
 
 # Set the Fortran module output directory for all targets
-#set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
+#set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 
 
-set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_MODULDIR}")
-message(STATUS "fortran module directory ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_MODULDIR}")
+
+message(STATUS "fortran module directory ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
 
 
 include_directories(${MPI_Fortran_INCLUDE_PATH})
@@ -1273,7 +1274,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/include/
 
 # Install module files
 install(DIRECTORY ${CMAKE_BINARY_DIR}/modules/
-  DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}"  # This will place .mod files in <prefix>/modules
+  DESTINATION "${CMAKE_INSTALL_MODULDIR}"  # This will place .mod files in <prefix>/modules
   FILES_MATCHING PATTERN "*.mod"
 )
 
