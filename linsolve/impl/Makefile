@@ -4,7 +4,9 @@ LIBDIR=../../lib
 INCDIR=../../include
 MODDIR=../../modules
 HERE=..
-OBJS=psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
+OBJS=psb_d_pMPK.o \
+		psb_d_powermethod.o \
+	psb_dkrylov.o psb_skrylov.o psb_ckrylov.o psb_zkrylov.o \
 		psb_drichardson.o psb_srichardson.o psb_crichardson.o psb_zrichardson.o \
     psb_dcgstab.o psb_dcg.o psb_dfcg.o psb_dgcr.o psb_dcgs.o \
 		psb_dbicg.o psb_dcgstabl.o psb_drgmres.o \

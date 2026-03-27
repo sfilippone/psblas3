@@ -9,7 +9,8 @@ MODDIR=../modules
 MODOBJS= psb_base_linsolve_conv_mod.o \
 	psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o \
 	psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o \
-	psb_linsolve_mod.o
+	psb_linsolve_mod.o \
+	psb_pMPK_mod.o psb_eigsolve_mod.o
 
 OBJS=$(MODOBJS)
 
@@ -20,16 +21,10 @@ FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR)
 
 objs: mods $(OBJS)  impld
 
-kernmods:
-	$(MAKE) -C kernels mods
-
-mods: kernmods $(MODOBJS)
+mods: $(MODOBJS)
 	$(INSTALL) -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
 
-kernlib: kernmods
-	$(MAKE) -C kernels lib
-
-lib: kernlib objs
+lib: objs
 	$(MAKE) -C impl lib
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)

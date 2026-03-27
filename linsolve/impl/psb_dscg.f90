@@ -197,6 +197,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, itmax, iter, err, 
 
   call psb_end_conv(methdname, itidx, desc_a, stopdat, info, derr, iter)
   if (present(err)) err = derr
+  if (present(iter)) iter = iter * s
 
   if (info == psb_success_) call psb_gefree(r, desc_a, info)
   if (info == psb_success_) call psb_gefree(Z, desc_a, info)

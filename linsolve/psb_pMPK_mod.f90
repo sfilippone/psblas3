@@ -1,6 +1,6 @@
-module psb_d_pMPK_mod
+module psb_pMPK_mod
     use psb_base_mod
-    use psb_d_prec_mod
+    use psb_prec_mod
 
     interface psb_pMPK
         subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_type, alpha, beta, gamma)
