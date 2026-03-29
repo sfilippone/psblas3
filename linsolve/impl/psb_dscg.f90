@@ -28,9 +28,9 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   character(len=20)           :: name = 'psb_dscg'
   character(len=*), parameter :: methdname = 'sStepCG'
 
-  real(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_a(:, :)
+  real(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_fa(:, :)
   type(psb_d_vect_type)       :: r  
-  type(psb_d_multivect_type)  :: Z, Q, P, V, temp
+  type(psb_d_multivect_type)  :: Z, Q, P, V, temp_mv
   integer(psb_ipk_)           :: itidx
   
   type(psb_itconv_type)         :: stopdat
@@ -108,19 +108,19 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   end if
 
   !Allocate and assembly data structure
-  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_a(s, s + 1), stat = info)
+  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, s + 1), stat = info)
   if (info == psb_success_) call psb_geall(r, desc_a, info)
   if (info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
   if (info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
   if (info == psb_success_) call psb_geall(P, desc_a, info, n = s)
   if (info == psb_success_) call psb_geall(V, desc_a, info, n = s)
-  if (info == psb_success_) call psb_geall(temp, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(temp_mv, desc_a, info, n = s)
   if (info == psb_success_) call psb_geasb(r, desc_a, info)
   if (info == psb_success_) call psb_geasb(Z, desc_a, info)
   if (info == psb_success_) call psb_geasb(Q, desc_a, info)
   if (info == psb_success_) call psb_geasb(P, desc_a, info)
   if (info == psb_success_) call psb_geasb(V, desc_a, info)
-  if (info == psb_success_) call psb_geasb(temp, desc_a, info)
+  if (info == psb_success_) call psb_geasb(temp_mv, desc_a, info)
 
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
@@ -179,15 +179,12 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
 
   ! Loop until convergence (or maxiter)
   do itidx = 1, itmax_
-    ! Compute matrix W and rhs for alpha 
-    ! Compute matrix W and rhs for alpha 
-    call psb_gedots(P, V, W, desc_a, info, global = .true.)
-    call psb_gedots(P, r, alpha, desc_a, info, global = .true.)
-    ! call psb_gedots(P, V, temp_a(:, 1 : s), desc_a, info, global = .false.)
-    ! call psb_gedots(P, r, temp_a(:, s + 1), desc_a, info, global = .false.)
-    ! call psb_sum(desc_a%get_ctxt(), temp_a, info)
-    ! W = temp_a(:, 1 : s)
-    ! alpha = temp_a(:, s + 1)
+    ! Compute matrix W and rhs for alpha
+    call psb_gedots(P, V, temp_fa(:, 1 : s), desc_a, info, global = .false.)
+    call psb_gedots(P, r, temp_fa(:, s + 1), desc_a, info, global = .false.)
+    call psb_sum(desc_a%get_context(), temp_fa)
+    W = temp_fa(:, 1 : s)
+    alpha = temp_fa(:, s + 1)
 
     ! Factor matrix W
     call dgetrf(s, s, W, s, pW, info)
@@ -196,8 +193,8 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
 
     ! Update solution and residual
-    call psb_geaxpby(P, alpha, x, desc_a, info, .true.)
-    call psb_geaxpby(V, -alpha, r, desc_a, info, .true.)
+    call psb_geaxpby(P, alpha, x, desc_a, info, upd_flag = .true.)
+    call psb_geaxpby(V, -alpha, r, desc_a, info, upd_flag = .true.)
 
     ! Check convergence. 
     if(psb_check_conv(methdname, itidx, x, r, desc_a, stopdat, info)) exit
@@ -213,11 +210,11 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     beta = -beta;
     call dgetrs('N', s, s, W, s, pW, beta, s, info)
 
-    ! Update P and V. Use of temp in needed because internal dgemm constraint
-    call psb_geaxpby(P, beta, temp, desc_a, info, .false.)
-    call psb_geaxpby(done, Z, done, temp, P, desc_a, info)
-    call psb_geaxpby(V, beta, temp, desc_a, info, .false.)
-    call psb_geaxpby(done, Q, done, temp, V, desc_a, info)
+    ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
+    call psb_geaxpby(P, beta, temp_mv, desc_a, info, .false.)
+    call psb_geaxpby(done, Z, done, temp_mv, P, desc_a, info)
+    call psb_geaxpby(V, beta, temp_mv, desc_a, info, .false.)
+    call psb_geaxpby(done, Q, done, temp_mv, V, desc_a, info)
   end do
 
   call psb_end_conv(methdname, itidx, desc_a, stopdat, info, derr, iter)
@@ -229,9 +226,9 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   if (info == psb_success_) call psb_gefree(Q, desc_a, info)
   if (info == psb_success_) call psb_gefree(P, desc_a, info)
   if (info == psb_success_) call psb_gefree(V, desc_a, info)
-  if (info == psb_success_) call psb_gefree(temp, desc_a, info)
+  if (info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
 
-  if (info == psb_success_) deallocate(alpha, beta, W, pW, stat = info)
+  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, stat = info)
   if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
