@@ -986,10 +986,14 @@ subroutine psb_daxpby_mv_cspan1D(x, coeff, y, desc_a, info, upd_flag)
   integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20) :: name, ch_err
-  logical :: upd_flag_ = .false.
+  logical :: upd_flag_
 
-  if(present(upd_flag)) upd_flag_ = upd_flag
-
+  if(present(upd_flag)) then
+    upd_flag_ = upd_flag
+  else
+    upd_flag_ = .false.
+  end if
+  
   name = 'psb_daxpby_mv_cspan1D'
   if (psb_errstatus_fatal()) return
   
@@ -1068,9 +1072,13 @@ subroutine psb_daxpby_mv_cspan2D(x, coeff, y, desc_a, info, upd_flag)
   integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20) :: name, ch_err
-  logical :: upd_flag_ = .false.
-
-  if(present(upd_flag)) upd_flag_ = upd_flag
+  logical :: upd_flag_ 
+  
+  if(present(upd_flag)) then
+    upd_flag_ = upd_flag
+  else
+    upd_flag_ = .false.
+  end if
 
   name = 'psb_daxpby_mv_cspan2D'
   if (psb_errstatus_fatal()) return

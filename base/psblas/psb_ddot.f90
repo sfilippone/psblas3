@@ -435,7 +435,7 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
        & err_act, iix, jjx, iiy, jjy, i, nr
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20)      :: name, ch_err
-  logical :: global_ = .true.
+  logical :: global_
 
   integer(psb_ipk_)           :: ovrlap_size, outm, outn
   real(psb_dpk_), allocatable :: ovrlap_xval(:), ovrlap_yval(:)
@@ -465,6 +465,8 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
 
   if (present(global)) then
     global_ = global
+  else
+    global_ = .true.
   end if
 
   ix = ione
@@ -556,7 +558,7 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
        & err_act, iix, jjx, iiy, jjy, i, nr
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m
   character(len=20) :: name, ch_err
-  logical :: global_ = .true.
+  logical :: global_
 
   integer(psb_ipk_)           :: ovrlap_size, outm
   real(psb_dpk_), allocatable :: ovrlap_xval(:)
@@ -593,6 +595,8 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
 
   if (present(global)) then
     global_ = global
+  else
+    global_ = .true.
   end if
 
   ix = ione
