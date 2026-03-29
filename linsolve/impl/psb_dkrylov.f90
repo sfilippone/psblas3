@@ -80,7 +80,7 @@
 !                                           estimate of) residual 
 ! 
 subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,irst,istop,cond)
+     & itmax,iter,err,itrace,irst,istop,cond, steps, eigext, base_type)
 
   use psb_base_mod
   use psb_prec_mod,only : psb_dprec_type
@@ -94,9 +94,11 @@ subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   type(psb_d_vect_type), intent(inout) :: x
   real(psb_dpk_), intent(in)           :: eps
   integer(psb_ipk_), intent(out)            :: info
-  integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, irst, istop
+  integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, irst, istop, steps
   integer(psb_ipk_), optional, intent(out)  :: iter
   real(psb_dpk_), optional, intent(out)     :: err, cond
+  real(psb_dpk_), optional, intent(in)      :: eigext(2)
+  character, optional, intent(in)           :: base_type
 
   abstract interface
     subroutine psb_dkryl_vect(a,prec,b,x,eps,&
@@ -147,8 +149,8 @@ subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       real(psb_dpk_), optional, intent(out)     :: err, cond
     end subroutine psb_dkryl_cond_vect
 
-    subroutine psb_dkryl_step_vect(a, prec, b, x, s, eps, desc_a, info, &
-         & itmax, iter, err, itrace, istop)
+    subroutine psb_dkryl_step_vect(a, prec, b, x, s, eps, base_type, desc_a, info, &
+         & itmax, iter, err, itrace, istop, eigext)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       type(psb_dspmat_type), intent(in)    :: a
@@ -158,10 +160,12 @@ subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       type(psb_d_vect_type), intent(inout) :: x
       integer(psb_ipk_), intent(in)        :: s
       real(psb_dpk_), intent(in)           :: eps
+      character, intent(in)                :: base_type
       integer(psb_ipk_), intent(out)            :: info
       integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_dpk_), optional, intent(out)     :: err
+      real(psb_dpk_), optional, intent(in)      :: eigext(2)
     end subroutine psb_dkryl_step_vect
   end interface
 
@@ -173,8 +177,9 @@ subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
 
   logical             :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: me, np, err_act, itrace_, s_
+  integer(psb_ipk_)   :: me, np, err_act, itrace_, steps_
   character(len=20)   :: name
+  character           :: base_type_       ! For s-step CG
 
   info = psb_success_
   name = 'psb_krylov'
@@ -222,14 +227,23 @@ subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
     call  psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
   case('SSTEPCG')
-    ! s parameter passed via irst parameter (defaulted to 5)
-    if(present(irst)) then 
-      s_ = irst
+    ! step (defaulted to 5)
+    if(present(steps)) then 
+      steps_ = steps
     else
-      s_ = 5
+      steps_ = 5
     endif
-    call psb_dscg_vect(a, prec, b, x, s_, eps, desc_a, info, &
-                        & itmax, iter, err, itrace = itrace_, istop = istop)
+
+    !Base selection (defaulted to Chebychev)
+    if(present(base_type)) then
+      base_type_  = base_type
+    else
+      base_type_  = "C"
+    endif
+      
+    call psb_dscg_vect(a, prec, b, x, steps_, eps, base_type_, desc_a, info, &
+                        & itmax = itmax, iter = iter, err = err, itrace = itrace_, &
+                        & istop = istop, eigext = eigext)
   case default
     if (me == 0) write(psb_err_unit,*) trim(name),&
          & ': Warning: Unknown method  ',method,&
@@ -250,8 +264,6 @@ subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
-
 end subroutine psb_dkrylov_vect
 
