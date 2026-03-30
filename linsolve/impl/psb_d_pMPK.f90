@@ -137,9 +137,9 @@ contains
 
         ! Loop for s > 2
         do i = 3, s
-            ind_tmp = mod(ind_tmp, 3) + 1
-            call psb_geaxpby(2*alpha, mvec_out, idx_Q, -2*beta, mvec_tmp, mod(ind_tmp - 1, 3) + 1, &
-                                & -gamma_, mvec_tmp, mod(ind_tmp - 2, 3) + 1, mvec_tmp, ind_tmp, desc, info)
+            ind_tmp = modulo(ind_tmp, 3) + 1
+            call psb_geaxpby(2*alpha, mvec_out, idx_Q, -2*beta, mvec_tmp, modulo(ind_tmp - 1, 3) + 1, &
+                                & -gamma_, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, mvec_tmp, ind_tmp, desc, info)
 
             idx_Z = idx_Z + 1
             call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info)
@@ -295,13 +295,12 @@ contains
 
         !Check second early exit
         if(s == 2) goto 9998
-
+        
         ! Loop for s > 2
         do i = 3, s
-            ind_tmp = mod(ind_tmp, 3) + 1
-            call psb_geaxpby(2*alpha, Q, idx_Q, -2*beta, mvec_tmp, mod(ind_tmp - 1, 3) + 1, &
-                                & -gamma_, mvec_tmp, mod(ind_tmp - 2, 3) + 1, mvec_tmp, ind_tmp, desc, info)
-
+            ind_tmp = modulo(ind_tmp, 3) + 1
+            call psb_geaxpby(2*alpha, Q, idx_Q, -2*beta, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, &
+                                & -gamma_, mvec_tmp, modulo(ind_tmp - 3, 3) + 1, mvec_tmp, ind_tmp, desc, info)
             idx_Z = idx_Z + 1
             call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info)
 
