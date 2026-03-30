@@ -1,7 +1,7 @@
 subroutine psb_d_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, tol)
-    use psb_base_mod, only : psb_ipk_, psb_dpk_, psb_desc_type, &
-                            & psb_dspmat_type, psb_d_vect_type
-    use psb_prec_mod, only : psb_dprec_type
+    use psb_base_mod
+    use psb_prec_mod
+    implicit none
     type(psb_dspmat_type), intent(in)     :: a
     class(psb_dprec_type), intent(inout)  :: prec 
     real(psb_dpk_), intent(out)           :: lambda
@@ -13,22 +13,47 @@ subroutine psb_d_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, 
     integer(psb_ipk_), intent(out), optional        :: iter
     real(psb_dpk_), intent(in), optional            :: tol ! def 10^-3
 
-    ! call psb_geasb(tz,desc_a,info,mold=vmold,scratch=.true.)
-    ! call psb_geasb(tt,desc_a,info,mold=vmold,scratch=.true.)
-    ! call psb_geasb(wv(1),desc_a,info,mold=vmold,scratch=.true.)
-    ! call psb_geasb(wv(2),desc_a,info,mold=vmold,scratch=.true.)
-    ! call psb_geall(tq,desc_a,info)
-    ! call tq%set(done)
-    ! call psb_geasb(tq,desc_a,info,mold=vmold)
-    ! call psb_spmm(done,a,tq,dzero,tt,desc_a,info) !
-    ! call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = BA q_k
-    ! do i=1,sm%rho_estimate_iterations
-    !     znrm = psb_genrm2(tz,desc_a,info)               ! znrm = |z_k|_2
-    !     call psb_geaxpby((done/znrm),tz,dzero,tq,desc_a,info)  ! q_k = z_k/znrm
-    !     call psb_spmm(done,a,tq,dzero,tt,desc_a,info) ! t_{k+1} = BA q_k
-    !     call sm%sv%apply_v(done,tt,dzero,tz,desc_a,'NoTrans',work,wv,info) ! z_{k+1} = B t_{k+1}
-    !     lambda = psb_gedot(tq,tz,desc_a,info)      ! lambda = q_k^T z_{k+1} = q_k^T BA q_k
-    !     !write(0,*) 'BLD: lambda estimate ',i,lambda
-    ! end do
-    ! sm%rho_ba = lambda
+    type(psb_d_vect_type)   :: z, q 
+    integer(psb_ipk_)       :: i, itmax_
+    real(psb_dpk_)          :: tol_
+    real(psb_dpk_)          :: lambda_old, norm_factor
+    
+    if(present(itmax)) then
+        itmax_ = itmax
+    else
+        itmax_ = 20_psb_ipk_
+    end if
+
+    if(present(tol)) then
+        tol_ = tol
+    else
+        tol_ = real(1.0e-3, psb_dpk_)
+    end if
+
+    call psb_geall(z, desc, info)
+    call psb_geall(q, desc, info)
+    call psb_geasb(z, desc, info)
+    call psb_geasb(q, desc, info)
+    call q%set(done)
+
+    if(present(x) .and. present(flag)) then     !TO DO: can we avoid the allocation of one vector in this case?
+        if(flag) call psb_geaxpby(done, x, dzero, q, desc, info)
+    end if
+
+    lambda_old = dzero
+    do i = 1, itmax_
+        norm_factor = done / psb_genrm2(q, desc, info)
+        call psb_geaxpby(norm_factor, q, dzero, z, desc, info)      ! z_k = q_k / |q_k|_2
+        call psb_spmm(done, a, z, dzero, q, desc, info)             ! q_k = A z_k 
+        call prec%apply(q, desc, info)                              ! q_k = B q_k
+        lambda = psb_gedot(z, q, desc, info)                        ! lambda = <z_k, q_k> = z_k^T BA z_k
+        if(abs(lambda - lambda_old) < tol_ * abs(lambda)) exit
+        lambda_old = lambda
+    end do
+
+    if(present(iter)) iter = i
+    if(present(x)) call psb_geaxpby(done, z, dzero, x, desc, info)
+
+    call psb_gefree(z, desc, info)
+    call psb_gefree(q, desc, info)    
 end subroutine

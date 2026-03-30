@@ -2,7 +2,7 @@ module psb_eigsolve_mod
   use psb_base_mod
   use psb_prec_mod
   interface psb_powermethod
-    subroutine psb_d_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter)
+    subroutine psb_d_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, tol)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
             psb_dspmat_type, psb_d_vect_type, psb_dprec_type
       type(psb_dspmat_type), intent(in)     :: a
@@ -14,6 +14,7 @@ module psb_eigsolve_mod
       logical, intent(in), optional                   :: flag
       integer(psb_ipk_), intent(in), optional         :: itmax
       integer(psb_ipk_), intent(out), optional        :: iter
+      real(psb_dpk_), intent(in), optional            :: tol ! def 10^-3
     end subroutine
 
     !TO DO: add s, c, z versions
