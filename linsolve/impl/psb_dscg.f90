@@ -20,8 +20,8 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   real(psb_dpk_), optional, intent(in)      :: eigext(2)
 
   ! Local vars
-  integer(psb_ipk_)   :: istop_, itmax_, itrace_
   type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: istop_, itmax_, itrace_
   integer(psb_ipk_)   :: err_act, np, me, debug_level, debug_unit, &
                           & n_col, n_row
   integer(psb_lpk_)   :: mglob
@@ -31,12 +31,15 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   real(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_fa(:, :)
   type(psb_d_vect_type)       :: r  
   type(psb_d_multivect_type)  :: Z, Q, P, V, temp_mv
+  real(psb_dpk_)              :: cheb_coeff(3)
   integer(psb_ipk_)           :: itidx
   
   type(psb_itconv_type)         :: stopdat
-  integer(psb_ipk_), parameter  :: Gram_solver_type = ione
   real(psb_dpk_)                :: derr 
-  real(psb_dpk_)                :: cheb_coeff(3)
+
+  integer(psb_ipk_), parameter  :: lapackLU = izero
+  integer(psb_ipk_), parameter  :: forwardGS = ione
+  integer(psb_ipk_), parameter  :: Gram_solver_type = forwardGS
 
 
   info = psb_success_
@@ -186,11 +189,14 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     W = temp_fa(:, 1 : s)
     alpha = temp_fa(:, s + 1)
 
-    ! Factor matrix W
-    call dgetrf(s, s, W, s, pW, info)
+    ! Factor matrix W (if soving with LU factorization)
+    if(Gram_solver_type == lapackLU) call dgetrf(s, s, W, s, pW, info)
 
     ! Solve for alpha
-    call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
+    select case(Gram_solver_type)
+      case(lapackLU);   call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
+      case(forwardGS);  call inner_solver_fgs_1D(W, alpha)
+    end select
 
     ! Update solution and residual
     call psb_geaxpby(P, alpha, x, desc_a, info, upd_flag = .true.)
@@ -205,10 +211,13 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
 
     ! Compute rhs for beta
     call psb_gedots(P, Q, beta, desc_a, info, .true.)
+    beta = -beta;
 
     ! Solve for beta
-    beta = -beta;
-    call dgetrs('N', s, s, W, s, pW, beta, s, info)
+    select case(Gram_solver_type)
+      case(lapackLU);   call dgetrs('N', s, s, W, s, pW, beta, s, info)
+      case(forwardGS);  call inner_solver_fgs_2D(W, beta)
+    end select
 
     ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
     call psb_geaxpby(P, beta, temp_mv, desc_a, info, .false.)
@@ -281,4 +290,48 @@ contains
     coeff(2) = (lambda_max + lambda_min) / (lambda_max - lambda_min)
     coeff(3) = done
   end function psb_d_chebyshev_coefficients
+
+  subroutine inner_solver_fgs_1D(M, rhs)
+    real(psb_dpk_), intent(in)    :: M(:, :)
+    real(psb_dpk_), intent(inout) :: rhs(:)
+
+    integer(psb_ipk_), parameter  :: num_iter = 50
+    integer(psb_ipk_) :: iter_idx, i, j, n
+    real(psb_dpk_)    :: sol(size(rhs))
+
+    sol = dzero
+    n = size(sol)
+    do iter_idx = 1, num_iter
+      do i = 1, n
+        sol(i) = rhs(i)
+        do j = 1, n
+          if(j /= i) sol(i) = sol(i) - M(i, j) * sol(j)
+        end do
+        sol(i) = sol(i) / M(i, i)
+      end do
+    end do
+    rhs = sol
+  end subroutine inner_solver_fgs_1D
+
+  subroutine inner_solver_fgs_2D(M, rhs)
+    real(psb_dpk_), intent(in)    :: M(:, :)
+    real(psb_dpk_), intent(inout) :: rhs(:, :)
+    
+    integer(psb_ipk_), parameter  :: num_iter = 50
+    integer(psb_ipk_) :: iter_idx, i, j, n
+    real(psb_dpk_)    :: sol(size(rhs, 1), size(rhs, 2))
+
+    sol = dzero
+    n = size(sol, 1)
+    do iter_idx = 1, num_iter
+      do i = 1, n
+        sol(i, :) = rhs(i, :)
+        do j = 1, n
+          if(j /= i) sol(i, :) = sol(i, :) - M(i, j) * sol(j, :)
+        end do
+        sol(i, :) = sol(i, :) / M(i, i)
+      end do
+    end do
+    rhs = sol
+  end subroutine inner_solver_fgs_2D
 end subroutine psb_dscg_vect
