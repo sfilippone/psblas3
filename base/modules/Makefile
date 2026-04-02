@@ -28,7 +28,10 @@ COMMINT= penv/psi_penv_mod.o \
 SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o \
 	serial/psb_serial_mod.o \
-	comm/psb_neighbor_topology_mod.o \
+	comm/comm_schemes/psb_comm_schemes_mod.o \
+	comm/comm_schemes/psb_comm_baseline_mod.o \
+	comm/comm_schemes/psb_comm_neighbor_impl_mod.o \
+	comm/comm_schemes/psb_comm_factory_mod.o \
 	serial/psb_i_base_vect_mod.o serial/psb_i_vect_mod.o\
 	serial/psb_l_base_vect_mod.o serial/psb_l_vect_mod.o\
 	serial/psb_d_base_vect_mod.o serial/psb_d_vect_mod.o\
@@ -95,9 +98,11 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 	comm/psb_s_linmap_mod.o comm/psb_d_linmap_mod.o \
 	comm/psb_c_linmap_mod.o comm/psb_z_linmap_mod.o \
 	comm/psb_comm_mod.o \
+	comm/psb_neighbor_topology_mod.o \
 	comm/psb_i_comm_mod.o comm/psb_l_comm_mod.o \
 	comm/psb_s_comm_mod.o comm/psb_d_comm_mod.o\
 	comm/psb_c_comm_mod.o comm/psb_z_comm_mod.o \
+	comm/psb_i2_comm_a_mod.o \
 	comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
 	comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
 	comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o \
@@ -182,6 +187,14 @@ auxil/psb_string_mod.o auxil/psb_m_realloc_mod.o auxil/psb_e_realloc_mod.o auxil
 auxil/psb_d_realloc_mod.o auxil/psb_c_realloc_mod.o auxil/psb_z_realloc_mod.o \
 desc/psb_desc_const_mod.o psi_penv_mod.o: psb_const_mod.o
 
+comm/comm_schemes/psb_comm_schemes_mod.o: psb_const_mod.o
+
+comm/comm_schemes/psb_comm_baseline_mod.o: comm/comm_schemes/psb_comm_schemes_mod.o
+
+comm/comm_schemes/psb_comm_neighbor_impl_mod.o: psb_const_mod.o desc/psb_desc_const_mod.o comm/comm_schemes/psb_comm_schemes_mod.o
+
+comm/comm_schemes/psb_comm_factory_mod.o: comm/comm_schemes/psb_comm_schemes_mod.o comm/comm_schemes/psb_comm_baseline_mod.o comm/comm_schemes/psb_comm_neighbor_impl_mod.o
+
 comm/psb_neighbor_topology_mod.o: psb_const_mod.o desc/psb_desc_const_mod.o
 
 desc/psb_indx_map_mod.o desc/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o  desc/psb_desc_const_mod.o
@@ -263,8 +276,10 @@ serial/psb_d_base_mat_mod.o: serial/psb_d_base_vect_mod.o
 serial/psb_c_base_mat_mod.o: serial/psb_c_base_vect_mod.o
 serial/psb_z_base_mat_mod.o: serial/psb_z_base_vect_mod.o
 serial/psb_l_base_vect_mod.o: serial/psb_i_base_vect_mod.o 
-serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o comm/psb_neighbor_topology_mod.o
-serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: auxil/psi_serial_mod.o psb_realloc_mod.o comm/psb_neighbor_topology_mod.o
+serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_z_base_vect_mod.o: serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o comm/comm_schemes/psb_comm_neighbor_impl_mod.o
+serial/psb_d_base_vect_mod.o: serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o comm/comm_schemes/psb_comm_schemes_mod.o comm/comm_schemes/psb_comm_factory_mod.o
+serial/psb_i_base_vect_mod.o serial/psb_l_base_vect_mod.o serial/psb_c_base_vect_mod.o serial/psb_s_base_vect_mod.o serial/psb_d_base_vect_mod.o serial/psb_z_base_vect_mod.o: auxil/psi_serial_mod.o psb_realloc_mod.o comm/comm_schemes/psb_comm_neighbor_impl_mod.o \
+	comm/psb_neighbor_topology_mod.o
 serial/psb_s_mat_mod.o: serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_vect_mod.o \
 	 serial/psb_i_vect_mod.o serial/psb_l_vect_mod.o
 serial/psb_d_mat_mod.o: serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_vect_mod.o \
@@ -342,11 +357,12 @@ comm/psb_comm_mod.o: desc/psb_desc_mod.o serial/psb_mat_mod.o
 comm/psb_comm_mod.o: comm/psb_i_comm_mod.o  comm/psb_l_comm_mod.o \
 	comm/psb_s_comm_mod.o comm/psb_d_comm_mod.o \
 	comm/psb_c_comm_mod.o comm/psb_z_comm_mod.o \
+	comm/psb_i2_comm_a_mod.o \
 	comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
 	comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
 	comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o 
 
-comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
+comm/psb_i2_comm_a_mod.o comm/psb_m_comm_a_mod.o comm/psb_e_comm_a_mod.o \
 comm/psb_s_comm_a_mod.o comm/psb_d_comm_a_mod.o\
 comm/psb_c_comm_a_mod.o comm/psb_z_comm_a_mod.o:  desc/psb_desc_mod.o
 
@@ -421,4 +437,3 @@ clean:
 
 veryclean: clean
 	/bin/rm -f *.h
-

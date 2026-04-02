@@ -59,12 +59,12 @@
 ! 
 ! 
 ! Arguments: 
-!    flag     - integer                 Choose the algorithm for data exchange: 
+!    swap_status     - integer                 Choose the algorithm for data exchange: 
 !                                       this is chosen through bit fields. 
-!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
-!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
-!                                        swap_send = iand(flag,psb_swap_send_) /= 0
-!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
+!                                        swap_mpi  = iand(swap_status,psb_swap_mpi_)  /= 0
+!                                        swap_sync = iand(swap_status,psb_swap_sync_) /= 0
+!                                        swap_send = iand(swap_status,psb_swap_send_) /= 0
+!                                        swap_recv = iand(swap_status,psb_swap_recv_) /= 0
 !                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
 !                                       if (swap_sync): use PSB_SND and PSB_RCV in 
 !                                                       synchronized pairs
@@ -92,8 +92,12 @@
 !   
 submodule (psi_d_comm_v_mod)  psi_d_swaptran_impl
   use psb_base_mod
+  use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_
+  use psb_comm_factory_mod, only: psb_comm_init, psb_comm_free
+  use psb_comm_baseline_mod, only: psb_comm_baseline_handle
+  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
 contains
-  module subroutine psi_dswaptran_vect(flag,beta,y,desc_a,info,data)
+  module subroutine psi_dswaptran_vect(swap_status,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -103,7 +107,7 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(in)               :: swap_status
     real(psb_dpk_), intent(in)                  :: beta
     class(psb_d_base_vect_type), intent(inout)  :: y
     type(psb_desc_type),target                  :: desc_a
@@ -153,37 +157,46 @@ contains
       goto 9999
     end if
 
-    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
-    swap_sync   = iand(flag,psb_swap_sync_) /= 0
-    swap_send   = iand(flag,psb_swap_send_) /= 0
-    swap_recv   = iand(flag,psb_swap_recv_) /= 0
-    swap_start  = iand(flag,psb_swap_start_) /= 0
-    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+    swap_mpi    = iand(swap_status,psb_swap_mpi_) /= 0
+    swap_sync   = iand(swap_status,psb_swap_sync_) /= 0
+    swap_send   = iand(swap_status,psb_swap_send_) /= 0
+    swap_recv   = iand(swap_status,psb_swap_recv_) /= 0
+    swap_start  = iand(swap_status,psb_swap_start_) /= 0
+    swap_wait   = iand(swap_status,psb_swap_wait_) /= 0
 
     baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
     neighbor_a2av = swap_start .or. swap_wait 
 
     if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
       info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      call psb_errpush(info,name,a_err='Incompatible swap_status settings: both baseline and neighbor_a2av are true')
       goto 9999
     end if
 
+    if (.not. allocated(y%comm_handle)) then
+      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
+        goto 9999
+      end if
+    end if
+
     if (baseline) then 
-      call psi_dtran_baseline_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_dtran_baseline_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='baseline swap')
         goto 9999
       end if
     else if (neighbor_a2av) then 
-      call psi_dtran_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_dtran_neighbor_topology_vect(ctxt,swap_status,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='neighbor a2av swap')
         goto 9999
       end if
     else 
       info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      call psb_errpush(info,name,a_err='Incompatible swap_status settings: neither baseline nor neighbor_a2av is true')
       goto 9999
     end if
 
@@ -208,8 +221,8 @@ contains
   !   
   !   
   ! 
-  module subroutine psi_dtran_baseline_vect(ctxt,flag,beta,y,idx,&
-       & num_neighbors,total_send,total_recv,info)
+  module subroutine psi_dtran_baseline_vect(ctxt,swap_status,beta,y,idx,&
+      & num_neighbors,total_send,total_recv,comm_handle,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -220,11 +233,12 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)             :: ctxt
-    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(in)               :: swap_status
     real(psb_dpk_), intent(in)                  :: beta
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_i_base_vect_type), intent(inout)  :: idx
     integer(psb_ipk_), intent(in)               :: num_neighbors,total_send, total_recv
+    class(psb_comm_handle_type), intent(inout)  :: comm_handle
     integer(psb_ipk_), intent(out)              :: info
 
     ! locals
@@ -232,6 +246,7 @@ contains
     integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
+    type(psb_comm_baseline_handle), pointer     :: baseline_comm_handle
     integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
          & snd_pt, rcv_pt, pnti
     logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
@@ -250,11 +265,21 @@ contains
     endif
     icomm = ctxt%get_mpic()
 
+    baseline_comm_handle => null()
+    select type(ch => comm_handle)
+    type is(psb_comm_baseline_handle)
+      baseline_comm_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected baseline comm_handle in baseline swaptran')
+      goto 9999
+    end select
+
     n=1
-    swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
-    swap_sync = iand(flag,psb_swap_sync_) /= 0
-    swap_send = iand(flag,psb_swap_send_) /= 0
-    swap_recv = iand(flag,psb_swap_recv_) /= 0
+    swap_mpi  = iand(swap_status,psb_swap_mpi_) /= 0
+    swap_sync = iand(swap_status,psb_swap_sync_) /= 0
+    swap_send = iand(swap_status,psb_swap_send_) /= 0
+    swap_recv = iand(swap_status,psb_swap_recv_) /= 0
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
@@ -265,8 +290,8 @@ contains
 
     if (debug) write(*,*) me,'Internal buffer'
     if (do_send) then 
-      if (allocated(y%comid)) then
-        if (any(y%comid /= mpi_request_null)) then 
+      if (allocated(baseline_comm_handle%comid)) then
+        if (any(baseline_comm_handle%comid /= mpi_request_null)) then 
           ! 
           ! Unfinished communication? Something is wrong....
           !
@@ -277,8 +302,8 @@ contains
       end if
       if (debug) write(*,*) me,'do_send start'
       call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(num_neighbors,info)
-      y%comid = mpi_request_null
+      call psb_realloc(num_neighbors,2_psb_ipk_,baseline_comm_handle%comid,info)
+      baseline_comm_handle%comid = mpi_request_null
       call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
       pnti   = 1
@@ -295,7 +320,7 @@ contains
           if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
           call mpi_irecv(y%combuf(snd_pt),nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag, icomm,y%comid(i,2),iret)
+            & p2ptag, icomm,baseline_comm_handle%comid(i,2),iret)
         end if
         pnti   = pnti + nerv + nesd + 3
       end do
@@ -342,7 +367,7 @@ contains
         if ((nerv>0).and.(proc_to_comm /= me)) then 
           call mpi_isend(y%combuf(rcv_pt),nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag,icomm,y%comid(i,1),iret)
+            & p2ptag,icomm,baseline_comm_handle%comid(i,1),iret)
         end if
 
         if(iret /= mpi_success) then
@@ -357,7 +382,7 @@ contains
 
     if (do_recv) then 
       if (debug) write(*,*) me,' do_Recv'
-      if (.not.allocated(y%comid)) then 
+      if (.not.allocated(baseline_comm_handle%comid)) then 
         ! 
         ! No matching send? Something is wrong....
         !
@@ -379,7 +404,7 @@ contains
 
         if (proc_to_comm /= me)then 
           if (nerv>0) then 
-            call mpi_wait(y%comid(i,1),p2pstat,iret)
+            call mpi_wait(baseline_comm_handle%comid(i,1),p2pstat,iret)
             if(iret /= mpi_success) then
               info=psb_err_mpi_error_
               call psb_errpush(info,name,m_err=(/iret/))
@@ -387,7 +412,7 @@ contains
             end if
           end if
           if (nesd>0) then 
-            call mpi_wait(y%comid(i,2),p2pstat,iret)
+            call mpi_wait(baseline_comm_handle%comid(i,2),p2pstat,iret)
             if(iret /= mpi_success) then
               info=psb_err_mpi_error_
               call psb_errpush(info,name,m_err=(/iret/))
@@ -425,7 +450,7 @@ contains
       !
       ! Waited for everybody, clean up
       !
-      y%comid = mpi_request_null
+      baseline_comm_handle%comid = mpi_request_null
 
       !
       ! Then wait for device
@@ -434,7 +459,9 @@ contains
       call y%device_wait()
       if (debug) write(*,*) me,' free buffer'
       call y%maybe_free_buffer(info)
-      if (info == 0) call y%free_comid(info)
+      if (info == 0) then
+        if (allocated(y%comm_handle)) call psb_comm_free(y%comm_handle, info)
+      end if
       if (info /= 0) then 
         call psb_errpush(psb_err_alloc_dealloc_,name)
         goto 9999
@@ -455,7 +482,8 @@ contains
 
 
 
-  subroutine psi_dtran_neighbor_topology_vect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+  subroutine psi_dtran_neighbor_topology_vect(ctxt,swap_status,beta,y,comm_indexes,&
+    & num_neighbors,total_send,total_recv,comm_handle,info)
 #ifdef PSB_MPI_MOD
   use mpi
 #endif
@@ -465,17 +493,19 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)             :: ctxt
-    integer(psb_ipk_), intent(in)               :: flag
+    integer(psb_ipk_), intent(in)               :: swap_status
     real(psb_dpk_), intent(in)                  :: beta
     class(psb_d_base_vect_type), intent(inout)  :: y
     class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
     integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+    class(psb_comm_handle_type), intent(inout)  :: comm_handle
     integer(psb_ipk_), intent(out)              :: info
 
     ! locals
     integer(psb_mpk_)                           :: icomm
     integer(psb_mpk_)                           :: np, me
     integer(psb_mpk_)                           :: iret, p2pstat(mpi_status_size)
+    type(psb_comm_neighbor_handle), pointer     :: neighbor_comm_handle
     integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
     logical                                     :: do_start, do_wait
     logical, parameter                          :: debug = .false.
@@ -494,8 +524,18 @@ contains
 
     icomm = ctxt%get_mpic()
 
-    do_start = iand(flag,psb_swap_start_) /= 0
-    do_wait  = iand(flag,psb_swap_wait_)  /= 0
+    neighbor_comm_handle => null()
+    select type(ch => comm_handle)
+    type is(psb_comm_neighbor_handle)
+      neighbor_comm_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected neighbor comm_handle in neighbor swaptran')
+      goto 9999
+    end select
+
+    do_start = iand(swap_status,psb_swap_start_) /= 0
+    do_wait  = iand(swap_status,psb_swap_wait_)  /= 0
 
     call comm_indexes%sync()
 
@@ -505,9 +545,9 @@ contains
     if (do_start) then
       if(debug) write(*,*) me,' nbr_vect: starting data exchange'
       ! Lazy initialization: build the topology on first call
-      if (.not. y%neighbor_topology%is_initialized) then
+      if (.not. neighbor_comm_handle%is_initialized) then
         if (debug) write(*,*) me,' nbr_vect: building topology'
-        call y%neighbor_topology%init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
+        call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
               & a_err='neighbor_topology_init')
@@ -515,8 +555,8 @@ contains
         end if
       end if
 
-      topology_total_send = y%neighbor_topology%total_send
-      topology_total_recv = y%neighbor_topology%total_recv
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
 
       ! Buffer layout:
       !   combuf(1 : total_send)                       = send area
@@ -528,12 +568,12 @@ contains
         call psb_errpush(psb_err_alloc_dealloc_, name)
         goto 9999
       end if
-      y%communication_handle = mpi_request_null
+      neighbor_comm_handle%comm_request = mpi_request_null
 
         ! For transpose exchange: gather recv area first (we will send "recv" data)
         if (debug) write(*,*) me,' nbr_tran_vect: gathering recv data,', topology_total_recv,' elems'
         call y%gth(int(topology_total_recv,psb_mpk_), &
-          & y%neighbor_topology%recv_indexes, &
+          & neighbor_comm_handle%recv_indexes, &
           & y%combuf(1:topology_total_recv))
 
         ! Wait for device (important for GPU subclasses)
@@ -543,15 +583,15 @@ contains
         if (debug) write(*,*) me,' nbr_tran_vect: posting MPI_Ineighbor_alltoallv (swapped)'
         call mpi_ineighbor_alltoallv( &
           & y%combuf(1),                           &  ! send buffer (recv_indexes gathered)
-          & y%neighbor_topology%recv_counts,       &
-          & y%neighbor_topology%recv_displs,       &
+          & neighbor_comm_handle%recv_counts,       &
+          & neighbor_comm_handle%recv_displs,       &
           & psb_mpi_r_dpk_,                        &
           & y%combuf(topology_total_recv + 1),     &  ! recv buffer (will contain send_indexes data)
-          & y%neighbor_topology%send_counts,       &
-          & y%neighbor_topology%send_displs,       &
+          & neighbor_comm_handle%send_counts,       &
+          & neighbor_comm_handle%send_displs,       &
           & psb_mpi_r_dpk_,                        &
-          & y%neighbor_topology%graph_comm,        &
-          & y%communication_handle, iret)
+          & neighbor_comm_handle%graph_comm,        &
+          & neighbor_comm_handle%comm_request, iret)
       if (iret /= mpi_success) then
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
@@ -565,19 +605,19 @@ contains
     ! ---------------------------------------------------------
     if (do_wait) then
 
-      if (y%communication_handle == mpi_request_null) then
+      if (neighbor_comm_handle%comm_request == mpi_request_null) then
         ! No matching start? Something is wrong
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/-2/))
         goto 9999
       end if
 
-      topology_total_send = y%neighbor_topology%total_send
-      topology_total_recv = y%neighbor_topology%total_recv
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
 
       ! Wait for the non-blocking collective to complete
       if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
-      call mpi_wait(y%communication_handle, p2pstat, iret)
+      call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
       if (iret /= mpi_success) then
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
@@ -587,13 +627,13 @@ contains
         ! For transpose exchange: scatter the data that correspond to peers' send area
         if (debug) write(*,*) me,' nbr_tran_vect: scattering send-index data,', topology_total_send,' elems'
         call y%sct(int(topology_total_send,psb_mpk_), &
-          & y%neighbor_topology%send_indexes, &
+          & neighbor_comm_handle%send_indexes, &
           & y%combuf(topology_total_recv+1:topology_total_recv+topology_total_send), &
           & beta)
 
 
       ! Clean up
-      y%communication_handle = mpi_request_null
+      neighbor_comm_handle%comm_request = mpi_request_null
       call y%device_wait()
       call y%maybe_free_buffer(info)
       if (info /= 0) then
@@ -625,7 +665,7 @@ contains
   !   Takes care of Y an encaspulated multivector.
   !   
   !   
-  module subroutine psi_dswaptran_multivect(flag,beta,y,desc_a,info,data)
+  module subroutine psi_dswaptran_multivect(swap_status,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -635,7 +675,7 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_ipk_), intent(in)                   :: swap_status
     real(psb_dpk_), intent(in)                      :: beta
     class(psb_d_base_multivect_type), intent(inout) :: y
     type(psb_desc_type),target                      :: desc_a
@@ -685,37 +725,46 @@ contains
       goto 9999
     end if
 
-    swap_mpi    = iand(flag,psb_swap_mpi_) /= 0
-    swap_sync   = iand(flag,psb_swap_sync_) /= 0
-    swap_send   = iand(flag,psb_swap_send_) /= 0
-    swap_recv   = iand(flag,psb_swap_recv_) /= 0
-    swap_start  = iand(flag,psb_swap_start_) /= 0
-    swap_wait   = iand(flag,psb_swap_wait_) /= 0
+    swap_mpi    = iand(swap_status,psb_swap_mpi_) /= 0
+    swap_sync   = iand(swap_status,psb_swap_sync_) /= 0
+    swap_send   = iand(swap_status,psb_swap_send_) /= 0
+    swap_recv   = iand(swap_status,psb_swap_recv_) /= 0
+    swap_start  = iand(swap_status,psb_swap_start_) /= 0
+    swap_wait   = iand(swap_status,psb_swap_wait_) /= 0
 
     baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
     neighbor_a2av = swap_start .or. swap_wait 
 
     if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
       info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible flag settings: both baseline and neighbor_a2av are true')
+      call psb_errpush(info,name,a_err='Incompatible swap_status settings: both baseline and neighbor_a2av are true')
       goto 9999
     end if
 
+    if (.not. allocated(y%comm_handle)) then
+      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      if (info /= psb_success_) then
+        call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
+        goto 9999
+      end if
+    end if
+
     if (baseline) then 
-      call psi_dtran_baseline_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_dtran_baseline_multivect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='baseline swap')
         goto 9999
       end if
     else if (neighbor_a2av) then 
-      call psi_dtran_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+      call psi_dtran_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,&
+      & total_send,total_recv,y%comm_handle,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='neighbor a2av swap')
         goto 9999
       end if
     else 
       info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible flag settings: neither baseline nor neighbor_a2av is true')
+      call psb_errpush(info,name,a_err='Incompatible swap_status settings: neither baseline nor neighbor_a2av is true')
       goto 9999
     end if
 
@@ -727,8 +776,8 @@ contains
     return
   end subroutine psi_dswaptran_multivect
 
-  subroutine psi_dtran_baseline_multivect(ctxt,flag,beta,y,idx,&
-       & num_neighbors,total_send,total_recv,info)
+  subroutine psi_dtran_baseline_multivect(ctxt,swap_status,beta,y,idx,&
+      & num_neighbors,total_send,total_recv,comm_handle,info)
 
 #ifdef PSB_MPI_MOD
     use mpi
@@ -739,18 +788,20 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)                 :: ctxt
-    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_ipk_), intent(in)                   :: swap_status
     integer(psb_ipk_), intent(out)                  :: info
     class(psb_d_base_multivect_type), intent(inout) :: y
     real(psb_dpk_), intent(in)                      :: beta
     class(psb_i_base_vect_type), intent(inout)      :: idx
     integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send,total_recv
+    class(psb_comm_handle_type), intent(inout)      :: comm_handle
 
     ! locals
     integer(psb_mpk_)   :: np, me, nesd, nerv, n
     integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
+    type(psb_comm_baseline_handle), pointer         :: baseline_comm_handle
     integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
          & snd_pt, rcv_pt, pnti
     logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
@@ -769,12 +820,22 @@ contains
     endif
     icomm = ctxt%get_mpic()
 
+    baseline_comm_handle => null()
+    select type(ch => comm_handle)
+    type is(psb_comm_baseline_handle)
+      baseline_comm_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected baseline comm_handle in baseline multivect swaptran')
+      goto 9999
+    end select
+
     n = y%get_ncols()
 
-    swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
-    swap_sync = iand(flag,psb_swap_sync_) /= 0
-    swap_send = iand(flag,psb_swap_send_) /= 0
-    swap_recv = iand(flag,psb_swap_recv_) /= 0
+    swap_mpi  = iand(swap_status,psb_swap_mpi_) /= 0
+    swap_sync = iand(swap_status,psb_swap_sync_) /= 0
+    swap_send = iand(swap_status,psb_swap_send_) /= 0
+    swap_recv = iand(swap_status,psb_swap_recv_) /= 0
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
@@ -785,8 +846,8 @@ contains
 
     if (debug) write(*,*) me,'Internal buffer'
     if (do_send) then 
-      if (allocated(y%comid)) then 
-        if (any(y%comid /= mpi_request_null)) then 
+      if (allocated(baseline_comm_handle%comid)) then 
+        if (any(baseline_comm_handle%comid /= mpi_request_null)) then 
           ! 
           ! Unfinished communication? Something is wrong....
           !
@@ -797,8 +858,8 @@ contains
       end if
       if (debug) write(*,*) me,'do_send start'
       call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(num_neighbors,info)
-      y%comid = mpi_request_null
+      call psb_realloc(num_neighbors,2_psb_ipk_,baseline_comm_handle%comid,info)
+      baseline_comm_handle%comid = mpi_request_null
       call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
       pnti   = 1
@@ -814,7 +875,7 @@ contains
           if (debug) write(*,*) me,'Posting receive from',prcid(i),snd_pt
           call mpi_irecv(y%combuf(snd_pt),n*nesd,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag, icomm,y%comid(i,2),iret)
+            & p2ptag, icomm,baseline_comm_handle%comid(i,2),iret)
         end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
@@ -861,7 +922,7 @@ contains
         if ((nerv>0).and.(proc_to_comm /= me)) then 
           call mpi_isend(y%combuf(rcv_pt),n*nerv,&
                & psb_mpi_r_dpk_,prcid(i),&
-               & p2ptag,icomm,y%comid(i,1),iret)
+            & p2ptag,icomm,baseline_comm_handle%comid(i,1),iret)
         end if
 
         if(iret /= mpi_success) then
@@ -877,7 +938,7 @@ contains
 
     if (do_recv) then 
       if (debug) write(*,*) me,' do_Recv'
-      if (.not.allocated(y%comid)) then 
+      if (.not.allocated(baseline_comm_handle%comid)) then 
         ! 
         ! No matching send? Something is wrong....
         !
@@ -898,7 +959,7 @@ contains
         nesd = idx%v(pnti+nerv+psb_n_elem_send_)
         if (proc_to_comm /= me)then 
           if (nerv>0) then 
-            call mpi_wait(y%comid(i,1),p2pstat,iret)
+            call mpi_wait(baseline_comm_handle%comid(i,1),p2pstat,iret)
             if(iret /= mpi_success) then
               info=psb_err_mpi_error_
               call psb_errpush(info,name,m_err=(/iret/))
@@ -906,7 +967,7 @@ contains
             end if
           end if
           if (nesd>0) then 
-            call mpi_wait(y%comid(i,2),p2pstat,iret)
+            call mpi_wait(baseline_comm_handle%comid(i,2),p2pstat,iret)
             if(iret /= mpi_success) then
               info=psb_err_mpi_error_
               call psb_errpush(info,name,m_err=(/iret/))
@@ -948,7 +1009,7 @@ contains
       !
       ! Waited for com, cleanup comid
       !
-      y%comid = mpi_request_null
+      baseline_comm_handle%comid = mpi_request_null
 
       !
       ! Then wait for device
@@ -957,7 +1018,9 @@ contains
       call y%device_wait()
       if (debug) write(*,*) me,' free buffer'
       call y%maybe_free_buffer(info)
-      if (info == 0) call y%free_comid(info)
+      if (info == 0) then
+        if (allocated(y%comm_handle)) call psb_comm_free(y%comm_handle, info)
+      end if
       if (info /= 0) then 
         call psb_errpush(psb_err_alloc_dealloc_,name)
         goto 9999
@@ -976,7 +1039,8 @@ contains
   end subroutine psi_dtran_baseline_multivect
 
 
-  subroutine psi_dtran_neighbor_topology_multivect(ctxt,flag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,info)
+  subroutine psi_dtran_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_indexes,&
+    & num_neighbors,total_send,total_recv,comm_handle,info)
 #ifdef PSB_MPI_MOD
   use mpi
 #endif
@@ -986,17 +1050,19 @@ contains
 #endif
 
     type(psb_ctxt_type), intent(in)                 :: ctxt
-    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_ipk_), intent(in)                   :: swap_status
     real(psb_dpk_), intent(in)                      :: beta
     class(psb_d_base_multivect_type), intent(inout) :: y
     class(psb_i_base_vect_type), intent(inout)      :: comm_indexes
     integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send,total_recv
+    class(psb_comm_handle_type), intent(inout)      :: comm_handle
     integer(psb_ipk_), intent(out)                  :: info
 
     ! locals
     integer(psb_mpk_)                               :: icomm
     integer(psb_mpk_)                               :: np, me
     integer(psb_mpk_)                               :: iret, p2pstat(mpi_status_size)
+    type(psb_comm_neighbor_handle), pointer         :: neighbor_comm_handle
     integer(psb_ipk_)                               :: err_act, topology_total_send, topology_total_recv, buffer_size
     logical                                         :: do_start, do_wait
     logical, parameter                              :: debug = .false.
@@ -1015,8 +1081,18 @@ contains
 
     icomm = ctxt%get_mpic()
 
-    do_start = iand(flag,psb_swap_start_) /= 0
-    do_wait  = iand(flag,psb_swap_wait_)  /= 0
+    neighbor_comm_handle => null()
+    select type(ch => comm_handle)
+    type is(psb_comm_neighbor_handle)
+      neighbor_comm_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected neighbor comm_handle in neighbor multivect swaptran')
+      goto 9999
+    end select
+
+    do_start = iand(swap_status,psb_swap_start_) /= 0
+    do_wait  = iand(swap_status,psb_swap_wait_)  /= 0
 
     call comm_indexes%sync()
 
@@ -1026,9 +1102,9 @@ contains
     if (do_start) then
       if(debug) write(*,*) me,' nbr_vect: starting data exchange'
       ! Lazy initialization: build the topology on first call
-      if (.not. y%neighbor_topology%is_initialized) then
+      if (.not. neighbor_comm_handle%is_initialized) then
         if (debug) write(*,*) me,' nbr_vect: building topology'
-        call y%neighbor_topology%init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
+        call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, &
               & a_err='neighbor_topology_init')
@@ -1036,8 +1112,8 @@ contains
         end if
       end if
 
-      topology_total_send = y%neighbor_topology%total_send
-      topology_total_recv = y%neighbor_topology%total_recv
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
 
       ! Buffer layout:
       !   combuf(1 : total_send)                       = send area
@@ -1049,12 +1125,12 @@ contains
         call psb_errpush(psb_err_alloc_dealloc_, name)
         goto 9999
       end if
-      y%communication_handle = mpi_request_null
+      neighbor_comm_handle%comm_request = mpi_request_null
 
         ! For transpose exchange: gather recv area first (we will send "recv" data)
         if (debug) write(*,*) me,' nbr_tran_vect: gathering recv data,', topology_total_recv,' elems'
         call y%gth(int(topology_total_recv,psb_mpk_), &
-          & y%neighbor_topology%recv_indexes, &
+          & neighbor_comm_handle%recv_indexes, &
           & y%combuf(1:topology_total_recv))
 
         ! Wait for device (important for GPU subclasses)
@@ -1064,15 +1140,15 @@ contains
         if (debug) write(*,*) me,' nbr_tran_vect: posting MPI_Ineighbor_alltoallv (swapped)'
         call mpi_ineighbor_alltoallv( &
           & y%combuf(1),                           &  ! send buffer (recv_indexes gathered)
-          & y%neighbor_topology%recv_counts,       &
-          & y%neighbor_topology%recv_displs,       &
+          & neighbor_comm_handle%recv_counts,       &
+          & neighbor_comm_handle%recv_displs,       &
           & psb_mpi_r_dpk_,                        &
           & y%combuf(topology_total_recv + 1),     &  ! recv buffer (will contain send_indexes data)
-          & y%neighbor_topology%send_counts,       &
-          & y%neighbor_topology%send_displs,       &
+          & neighbor_comm_handle%send_counts,       &
+          & neighbor_comm_handle%send_displs,       &
           & psb_mpi_r_dpk_,                        &
-          & y%neighbor_topology%graph_comm,        &
-          & y%communication_handle, iret)
+          & neighbor_comm_handle%graph_comm,        &
+          & neighbor_comm_handle%comm_request, iret)
       if (iret /= mpi_success) then
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
@@ -1086,19 +1162,19 @@ contains
     ! ---------------------------------------------------------
     if (do_wait) then
 
-      if (y%communication_handle == mpi_request_null) then
+      if (neighbor_comm_handle%comm_request == mpi_request_null) then
         ! No matching start? Something is wrong
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/-2/))
         goto 9999
       end if
 
-      topology_total_send = y%neighbor_topology%total_send
-      topology_total_recv = y%neighbor_topology%total_recv
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
 
       ! Wait for the non-blocking collective to complete
       if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
-      call mpi_wait(y%communication_handle, p2pstat, iret)
+      call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
       if (iret /= mpi_success) then
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
@@ -1108,13 +1184,13 @@ contains
         ! For transpose exchange: scatter the data that correspond to peers' send area
         if (debug) write(*,*) me,' nbr_tran_vect: scattering send-index data,', topology_total_send,' elems'
         call y%sct(int(topology_total_send,psb_mpk_), &
-          & y%neighbor_topology%send_indexes, &
+          & neighbor_comm_handle%send_indexes, &
           & y%combuf(topology_total_recv+1:topology_total_recv+topology_total_send), &
           & beta)
 
 
       ! Clean up
-      y%communication_handle = mpi_request_null
+      neighbor_comm_handle%comm_request = mpi_request_null
       call y%device_wait()
       call y%maybe_free_buffer(info)
       if (info /= 0) then
