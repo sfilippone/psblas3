@@ -54,6 +54,8 @@
 subroutine psb_dhalo_vect(x,desc_a,info,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_dhalo_vect
   use psi_mod
+  use psb_comm_factory_mod
+  
   implicit none
 
   type(psb_d_vect_type), intent(inout)              :: x
@@ -115,7 +117,7 @@ subroutine psb_dhalo_vect(x,desc_a,info,tran,mode,data)
   if (present(mode)) then 
     imode = mode
   else
-    imode = IOR(psb_swap_send_,psb_swap_recv_) ! default base communication scheme Isend/Irecv
+    imode = psb_comm_status_sync_
   endif
 
   if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
@@ -238,7 +240,7 @@ subroutine psb_dhalo_multivect(x,desc_a,info,tran,mode,data)
   if (present(mode)) then 
     imode = mode
   else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
+    imode = psb_comm_mov_
   endif
 
   if (lldx < ncol) call x%reall(ncol,x%get_ncols(),info)

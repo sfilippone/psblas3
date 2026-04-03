@@ -65,6 +65,7 @@
 subroutine psb_dovrl_vect(x,desc_a,info,update,mode)
   use psb_base_mod, psb_protect_name => psb_dovrl_vect
   use psi_mod
+  use psb_comm_factory_mod
   implicit none
 
   type(psb_d_vect_type), intent(inout)    :: x
@@ -121,7 +122,7 @@ subroutine psb_dovrl_vect(x,desc_a,info,update,mode)
   if (present(mode)) then 
     mode_ = mode
   else
-    mode_ = IOR(psb_swap_send_,psb_swap_recv_)
+    mode_ = psb_comm_status_sync_
   endif
   do_swap = (mode_ /= 0)
 

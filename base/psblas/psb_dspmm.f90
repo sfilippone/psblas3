@@ -57,6 +57,8 @@ subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
      & trans, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmv_vect
   use psi_mod
+  use psb_comm_factory_mod
+
   implicit none
 
   real(psb_dpk_), intent(in)            :: alpha, beta
@@ -174,12 +176,12 @@ subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if (do_timings) call psb_barrier(ctxt)
         if (do_timings) call psb_tic(mv_phase1)
-        if (doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
+        if (doswap_) call psi_swapdata(psb_comm_status_start_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase1)
         if (do_timings) call psb_tic(mv_phase2)          
         call a%ad%spmm(alpha,x%v,beta,y%v,info)
         if (do_timings) call psb_tic(mv_phase3)
-        if (doswap_) call psi_swapdata(psb_swap_recv_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
+        if (doswap_) call psi_swapdata(psb_comm_status_wait_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase3)
         if (do_timings) call psb_tic(mv_phase4)          
         call a%and%spmm(alpha,x%v,done,y%v,info)
@@ -194,7 +196,7 @@ subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         
         if (do_timings) call psb_tic(mv_phase11)          
           if (doswap_) then
-            call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_), dzero, x%v, desc_a, info, data=psb_comm_halo_)
+            call psi_swapdata(psb_comm_status_sync_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
           end if
         if (do_timings) call psb_toc(mv_phase11)
         if (do_timings) call psb_tic(mv_phase12)          
@@ -237,9 +239,9 @@ subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     if (doswap_) then
-      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_), done, y%v, desc_a, info)
+      call psi_swaptran(psb_comm_status_sync_, done, y%v, desc_a, info)
       if (info == psb_success_) then 
-        call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_), done, y%v, desc_a, info, data=psb_comm_ovr_)
+        call psi_swapdata(psb_comm_status_sync_, done, y%v, desc_a, info, data=psb_comm_ovr_)
       end if
 
       if (debug_level >= psb_debug_comp_) &
@@ -301,6 +303,8 @@ subroutine psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
      & trans, k, jx, jy, work, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmm
   use psi_mod
+  use psb_comm_factory_mod
+  
   implicit none
 
   real(psb_dpk_), intent(in)             :: alpha, beta
@@ -560,9 +564,9 @@ subroutine psb_dspmm(alpha,a,x,beta,y,desc_a,info,&
     if (doswap_)then
       ik = lik ! This should not be an issue, we are expecting the values
       ! to be small, within PSB_IPK
-      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-           & ik,done,y(:,1:ik),desc_a,iwork,info)
-      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+       call psi_swaptran(psb_comm_status_sync_,&
+         & ik,done,y(:,1:ik),desc_a,iwork,info,data=psb_comm_ovr_)
+       if (info == psb_success_) call psi_swapdata(psb_comm_status_sync_,&
            & ik,done,y(:,1:ik),desc_a,iwork,info,data=psb_comm_ovr_)
 
       if (debug_level >= psb_debug_comp_) &
@@ -653,6 +657,7 @@ subroutine psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
      & trans, work, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmv
   use psi_mod
+  use psb_comm_factory_mod
   implicit none
 
   real(psb_dpk_), intent(in)             :: alpha, beta
@@ -799,8 +804,7 @@ subroutine psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     if (doswap_) then
-      call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
+      call psi_swapdata(psb_comm_status_sync_,dzero,x,desc_a,iwork,info,data=psb_comm_halo_)
     end if
 
     call psb_csmm(alpha,a,x,beta,y,info)
@@ -866,11 +870,10 @@ subroutine psb_dspmv(alpha,a,x,beta,y,desc_a,info,&
     end if
 
     if (doswap_) then
-      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-           & done,yp,desc_a,iwork,info)
-      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
-
+      call psi_swaptran(psb_comm_status_sync_,done,yp,desc_a,iwork,info)
+      if (info == psb_success_) then  
+        call psi_swapdata(psb_comm_status_sync_,done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
+      end if
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
       if(info /= psb_success_) then

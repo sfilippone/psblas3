@@ -17,6 +17,7 @@ module psb_comm_schemes_mod
     enumerator psb_comm_status_unknown_
     enumerator psb_comm_status_start_
     enumerator psb_comm_status_wait_
+    enumerator psb_comm_status_sync_ ! Used in order to exchange data in a synchronous way (Start and recv in the same call)
   end enum
 
 

@@ -92,10 +92,7 @@
 !   
 submodule (psi_d_comm_v_mod)  psi_d_swaptran_impl
   use psb_base_mod
-  use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_
-  use psb_comm_factory_mod, only: psb_comm_init, psb_comm_free
-  use psb_comm_baseline_mod, only: psb_comm_baseline_handle
-  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
+  use psb_comm_factory_mod
 contains
   module subroutine psi_dswaptran_vect(swap_status,beta,y,desc_a,info,data)
 
@@ -122,9 +119,7 @@ contains
     character(len=20)  :: name
 
     ! local variables used to detect the communication scheme
-    logical                                     :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
     logical                                     :: baseline, neighbor_a2av
-
 
     info = psb_success_
     name = 'psi_dswaptran_vect'
@@ -157,20 +152,11 @@ contains
       goto 9999
     end if
 
-    swap_mpi    = iand(swap_status,psb_swap_mpi_) /= 0
-    swap_sync   = iand(swap_status,psb_swap_sync_) /= 0
-    swap_send   = iand(swap_status,psb_swap_send_) /= 0
-    swap_recv   = iand(swap_status,psb_swap_recv_) /= 0
-    swap_start  = iand(swap_status,psb_swap_start_) /= 0
-    swap_wait   = iand(swap_status,psb_swap_wait_) /= 0
-
-    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
-    neighbor_a2av = swap_start .or. swap_wait 
-
-    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
-      info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible swap_status settings: both baseline and neighbor_a2av are true')
-      goto 9999
+    if( (swap_status /= psb_comm_status_start_).and.(swap_status /= psb_comm_status_wait_)&
+      & .and.(swap_status /= psb_comm_status_sync_) ) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,a_err='Invalid swap_status swap_status')
+        goto 9999
     end if
 
     if (.not. allocated(y%comm_handle)) then
@@ -180,6 +166,22 @@ contains
         goto 9999
       end if
     end if
+
+    ! Set the normalized swap status on the comm handle
+    call y%comm_handle%set_swap_status(swap_status, info)
+    if (info /= psb_success_) then
+      call psb_errpush(info,name,a_err='set_swap_status')
+      goto 9999
+    end if
+
+    baseline = .false.
+    neighbor_a2av = .false.
+    select case(y%comm_handle%comm_type)
+    case(psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_)
+      neighbor_a2av = .true.
+    case default
+      baseline = .true.
+    end select
 
     if (baseline) then 
       call psi_dtran_baseline_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
@@ -276,12 +278,8 @@ contains
     end select
 
     n=1
-    swap_mpi  = iand(swap_status,psb_swap_mpi_) /= 0
-    swap_sync = iand(swap_status,psb_swap_sync_) /= 0
-    swap_send = iand(swap_status,psb_swap_send_) /= 0
-    swap_recv = iand(swap_status,psb_swap_recv_) /= 0
-    do_send = swap_mpi .or. swap_sync .or. swap_send
-    do_recv = swap_mpi .or. swap_sync .or. swap_recv
+    do_send = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_recv = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
 
     total_recv_ = total_recv * n
     total_send_ = total_send * n
@@ -534,8 +532,8 @@ contains
       goto 9999
     end select
 
-    do_start = iand(swap_status,psb_swap_start_) /= 0
-    do_wait  = iand(swap_status,psb_swap_wait_)  /= 0
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
 
     call comm_indexes%sync()
 
@@ -690,8 +688,8 @@ contains
     character(len=20)                               :: name
 
     ! local variables used to detect the communication scheme
-    logical                                         :: swap_mpi, swap_sync, swap_send, swap_recv, swap_start, swap_wait
     logical                                         :: baseline, neighbor_a2av
+    integer(psb_ipk_)                               :: setflag
 
 
     info = psb_success_
@@ -725,19 +723,20 @@ contains
       goto 9999
     end if
 
-    swap_mpi    = iand(swap_status,psb_swap_mpi_) /= 0
-    swap_sync   = iand(swap_status,psb_swap_sync_) /= 0
-    swap_send   = iand(swap_status,psb_swap_send_) /= 0
-    swap_recv   = iand(swap_status,psb_swap_recv_) /= 0
-    swap_start  = iand(swap_status,psb_swap_start_) /= 0
-    swap_wait   = iand(swap_status,psb_swap_wait_) /= 0
+    setflag = swap_status
+    if (swap_status == psb_swap_start_) then
+      setflag = psb_comm_status_start_
+    else if (swap_status == psb_swap_wait_) then
+      setflag = psb_comm_status_wait_
+    else if ((iand(swap_status, psb_swap_send_) /= 0) .or. (iand(swap_status, psb_swap_recv_) /= 0) .or. &
+      & (iand(swap_status, psb_swap_mpi_) /= 0) .or. (iand(swap_status, psb_swap_sync_) /= 0)) then
+      setflag = psb_comm_status_sync_
+    end if
 
-    baseline = swap_mpi .or. swap_send .or. swap_recv .or. swap_sync
-    neighbor_a2av = swap_start .or. swap_wait 
-
-    if( (baseline.eqv..true.).and.(neighbor_a2av.eqv..true.) ) then 
+    if ((setflag /= psb_comm_status_start_) .and. (setflag /= psb_comm_status_wait_) .and. &
+      & (setflag /= psb_comm_status_sync_)) then
       info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible swap_status settings: both baseline and neighbor_a2av are true')
+      call psb_errpush(info,name,a_err='Invalid swap_status')
       goto 9999
     end if
 
@@ -749,14 +748,29 @@ contains
       end if
     end if
 
+    call y%comm_handle%set_swap_status(setflag, info)
+    if (info /= psb_success_) then
+      call psb_errpush(info,name,a_err='set_swap_status')
+      goto 9999
+    end if
+
+    baseline = .false.
+    neighbor_a2av = .false.
+    select case(y%comm_handle%comm_type)
+    case(psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_)
+      neighbor_a2av = .true.
+    case default
+      baseline = .true.
+    end select
+
     if (baseline) then 
-      call psi_dtran_baseline_multivect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
+      call psi_dtran_baseline_multivect(ctxt,setflag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='baseline swap')
         goto 9999
       end if
     else if (neighbor_a2av) then 
-      call psi_dtran_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,&
+      call psi_dtran_neighbor_topology_multivect(ctxt,setflag,beta,y,comm_indexes,num_neighbors,&
       & total_send,total_recv,y%comm_handle,info)
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='neighbor a2av swap')
@@ -832,12 +846,8 @@ contains
 
     n = y%get_ncols()
 
-    swap_mpi  = iand(swap_status,psb_swap_mpi_) /= 0
-    swap_sync = iand(swap_status,psb_swap_sync_) /= 0
-    swap_send = iand(swap_status,psb_swap_send_) /= 0
-    swap_recv = iand(swap_status,psb_swap_recv_) /= 0
-    do_send = swap_mpi .or. swap_sync .or. swap_send
-    do_recv = swap_mpi .or. swap_sync .or. swap_recv
+    do_send = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_recv = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
 
     total_recv_ = total_recv * n
     total_send_ = total_send * n
@@ -1091,8 +1101,8 @@ contains
       goto 9999
     end select
 
-    do_start = iand(swap_status,psb_swap_start_) /= 0
-    do_wait  = iand(swap_status,psb_swap_wait_)  /= 0
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
 
     call comm_indexes%sync()
 

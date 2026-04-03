@@ -82,12 +82,7 @@
 submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
-    use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
-      & psb_comm_persistent_ineighbor_alltoallv_, &
-      & psb_comm_status_start_, psb_comm_status_wait_, psb_comm_status_unknown_
-  use psb_comm_factory_mod, only: psb_comm_init, psb_comm_free
-  use psb_comm_baseline_mod, only: psb_comm_baseline_handle, psb_comm_baseline_alloc_comid
-  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
+  use psb_comm_factory_mod
 contains
   module subroutine psi_dswapdata_vect(swap_status,beta,y,desc_a,info,data)
 
@@ -109,7 +104,6 @@ contains
     ! locals
     type(psb_ctxt_type)                         :: ctxt
     integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, data_, err_act
-    integer(psb_ipk_)                           :: setflag
     class(psb_i_base_vect_type), pointer        :: comm_indexes
 
     ! communication scheme/status selectors
@@ -155,21 +149,13 @@ contains
     !   write(psb_err_unit,*) me, 'DBG: get_list_p -> num_neighbors=', &
     !   & num_neighbors, ' total_send=', total_send, ' total_recv=', total_recv
     ! end if
-    ! Accept both new comm-status enums and legacy descriptor bitfields.
-    setflag = swap_status
-    if (swap_status == psb_swap_start_) then
-      setflag = psb_comm_status_start_
-    else if (swap_status == psb_swap_wait_) then
-      setflag = psb_comm_status_wait_
-    else if (iand(swap_status, psb_swap_start_) /= 0 .and. iand(swap_status, psb_swap_wait_) /= 0) then
-      setflag = psb_comm_status_unknown_
-    end if
 
-    if ((setflag /= psb_comm_status_start_) .and. (setflag /= psb_comm_status_wait_) .and. &
-      & (setflag /= psb_comm_status_unknown_)) then
-      info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Invalid swap_status swap_status')
-      goto 9999
+
+    if( (swap_status /= psb_comm_status_start_).and.(swap_status /= psb_comm_status_wait_)&
+      & .and.(swap_status /= psb_comm_status_sync_) ) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,a_err='Invalid swap_status swap_status')
+        goto 9999
     end if
 
     if (.not. allocated(y%comm_handle)) then
@@ -189,7 +175,7 @@ contains
     !   end if
     ! end if
     ! Set the normalized swap status on the comm handle
-    call y%comm_handle%set_swap_status(setflag, info)
+    call y%comm_handle%set_swap_status(swap_status, info)
     if (info /= psb_success_) then
       call psb_errpush(info,name,a_err='set_swap_status')
       goto 9999
@@ -292,9 +278,15 @@ contains
       goto 9999
     end select
 
+    if(swap_status == psb_comm_status_unknown_) then
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Invalid swap_status: psb_comm_status_unknown_ is not allowed in neighbor swap')
+      goto 9999
+    end if
+
     n=1
-    do_send = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_unknown_)
-    do_recv = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_unknown_)
+    do_send = (swap_status == psb_comm_status_start_).or.(swap_status == psb_comm_status_sync_) 
+    do_recv = (swap_status == psb_comm_status_wait_).or.(swap_status == psb_comm_status_sync_)  
 
     total_recv_ = total_recv * n
     total_send_ = total_send * n
@@ -539,8 +531,14 @@ contains
       goto 9999
     end select
 
-    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_unknown_)
-    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_unknown_)
+    if(swap_status == psb_comm_status_unknown_) then
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Invalid swap_status: psb_comm_status_unknown_ is not allowed in neighbor swap')
+      goto 9999
+    end if
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
 
     call comm_indexes%sync()
 

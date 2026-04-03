@@ -21,7 +21,7 @@ YELLOW=\033[33m
 END_COLOUR=\033[0m
 
 
-all: runsd psb_spmm_test 
+all: runsd psb_spmm_test psb_spmm_overlap_test
 	@printf "$(GREEN)[INFO]\tCompilation success!$(END_COLOUR)\n" 
 
 runsd: 	
@@ -36,7 +36,7 @@ psb_spmm_test:
 
 clean: 
 	@rm -f $(OBJS)\
-        *$(.mod) $(EXEDIR)/psb_spmm_test 
+        *$(.mod) $(EXEDIR)/psb_spmm_test $(EXEDIR)/psb_spmm_overlap_test 
 
 .PHONY: all runsd clean   
 

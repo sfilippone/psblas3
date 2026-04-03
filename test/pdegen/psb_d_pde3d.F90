@@ -670,6 +670,8 @@ program psb_d_pde3d
   use psb_linsolve_mod
   use psb_util_mod
   use psb_d_pde3d_mod
+  use psb_comm_factory_mod
+
 #if defined(PSB_OPENMP)
   use omp_lib
 #endif
@@ -835,6 +837,14 @@ program psb_d_pde3d
          & err=err,itrace=itrace,&
          & istop=istopc)
   case('BICGSTAB','BICGSTABL','BICG','CG','CGS','FCG','GCR','RGMRES')
+    call psb_comm_init(psb_comm_persistent_ineighbor_alltoallv_,xxv%v%comm_handle,info)
+    if(info /= psb_success_) then
+      info=psb_err_from_subroutine_
+      ch_err='comm init'
+      call psb_errpush(info,name,a_err=ch_err)
+      goto 9999
+    end if
+
     call psb_krylov(kmethd,a,prec,bv,xxv,eps,&
          & desc_a,info,itmax=itmax,iter=iter,err=err,itrace=itrace,&
          & istop=istopc,irst=irst)
