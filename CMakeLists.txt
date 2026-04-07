@@ -132,12 +132,10 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
 message(STATUS "Using compiler ${CMAKE_C_COMPILER};")
 
 
-# Define Major and Minor Version and Patch Level, String Version
-set(PSBLASMAJOR "3")
-set(PSBLASMINOR "9")
-set(PSBLASPATCH "0")
-set(PSBLASSTRING "\"3.9.0\"")
-
+# Find PSBLAS constants
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/readPSBConst.cmake)
+_psb_read_const()
+_psb_read_desc_const()
 
 # Set default values for IPK_SIZE and LPK_SIZE
 set(DEFAULT_IPK_SIZE 4)
@@ -430,7 +428,7 @@ if(METIS_FOUND)
   include(CheckTypeSize)
   message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
   # Make sure this path is correct
-#  set(METISINCFILE "metis.h")  # Adjust this to your actual path
+  set(CMAKE_METIS_INCFILE "metis.h")  # Adjust this to your actual path
 
   # Specify the configuration file
   #  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
@@ -511,7 +509,7 @@ if(METIS_FOUND)
 
   
  # 1. Tell CMake where to find metis.h for the check
-set(CMAKE_EXTRA_INCLUDE_FILES "${METIS_INCLUDES}/metis.h")
+set(CMAKE_EXTRA_INCLUDE_FILES "${METIS_INCLUDES}/${CMAKE_METIS_INCFILE}")
 
 # 2. Check the size of Metis's own type: real_t
 # This replaces checking 'float' and 'double' separately
@@ -853,7 +851,7 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
 
 
 
-message(STATUS "fortran module direcotry ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+message(STATUS "fortran module directory ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
 
 
 include_directories(${MPI_Fortran_INCLUDE_PATH})
