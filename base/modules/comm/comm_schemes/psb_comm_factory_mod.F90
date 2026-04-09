@@ -11,7 +11,7 @@ module psb_comm_factory_mod
 contains
 
   ! Allocatable-based factory routines (preferred names)
-  subroutine psb_comm_init(comm_type, handle, info)
+  subroutine psb_comm_set(comm_type, handle, info)
     implicit none
     integer(psb_ipk_), intent(in) :: comm_type
     class(psb_comm_handle_type), allocatable, intent(inout) :: handle
@@ -68,7 +68,7 @@ contains
       handle%id = old_id
       handle%swap_status = old_swap_status
     end select
-  end subroutine psb_comm_init
+  end subroutine psb_comm_set
 
   subroutine psb_comm_free(handle, info)
     implicit none
@@ -82,25 +82,6 @@ contains
       deallocate(handle)
     end if
   end subroutine psb_comm_free
-
-
-  ! Allocatable-based factory routines 
-  subroutine psb_comm_create(comm_type, handle, info)
-    implicit none
-    integer(psb_ipk_), intent(in) :: comm_type
-    class(psb_comm_handle_type), allocatable, intent(inout) :: handle
-    integer(psb_ipk_), intent(out) :: info
-
-    call psb_comm_init(comm_type, handle, info)
-  end subroutine psb_comm_create
-
-  subroutine psb_comm_destroy(handle, info)
-    implicit none
-    class(psb_comm_handle_type), allocatable, intent(inout) :: handle
-    integer(psb_ipk_), intent(out) :: info
-
-    call psb_comm_free(handle, info)
-  end subroutine psb_comm_destroy
 
   subroutine psb_comm_set_swap_status(handle, flag, info)
     implicit none

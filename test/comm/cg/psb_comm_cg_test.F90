@@ -13,27 +13,41 @@ program psb_comm_cg_test
   type(psb_dprec_type)  :: prec
 
   integer(psb_ipk_) :: info, iam, np
-  integer(psb_ipk_) :: idim, itmax, itrace, istop, iter, is
-  integer(psb_ipk_) :: iter_arr(3), info_arr(3)
-  integer(psb_ipk_) :: scheme_types(3)
-  real(psb_dpk_) :: eps, err, t1, t2
-  real(psb_dpk_) :: tsolve(3), err_arr(3)
-  character(len=25) :: scheme_names(3)
+  integer(psb_ipk_) :: idim, itmax, itrace, istop, iter
+  integer(psb_ipk_) :: scheme_idx, prec_idx, rep, nrep, nwarm
+  integer(psb_ipk_), parameter :: n_schemes=3, n_precs=2
+  integer(psb_ipk_), allocatable :: iter_count(:,:,:), solve_info(:,:,:)
+  integer(psb_ipk_) :: scheme_type(n_schemes)
+  real(psb_dpk_) :: eps, err, t_start, t_elapsed
+  real(psb_dpk_), allocatable :: setup_time(:,:,:), solve_time(:,:,:)
+  real(psb_dpk_), allocatable :: total_time(:,:,:), final_error(:,:,:)
+  real(psb_dpk_) :: avg_t, std_t, med_t, p10_t, p90_t, min_t, max_t
+  character(len=25) :: scheme_name(n_schemes)
+  character(len=12) :: prec_type(n_precs)
+  character(len=20) :: prec_name(n_precs)
   character(len=5) :: afmt
   character(len=256) :: arg
+  logical :: prec_ready
 
   info = psb_success_
+  prec_ready = .false.
   afmt = 'CSR'
-  idim = 40
-  itmax = 500
-    itrace = 0
+  idim = 20
+  itmax = 5000
+  nrep = 1
+  nwarm = 1
+  itrace = 0
   istop = 2
   eps = 1.d-6
-  scheme_types = (/ psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
+  scheme_type = (/ psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
        & psb_comm_persistent_ineighbor_alltoallv_ /)
-  scheme_names(1) = 'isend_irecv'
-  scheme_names(2) = 'ineighbor_alltoallv'
-  scheme_names(3) = 'persistent_ineighbor_a2av'
+  scheme_name(1) = 'isend_irecv'
+  scheme_name(2) = 'ineighbor_alltoallv'
+  scheme_name(3) = 'persistent_ineighbor_a2av'
+  prec_type(1) = 'NONE'
+  prec_type(2) = 'DIAG'
+  prec_name(1) = 'none'
+  prec_name(2) = 'diag'
 
   call get_command_argument(1,arg)
   if (len_trim(arg) > 0) then
@@ -43,6 +57,27 @@ program psb_comm_cg_test
       info = psb_success_
     end if
   end if
+  call get_command_argument(2,arg)
+  if (len_trim(arg) > 0) then
+    read(arg,*,iostat=info) nrep
+    if ((info /= 0).or.(nrep <= 0)) then
+      nrep = 7
+      info = psb_success_
+    end if
+  end if
+  call get_command_argument(3,arg)
+  if (len_trim(arg) > 0) then
+    read(arg,*,iostat=info) nwarm
+    if ((info /= 0).or.(nwarm < 0)) then
+      nwarm = 1
+      info = psb_success_
+    end if
+  end if
+
+  allocate(setup_time(n_precs,n_schemes,nrep), solve_time(n_precs,n_schemes,nrep), &
+       & total_time(n_precs,n_schemes,nrep), final_error(n_precs,n_schemes,nrep), &
+       & iter_count(n_precs,n_schemes,nrep), solve_info(n_precs,n_schemes,nrep), stat=info)
+  if (info /= psb_success_) stop 1
 
   call psb_init(ctxt)
   call psb_info(ctxt, iam, np)
@@ -53,58 +88,120 @@ program psb_comm_cg_test
     write(psb_out_unit,'("Grid dimensions      : ",i4," x ",i4," x ",i4)') idim,idim,idim
     write(psb_out_unit,'("Number of processors : ",i0)') np
     write(psb_out_unit,'("Iterative method     : CG")')
-    write(psb_out_unit,'("Preconditioner       : NONE")')
+    write(psb_out_unit,'("Preconditioners      : NONE, DIAG")')
+    write(psb_out_unit,'("Repetitions          : ",i0)') nrep
+    write(psb_out_unit,'("Warmup solves        : ",i0," (each with itmax=1)")') nwarm
     write(psb_out_unit,'(" ")')
   end if
 
   call psb_barrier(ctxt)
-  t1 = psb_wtime()
+  t_start = psb_wtime()
   call psb_d_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)
   if (info /= psb_success_) goto 9999
 
-  call prec%init(ctxt,'NONE',info)
-  if (info /= psb_success_) goto 9999
+  do prec_idx = 1, n_precs
+    do scheme_idx = 1, n_schemes
+      do rep = 1, nrep
+        if (prec_ready) then
+          call psb_precfree(prec,info)
+          if (info /= psb_success_) goto 9999
+          prec_ready = .false.
+        end if
 
-  call prec%build(a,desc_a,info)
-  if (info /= psb_success_) goto 9999
+        call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
+        if (info /= psb_success_) goto 9999
 
-  do is = 1, 3
-    call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
-    if (info /= psb_success_) goto 9999
+        call psb_barrier(ctxt)
+        t_start = psb_wtime()
+        call psb_precinit(ctxt,prec,trim(prec_type(prec_idx)),info)
+        if (info /= psb_success_) goto 9999
+        call psb_precbld(a,desc_a,prec,info)
+        if (info /= psb_success_) goto 9999
+        if (.not.allocated(prec%prec)) then
+          info = psb_err_internal_error_
+          write(psb_err_unit,*) 'Preconditioner object not allocated after build'
+          goto 9999
+        end if
+        prec_ready = .true.
 
-    call psb_comm_init(scheme_types(is),x%v%comm_handle,info)
-    if (info /= psb_success_) goto 9999
+        call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
+        if (info /= psb_success_) goto 9999
+        if (.not.allocated(prec%prec)) then
+          info = psb_err_internal_error_
+          write(psb_err_unit,*) 'Preconditioner object lost after psb_comm_set'
+          goto 9999
+        end if
 
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    call psb_krylov('CG',a,prec,b,x,eps,desc_a,info,&
-         & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istop)
-    t2 = psb_wtime() - t1
-    call psb_amx(ctxt,t2)
+        setup_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+        call psb_amx(ctxt,setup_time(prec_idx,scheme_idx,rep))
 
-    tsolve(is) = t2
-    iter_arr(is) = iter
-    err_arr(is) = err
-    info_arr(is) = info
+        do iter = 1, nwarm
+          call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
+          if (info /= psb_success_) goto 9999
+          call psb_krylov('CG',a,prec,b,x,eps,desc_a,info,&
+               & itmax=itmax,itrace=itrace,istop=istop)
+          if (info /= psb_success_) goto 9999
+        end do
 
-    if (info /= psb_success_) goto 9999
+        call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
+        if (info /= psb_success_) goto 9999
+
+        call psb_barrier(ctxt)
+        t_start = psb_wtime()
+        if (.not.allocated(prec%prec)) then
+          info = psb_err_internal_error_
+          write(psb_err_unit,*) 'Preconditioner object lost before psb_krylov'
+          goto 9999
+        end if
+        call psb_krylov('CG',a,prec,b,x,eps,desc_a,info,&
+             & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istop)
+        t_elapsed = psb_wtime() - t_start
+        call psb_amx(ctxt,t_elapsed)
+
+        solve_time(prec_idx,scheme_idx,rep) = t_elapsed
+        total_time(prec_idx,scheme_idx,rep) = setup_time(prec_idx,scheme_idx,rep) + &
+             & solve_time(prec_idx,scheme_idx,rep)
+        iter_count(prec_idx,scheme_idx,rep) = iter
+        final_error(prec_idx,scheme_idx,rep) = err
+        solve_info(prec_idx,scheme_idx,rep) = info
+
+        if (info /= psb_success_) goto 9999
+      end do
+    end do
   end do
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("CG solve time by communication scheme")')
-    write(psb_out_unit,'("--------------------------------------")')
-    do is = 1, 3
-      write(psb_out_unit,'(a25,2x,"time=",es12.5,2x,"iter=",i8,2x,"err=",es12.5,2x,"info=",i6)') &
-           & trim(scheme_names(is)), tsolve(is), iter_arr(is), err_arr(is), info_arr(is)
+    write(psb_out_unit,'("CG timing stats by preconditioner and communication scheme")')
+    write(psb_out_unit,'("-----------------------------------------------------------")')
+    do prec_idx = 1, n_precs
+      write(psb_out_unit,'("Preconditioner: ",a)') trim(prec_name(prec_idx))
+      do scheme_idx = 1, n_schemes
+        call compute_stats(setup_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,&
+             & '(a25,2x,"setup median=",es12.5,2x,"p10=",es12.5,2x,"p90=",es12.5)') &
+             & trim(scheme_name(scheme_idx)), med_t, p10_t, p90_t
+        call compute_stats(solve_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,&
+             & '(27x,"solve median=",es12.5,2x,"mean=",es12.5,2x,"std=",es12.5)') med_t, avg_t, std_t
+        call compute_stats(total_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,&
+             & '(27x,"total median=",es12.5,2x,"min=",es12.5,2x,"max=",es12.5)') med_t, min_t, max_t
+        call compute_stats(final_error(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,&
+             & '(27x,"err median=",es12.5,2x,"last it/info=",i8,"/",i6)') &
+             & med_t, iter_count(prec_idx,scheme_idx,nrep), solve_info(prec_idx,scheme_idx,nrep)
+      end do
+      write(psb_out_unit,'(" ")')
     end do
   end if
 
   call psb_gefree(b,desc_a,info)
   call psb_gefree(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  call prec%free(info)
+  if (prec_ready) call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
+  deallocate(setup_time,solve_time,total_time,final_error,iter_count,solve_info)
 
   call psb_exit(ctxt)
   stop
@@ -113,6 +210,64 @@ program psb_comm_cg_test
   stop 1
 
 contains
+
+  subroutine sort_real_inplace(v)
+    real(psb_dpk_), intent(inout) :: v(:)
+    integer(psb_ipk_) :: i, j
+    real(psb_dpk_) :: key
+
+    do i = 2, size(v)
+      key = v(i)
+      j = i - 1
+      do while ((j >= 1).and.(v(j) > key))
+        v(j+1) = v(j)
+        j = j - 1
+      end do
+      v(j+1) = key
+    end do
+  end subroutine sort_real_inplace
+
+  subroutine compute_stats(vals,mean_v,std_v,median_v,p10_v,p90_v,min_v,max_v)
+    real(psb_dpk_), intent(in)  :: vals(:)
+    real(psb_dpk_), intent(out) :: mean_v,std_v,median_v,p10_v,p90_v,min_v,max_v
+    real(psb_dpk_), allocatable :: tmp(:)
+    integer(psb_ipk_) :: n, idx10, idx90
+
+    n = size(vals)
+    if (n <= 0) then
+      mean_v = dzero; std_v = dzero; median_v = dzero
+      p10_v  = dzero; p90_v = dzero; min_v = dzero; max_v = dzero
+      return
+    end if
+
+    mean_v = sum(vals)/real(n,psb_dpk_)
+    if (n > 1) then
+      std_v = sqrt(sum((vals-mean_v)**2)/real(n-1,psb_dpk_))
+    else
+      std_v = dzero
+    end if
+
+    allocate(tmp(n))
+    tmp = vals
+    call sort_real_inplace(tmp)
+
+    if (mod(n,2) == 0) then
+      median_v = (tmp(n/2)+tmp(n/2+1))/2.0_psb_dpk_
+    else
+      median_v = tmp((n+1)/2)
+    end if
+
+    idx10 = int(ceiling(0.10_psb_dpk_*real(n,psb_dpk_)),kind=psb_ipk_)
+    idx90 = int(ceiling(0.90_psb_dpk_*real(n,psb_dpk_)),kind=psb_ipk_)
+    idx10 = max(1_psb_ipk_,min(n,idx10))
+    idx90 = max(1_psb_ipk_,min(n,idx90))
+    p10_v = tmp(idx10)
+    p90_v = tmp(idx90)
+    min_v = tmp(1)
+    max_v = tmp(n)
+
+    deallocate(tmp)
+  end subroutine compute_stats
 
   function b1(x,y,z) result(val)
     real(psb_dpk_), intent(in) :: x,y,z

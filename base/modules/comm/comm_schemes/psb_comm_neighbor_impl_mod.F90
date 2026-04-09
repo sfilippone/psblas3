@@ -28,6 +28,7 @@ module psb_comm_neighbor_impl_mod
     integer(psb_mpk_) :: comm_request = mpi_request_null
     integer(psb_mpk_) :: persistent_request = mpi_request_null
     logical :: persistent_request_ready = .false.
+    logical :: persistent_in_flight = .false.
     integer(psb_ipk_) :: persistent_buffer_size = 0
   contains
     procedure, pass :: init => psb_comm_neighbor_init
@@ -316,6 +317,7 @@ contains
       end if
       this%persistent_request = mpi_request_null
       this%persistent_request_ready = .false.
+      this%persistent_in_flight = .false.
       this%persistent_buffer_size = 0
     end if
 
@@ -372,6 +374,7 @@ contains
     this%id = 0
     this%swap_status = 0
     this%comm_request = mpi_request_null
+    this%persistent_in_flight = .false.
     this%persistent_request = mpi_request_null
     this%persistent_request_ready = .false.
     this%persistent_buffer_size = 0
@@ -388,6 +391,7 @@ contains
     this%comm_request = mpi_request_null
     this%persistent_request = mpi_request_null
     this%persistent_request_ready = .false.
+    this%persistent_in_flight = .false.
     this%persistent_buffer_size = 0
     call this%free(info)
   end subroutine psb_comm_neighbor_destroy
@@ -424,6 +428,7 @@ contains
     this%comm_request = mpi_request_null
     this%persistent_request = mpi_request_null
     this%persistent_request_ready = .false.
+    this%persistent_in_flight = .false.
     this%persistent_buffer_size = 0
   end subroutine psb_comm_neighbor_init
 

@@ -120,6 +120,7 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
   integer(psb_ipk_) :: itmax_, istop_, it, itx, itrace_,&
        &  n_col, n_row,err_act, ieg,nspl, istebz
+    integer(psb_ipk_) :: i, swap_status
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   type(psb_ctxt_type) :: ctxt
@@ -173,6 +174,19 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
 
   if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
   if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)  
+  if ((info == psb_success_).and.allocated(x%v%comm_handle)) then
+    do i=1,size(wwrk)
+      if (allocated(wwrk(i)%v)) then
+        call psb_comm_set(x%v%comm_handle%comm_type,wwrk(i)%v%comm_handle,info)
+        if (info /= psb_success_) exit
+        wwrk(i)%v%comm_handle%id = x%v%comm_handle%id
+        call x%v%comm_handle%get_swap_status(swap_status,info)
+        if (info /= psb_success_) exit
+        call wwrk(i)%v%comm_handle%set_swap_status(swap_status,info)
+        if (info /= psb_success_) exit
+      end if
+    end do
+  end if
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)

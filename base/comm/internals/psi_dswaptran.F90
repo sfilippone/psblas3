@@ -160,7 +160,7 @@ contains
     end if
 
     if (.not. allocated(y%comm_handle)) then
-      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
         goto 9999
@@ -741,7 +741,7 @@ contains
     end if
 
     if (.not. allocated(y%comm_handle)) then
-      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
         goto 9999

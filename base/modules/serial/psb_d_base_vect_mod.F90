@@ -50,7 +50,7 @@ module psb_d_base_vect_mod
   use psb_i_base_vect_mod
   use psb_l_base_vect_mod
   use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, psb_comm_unknown_
-  use psb_comm_factory_mod, only: psb_comm_init, psb_comm_free
+  use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
 
 
   !> \namespace  psb_base_mod  \class psb_d_base_vect_type
@@ -176,13 +176,6 @@ module psb_d_base_vect_mod
 
     procedure, pass(x) :: check_addr  => d_base_check_addr
     
-    ! Communication lifecycle split:
-    ! - `create_comm`: allocate/select a fresh handle implementation via factory.
-    ! - `init_comm`:   configure the current handle instance from an existing one
-    !                  (e.g., copy `id` and swap status), and reset buffers;
-    !                  it recreates the handle only if missing or scheme changes.
-    ! - `destroy_comm`/`free_comm`: release current handle resources.
-
 
     !
     ! Dot product and AXPBY
@@ -414,7 +407,7 @@ contains
     end if
     if (info == psb_success_) then
       if (.not. allocated(x%comm_handle)) then
-        call psb_comm_init(psb_comm_isend_irecv_, x%comm_handle, info)
+        call psb_comm_set(psb_comm_isend_irecv_, x%comm_handle, info)
       end if
     end if
 
@@ -436,7 +429,7 @@ contains
 
     allocate(psb_d_base_vect_type :: y, stat=info)
     if (info == psb_success_) then
-      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
     end if
 
   end subroutine d_base_mold
@@ -464,7 +457,7 @@ contains
     end if
     if (info == psb_success_) then
       if (.not. allocated(x%comm_handle)) then
-        call psb_comm_init(psb_comm_isend_irecv_, x%comm_handle, info)
+        call psb_comm_set(psb_comm_isend_irecv_, x%comm_handle, info)
       end if
     end if
 
@@ -1114,7 +1107,7 @@ contains
     call y%set_ncfs(x%get_ncfs())
     if (allocated(x%iv)) y%iv = x%iv
     if (allocated(x%comm_handle)) then
-      call psb_comm_init(x%comm_handle%comm_type, y%comm_handle, info)
+      call psb_comm_set(x%comm_handle%comm_type, y%comm_handle, info)
       if (info /= psb_success_) return
       y%comm_handle%id = x%comm_handle%id
       call x%comm_handle%get_swap_status(swap_status, info)
@@ -1122,7 +1115,7 @@ contains
       call y%comm_handle%set_swap_status(swap_status, info)
       if (info /= psb_success_) return
     else
-      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
     end if
   end subroutine d_base_cpy
 
@@ -2409,7 +2402,7 @@ contains
     end if
 
     if (need_new_handle) then
-      call psb_comm_init(comm_type, x%comm_handle, info)
+      call psb_comm_set(comm_type, x%comm_handle, info)
       if (info /= psb_success_) return
     end if
 

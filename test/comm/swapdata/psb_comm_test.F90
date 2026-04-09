@@ -18,7 +18,7 @@
 program psb_comm_test
   use psb_base_mod
   use psi_mod
-  use psb_comm_factory_mod, only: psb_comm_init, psb_comm_free
+  use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
   use psb_comm_schemes_mod, only: psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_, &
     & psb_comm_isend_irecv_
   use psb_comm_schemes_mod, only: psb_comm_status_start_, psb_comm_status_wait_, psb_comm_status_unknown_
@@ -219,9 +219,9 @@ program psb_comm_test
   ! ==================================================================
   !  7. Neighbor topology halo exchange  (start + wait)
   ! ==================================================================
-  call psb_comm_init(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
+  call psb_comm_set(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
   if (info /= 0) then
-    write(psb_err_unit,*) my_rank, 'psb_comm_init neighbor error:', info
+    write(psb_err_unit,*) my_rank, 'psb_comm_set neighbor error:', info
     call psb_abort(ctxt)
   end if
   call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
@@ -239,9 +239,9 @@ program psb_comm_test
   ! ==================================================================
   !  7b. Persistent-neighbor halo exchange  (start + wait)
   ! ==================================================================
-  call psb_comm_init(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
+  call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
   if (info /= 0) then
-    write(psb_err_unit,*) my_rank, 'psb_comm_init persistent-neighbor error:', info
+    write(psb_err_unit,*) my_rank, 'psb_comm_set persistent-neighbor error:', info
     call psb_abort(ctxt)
   end if
   call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
@@ -266,9 +266,9 @@ program psb_comm_test
   tsum_neighbor = 0.0_psb_dpk_
   tsum_neighbor_persistent = 0.0_psb_dpk_
 
-  call psb_comm_init(psb_comm_isend_irecv_, v_baseline%v%comm_handle, info)
-  call psb_comm_init(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
-  call psb_comm_init(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
+  call psb_comm_set(psb_comm_isend_irecv_, v_baseline%v%comm_handle, info)
+  call psb_comm_set(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
+  call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
 
   ! ---- Comm check: verify selected communication schemes ----
   n_total = n_total + 1

@@ -8,7 +8,7 @@ module psb_spmv_overlap_test
 
   use psb_base_mod
   use psb_util_mod
-  use psb_comm_factory_mod, only: psb_comm_init
+  use psb_comm_factory_mod, only: psb_comm_set
   use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
     & psb_comm_persistent_ineighbor_alltoallv_
 
@@ -584,11 +584,11 @@ contains
     if (info /= psb_success_) goto 9999
 
     ! Set communication schemes on the x vectors used by psb_spmm.
-    call psb_comm_init(psb_comm_isend_irecv_, x_baseline%v%comm_handle, info)
+    call psb_comm_set(psb_comm_isend_irecv_, x_baseline%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
-    call psb_comm_init(psb_comm_ineighbor_alltoallv_, x_neighbor%v%comm_handle, info)
+    call psb_comm_set(psb_comm_ineighbor_alltoallv_, x_neighbor%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
-    call psb_comm_init(psb_comm_persistent_ineighbor_alltoallv_, x_persistent%v%comm_handle, info)
+    call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, x_persistent%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
 
     ! Warm-up all schemes once.

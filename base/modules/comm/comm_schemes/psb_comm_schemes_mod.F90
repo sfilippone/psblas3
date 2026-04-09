@@ -21,15 +21,13 @@ module psb_comm_schemes_mod
   end enum
 
 
-  ! (abstract interfaces moved below type definition)
-
   ! --- comm handle type  ---
   type, abstract :: psb_comm_handle_type
     integer(psb_ipk_) :: id = -1
     integer(psb_ipk_) :: comm_type = psb_comm_unknown_
     integer(psb_ipk_) :: swap_status = psb_comm_status_unknown_
   contains
-    procedure(psb_comm_init), deferred            :: init
+    procedure(psb_comm_set), deferred             :: init
     procedure(psb_comm_free), deferred            :: free
     procedure(psb_comm_set_swap_status), deferred :: set_swap_status
     procedure(psb_comm_get_swap_status), deferred :: get_swap_status
@@ -37,7 +35,7 @@ module psb_comm_schemes_mod
 
   ! --- abstract interfaces ---
   abstract interface
-    subroutine psb_comm_init(this, info)
+    subroutine psb_comm_set(this, info)
       import :: psb_ipk_, psb_comm_handle_type
       class(psb_comm_handle_type), intent(inout)  :: this
       integer(psb_ipk_), intent(out)              :: info

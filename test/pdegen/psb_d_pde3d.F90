@@ -837,7 +837,7 @@ program psb_d_pde3d
          & err=err,itrace=itrace,&
          & istop=istopc)
   case('BICGSTAB','BICGSTABL','BICG','CG','CGS','FCG','GCR','RGMRES')
-    call psb_comm_init(psb_comm_persistent_ineighbor_alltoallv_,xxv%v%comm_handle,info)
+    call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_,xxv%v%comm_handle,info)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='comm init'

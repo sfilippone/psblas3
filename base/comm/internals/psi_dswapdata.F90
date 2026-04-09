@@ -159,7 +159,7 @@ contains
     end if
 
     if (.not. allocated(y%comm_handle)) then
-      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
         goto 9999
@@ -338,6 +338,16 @@ contains
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
         idx_pt = snd_pt
+        if ((idx_pt < 1) .or. (nesd < 0) .or. (idx_pt+max(0,nesd)-1 > size(comm_indexes%v))) then
+          info = psb_err_internal_error_
+          call psb_errpush(info,name,a_err='baseline gather metadata out of bounds')
+          goto 9999
+        end if
+        if ((idx_pt < 1) .or. (nesd < 0) .or. (idx_pt+max(0,nesd)-1 > size(y%combuf))) then
+          info = psb_err_internal_error_
+          call psb_errpush(info,name,a_err='baseline gather combuf bounds error')
+          goto 9999
+        end if
         call y%gth(idx_pt,nesd,comm_indexes)
         pnti   = pnti + nerv + nesd + 3
       end do
@@ -440,6 +450,17 @@ contains
         idx_pt = 1+pnti+psb_n_elem_recv_
         snd_pt = 1+pnti+nerv+psb_n_elem_send_
         rcv_pt = 1+pnti+psb_n_elem_recv_
+
+        if ((idx_pt < 1) .or. (nerv < 0) .or. (idx_pt+max(0,nerv)-1 > size(comm_indexes%v))) then
+          info = psb_err_internal_error_
+          call psb_errpush(info,name,a_err='baseline scatter metadata out of bounds')
+          goto 9999
+        end if
+        if ((rcv_pt < 1) .or. (nerv < 0) .or. (rcv_pt+max(0,nerv)-1 > size(y%combuf))) then
+          info = psb_err_internal_error_
+          call psb_errpush(info,name,a_err='baseline scatter combuf bounds error')
+          goto 9999
+        end if
 
         if (debug) write(0,*)me,' Received from: ',prcid(i),&
             & y%combuf(rcv_pt:rcv_pt+nerv-1)        
@@ -547,6 +568,13 @@ contains
     ! ---------------------------------------------------------
     if (do_start) then
       if(debug) write(*,*) me,' nbr_vect: starting data exchange'
+      if (neighbor_comm_handle%use_persistent_buffers) then
+        if (neighbor_comm_handle%persistent_in_flight) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, a_err='Invalid START: persistent neighbor request already in flight')
+          goto 9999
+        end if
+      end if
       if (.not. neighbor_comm_handle%is_initialized) then
         if (debug) write(*,*) me,' nbr_vect: building topology via handle'
         call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
@@ -571,6 +599,7 @@ contains
             end if
             neighbor_comm_handle%persistent_request = mpi_request_null
             neighbor_comm_handle%persistent_request_ready = .false.
+            neighbor_comm_handle%persistent_in_flight = .false.
             neighbor_comm_handle%persistent_buffer_size = 0
           end if
           call y%new_buffer(buffer_size, info)
@@ -635,6 +664,7 @@ contains
           call psb_errpush(info, name, m_err=(/iret/))
           goto 9999
         end if
+        neighbor_comm_handle%persistent_in_flight = .true.
 #else
         call mpi_ineighbor_alltoallv( &
             & y%combuf(1),                        &  ! send buffer
@@ -652,6 +682,7 @@ contains
           call psb_errpush(info, name, m_err=(/iret/))
           goto 9999
         end if
+        neighbor_comm_handle%persistent_in_flight = .true.
 #endif
       else
         ! Post non-blocking neighborhood alltoallv
@@ -682,19 +713,11 @@ contains
     if (do_wait) then
 
       if (neighbor_comm_handle%use_persistent_buffers) then
-#ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
-        if (.not. neighbor_comm_handle%persistent_request_ready) then
+        if (.not. neighbor_comm_handle%persistent_in_flight) then
           info = psb_err_mpi_error_
-          call psb_errpush(info, name, m_err=(/-2/))
+          call psb_errpush(info, name, a_err='Invalid WAIT: no persistent neighbor request in flight')
           goto 9999
         end if
-#else
-        if (neighbor_comm_handle%comm_request == mpi_request_null) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info, name, m_err=(/-2/))
-          goto 9999
-        end if
-#endif
       else
         if (neighbor_comm_handle%comm_request == mpi_request_null) then
           write(psb_err_unit,*) me, 'DBG: neighbor WAIT but comm_request is NULL; is_initialized=', &
@@ -723,6 +746,9 @@ contains
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
         goto 9999
+      end if
+      if (neighbor_comm_handle%use_persistent_buffers) then
+        neighbor_comm_handle%persistent_in_flight = .false.
       end if
 
       ! Scatter received data to local vector positions (polymorphic for GPU)
@@ -834,7 +860,7 @@ contains
     end if
 
     if (.not. allocated(y%comm_handle)) then
-      call psb_comm_init(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
         goto 9999
@@ -1202,6 +1228,13 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
   ! ---------------------------------------------------------
   if (do_start) then
     if(debug) write(*,*) me,' nbr_vect: starting data exchange'
+    if (neighbor_comm_handle%use_persistent_buffers) then
+      if (neighbor_comm_handle%persistent_in_flight) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, a_err='Invalid START: persistent neighbor request already in flight')
+        goto 9999
+      end if
+    end if
     if (.not. neighbor_comm_handle%is_initialized) then
       if (debug) write(*,*) me,' nbr_vect: building topology via handle'
       call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, &
@@ -1227,6 +1260,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
           end if
           neighbor_comm_handle%persistent_request = mpi_request_null
           neighbor_comm_handle%persistent_request_ready = .false.
+          neighbor_comm_handle%persistent_in_flight = .false.
           neighbor_comm_handle%persistent_buffer_size = 0
         end if
         call y%new_buffer(buffer_size, info)
@@ -1290,6 +1324,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
         call psb_errpush(info, name, m_err=(/iret/))
         goto 9999
       end if
+      neighbor_comm_handle%persistent_in_flight = .true.
 #else
       call mpi_ineighbor_alltoallv( &
           & y%combuf(1),                        &  ! send buffer
@@ -1307,6 +1342,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
         call psb_errpush(info, name, m_err=(/iret/))
         goto 9999
       end if
+      neighbor_comm_handle%persistent_in_flight = .true.
 #endif
     else
       ! Post non-blocking neighborhood alltoallv
@@ -1337,19 +1373,11 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
   if (do_wait) then
 
     if (neighbor_comm_handle%use_persistent_buffers) then
-#ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
-      if (.not. neighbor_comm_handle%persistent_request_ready) then
+      if (.not. neighbor_comm_handle%persistent_in_flight) then
         info = psb_err_mpi_error_
-        call psb_errpush(info, name, m_err=(/-2/))
+        call psb_errpush(info, name, a_err='Invalid WAIT: no persistent neighbor request in flight')
         goto 9999
       end if
-#else
-      if (neighbor_comm_handle%comm_request == mpi_request_null) then
-        info = psb_err_mpi_error_
-        call psb_errpush(info, name, m_err=(/-2/))
-        goto 9999
-      end if
-#endif
     else
       if (neighbor_comm_handle%comm_request == mpi_request_null) then
         info = psb_err_mpi_error_
@@ -1376,6 +1404,9 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
       info = psb_err_mpi_error_
       call psb_errpush(info, name, m_err=(/iret/))
       goto 9999
+    end if
+    if (neighbor_comm_handle%use_persistent_buffers) then
+      neighbor_comm_handle%persistent_in_flight = .false.
     end if
 
     ! Scatter received data to local vector positions (polymorphic for GPU)
