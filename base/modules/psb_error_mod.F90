@@ -509,7 +509,6 @@ contains
       write(tmpmsg,'("PSBLAS Error (",i0,") in subroutine: ",a)')&
            & err_c,trim(r_name)
     end if
-
     
     select case (err_c)
     case(:psb_success_)
