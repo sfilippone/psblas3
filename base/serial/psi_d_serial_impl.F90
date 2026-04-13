@@ -1089,7 +1089,7 @@ subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
   end if
 
   ! Get the op-code based on the values of alpha, beta, gamma
-  code = get_apbylike_code(alpha, beta, gamma)
+  code = get_axpbylike_code(alpha, beta, gamma)
 
   select case (code)
     case( 0) ! (alpha, beta, gamma) = ( *,  *,  *)
@@ -1466,7 +1466,7 @@ subroutine psi_daxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
   end if
 
   ! Get the op-code based on the values of alpha, beta, gamma
-  code = get_apbylike_code(alpha, beta, gamma)
+  code = get_axpbylike_code(alpha, beta, gamma)
 
   select case (code)
     case( 0) ! (alpha, beta, gamma) = ( *,  *,  *)
@@ -2543,7 +2543,7 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
   endif
 
   ! Get the op-code based on the values of alpha, beta, gamma
-  code = get_apbylike_code(alpha, beta, gamma)
+  code = get_axpbylike_code(alpha, beta, gamma)
   select case (code)
     case( 0) ! (alpha, beta, gamma) = ( *,  *,  *)
       do j = 1, n

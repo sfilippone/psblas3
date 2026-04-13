@@ -339,11 +339,11 @@ module psb_const_mod
   logical, parameter :: try_newins=.true.
 
   ! Interface for dispach of axpy-like operations.
-  interface get_apbylike_code
+  interface get_axpbylike_code
     module procedure get_axpbylike_code1
     module procedure get_axpbylike_code2
     module procedure get_axpbylike_code3
-  end interface get_apbylike_code
+  end interface get_axpbylike_code
 
 contains
 
