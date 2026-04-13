@@ -1617,9 +1617,9 @@ module psb_d_multivect_mod
     ! three term axpy-like operations with separate output mv (rename?)
     procedure, pass(w) :: axpbycz_mm_o => d_mvect_axpbycz_mm_out
     ! linear combinations of columns of the multivector
-    procedure, pass(x) :: colspan1D   => d_mvect_colspan1D
-    procedure, pass(x) :: colspan2D   => d_mvect_colspan2D
-    ! all generics exported as axpby
+    procedure, pass(x) :: colspan1D    => d_mvect_colspan1D
+    procedure, pass(x) :: colspan2D    => d_mvect_colspan2D
+    ! all procedures exported as axpby
     generic, public    :: axpby        => axpby_v_i, axpby_v_f, & 
                                           axpby_m_i, axpby_m_f, &
                                           axpby_m_f_o, &
@@ -1631,6 +1631,22 @@ module psb_d_multivect_mod
     procedure, pass(x) :: dot_mm   => d_mvect_dot_mm
     procedure, pass(x) :: dot_mv   => d_mvect_dot_mv
     generic, public    :: dot      => dot_mm, dot_mv
+
+    ! Element wise multiplication operations with in place output
+    procedure, pass(y) :: mlt_v_f    => d_mvect_mlt_v_full
+    procedure, pass(y) :: mlt_v_i    => d_mvect_mlt_v_idxs
+    procedure, pass(y) :: mlt_m_f    => d_mvect_mlt_m_full
+    procedure, pass(y) :: mlt_m_i    => d_mvect_mlt_v_idxs
+    ! Element wise multiplication operations with separate output
+    procedure, pass(z) :: mlt_v_f_o  => d_mvect_mlt_v_full_out
+    procedure, pass(z) :: mlt_v_i_o  => d_mvect_mlt_v_idxs_out
+    procedure, pass(z) :: mlt_m_f_o  => d_mvect_mlt_m_full_out
+    procedure, pass(z) :: mlt_m_i_o  => d_mvect_mlt_v_idxs_out
+    ! All procedures exported as mlt
+    generic, public    :: mlt        => mlt_v_f, mlt_v_i, &
+                                        mlt_m_f, mlt_m_i, &
+                                        mlt_v_f_o, mlt_v_i_o, &
+                                        mlt_f_o, mlt_m_i_o  
 
 !!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
 !!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
@@ -1661,7 +1677,7 @@ module psb_d_multivect_mod
     module procedure constructor, size_const
   end interface psb_d_multivect
 
-  class(psb_d_base_multivect_type), allocatable, target,&
+  class(psb_d_base_multivect_type), allocatable, target, &
        & save, private :: psb_d_base_multivect_default
 
   interface psb_set_multivect_default
@@ -1672,9 +1688,7 @@ module psb_d_multivect_mod
     module procedure psb_d_get_multivect_default
   end interface psb_get_multivect_default
 
-
 contains
-
   
   function d_mvect_is_remote_build(x) result(res)
     implicit none
@@ -2390,7 +2404,7 @@ contains
     implicit none
     integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y, idx_z, idx_w
     class(psb_d_multivect_type), intent(inout)  :: x, y, z, w
-    real(psb_dpk_), intent(in)                 :: alpha, beta, gamma
+    real(psb_dpk_), intent(in)                  :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)              :: info
 
     if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) & 
@@ -2478,12 +2492,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
     real(psb_dpk_), intent(out)                 :: res(:)
 
-    if(.not. allocated(x%v)) then
-      info = psb_err_invalid_mvect_state_
-      return
-    endif
-
-    if(.not. allocated(y%v)) then
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
       info = psb_err_invalid_vect_state_
       return
     endif
@@ -2491,6 +2500,242 @@ contains
     call x%v%dotsbr(m, y%v, res, info)
   end subroutine d_mvect_dot_mv
 
+
+
+  subroutine d_mvect_mlt_v_full(m, alpha, x, y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call y%v%mlt(m, alpha, x%v, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_v_full
+
+  subroutine d_mvect_mlt_v_idxs(m, alpha, x, y, idx_y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x
+    class(psb_d_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(in)               :: idx_y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+    
+    if(idx_y < 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_y > y%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call y%v%mlt(m, alpha, x%v, idx_y, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_v_idxs
+
+  subroutine d_mvect_mlt_m_full(m, alpha, x, y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_multivect_type), intent(inout)  :: x, y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    ! Multivector with different size rise error
+    if(x%get_ncols() /= y%get_ncols()) then
+      info = psb_err_invalid_mvect_size_
+      return
+    endif
+
+    call y%v%mlt(m, alpha, x%v, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_m_full
+
+  subroutine d_mvect_mlt_m_idxs(m, alpha, x, idx_x, y, idx_y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_multivect_type), intent(inout)  :: x, y
+    integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if((idx_y < 0) .or. (idx_x < 0)) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if((idx_y > y%get_ncols()) .or. (idx_x > x%get_ncols())) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call y%v%mlt(m, alpha, x%v, idx_x, idx_y, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_m_idxs
+
+  subroutine d_mvect_mlt_v_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x
+    class(psb_d_multivect_type), intent(inout)  :: y, z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call z%v%mlt(m, alpha, x%v, y%v, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_v_full_out
+
+  subroutine d_mvect_mlt_v_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x
+    class(psb_d_multivect_type), intent(inout)  :: y, z
+    integer(psb_ipk_), intent(in)               :: idx_y, idx_z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)).or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+    
+    if((idx_y < 0) .or. (idx_z < 0)) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if((idx_y > y%get_ncols()) .or. (idx_z > z%get_ncols())) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call z%v%mlt(m, alpha, x%v, y%v, idx_y, beta, idx_z, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_v_idxs_out
+
+  subroutine d_mvect_mlt_m_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_multivect_type), intent(inout)  :: x, y, z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) &
+          .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    ! Multivector with different size rise error
+    if((z%get_ncols() /= x%get_ncols()) .or. (z%get_ncols() /= y%get_ncols())) then
+      info = psb_err_invalid_mvect_size_
+      return
+    endif
+
+    call z%v%mlt(m, alpha, x%v, y%v, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_m_full_out
+
+  subroutine d_mvect_mlt_m_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_multivect_type), intent(inout)  :: x, y, z
+    integer(psb_ipk_), intent(in)               :: idx_x, idx_y, idx_z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) &
+          .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if((idx_z < 0) .or. (idx_y < 0) .or. (idx_x < 0)) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if((idx_z > z%get_ncols()) .or. (idx_y > y%get_ncols()) &
+          .or. (idx_x > x%get_ncols())) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call z%v%mlt(m, alpha, x%v, idx_x, y%v, idx_y, beta, idx_z, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_m_idxs_out
+  
+
+  
+  
 
 !!$  function d_mvect_dot_v(n,x,y) result(res)
 !!$    implicit none

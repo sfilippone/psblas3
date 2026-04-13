@@ -2706,35 +2706,36 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: set_colm => d_base_mlv_set_colm
     generic, public    :: set      => set_vect, set_scal, set_colm
 
-
-    !
-    ! Dot product and AXPBY
-    !
-    procedure, pass(x) :: dot_v    => d_base_mlv_dot_v
-    procedure, pass(x) :: dot_a    => d_base_mlv_dot_a
-    generic, public    :: dot      => dot_v, dot_a
+    ! !
+    ! ! OLD implementations of "axpy - like" and "dot - like" operations
+    ! ! Remove after we check there are really not used
+    ! !
     
-    procedure, pass(y) :: axpby_v  => d_base_mlv_axpby_v
-    procedure, pass(y) :: axpby_a  => d_base_mlv_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
-
-
-    ! New implementations of "axpy - like" operations 
-    ! TO DO: check and clear possibile duplicates
+    ! procedure, pass(x) :: dot_v    => d_base_mlv_dot_v
+    ! procedure, pass(x) :: dot_a    => d_base_mlv_dot_a
+    ! generic, public    :: dot      => dot_v, dot_a
     
-    ! two term axpy like operations - indexed and full versions
+    ! procedure, pass(y) :: axpby_v  => d_base_mlv_axpby_v
+    ! procedure, pass(y) :: axpby_a  => d_base_mlv_axpby_a
+    ! generic, public    :: axpby    => axpby_v, axpby_a
+
+
+    !! 
+    !! AXPY - like operations 
+    !! 
+    ! two term operations - indexed and full versions
     procedure, pass(y) :: axpby_v_i    => d_base_mvect_axpby_v_idxs
     procedure, pass(y) :: axpby_v_f    => d_base_mvect_axpby_v_full
     procedure, pass(y) :: axpby_m_i    => d_base_mvect_axpby_m_idxs
     procedure, pass(y) :: axpby_m_f    => d_base_mvect_axpby_m_full
-    ! two term axpy-like operations with separate output mv
+    ! two term operations with separate output mv
     procedure, pass(z) :: axpby_m_f_o  => d_base_mvect_axpby_m_full_out
-    ! three term axpy like operations
+    ! three term operations
     procedure, pass(z) :: axpbycz_vv   => d_base_mvect_axpbycz_vv
     procedure, pass(z) :: axpbycz_mv   => d_base_mvect_axpbycz_mv
     procedure, pass(z) :: axpbycz_mm_i => d_base_mvect_axpbycz_mm_idxs
     procedure, pass(z) :: axpbycz_mm_f => d_base_mvect_axpbycz_mm_full
-    ! three term axpy-like operations with separate output mv
+    ! three term operations with separate output mv
     procedure, pass(w) :: axpbycz_mm_o => d_base_mvect_axpbycz_mm_out
     ! linear combinations of columns of the multivector (rename?)
     procedure, pass(x) :: colspan1D    => d_base_mvect_colspan1D
@@ -2747,26 +2748,51 @@ module psb_d_base_multivect_mod
                                           axpbycz_mm_f, axpbycz_mm_o, &
                                           colspan1D, colspan2D
 
-    ! dot products operations - only full-full version for now
+    !! 
+    !! DOT - like operations 
+    !!
+    ! only full-full version for now
     procedure, pass(x) :: dot_mm   => d_base_mvect_dot_mm
     procedure, pass(x) :: dot_mv   => d_base_mvect_dot_mv
     generic, public    :: dotsbr   => dot_mm, dot_mv
 
+    !! 
+    !! Element wise multiplications 
+    !!
+    ! two input with in place output
+    procedure, pass(y) :: mlt_v_f    => d_base_mvect_mlt_v_full
+    procedure, pass(y) :: mlt_v_i    => d_base_mvect_mlt_v_idxs
+    procedure, pass(y) :: mlt_m_f    => d_base_mvect_mlt_m_full
+    procedure, pass(y) :: mlt_m_i    => d_base_mvect_mlt_v_idxs
+    ! two input with separate output
+    procedure, pass(z) :: mlt_v_f_o  => d_base_mvect_mlt_v_full_out
+    procedure, pass(z) :: mlt_v_i_o  => d_base_mvect_mlt_v_idxs_out
+    procedure, pass(z) :: mlt_m_f_o  => d_base_mvect_mlt_m_full_out
+    procedure, pass(z) :: mlt_m_i_o  => d_base_mvect_mlt_v_idxs_out
+    ! All procedures exported as mlt
+    generic, public    :: mlt        => mlt_v_f, mlt_v_i, &
+                                        mlt_m_f, mlt_m_i, &
+                                        mlt_v_f_o, mlt_v_i_o, &
+                                        mlt_f_o, mlt_m_i_o
 
-    !
-    ! MultiVector by vector/multivector multiplication. Need all variants
-    ! to handle multiple requirements from preconditioners
-    !
-    procedure, pass(y) :: mlt_mv   => d_base_mlv_mlt_mv
-    procedure, pass(y) :: mlt_mv_v => d_base_mlv_mlt_mv_v
-    procedure, pass(y) :: mlt_ar1  => d_base_mlv_mlt_ar1
-    procedure, pass(y) :: mlt_ar2  => d_base_mlv_mlt_ar2
-    procedure, pass(z) :: mlt_a_2  => d_base_mlv_mlt_a_2
-    procedure, pass(z) :: mlt_v_2  => d_base_mlv_mlt_v_2
-!!$    procedure, pass(z) :: mlt_va   => d_base_mlv_mlt_va
-!!$    procedure, pass(z) :: mlt_av   => d_base_mlv_mlt_av
-    generic, public    :: mlt      => mlt_mv, mlt_mv_v, mlt_ar1, mlt_ar2, &
-         & mlt_a_2, mlt_v_2 !, mlt_av, mlt_va
+    ! OLD routine for Element wise multiplication operations.
+    ! Remove after wecheck there are really not used
+    !                                         
+    !     ! MultiVector by vector/multivector multiplication. Need all variants
+    !     ! to handle multiple requirements from preconditioners
+    !     !
+    !     procedure, pass(y) :: mlt_mv   => d_base_mlv_mlt_mv
+    !     procedure, pass(y) :: mlt_mv_v => d_base_mlv_mlt_mv_v
+    !     procedure, pass(y) :: mlt_ar1  => d_base_mlv_mlt_ar1
+    !     procedure, pass(y) :: mlt_ar2  => d_base_mlv_mlt_ar2
+    !     procedure, pass(z) :: mlt_a_2  => d_base_mlv_mlt_a_2
+    !     procedure, pass(z) :: mlt_v_2  => d_base_mlv_mlt_v_2
+    ! !!$    procedure, pass(z) :: mlt_va   => d_base_mlv_mlt_va
+    ! !!$    procedure, pass(z) :: mlt_av   => d_base_mlv_mlt_av
+    !     generic, public    :: mlt      => mlt_mv, mlt_mv_v, mlt_ar1, mlt_ar2, &
+    !          & mlt_a_2, mlt_v_2 !, mlt_av, mlt_va
+                                        
+
     !
     ! Scaling and norms
     !
@@ -3877,7 +3903,6 @@ contains
     end select
   end subroutine d_base_mvect_axpbycz_mm_full
 
-
   subroutine d_base_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
     use psi_serial_mod
     implicit none
@@ -4014,228 +4039,405 @@ contains
   end subroutine d_base_mvect_dot_mv
 
 
-  !
-  !  Multiple variants of two operations:
-  !  Simple multiplication  Y(:.:) = X(:,:)*Y(:,:)
-  !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
-  !
-  !  Variants expanded according to the dynamic type
-  !  of the involved entities
-  !
-  !
-  !> Function  base_mlv_mlt_mv
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief Multivector entry-by-entry multiply  by a base_mlv_multivect  y=x*y
-  !! \param x   The class(base_mlv_vect) to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine d_base_mlv_mlt_mv(x, y, info)
+  subroutine d_base_mvect_mlt_v_full(m , alpha, x, y, beta, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
-    class(psb_d_base_multivect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
-
-  end subroutine d_base_mlv_mlt_mv
-
-  subroutine d_base_mlv_mlt_mv_v(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_d_base_vect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
-
-  end subroutine d_base_mlv_mlt_mv_v
-
-  !
-  !> Function  base_mlv_mlt_ar1
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief MultiVector entry-by-entry multiply  by a rank 1 array y=x*y
-  !! \param x(:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine d_base_mlv_mlt_ar1(x, y, info)
-    use psi_serial_mod
-    implicit none
-    real(psb_dpk_), intent(in)        :: x(:)
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    n = min(psb_size(y%v,1_psb_ipk_), size(x))
-    do i=1, n
-      y%v(i,:) = y%v(i,:)*x(i)
-    end do
-
-  end subroutine d_base_mlv_mlt_ar1
-
-  !
-  !> Function  base_mlv_mlt_ar2
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief MultiVector entry-by-entry multiply  by a rank 2 array y=x*y
-  !! \param x(:,:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine d_base_mlv_mlt_ar2(x, y, info)
-    use psi_serial_mod
-    implicit none
-    real(psb_dpk_), intent(in)        :: x(:,:)
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, nr,nc
-
-    info = 0
-    nr   = min(psb_size(y%v,1_psb_ipk_), size(x,1))
-    nc   = min(psb_size(y%v,2_psb_ipk_), size(x,2))
-    y%v(1:nr,1:nc) = y%v(1:nr,1:nc)*x(1:nr,1:nc)
-
-  end subroutine d_base_mlv_mlt_ar2
-
-
-  !
-  !> Function  base_mlv_mlt_a_2
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
-  !!        z=beta*z+alpha*x*y
-  !! \param alpha
-  !! \param beta
-  !! \param x(:) The array to be multiplied b
-  !! \param y(:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine d_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_dpk_), intent(in)        :: alpha,beta
-    real(psb_dpk_), intent(in)        :: y(:,:)
-    real(psb_dpk_), intent(in)        :: x(:,:)
-    class(psb_d_base_multivect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, nr, nc
-
-    info = 0
-    nr = min(psb_size(z%v,1_psb_ipk_), size(x,1), size(y,1))
-    nc = min(psb_size(z%v,2_psb_ipk_), size(x,2), size(y,2))
-    if (alpha == dzero) then
-      if (beta == done) then
-        return
-      else
-        z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc)
-      end if
-    else
-      if (alpha == done) then
-        if (beta == dzero) then
-          z%v(1:nr,1:nc) = y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == done) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      else if (alpha == -done) then
-        if (beta == dzero) then
-          z%v(1:nr,1:nc) = -y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == done) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      else
-        if (beta == dzero) then
-          z%v(1:nr,1:nc) = alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == done) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      end if
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
     end if
-  end subroutine d_base_mlv_mlt_a_2
 
-  !
-  !> Function  base_mlv_mlt_v_2
-  !! \memberof  psb_d_base_multivect_type
-  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mlv_vect)
-  !!        z=beta*z+alpha*x*y
-  !! \param alpha
-  !! \param beta
-  !! \param x  The class(base_mlv_vect) to be multiplied b
-  !! \param y  The class(base_mlv_vect) to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine d_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-    use psi_serial_mod
-    use psb_string_mod
-    implicit none
-    real(psb_dpk_), intent(in)        :: alpha,beta
-    class(psb_d_base_multivect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y
-    class(psb_d_base_multivect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    character(len=1), intent(in), optional     :: conjgx, conjgy
-    integer(psb_ipk_) :: i, n
-    logical :: conjgx_, conjgy_
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    if (y%is_dev()) call y%sync()
-    if (z%is_dev()) call z%sync()
-    if (.not.psb_d_is_complex_) then
-      call z%mlt(alpha,x%v,y%v,beta,info)
-    else
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-      call z%mlt(alpha,x%v,y%v,beta,info)
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
     end if
-  end subroutine d_base_mlv_mlt_v_2
-!!$
-!!$  subroutine d_base_mlv_mlt_av(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none
-!!$    real(psb_dpk_), intent(in)        :: alpha,beta
-!!$    real(psb_dpk_), intent(in)        :: x(:)
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: y
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$
-!!$    call z%mlt(alpha,x,y%v,beta,info)
-!!$
-!!$  end subroutine d_base_mlv_mlt_av
-!!$
-!!$  subroutine d_base_mlv_mlt_va(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none
-!!$    real(psb_dpk_), intent(in)        :: alpha,beta
-!!$    real(psb_dpk_), intent(in)        :: y(:)
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_d_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$
-!!$    call z%mlt(alpha,y,x,beta,info)
-!!$
-!!$  end subroutine d_base_mlv_mlt_va
-!!$
-!!$
+
+    call psb_gemlt(m, y%get_ncols(), alpha, x%v, y%v, beta, info)
+  end subroutine d_base_mvect_mlt_v_full
+
+  subroutine d_base_mvect_mlt_v_idxs(m , alpha, x, y, idx_y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)                   :: idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, info)
+  end subroutine d_base_mvect_mlt_v_idxs
+
+  subroutine d_base_mvect_mlt_m_full(m , alpha, x, y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, y%get_ncols(), alpha, x%v, y%v, beta, info)
+  end subroutine d_base_mvect_mlt_m_full
+
+  subroutine d_base_mvect_mlt_m_idxs(m , alpha, x, idx_x, y, idx_y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, info)
+  end subroutine d_base_mvect_mlt_m_idxs
+
+  subroutine d_base_mvect_mlt_v_full_out(m , alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y, z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)    
+  end subroutine d_base_mvect_mlt_v_full_out
+
+  subroutine d_base_mvect_mlt_v_idxs_out(m , alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y, z
+    integer(psb_ipk_), intent(in)                   :: idx_y, idx_z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, z%v(:, idx_z), info)
+  end subroutine d_base_mvect_mlt_v_idxs_out
+
+  subroutine d_base_mvect_mlt_m_full_out(m , alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) &
+          .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)
+  end subroutine d_base_mvect_mlt_m_full_out
+
+  subroutine d_base_mvect_mlt_m_idxs_out(m , alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y, idx_z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) &
+          .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, z%(:, idx_z), info)
+  end subroutine d_base_mvect_mlt_m_idxs_out
+
+
+  !   !
+  !   !  Multiple variants of two operations:
+  !   !  Simple multiplication  Y(:.:) = X(:,:)*Y(:,:)
+  !   !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
+  !   !
+  !   !  Variants expanded according to the dynamic type
+  !   !  of the involved entities
+  !   !
+  !   !
+  !   !> Function  base_mlv_mlt_mv
+  !   !! \memberof  psb_d_base_multivect_type
+  !   !! \brief Multivector entry-by-entry multiply  by a base_mlv_multivect  y=x*y
+  !   !! \param x   The class(base_mlv_vect) to be multiplied by
+  !   !! \param info   return code
+  !   !!
+  !   subroutine d_base_mlv_mlt_mv(x, y, info)
+  !     use psi_serial_mod
+  !     implicit none
+  !     class(psb_d_base_multivect_type), intent(inout)  :: x
+  !     class(psb_d_base_multivect_type), intent(inout)  :: y
+  !     integer(psb_ipk_), intent(out)              :: info
+
+  !     info = 0
+  !     if (x%is_dev()) call x%sync()
+  !     call y%mlt(x%v,info)
+
+  !   end subroutine d_base_mlv_mlt_mv
+
+  !   subroutine d_base_mlv_mlt_mv_v(x, y, info)
+  !     use psi_serial_mod
+  !     implicit none
+  !     class(psb_d_base_vect_type), intent(inout)  :: x
+  !     class(psb_d_base_multivect_type), intent(inout)  :: y
+  !     integer(psb_ipk_), intent(out)              :: info
+
+  !     info = 0
+  !     if (x%is_dev()) call x%sync()
+  !     call y%mlt(x%v,info)
+
+  !   end subroutine d_base_mlv_mlt_mv_v
+
+  !   !
+  !   !> Function  base_mlv_mlt_ar1
+  !   !! \memberof  psb_d_base_multivect_type
+  !   !! \brief MultiVector entry-by-entry multiply  by a rank 1 array y=x*y
+  !   !! \param x(:) The array to be multiplied by
+  !   !! \param info   return code
+  !   !!
+  !   subroutine d_base_mlv_mlt_ar1(x, y, info)
+  !     use psi_serial_mod
+  !     implicit none
+  !     real(psb_dpk_), intent(in)        :: x(:)
+  !     class(psb_d_base_multivect_type), intent(inout)  :: y
+  !     integer(psb_ipk_), intent(out)              :: info
+  !     integer(psb_ipk_) :: i, n
+
+  !     info = 0
+  !     n = min(psb_size(y%v,1_psb_ipk_), size(x))
+  !     do i=1, n
+  !       y%v(i,:) = y%v(i,:)*x(i)
+  !     end do
+
+  !   end subroutine d_base_mlv_mlt_ar1
+
+  !   !
+  !   !> Function  base_mlv_mlt_ar2
+  !   !! \memberof  psb_d_base_multivect_type
+  !   !! \brief MultiVector entry-by-entry multiply  by a rank 2 array y=x*y
+  !   !! \param x(:,:) The array to be multiplied by
+  !   !! \param info   return code
+  !   !!
+  !   subroutine d_base_mlv_mlt_ar2(x, y, info)
+  !     use psi_serial_mod
+  !     implicit none
+  !     real(psb_dpk_), intent(in)        :: x(:,:)
+  !     class(psb_d_base_multivect_type), intent(inout)  :: y
+  !     integer(psb_ipk_), intent(out)              :: info
+  !     integer(psb_ipk_) :: i, nr,nc
+
+  !     info = 0
+  !     nr   = min(psb_size(y%v,1_psb_ipk_), size(x,1))
+  !     nc   = min(psb_size(y%v,2_psb_ipk_), size(x,2))
+  !     y%v(1:nr,1:nc) = y%v(1:nr,1:nc)*x(1:nr,1:nc)
+
+  !   end subroutine d_base_mlv_mlt_ar2
+
+
+  !   !
+  !   !> Function  base_mlv_mlt_a_2
+  !   !! \memberof  psb_d_base_multivect_type
+  !   !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
+  !   !!        z=beta*z+alpha*x*y
+  !   !! \param alpha
+  !   !! \param beta
+  !   !! \param x(:) The array to be multiplied b
+  !   !! \param y(:) The array to be multiplied by
+  !   !! \param info   return code
+  !   !!
+  !   subroutine d_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
+  !     use psi_serial_mod
+  !     implicit none
+  !     real(psb_dpk_), intent(in)        :: alpha,beta
+  !     real(psb_dpk_), intent(in)        :: y(:,:)
+  !     real(psb_dpk_), intent(in)        :: x(:,:)
+  !     class(psb_d_base_multivect_type), intent(inout)  :: z
+  !     integer(psb_ipk_), intent(out)              :: info
+  !     integer(psb_ipk_) :: i, nr, nc
+
+  !     info = 0
+  !     nr = min(psb_size(z%v,1_psb_ipk_), size(x,1), size(y,1))
+  !     nc = min(psb_size(z%v,2_psb_ipk_), size(x,2), size(y,2))
+  !     if (alpha == dzero) then
+  !       if (beta == done) then
+  !         return
+  !       else
+  !         z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc)
+  !       end if
+  !     else
+  !       if (alpha == done) then
+  !         if (beta == dzero) then
+  !           z%v(1:nr,1:nc) = y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         else if (beta == done) then
+  !           z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         else
+  !           z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         end if
+  !       else if (alpha == -done) then
+  !         if (beta == dzero) then
+  !           z%v(1:nr,1:nc) = -y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         else if (beta == done) then
+  !           z%v(1:nr,1:nc) = z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         else
+  !           z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         end if
+  !       else
+  !         if (beta == dzero) then
+  !           z%v(1:nr,1:nc) = alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         else if (beta == done) then
+  !           z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         else
+  !           z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
+  !         end if
+  !       end if
+  !     end if
+  !   end subroutine d_base_mlv_mlt_a_2
+
+  !   !
+  !   !> Function  base_mlv_mlt_v_2
+  !   !! \memberof  psb_d_base_multivect_type
+  !   !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mlv_vect)
+  !   !!        z=beta*z+alpha*x*y
+  !   !! \param alpha
+  !   !! \param beta
+  !   !! \param x  The class(base_mlv_vect) to be multiplied b
+  !   !! \param y  The class(base_mlv_vect) to be multiplied by
+  !   !! \param info   return code
+  !   !!
+  !   subroutine d_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+  !     use psi_serial_mod
+  !     use psb_string_mod
+  !     implicit none
+  !     real(psb_dpk_), intent(in)        :: alpha,beta
+  !     class(psb_d_base_multivect_type), intent(inout)  :: x
+  !     class(psb_d_base_multivect_type), intent(inout)  :: y
+  !     class(psb_d_base_multivect_type), intent(inout)  :: z
+  !     integer(psb_ipk_), intent(out)              :: info
+  !     character(len=1), intent(in), optional     :: conjgx, conjgy
+  !     integer(psb_ipk_) :: i, n
+  !     logical :: conjgx_, conjgy_
+
+  !     info = 0
+  !     if (x%is_dev()) call x%sync()
+  !     if (y%is_dev()) call y%sync()
+  !     if (z%is_dev()) call z%sync()
+  !     if (.not.psb_d_is_complex_) then
+  !       call z%mlt(alpha,x%v,y%v,beta,info)
+  !     else
+  !       conjgx_=.false.
+  !       if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
+  !       conjgy_=.false.
+  !       if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
+  !       if (conjgx_) x%v=(x%v)
+  !       if (conjgy_) y%v=(y%v)
+  !       call z%mlt(alpha,x%v,y%v,beta,info)
+  !       if (conjgx_) x%v=(x%v)
+  !       if (conjgy_) y%v=(y%v)
+  !     end if
+  !   end subroutine d_base_mlv_mlt_v_2
+  ! !!$
+  ! !!$  subroutine d_base_mlv_mlt_av(alpha,x,y,beta,z,info)
+  ! !!$    use psi_serial_mod
+  ! !!$    implicit none
+  ! !!$    real(psb_dpk_), intent(in)        :: alpha,beta
+  ! !!$    real(psb_dpk_), intent(in)        :: x(:)
+  ! !!$    class(psb_d_base_multivect_type), intent(inout)  :: y
+  ! !!$    class(psb_d_base_multivect_type), intent(inout)  :: z
+  ! !!$    integer(psb_ipk_), intent(out)              :: info
+  ! !!$    integer(psb_ipk_) :: i, n
+  ! !!$
+  ! !!$    info = 0
+  ! !!$
+  ! !!$    call z%mlt(alpha,x,y%v,beta,info)
+  ! !!$
+  ! !!$  end subroutine d_base_mlv_mlt_av
+  ! !!$
+  ! !!$  subroutine d_base_mlv_mlt_va(alpha,x,y,beta,z,info)
+  ! !!$    use psi_serial_mod
+  ! !!$    implicit none
+  ! !!$    real(psb_dpk_), intent(in)        :: alpha,beta
+  ! !!$    real(psb_dpk_), intent(in)        :: y(:)
+  ! !!$    class(psb_d_base_multivect_type), intent(inout)  :: x
+  ! !!$    class(psb_d_base_multivect_type), intent(inout)  :: z
+  ! !!$    integer(psb_ipk_), intent(out)              :: info
+  ! !!$    integer(psb_ipk_) :: i, n
+  ! !!$
+  ! !!$    info = 0
+  ! !!$
+  ! !!$    call z%mlt(alpha,y,x,beta,info)
+  ! !!$
+  ! !!$  end subroutine d_base_mlv_mlt_va
+  ! !!$
+  ! !!$
+
+
   !
   ! Simple scaling
   !
