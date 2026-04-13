@@ -701,21 +701,21 @@ subroutine psi_daxpby3(m, n, alpha, x, beta, y, gamma, z, info)
   if (lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
-    call psb_errpush(info, name, i_err  =ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
   if (ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
-    call psb_errpush(info, name, i_err  =ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
   if (lz < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
-    call psb_errpush(info, name, i_err  =ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
@@ -1812,6 +1812,994 @@ subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
   ! end do  
 end subroutine psi_daxpbymvc
 
+subroutine psi_dmlt(m, n, alpha, x, y, beta, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:, :)
+  real(psb_dpk_), intent(inout)   :: y(:, :)
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: i, j, code
+  integer(psb_ipk_) :: ierr(5), err_act
+  character  name*20
+  name = 'dmlt'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  endif
+
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  
+  ! Make a separate subroutine like in the axpby case?
+  code = get_axpbylike_code(alpha, beta)
+  select case (code)
+    case( 0) ! (alpha, beta) = ( *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i, j)*y(i, j) + beta*y(i, j)
+        end do
+      end do
+    case( 1) ! (alpha, beta) = ( 1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i, j)*y(i, j) + beta*y(i, j)
+        end do
+      end do
+    case( 2) ! (alpha, beta) = ( 0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = beta*y(i, j)
+        end do
+      end do
+    case( 3) ! (alpha, beta) = (-1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i, j)*y(i, j) + beta*y(i, j)
+        end do
+      end do
+    case( 4) ! (alpha, beta) = ( *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i, j)*y(i, j) + y(i, j)
+        end do
+      end do
+    case( 5) ! (alpha, beta) = ( 1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i, j)*y(i, j) + y(i, j)
+        end do
+      end do
+    case( 6) ! (alpha, beta) = ( 0,  1)
+      ! empty case: y(i, j) = y(i, j)
+    case( 7) ! (alpha, beta) = (-1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i, j)*y(i, j) + y(i, j)
+        end do
+      end do
+    case( 8) ! (alpha, beta) = ( *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i, j)*y(i, j)
+        end do
+      end do
+    case( 9) ! (alpha, beta) = ( 1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i, j)*y(i, j)
+        end do
+      end do
+    case(10) ! (alpha, beta) = ( 0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = 0
+        end do
+      end do
+    case(11) ! (alpha, beta) = (-1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i, j)*y(i, j)
+        end do
+      end do
+    case(12) ! (alpha, beta) = ( *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i, j)*y(i, j) - y(i, j)
+        end do
+      end do
+    case(13) ! (alpha, beta) = ( 1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i, j)*y(i, j) - y(i, j)
+        end do
+      end do
+    case(14) ! (alpha, beta) = ( 0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -y(i, j)
+        end do
+      end do
+    case(15) ! (alpha, beta,) = (-1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i, j)*y(i, j) - y(i, j)
+        end do
+      end do
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_dmlt 
+
+subroutine psi_dmlt2(m, n, alpha, x, y, beta, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:, :)
+  real(psb_dpk_), intent(in)      :: y(:, :)
+  real(psb_dpk_), intent(inout)   :: z(:, :)
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: i, j, code
+  integer(psb_ipk_) :: ierr(5), err_act
+  character  name*20
+  name = 'dmlt'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  endif
+
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  
+  if(lz < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 7; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  ! Make a separate subroutine like in the axpby case?
+  code = get_axpbylike_code(alpha, beta)
+  select case (code)
+    case( 0) ! (alpha, beta) = ( *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j)*y(i, j) + beta*z(i, j)
+        end do
+      end do
+    case( 1) ! (alpha, beta) = ( 1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j)*y(i, j) + beta*z(i, j)
+        end do
+      end do
+    case( 2) ! (alpha, beta) = ( 0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = beta*z(i, j)
+        end do
+      end do
+    case( 3) ! (alpha, beta) = (-1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j)*y(i, j) + beta*z(i, j)
+        end do
+      end do
+    case( 4) ! (alpha, beta) = ( *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j)*y(i, j) + z(i, j)
+        end do
+      end do
+    case( 5) ! (alpha, beta) = ( 1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j)*y(i, j) + z(i, j)
+        end do
+      end do
+    case( 6) ! (alpha, beta) = ( 0,  1)
+      ! empty case: z(i, j) = z(i, j)
+    case( 7) ! (alpha, beta) = (-1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j)*y(i, j) + z(i, j)
+        end do
+      end do
+    case( 8) ! (alpha, beta) = ( *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j)*y(i, j)
+        end do
+      end do
+    case( 9) ! (alpha, beta) = ( 1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j)*y(i, j)
+        end do
+      end do
+    case(10) ! (alpha, beta) = ( 0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = 0
+        end do
+      end do
+    case(11) ! (alpha, beta) = (-1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j)*y(i, j)
+        end do
+      end do
+    case(12) ! (alpha, beta) = ( *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j)*y(i, j) - z(i, j)
+        end do
+      end do
+    case(13) ! (alpha, beta) = ( 1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j)*y(i, j) - z(i, j)
+        end do
+      end do
+    case(14) ! (alpha, beta) = ( 0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j)
+        end do
+      end do
+    case(15) ! (alpha, beta) = (-1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j)*y(i, j) - z(i, j)
+        end do
+      end do
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_dmlt2 
+
+subroutine psi_dmltv(m, alpha, x, y, beta, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(inout)   :: y(:)
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: i, code
+  integer(psb_ipk_) :: ierr(5), err_act
+  character  name*20
+  name = 'dmlt'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 3; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  endif
+
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  
+  ! Make a separate subroutine like in the axpby case?
+  code = get_axpbylike_code(alpha, beta)
+  select case (code)
+    case( 0) ! (alpha, beta) = ( *,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = alpha*x(i)*y(i) + beta*y(i)
+      end do
+    case( 1) ! (alpha, beta) = ( 1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = x(i)*y(i) + beta*y(i)
+      end do
+    case( 2) ! (alpha, beta) = ( 0,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = beta*y(i)
+      end do
+    case( 3) ! (alpha, beta) = (-1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = -x(i)*y(i) + beta*y(i)
+      end do
+    case( 4) ! (alpha, beta) = ( *,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = alpha*x(i)*y(i) + y(i)
+      end do
+    case( 5) ! (alpha, beta) = ( 1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = x(i)*y(i) + y(i)
+      end do
+    case( 6) ! (alpha, beta) = ( 0,  1)
+      ! empty case: y(i) = y(i)
+    case( 7) ! (alpha, beta) = (-1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = -x(i)*y(i) + y(i)
+      end do
+    case( 8) ! (alpha, beta) = ( *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = alpha*x(i)*y(i)
+      end do
+    case( 9) ! (alpha, beta) = ( 1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = x(i)*y(i)
+      end do
+    case(10) ! (alpha, beta) = ( 0,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = 0
+      end do
+    case(11) ! (alpha, beta) = (-1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = -x(i)*y(i)
+      end do
+    case(12) ! (alpha, beta) = ( *, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = alpha*x(i)*y(i) - y(i)
+      end do
+    case(13) ! (alpha, beta) = ( 1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = x(i)*y(i) - y(i)
+      end do
+    case(14) ! (alpha, beta) = ( 0, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = -y(i)
+      end do
+    case(15) ! (alpha, beta) = (-1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        y(i) = -x(i)*y(i) - y(i)
+      end do
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_dmlt 
+
+subroutine psi_dmltv2(m, alpha, x, y, beta, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: y(:)
+  real(psb_dpk_), intent(inout)   :: z(:)
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: i, j, code
+  integer(psb_ipk_) :: ierr(5), err_act
+  character  name*20
+  name = 'dmlt'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+  
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  endif
+
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  
+  if(lz < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  ! Make a separate subroutine like in the axpby case?
+  code = get_axpbylike_code(alpha, beta)
+  select case (code)
+    case( 0) ! (alpha, beta) = ( *,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = alpha*x(i)*y(i) + beta*z(i)
+      end do
+    case( 1) ! (alpha, beta) = ( 1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = x(i)*y(i) + beta*z(i)
+      end do
+    case( 2) ! (alpha, beta) = ( 0,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = beta*z(i)
+      end do
+    case( 3) ! (alpha, beta) = (-1,  *)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = -x(i)*y(i) + beta*z(i)
+      end do
+    case( 4) ! (alpha, beta) = ( *,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = alpha*x(i)*y(i) + z(i)
+      end do
+    case( 5) ! (alpha, beta) = ( 1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = x(i)*y(i) + z(i)
+      end do
+    case( 6) ! (alpha, beta) = ( 0,  1)
+      ! empty case: z(i) = z(i)
+    case( 7) ! (alpha, beta) = (-1,  1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = -x(i)*y(i) + z(i)
+      end do
+    case( 8) ! (alpha, beta) = ( *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = alpha*x(i)*y(i)
+      end do
+    case( 9) ! (alpha, beta) = ( 1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = x(i)*y(i)
+      end do
+    case(10) ! (alpha, beta) = ( 0,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = 0
+      end do
+    case(11) ! (alpha, beta) = (-1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = -x(i)*y(i)
+      end do
+    case(12) ! (alpha, beta) = ( *, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = alpha*x(i)*y(i) - z(i)
+      end do
+    case(13) ! (alpha, beta) = ( 1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = x(i)*y(i) - z(i)
+      end do
+    case(14) ! (alpha, beta) = ( 0, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = -y(i)
+      end do
+    case(15) ! (alpha, beta) = (-1, -1)
+      !$omp parallel do private(i)
+      do i = 1, m
+        z(i) = -x(i)*y(i) - z(i)
+      end do
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_dmltv2
+
+subroutine psi_dmltx(m, n, alpha, x, y, beta, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(inout)   :: y(:, :)
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: i, j, code
+  integer(psb_ipk_) :: ierr(5), err_act
+  character  name*20
+  name = 'dmlt'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  endif
+
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  
+  ! Make a separate subroutine like in the axpby case?
+  code = get_axpbylike_code(alpha, beta)
+  select case (code)
+    case( 0) ! (alpha, beta) = ( *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i)*y(i, j) + beta*y(i, j)
+        end do
+      end do
+    case( 1) ! (alpha, beta) = ( 1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i)*y(i, j) + beta*y(i, j)
+        end do
+      end do
+    case( 2) ! (alpha, beta) = ( 0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = beta*y(i, j)
+        end do
+      end do
+    case( 3) ! (alpha, beta) = (-1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i)*y(i, j) + beta*y(i, j)
+        end do
+      end do
+    case( 4) ! (alpha, beta) = ( *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i)*y(i, j) + y(i, j)
+        end do
+      end do
+    case( 5) ! (alpha, beta) = ( 1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i)*y(i, j) + y(i, j)
+        end do
+      end do
+    case( 6) ! (alpha, beta) = ( 0,  1)
+      ! empty case: y(i, j) = y(i, j)
+    case( 7) ! (alpha, beta) = (-1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i)*y(i, j) + y(i, j)
+        end do
+      end do
+    case( 8) ! (alpha, beta) = ( *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i)*y(i, j)
+        end do
+      end do
+    case( 9) ! (alpha, beta) = ( 1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i)*y(i, j)
+        end do
+      end do
+    case(10) ! (alpha, beta) = ( 0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = 0
+        end do
+      end do
+    case(11) ! (alpha, beta) = (-1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i)*y(i, j)
+        end do
+      end do
+    case(12) ! (alpha, beta) = ( *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = alpha*x(i)*y(i, j) - y(i, j)
+        end do
+      end do
+    case(13) ! (alpha, beta) = ( 1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = x(i)*y(i, j) - y(i, j)
+        end do
+      end do
+    case(14) ! (alpha, beta) = ( 0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -y(i, j)
+        end do
+      end do
+    case(15) ! (alpha, beta,) = (-1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            y(i, j) = -x(i)*y(i, j) - y(i, j)
+        end do
+      end do
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_dmltx
+
+subroutine psi_dmltx2(m, n, alpha, x, y, beta, z, info)
+  use psb_const_mod
+  use psb_error_mod
+  implicit none
+  integer(psb_ipk_), intent(in)   :: m, n
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(in)      :: y(:, :)
+  real(psb_dpk_), intent(inout)   :: z(:, :)
+  integer(psb_ipk_), intent(out)  :: info
+
+  integer(psb_ipk_) :: i, j, code
+  integer(psb_ipk_) :: ierr(5), err_act
+  character  name*20
+  name = 'dmlt'
+
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ ;    goto 9999
+  end if
+
+  if (m < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 1; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if (n < 0) then
+    info = psb_err_iarg_neg_
+    ierr(1) = 2; ierr(2) = n
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  endif
+
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 5; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  
+  if(lz < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 7; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  ! Make a separate subroutine like in the axpby case?
+  code = get_axpbylike_code(alpha, beta)
+  select case (code)
+    case( 0) ! (alpha, beta) = ( *,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i)*y(i, j) + beta*z(i, j)
+        end do
+      end do
+    case( 1) ! (alpha, beta) = ( 1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i)*y(i, j) + beta*z(i, j)
+        end do
+      end do
+    case( 2) ! (alpha, beta) = ( 0,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = beta*z(i, j)
+        end do
+      end do
+    case( 3) ! (alpha, beta) = (-1,  *)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i)*y(i, j) + beta*z(i, j)
+        end do
+      end do
+    case( 4) ! (alpha, beta) = ( *,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i)*y(i, j) + z(i, j)
+        end do
+      end do
+    case( 5) ! (alpha, beta) = ( 1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i)*y(i, j) + z(i, j)
+        end do
+      end do
+    case( 6) ! (alpha, beta) = ( 0,  1)
+      ! empty case: z(i, j) = z(i, j)
+    case( 7) ! (alpha, beta) = (-1,  1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i)*y(i, j) + z(i, j)
+        end do
+      end do
+    case( 8) ! (alpha, beta) = ( *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i)*y(i, j)
+        end do
+      end do
+    case( 9) ! (alpha, beta) = ( 1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i)*y(i, j)
+        end do
+      end do
+    case(10) ! (alpha, beta) = ( 0,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = 0
+        end do
+      end do
+    case(11) ! (alpha, beta) = (-1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i)*y(i, j)
+        end do
+      end do
+    case(12) ! (alpha, beta) = ( *, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i)*y(i, j) - z(i, j)
+        end do
+      end do
+    case(13) ! (alpha, beta) = ( 1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i)*y(i, j) - z(i, j)
+        end do
+      end do
+    case(14) ! (alpha, beta) = ( 0, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -y(i, j)
+        end do
+      end do
+    case(15) ! (alpha, beta) = (-1, -1)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i)*y(i, j) - z(i, j)
+        end do
+      end do
+  end select
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psi_dmltx2 
+
+
 subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
   use psb_const_mod
   implicit none
@@ -2727,9 +3715,8 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
             z(i, j) = x(i, j) + z(i, j)
         end do
       end do
-    case(26)
-      do j = 1, n
-      end do
+    case(26) ! (alpha, beta, gamma) = ( 0,  0,  1)
+      ! empty case: z(i) = z(i)
     case(27) ! (alpha, beta, gamma) = (-1,  0,  1)
       do j = 1, n
         !$omp parallel do private(i)

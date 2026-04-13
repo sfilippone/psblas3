@@ -156,6 +156,72 @@ module psi_d_serial_mod
     end subroutine psi_daxpbymvc
   end interface psb_geaxpby
 
+  interface psb_gemlt
+    subroutine psi_dmlt(m, n, alpha, x, y, beta, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      real(psb_dpk_), intent(in)      :: x(:, :)
+      real(psb_dpk_), intent(inout)   :: y(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_dmlt
+
+    subroutine psi_dmlt2(m, n, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      real(psb_dpk_), intent(in)      :: x(:, :)
+      real(psb_dpk_), intent(in)      :: y(:, :)
+      real(psb_dpk_), intent(inout)   :: z(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_dmlt2
+
+    subroutine psi_dmltv(m, alpha, x, y, beta, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(inout)   :: y(:)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_dmltv
+
+    subroutine psi_dmltv2(m, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(in)      :: y(:)
+      real(psb_dpk_), intent(inout)   :: z(:)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_dmltv2
+
+    subroutine psi_dmltx(m, n, alpha, x, y, beta, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(inout)   :: y(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_dmltv
+
+    subroutine psi_dmltx2(m, n, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_dpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      real(psb_dpk_), intent(in)      :: alpha, beta
+      real(psb_dpk_), intent(in)      :: x(:)
+      real(psb_dpk_), intent(in)      :: y(:, :)
+      real(psb_dpk_), intent(inout)   :: z(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_dmltv2
+
+  end interface psb_gemlt
+
   interface psi_upd_xyz
     subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
       import :: psb_ipk_, psb_dpk_
