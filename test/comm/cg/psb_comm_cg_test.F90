@@ -3,6 +3,7 @@ program psb_comm_cg_test
   use psb_prec_mod
   use psb_linsolve_mod
   use psb_comm_factory_mod
+  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
 
   implicit none
 
@@ -19,8 +20,12 @@ program psb_comm_cg_test
   integer(psb_ipk_), allocatable :: iter_count(:,:,:), solve_info(:,:,:)
   integer(psb_ipk_) :: scheme_type(n_schemes)
   real(psb_dpk_) :: eps, err, t_start, t_elapsed
+  real(psb_dpk_), allocatable :: prec_init_time(:,:,:), prec_bld_time(:,:,:)
+  real(psb_dpk_), allocatable :: comm_set_time(:,:,:), krylov_time(:,:,:)
   real(psb_dpk_), allocatable :: setup_time(:,:,:), solve_time(:,:,:)
   real(psb_dpk_), allocatable :: total_time(:,:,:), final_error(:,:,:)
+  real(psb_dpk_), allocatable :: krylov_it_time(:,:,:), total_it_time(:,:,:)
+  real(psb_dpk_) :: iter_denom
   real(psb_dpk_) :: avg_t, std_t, med_t, p10_t, p90_t, min_t, max_t
   character(len=25) :: scheme_name(n_schemes)
   character(len=12) :: prec_type(n_precs)
@@ -28,13 +33,14 @@ program psb_comm_cg_test
   character(len=5) :: afmt
   character(len=256) :: arg
   logical :: prec_ready
+  logical :: setup_done
 
   info = psb_success_
   prec_ready = .false.
   afmt = 'CSR'
-  idim = 20
-  itmax = 5000
-  nrep = 1
+  idim = 40
+  itmax = 1000
+  nrep = 5
   nwarm = 1
   itrace = 0
   istop = 2
@@ -73,10 +79,21 @@ program psb_comm_cg_test
       info = psb_success_
     end if
   end if
+  call get_command_argument(4,arg)
+  if (len_trim(arg) > 0) then
+    read(arg,*,iostat=info) itmax
+    if ((info /= 0).or.(itmax <= 0)) then
+      itmax = 1000
+      info = psb_success_
+    end if
+  end if
 
   allocate(setup_time(n_precs,n_schemes,nrep), solve_time(n_precs,n_schemes,nrep), &
        & total_time(n_precs,n_schemes,nrep), final_error(n_precs,n_schemes,nrep), &
-       & iter_count(n_precs,n_schemes,nrep), solve_info(n_precs,n_schemes,nrep), stat=info)
+      & krylov_it_time(n_precs,n_schemes,nrep), total_it_time(n_precs,n_schemes,nrep), &
+       & iter_count(n_precs,n_schemes,nrep), solve_info(n_precs,n_schemes,nrep), &
+       & prec_init_time(n_precs,n_schemes,nrep), prec_bld_time(n_precs,n_schemes,nrep), &
+       & comm_set_time(n_precs,n_schemes,nrep), krylov_time(n_precs,n_schemes,nrep), stat=info)
   if (info /= psb_success_) stop 1
 
   call psb_init(ctxt)
@@ -89,8 +106,11 @@ program psb_comm_cg_test
     write(psb_out_unit,'("Number of processors : ",i0)') np
     write(psb_out_unit,'("Iterative method     : CG")')
     write(psb_out_unit,'("Preconditioners      : NONE, DIAG")')
+    write(psb_out_unit,'("Max iterations (CG)  : ",i0)') itmax
     write(psb_out_unit,'("Repetitions          : ",i0)') nrep
-    write(psb_out_unit,'("Warmup solves        : ",i0," (each with itmax=1)")') nwarm
+    write(psb_out_unit,'("Warmup solves        : ",i0)') nwarm
+    write(psb_out_unit,'(" ")')
+    write(psb_out_unit,'("Usage: ./psb_comm_cg_test [idim] [nrep] [nwarm] [itmax]")')
     write(psb_out_unit,'(" ")')
   end if
 
@@ -101,39 +121,53 @@ program psb_comm_cg_test
 
   do prec_idx = 1, n_precs
     do scheme_idx = 1, n_schemes
+      setup_done = .false.
       do rep = 1, nrep
-        if (prec_ready) then
-          call psb_precfree(prec,info)
-          if (info /= psb_success_) goto 9999
-          prec_ready = .false.
-        end if
-
         call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
         if (info /= psb_success_) goto 9999
 
-        call psb_barrier(ctxt)
-        t_start = psb_wtime()
-        call psb_precinit(ctxt,prec,trim(prec_type(prec_idx)),info)
-        if (info /= psb_success_) goto 9999
-        call psb_precbld(a,desc_a,prec,info)
-        if (info /= psb_success_) goto 9999
-        if (.not.allocated(prec%prec)) then
-          info = psb_err_internal_error_
-          write(psb_err_unit,*) 'Preconditioner object not allocated after build'
-          goto 9999
-        end if
-        prec_ready = .true.
+        if (.not. setup_done) then
+          call psb_barrier(ctxt)
+          t_start = psb_wtime()
+          call prec%init(ctxt,trim(prec_type(prec_idx)),info)
+          if (info /= psb_success_) goto 9999
+          prec_init_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+          call psb_amx(ctxt,prec_init_time(prec_idx,scheme_idx,rep))
 
-        call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
-        if (info /= psb_success_) goto 9999
-        if (.not.allocated(prec%prec)) then
-          info = psb_err_internal_error_
-          write(psb_err_unit,*) 'Preconditioner object lost after psb_comm_set'
-          goto 9999
-        end if
+          t_start = psb_wtime()
+          call psb_precbld(a,desc_a,prec,info)
+          if (info /= psb_success_) goto 9999
+          prec_bld_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+          call psb_amx(ctxt,prec_bld_time(prec_idx,scheme_idx,rep))
 
-        setup_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
-        call psb_amx(ctxt,setup_time(prec_idx,scheme_idx,rep))
+          if (.not.allocated(prec%prec)) then
+            info = psb_err_internal_error_
+            write(psb_err_unit,*) 'Preconditioner object not allocated after build'
+            goto 9999
+          end if
+
+          t_start = psb_wtime()
+          call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
+          comm_set_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+          call psb_amx(ctxt,comm_set_time(prec_idx,scheme_idx,rep))
+
+          if (info /= psb_success_) goto 9999
+          if (.not.allocated(prec%prec)) then
+            info = psb_err_internal_error_
+            write(psb_err_unit,*) 'Preconditioner object lost after psb_comm_set'
+            goto 9999
+          end if
+
+          setup_time(prec_idx,scheme_idx,rep) = prec_init_time(prec_idx,scheme_idx,rep) + &
+               & prec_bld_time(prec_idx,scheme_idx,rep) + comm_set_time(prec_idx,scheme_idx,rep)
+          setup_done = .true.
+          prec_ready = .true.
+        else
+          prec_init_time(prec_idx,scheme_idx,rep) = prec_init_time(prec_idx,scheme_idx,1)
+          prec_bld_time(prec_idx,scheme_idx,rep) = prec_bld_time(prec_idx,scheme_idx,1)
+          comm_set_time(prec_idx,scheme_idx,rep) = comm_set_time(prec_idx,scheme_idx,1)
+          setup_time(prec_idx,scheme_idx,rep) = setup_time(prec_idx,scheme_idx,1)
+        end if
 
         do iter = 1, nwarm
           call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
@@ -147,53 +181,123 @@ program psb_comm_cg_test
         if (info /= psb_success_) goto 9999
 
         call psb_barrier(ctxt)
-        t_start = psb_wtime()
         if (.not.allocated(prec%prec)) then
           info = psb_err_internal_error_
           write(psb_err_unit,*) 'Preconditioner object lost before psb_krylov'
           goto 9999
         end if
+        t_start = psb_wtime()
         call psb_krylov('CG',a,prec,b,x,eps,desc_a,info,&
              & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istop)
-        t_elapsed = psb_wtime() - t_start
-        call psb_amx(ctxt,t_elapsed)
+        krylov_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+        call psb_amx(ctxt,krylov_time(prec_idx,scheme_idx,rep))
 
-        solve_time(prec_idx,scheme_idx,rep) = t_elapsed
+        solve_time(prec_idx,scheme_idx,rep) = krylov_time(prec_idx,scheme_idx,rep)
         total_time(prec_idx,scheme_idx,rep) = setup_time(prec_idx,scheme_idx,rep) + &
              & solve_time(prec_idx,scheme_idx,rep)
         iter_count(prec_idx,scheme_idx,rep) = iter
+           iter_denom = real(max(iter,1_psb_ipk_),psb_dpk_)
+           krylov_it_time(prec_idx,scheme_idx,rep) = solve_time(prec_idx,scheme_idx,rep)/iter_denom
+           total_it_time(prec_idx,scheme_idx,rep) = total_time(prec_idx,scheme_idx,rep)/iter_denom
         final_error(prec_idx,scheme_idx,rep) = err
         solve_info(prec_idx,scheme_idx,rep) = info
 
+        if (iam == psb_root_) then
+          select type(ch => x%v%comm_handle)
+          type is(psb_comm_neighbor_handle)
+            write(psb_out_unit,'("DIAG_COMM scheme=",a,", prec=",a,", rep=",i0)') &
+                 & trim(scheme_name(scheme_idx)), trim(prec_name(prec_idx)), rep
+            write(psb_out_unit,'("DIAG_COMM counters: init=",i0,", start=",i0,", wait=",i0,", realloc=",i0)') &
+              & ch%diag_init_calls, ch%diag_start_calls, ch%diag_wait_calls, &
+              & ch%diag_buffer_reallocs
+            write(psb_out_unit,'("DIAG_COMM state: ready=",l1,", bsz=",i0)') &
+              & ch%persistent_request_ready, ch%persistent_buffer_size
+          class default
+            continue
+          end select
+        end if
+
         if (info /= psb_success_) goto 9999
       end do
+
+      if (prec_ready) then
+        call psb_precfree(prec,info)
+        if (info /= psb_success_) goto 9999
+        prec_ready = .false.
+      end if
     end do
   end do
 
   if (iam == psb_root_) then
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("CG timing stats by preconditioner and communication scheme")')
-    write(psb_out_unit,'("-----------------------------------------------------------")')
+    write(psb_out_unit,'(100("="))')
+    write(psb_out_unit,'("CG TIMING STATISTICS - FINAL RESULTS TABLE")')
+    write(psb_out_unit,'(100("="))')
+    
     do prec_idx = 1, n_precs
-      write(psb_out_unit,'("Preconditioner: ",a)') trim(prec_name(prec_idx))
-      do scheme_idx = 1, n_schemes
-        call compute_stats(setup_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
-        write(psb_out_unit,&
-             & '(a25,2x,"setup median=",es12.5,2x,"p10=",es12.5,2x,"p90=",es12.5)') &
-             & trim(scheme_name(scheme_idx)), med_t, p10_t, p90_t
-        call compute_stats(solve_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
-        write(psb_out_unit,&
-             & '(27x,"solve median=",es12.5,2x,"mean=",es12.5,2x,"std=",es12.5)') med_t, avg_t, std_t
-        call compute_stats(total_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
-        write(psb_out_unit,&
-             & '(27x,"total median=",es12.5,2x,"min=",es12.5,2x,"max=",es12.5)') med_t, min_t, max_t
-        call compute_stats(final_error(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
-        write(psb_out_unit,&
-             & '(27x,"err median=",es12.5,2x,"last it/info=",i8,"/",i6)') &
-             & med_t, iter_count(prec_idx,scheme_idx,nrep), solve_info(prec_idx,scheme_idx,nrep)
-      end do
       write(psb_out_unit,'(" ")')
+      write(psb_out_unit,'("Preconditioner: ",a)') trim(prec_name(prec_idx))
+      write(psb_out_unit,'(100("-"))')
+      
+      ! Print header
+      write(psb_out_unit,'(a25,a18,a18,a18,a18,a18)') &
+        & 'Scheme', 'Phase', 'Minimum [s]', 'Average [s]', 'Maximum [s]', 'Std Dev [s]'
+      write(psb_out_unit,'(100("-"))')
+      
+      do scheme_idx = 1, n_schemes
+        ! Preconditioner init phase
+        call compute_stats(prec_init_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & trim(scheme_name(scheme_idx)), 'Prec Init', min_t, avg_t, max_t, std_t
+        
+        ! Preconditioner build phase
+        call compute_stats(prec_bld_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'Prec Build', min_t, avg_t, max_t, std_t
+        
+        ! Communication setup phase
+        call compute_stats(comm_set_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'Comm Setup', min_t, avg_t, max_t, std_t
+        
+        ! Total setup phase
+        call compute_stats(setup_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'SetupTotal', min_t, avg_t, max_t, std_t
+
+        ! Krylov solve phase (this is the actual solver)
+        call compute_stats(krylov_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'KrylovSolve', min_t, avg_t, max_t, std_t
+
+           ! Krylov solve normalized per actual CG iteration
+           call compute_stats(krylov_it_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+           write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'KrylovPerIter', min_t, avg_t, max_t, std_t
+        
+        ! Total phase statistics
+        call compute_stats(total_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'TotalTime', min_t, avg_t, max_t, std_t
+
+           ! Total (setup+solve) normalized per actual CG iteration
+           call compute_stats(total_it_time(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+           write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'TotalPerIter', min_t, avg_t, max_t, std_t
+        
+        ! Final error and convergence info
+        call compute_stats(final_error(prec_idx,scheme_idx,:),avg_t,std_t,med_t,p10_t,p90_t,min_t,max_t)
+        write(psb_out_unit,'(a25,a18,es18.10,es18.10,es18.10,es18.10)') &
+             & ' ', 'Final Error', min_t, avg_t, max_t, std_t
+        write(psb_out_unit,'(a25,a18,"Iterations: ",i8,"  Info code: ",i6)') &
+             & ' ', ' ', iter_count(prec_idx,scheme_idx,nrep), solve_info(prec_idx,scheme_idx,nrep)
+        
+        write(psb_out_unit,'(100("-"))')
+      end do
     end do
+    
+    write(psb_out_unit,'(100("="))')
+    write(psb_out_unit,'(" ")')
   end if
 
   call psb_gefree(b,desc_a,info)
@@ -201,7 +305,9 @@ program psb_comm_cg_test
   call psb_spfree(a,desc_a,info)
   if (prec_ready) call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
-  deallocate(setup_time,solve_time,total_time,final_error,iter_count,solve_info)
+  deallocate(setup_time,solve_time,total_time,final_error,iter_count,solve_info, &
+      & prec_init_time,prec_bld_time,comm_set_time,krylov_time, &
+      & krylov_it_time,total_it_time)
 
   call psb_exit(ctxt)
   stop

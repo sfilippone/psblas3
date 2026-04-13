@@ -593,6 +593,7 @@ contains
 
       if (neighbor_comm_handle%use_persistent_buffers) then
         if ((.not.allocated(y%combuf)) .or. (size(y%combuf) < buffer_size)) then
+          neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
           if (neighbor_comm_handle%persistent_request_ready) then
             if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
               call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
@@ -648,6 +649,7 @@ contains
             call psb_errpush(info, name, m_err=(/iret/))
             goto 9999
           end if
+          neighbor_comm_handle%diag_init_calls = neighbor_comm_handle%diag_init_calls + 1
           neighbor_comm_handle%persistent_request_ready = .true.
           neighbor_comm_handle%persistent_buffer_size = buffer_size
 #else
@@ -664,6 +666,7 @@ contains
           call psb_errpush(info, name, m_err=(/iret/))
           goto 9999
         end if
+  neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
         neighbor_comm_handle%persistent_in_flight = .true.
 #else
         call mpi_ineighbor_alltoallv( &
@@ -746,6 +749,9 @@ contains
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
         goto 9999
+      end if
+      if (neighbor_comm_handle%use_persistent_buffers) then
+        neighbor_comm_handle%diag_wait_calls = neighbor_comm_handle%diag_wait_calls + 1
       end if
       if (neighbor_comm_handle%use_persistent_buffers) then
         neighbor_comm_handle%persistent_in_flight = .false.
@@ -1254,6 +1260,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
 
     if (neighbor_comm_handle%use_persistent_buffers) then
       if ((.not.allocated(y%combuf)) .or. (size(y%combuf) < buffer_size)) then
+        neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
         if (neighbor_comm_handle%persistent_request_ready) then
           if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
             call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
@@ -1308,6 +1315,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
           call psb_errpush(info, name, m_err=(/iret/))
           goto 9999
         end if
+        neighbor_comm_handle%diag_init_calls = neighbor_comm_handle%diag_init_calls + 1
         neighbor_comm_handle%persistent_request_ready = .true.
         neighbor_comm_handle%persistent_buffer_size = buffer_size
 #else
@@ -1324,6 +1332,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
         call psb_errpush(info, name, m_err=(/iret/))
         goto 9999
       end if
+  neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
       neighbor_comm_handle%persistent_in_flight = .true.
 #else
       call mpi_ineighbor_alltoallv( &
@@ -1404,6 +1413,9 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
       info = psb_err_mpi_error_
       call psb_errpush(info, name, m_err=(/iret/))
       goto 9999
+    end if
+    if (neighbor_comm_handle%use_persistent_buffers) then
+      neighbor_comm_handle%diag_wait_calls = neighbor_comm_handle%diag_wait_calls + 1
     end if
     if (neighbor_comm_handle%use_persistent_buffers) then
       neighbor_comm_handle%persistent_in_flight = .false.
