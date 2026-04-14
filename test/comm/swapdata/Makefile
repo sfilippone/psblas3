@@ -1,4 +1,4 @@
-INSTALLDIR=../..
+INSTALLDIR=../../..
 INCDIR=$(INSTALLDIR)/include/
 MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas

@@ -591,38 +591,61 @@ contains
       !   combuf(total_send+1 : total_send+total_recv) = recv area
       buffer_size = topology_total_send + topology_total_recv
 
-      if (neighbor_comm_handle%use_persistent_buffers) then
-        if ((.not.allocated(y%combuf)) .or. (size(y%combuf) < buffer_size)) then
-          neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
-          if (neighbor_comm_handle%persistent_request_ready) then
-            if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
-              call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+      if (buffer_size > 0) then
+        if (neighbor_comm_handle%use_persistent_buffers) then
+          if (.not. allocated(y%combuf)) then
+            neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
+            if (neighbor_comm_handle%persistent_request_ready) then
+              if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+                call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+              end if
+              neighbor_comm_handle%persistent_request = mpi_request_null
+              neighbor_comm_handle%persistent_request_ready = .false.
+              neighbor_comm_handle%persistent_in_flight = .false.
+              neighbor_comm_handle%persistent_buffer_size = 0
             end if
-            neighbor_comm_handle%persistent_request = mpi_request_null
-            neighbor_comm_handle%persistent_request_ready = .false.
-            neighbor_comm_handle%persistent_in_flight = .false.
-            neighbor_comm_handle%persistent_buffer_size = 0
+            call y%new_buffer(buffer_size, info)
+            if (info /= 0) then
+              call psb_errpush(psb_err_alloc_dealloc_, name)
+              goto 9999
+            end if
+          else if (size(y%combuf) < buffer_size) then
+            neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
+            if (neighbor_comm_handle%persistent_request_ready) then
+              if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+                call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+              end if
+              neighbor_comm_handle%persistent_request = mpi_request_null
+              neighbor_comm_handle%persistent_request_ready = .false.
+              neighbor_comm_handle%persistent_in_flight = .false.
+              neighbor_comm_handle%persistent_buffer_size = 0
+            end if
+            call y%new_buffer(buffer_size, info)
+            if (info /= 0) then
+              call psb_errpush(psb_err_alloc_dealloc_, name)
+              goto 9999
+            end if
           end if
+        else
           call y%new_buffer(buffer_size, info)
           if (info /= 0) then
             call psb_errpush(psb_err_alloc_dealloc_, name)
             goto 9999
           end if
         end if
-      else
-        call y%new_buffer(buffer_size, info)
-        if (info /= 0) then
-          call psb_errpush(psb_err_alloc_dealloc_, name)
-          goto 9999
-        end if
-      end if
-      neighbor_comm_handle%comm_request = mpi_request_null
+        neighbor_comm_handle%comm_request = mpi_request_null
 
-      ! Gather send data into contiguous send buffer (polymorphic for GPU)
-      if (debug) write(*,*) me,' nbr_vect: gathering send data,', topology_total_send,' elems'
-      call y%gth(int(topology_total_send,psb_mpk_), &
-          & neighbor_comm_handle%send_indexes, &
-          & y%combuf(1:topology_total_send))
+        ! Gather send data into contiguous send buffer (polymorphic for GPU)
+        if (debug) write(*,*) me,' nbr_vect: gathering send data,', topology_total_send,' elems'
+        call y%gth(int(topology_total_send,psb_mpk_), &
+            & neighbor_comm_handle%send_indexes, &
+            & y%combuf(1:topology_total_send))
+      else
+        ! No data to send/recv: ensure requests/buffers indicate idle state
+        neighbor_comm_handle%comm_request = mpi_request_null
+        neighbor_comm_handle%persistent_in_flight = .false.
+        neighbor_comm_handle%persistent_request_ready = neighbor_comm_handle%persistent_request_ready
+      end if
 
       ! Wait for device (important for GPU subclasses)
       call y%device_wait()
@@ -631,27 +654,32 @@ contains
         ! Lazy persistent-init: build the request once, then reuse with START/WAIT.
         if (.not. neighbor_comm_handle%persistent_request_ready) then
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
-          if (debug) write(*,*) me,' nbr_vect: posting MPI_Neighbor_alltoallv_init'
-          call mpi_neighbor_alltoallv_init( &
-              & y%combuf(1),                          &  ! send buffer
-              & neighbor_comm_handle%send_counts,     &
-              & neighbor_comm_handle%send_displs,     &
-              & psb_mpi_r_dpk_,                       &
-              & y%combuf(topology_total_send + 1),    &  ! recv buffer
-              & neighbor_comm_handle%recv_counts,     &
-              & neighbor_comm_handle%recv_displs,     &
-              & psb_mpi_r_dpk_,                       &
-              & neighbor_comm_handle%graph_comm,      &
-              & mpi_info_null,                        &
-              & neighbor_comm_handle%persistent_request, iret)
-          if (iret /= mpi_success) then
-            info = psb_err_mpi_error_
-            call psb_errpush(info, name, m_err=(/iret/))
-            goto 9999
+          if (buffer_size > 0) then
+            if (debug) write(*,*) me,' nbr_vect: posting MPI_Neighbor_alltoallv_init'
+            call mpi_neighbor_alltoallv_init( &
+                & y%combuf(1),                          &  ! send buffer
+                & neighbor_comm_handle%send_counts,     &
+                & neighbor_comm_handle%send_displs,     &
+                & psb_mpi_r_dpk_,                       &
+                & y%combuf(topology_total_send + 1),    &  ! recv buffer
+                & neighbor_comm_handle%recv_counts,     &
+                & neighbor_comm_handle%recv_displs,     &
+                & psb_mpi_r_dpk_,                       &
+                & neighbor_comm_handle%graph_comm,      &
+                & mpi_info_null,                        &
+                & neighbor_comm_handle%persistent_request, iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info, name, m_err=(/iret/))
+              goto 9999
+            end if
+            neighbor_comm_handle%diag_init_calls = neighbor_comm_handle%diag_init_calls + 1
+            neighbor_comm_handle%persistent_request_ready = .true.
+            neighbor_comm_handle%persistent_buffer_size = buffer_size
+          else
+            neighbor_comm_handle%persistent_request_ready = .false.
+            neighbor_comm_handle%persistent_buffer_size = 0
           end if
-          neighbor_comm_handle%diag_init_calls = neighbor_comm_handle%diag_init_calls + 1
-          neighbor_comm_handle%persistent_request_ready = .true.
-          neighbor_comm_handle%persistent_buffer_size = buffer_size
 #else
           ! Fallback when persistent neighborhood collectives are not available
           neighbor_comm_handle%persistent_request_ready = .false.
@@ -660,51 +688,64 @@ contains
         end if
 
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
-        call mpi_start(neighbor_comm_handle%persistent_request, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info, name, m_err=(/iret/))
-          goto 9999
+        if (buffer_size > 0) then
+          call mpi_start(neighbor_comm_handle%persistent_request, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, m_err=(/iret/))
+            goto 9999
+          end if
+          neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
+          neighbor_comm_handle%persistent_in_flight = .true.
+        else
+          neighbor_comm_handle%persistent_in_flight = .false.
         end if
-  neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
-        neighbor_comm_handle%persistent_in_flight = .true.
 #else
-        call mpi_ineighbor_alltoallv( &
-            & y%combuf(1),                        &  ! send buffer
-            & neighbor_comm_handle%send_counts,     &
-            & neighbor_comm_handle%send_displs,     &
-            & psb_mpi_r_dpk_,                     &
-            & y%combuf(topology_total_send + 1),       &  ! recv buffer
-            & neighbor_comm_handle%recv_counts,     &
-            & neighbor_comm_handle%recv_displs,     &
-            & psb_mpi_r_dpk_,                     &
-            & neighbor_comm_handle%graph_comm,      &
-            & neighbor_comm_handle%comm_request, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info, name, m_err=(/iret/))
-          goto 9999
+        if (buffer_size > 0) then
+          call mpi_ineighbor_alltoallv( &
+              & y%combuf(1),                        &  ! send buffer
+              & neighbor_comm_handle%send_counts,     &
+              & neighbor_comm_handle%send_displs,     &
+              & psb_mpi_r_dpk_,                     &
+              & y%combuf(topology_total_send + 1),       &  ! recv buffer
+              & neighbor_comm_handle%recv_counts,     &
+              & neighbor_comm_handle%recv_displs,     &
+              & psb_mpi_r_dpk_,                     &
+              & neighbor_comm_handle%graph_comm,      &
+              & neighbor_comm_handle%comm_request, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, m_err=(/iret/))
+            goto 9999
+          end if
+          neighbor_comm_handle%persistent_in_flight = .true.
+        else
+          neighbor_comm_handle%persistent_in_flight = .false.
+          neighbor_comm_handle%comm_request = mpi_request_null
         end if
-        neighbor_comm_handle%persistent_in_flight = .true.
 #endif
       else
         ! Post non-blocking neighborhood alltoallv
         if (debug) write(*,*) me,' nbr_vect: posting MPI_Ineighbor_alltoallv'
-        call mpi_ineighbor_alltoallv( &
-            & y%combuf(1),                        &  ! send buffer
-            & neighbor_comm_handle%send_counts,     &
-            & neighbor_comm_handle%send_displs,     &
-            & psb_mpi_r_dpk_,                     &
-            & y%combuf(topology_total_send + 1),       &  ! recv buffer
-            & neighbor_comm_handle%recv_counts,     &
-            & neighbor_comm_handle%recv_displs,     &
-            & psb_mpi_r_dpk_,                     &
-            & neighbor_comm_handle%graph_comm,      &
-            & neighbor_comm_handle%comm_request, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info, name, m_err=(/iret/))
-          goto 9999
+        if (buffer_size > 0) then
+          call mpi_ineighbor_alltoallv( &
+              & y%combuf(1),                        &  ! send buffer
+              & neighbor_comm_handle%send_counts,     &
+              & neighbor_comm_handle%send_displs,     &
+              & psb_mpi_r_dpk_,                     &
+              & y%combuf(topology_total_send + 1),       &  ! recv buffer
+              & neighbor_comm_handle%recv_counts,     &
+              & neighbor_comm_handle%recv_displs,     &
+              & psb_mpi_r_dpk_,                     &
+              & neighbor_comm_handle%graph_comm,      &
+              & neighbor_comm_handle%comm_request, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, m_err=(/iret/))
+            goto 9999
+          end if
+        else
+          neighbor_comm_handle%comm_request = mpi_request_null
         end if
       end if
 
@@ -715,54 +756,68 @@ contains
     ! ---------------------------------------------------------
     if (do_wait) then
 
-      if (neighbor_comm_handle%use_persistent_buffers) then
-        if (.not. neighbor_comm_handle%persistent_in_flight) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info, name, a_err='Invalid WAIT: no persistent neighbor request in flight')
-          goto 9999
-        end if
-      else
-        if (neighbor_comm_handle%comm_request == mpi_request_null) then
-          write(psb_err_unit,*) me, 'DBG: neighbor WAIT but comm_request is NULL; is_initialized=', &
-          & neighbor_comm_handle%is_initialized
-          info = psb_err_mpi_error_
-          call psb_errpush(info, name, m_err=(/-2/))
-          goto 9999
-        end if
-      end if
-
       topology_total_send = neighbor_comm_handle%total_send
       topology_total_recv = neighbor_comm_handle%total_recv
 
-      ! Wait for the non-blocking collective to complete
-      if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
-      if (neighbor_comm_handle%use_persistent_buffers) then
-#ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
-        call mpi_wait(neighbor_comm_handle%persistent_request, p2pstat, iret)
-#else
-        call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
-#endif
+      if ((topology_total_send + topology_total_recv) == 0) then
+        ! Valid no-op exchange: nothing was posted in START and nothing to wait/scatter.
+        if (neighbor_comm_handle%use_persistent_buffers) then
+          neighbor_comm_handle%persistent_in_flight = .false.
+        else
+          neighbor_comm_handle%comm_request = mpi_request_null
+        end if
       else
-        call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
-      end if
-      if (iret /= mpi_success) then
-        info = psb_err_mpi_error_
-        call psb_errpush(info, name, m_err=(/iret/))
-        goto 9999
-      end if
-      if (neighbor_comm_handle%use_persistent_buffers) then
-        neighbor_comm_handle%diag_wait_calls = neighbor_comm_handle%diag_wait_calls + 1
-      end if
-      if (neighbor_comm_handle%use_persistent_buffers) then
-        neighbor_comm_handle%persistent_in_flight = .false.
+        if (neighbor_comm_handle%use_persistent_buffers) then
+          if (.not. neighbor_comm_handle%persistent_in_flight) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, a_err='Invalid WAIT: no persistent neighbor request in flight')
+            goto 9999
+          end if
+        else
+          if (neighbor_comm_handle%comm_request == mpi_request_null) then
+            write(psb_err_unit,*) me, 'DBG: neighbor WAIT but comm_request is NULL; is_initialized=', &
+            & neighbor_comm_handle%is_initialized
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, m_err=(/-2/))
+            goto 9999
+          end if
+        end if
       end if
 
-      ! Scatter received data to local vector positions (polymorphic for GPU)
-      if (debug) write(*,*) me,' nbr_vect: scattering recv data,', topology_total_recv,' elems'
-      call y%sct(int(topology_total_recv,psb_mpk_), &
-          & neighbor_comm_handle%recv_indexes, &
-          & y%combuf(topology_total_send+1:topology_total_send+topology_total_recv), &
-          & beta)
+      ! Only wait and scatter if there's data
+      if ((topology_total_send + topology_total_recv) > 0) then
+        ! Wait for the non-blocking collective to complete
+        if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
+        if (neighbor_comm_handle%use_persistent_buffers) then
+#ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
+          call mpi_wait(neighbor_comm_handle%persistent_request, p2pstat, iret)
+#else
+          call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
+#endif
+        else
+          call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
+        end if
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
+          goto 9999
+        end if
+        if (neighbor_comm_handle%use_persistent_buffers) then
+          neighbor_comm_handle%diag_wait_calls = neighbor_comm_handle%diag_wait_calls + 1
+        end if
+        if (neighbor_comm_handle%use_persistent_buffers) then
+          neighbor_comm_handle%persistent_in_flight = .false.
+        end if
+
+        ! Scatter received data to local vector positions (polymorphic for GPU)
+        if (debug) write(*,*) me,' nbr_vect: scattering recv data,', topology_total_recv,' elems'
+        call y%sct(int(topology_total_recv,psb_mpk_), &
+            & neighbor_comm_handle%recv_indexes, &
+            & y%combuf(topology_total_send+1:topology_total_send+topology_total_recv), &
+            & beta)
+      else
+        ! nothing to wait/scatter
+      end if
 
 
       ! Clean up
@@ -1259,7 +1314,23 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
     buffer_size = topology_total_send + topology_total_recv
 
     if (neighbor_comm_handle%use_persistent_buffers) then
-      if ((.not.allocated(y%combuf)) .or. (size(y%combuf) < buffer_size)) then
+      if (.not. allocated(y%combuf)) then
+        neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
+        if (neighbor_comm_handle%persistent_request_ready) then
+          if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+            call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+          end if
+          neighbor_comm_handle%persistent_request = mpi_request_null
+          neighbor_comm_handle%persistent_request_ready = .false.
+          neighbor_comm_handle%persistent_in_flight = .false.
+          neighbor_comm_handle%persistent_buffer_size = 0
+        end if
+        call y%new_buffer(buffer_size, info)
+        if (info /= 0) then
+          call psb_errpush(psb_err_alloc_dealloc_, name)
+          goto 9999
+        end if
+      else if (size(y%combuf) < buffer_size) then
         neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
         if (neighbor_comm_handle%persistent_request_ready) then
           if (neighbor_comm_handle%persistent_request /= mpi_request_null) then

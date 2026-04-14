@@ -4,6 +4,7 @@ program psb_comm_cg_test
   use psb_linsolve_mod
   use psb_comm_factory_mod
   use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
+  use, intrinsic :: ieee_arithmetic
 
   implicit none
 
@@ -32,17 +33,16 @@ program psb_comm_cg_test
   character(len=20) :: prec_name(n_precs)
   character(len=5) :: afmt
   character(len=256) :: arg
-  logical :: prec_ready
   logical :: setup_done
 
   info = psb_success_
-  prec_ready = .false.
   afmt = 'CSR'
   idim = 40
   itmax = 1000
   nrep = 5
   nwarm = 1
-  itrace = 0
+  ! Keep itrace positive to avoid modulo-by-zero paths in convergence logging.
+  itrace = 1
   istop = 2
   eps = 1.d-6
   scheme_type = (/ psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
@@ -87,6 +87,15 @@ program psb_comm_cg_test
       info = psb_success_
     end if
   end if
+  ! call psb_set_debug_level(psb_debug_ext_)
+
+
+  ! call probe_ieee('before psb_init')
+  call psb_init(ctxt)
+  ! call probe_ieee('after psb_init')
+  ! call clear_ieee_flags()
+  ! call probe_ieee('after clear_ieee_flags')
+  call psb_info(ctxt, iam, np)
 
   allocate(setup_time(n_precs,n_schemes,nrep), solve_time(n_precs,n_schemes,nrep), &
        & total_time(n_precs,n_schemes,nrep), final_error(n_precs,n_schemes,nrep), &
@@ -95,9 +104,6 @@ program psb_comm_cg_test
        & prec_init_time(n_precs,n_schemes,nrep), prec_bld_time(n_precs,n_schemes,nrep), &
        & comm_set_time(n_precs,n_schemes,nrep), krylov_time(n_precs,n_schemes,nrep), stat=info)
   if (info /= psb_success_) stop 1
-
-  call psb_init(ctxt)
-  call psb_info(ctxt, iam, np)
 
   if (iam == psb_root_) then
     write(psb_out_unit,*) 'Welcome to PSBLAS version: ', psb_version_string_
@@ -116,58 +122,52 @@ program psb_comm_cg_test
 
   call psb_barrier(ctxt)
   t_start = psb_wtime()
+  ! call probe_ieee('before psb_d_gen_pde3d')
   call psb_d_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)
+  ! call probe_ieee('after psb_d_gen_pde3d')
   if (info /= psb_success_) goto 9999
 
   do prec_idx = 1, n_precs
     do scheme_idx = 1, n_schemes
-      setup_done = .false.
       do rep = 1, nrep
         call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
         if (info /= psb_success_) goto 9999
 
-        if (.not. setup_done) then
-          call psb_barrier(ctxt)
-          t_start = psb_wtime()
-          call prec%init(ctxt,trim(prec_type(prec_idx)),info)
-          if (info /= psb_success_) goto 9999
-          prec_init_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
-          call psb_amx(ctxt,prec_init_time(prec_idx,scheme_idx,rep))
+        call psb_barrier(ctxt)
 
-          t_start = psb_wtime()
-          call psb_precbld(a,desc_a,prec,info)
-          if (info /= psb_success_) goto 9999
-          prec_bld_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
-          call psb_amx(ctxt,prec_bld_time(prec_idx,scheme_idx,rep))
+        t_start = psb_wtime()
+        call prec%init(ctxt,trim(prec_type(prec_idx)),info)
+        if (info /= psb_success_) goto 9999
 
-          if (.not.allocated(prec%prec)) then
-            info = psb_err_internal_error_
-            write(psb_err_unit,*) 'Preconditioner object not allocated after build'
-            goto 9999
-          end if
+        prec_init_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+        call psb_amx(ctxt,prec_init_time(prec_idx,scheme_idx,rep))
 
-          t_start = psb_wtime()
-          call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
-          comm_set_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
-          call psb_amx(ctxt,comm_set_time(prec_idx,scheme_idx,rep))
+        t_start = psb_wtime()
+        call prec%build(a,desc_a,info)
+        if (info /= psb_success_) goto 9999
+        prec_bld_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+        call psb_amx(ctxt,prec_bld_time(prec_idx,scheme_idx,rep))
 
-          if (info /= psb_success_) goto 9999
-          if (.not.allocated(prec%prec)) then
-            info = psb_err_internal_error_
-            write(psb_err_unit,*) 'Preconditioner object lost after psb_comm_set'
-            goto 9999
-          end if
-
-          setup_time(prec_idx,scheme_idx,rep) = prec_init_time(prec_idx,scheme_idx,rep) + &
-               & prec_bld_time(prec_idx,scheme_idx,rep) + comm_set_time(prec_idx,scheme_idx,rep)
-          setup_done = .true.
-          prec_ready = .true.
-        else
-          prec_init_time(prec_idx,scheme_idx,rep) = prec_init_time(prec_idx,scheme_idx,1)
-          prec_bld_time(prec_idx,scheme_idx,rep) = prec_bld_time(prec_idx,scheme_idx,1)
-          comm_set_time(prec_idx,scheme_idx,rep) = comm_set_time(prec_idx,scheme_idx,1)
-          setup_time(prec_idx,scheme_idx,rep) = setup_time(prec_idx,scheme_idx,1)
+        if (.not.allocated(prec%prec)) then
+          info = psb_err_internal_error_
+          write(psb_err_unit,*) 'Preconditioner object not allocated after build'
+          goto 9999
         end if
+
+        t_start = psb_wtime()
+        call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
+        comm_set_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+        call psb_amx(ctxt,comm_set_time(prec_idx,scheme_idx,rep))
+
+        if (info /= psb_success_) goto 9999
+        if (.not.allocated(prec%prec)) then
+          info = psb_err_internal_error_
+          write(psb_err_unit,*) 'Preconditioner object lost after psb_comm_set'
+          goto 9999
+        end if
+
+        setup_time(prec_idx,scheme_idx,rep) = prec_init_time(prec_idx,scheme_idx,rep) + &
+             & prec_bld_time(prec_idx,scheme_idx,rep) + comm_set_time(prec_idx,scheme_idx,rep)
 
         do iter = 1, nwarm
           call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
@@ -181,24 +181,34 @@ program psb_comm_cg_test
         if (info /= psb_success_) goto 9999
 
         call psb_barrier(ctxt)
-        if (.not.allocated(prec%prec)) then
-          info = psb_err_internal_error_
-          write(psb_err_unit,*) 'Preconditioner object lost before psb_krylov'
-          goto 9999
-        end if
         t_start = psb_wtime()
         call psb_krylov('CG',a,prec,b,x,eps,desc_a,info,&
              & itmax=itmax,iter=iter,err=err,itrace=itrace,istop=istop)
         krylov_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
         call psb_amx(ctxt,krylov_time(prec_idx,scheme_idx,rep))
 
+        if (info /= psb_success_) goto 9999
+
+        call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
+        if (info /= psb_success_) goto 9999
+
+        call psb_barrier(ctxt)
+        if (.not.allocated(prec%prec)) then
+          info = psb_err_internal_error_
+          write(psb_err_unit,*) 'Preconditioner object lost before psb_krylov'
+          goto 9999
+        end if
+
+        call prec%free(info)
+        if (info /= psb_success_) goto 9999
+
         solve_time(prec_idx,scheme_idx,rep) = krylov_time(prec_idx,scheme_idx,rep)
         total_time(prec_idx,scheme_idx,rep) = setup_time(prec_idx,scheme_idx,rep) + &
              & solve_time(prec_idx,scheme_idx,rep)
         iter_count(prec_idx,scheme_idx,rep) = iter
-           iter_denom = real(max(iter,1_psb_ipk_),psb_dpk_)
-           krylov_it_time(prec_idx,scheme_idx,rep) = solve_time(prec_idx,scheme_idx,rep)/iter_denom
-           total_it_time(prec_idx,scheme_idx,rep) = total_time(prec_idx,scheme_idx,rep)/iter_denom
+        iter_denom = real(max(iter,1_psb_ipk_),psb_dpk_)
+        krylov_it_time(prec_idx,scheme_idx,rep) = solve_time(prec_idx,scheme_idx,rep)/iter_denom
+        total_it_time(prec_idx,scheme_idx,rep) = total_time(prec_idx,scheme_idx,rep)/iter_denom
         final_error(prec_idx,scheme_idx,rep) = err
         solve_info(prec_idx,scheme_idx,rep) = info
 
@@ -219,12 +229,6 @@ program psb_comm_cg_test
 
         if (info /= psb_success_) goto 9999
       end do
-
-      if (prec_ready) then
-        call psb_precfree(prec,info)
-        if (info /= psb_success_) goto 9999
-        prec_ready = .false.
-      end if
     end do
   end do
 
@@ -303,7 +307,7 @@ program psb_comm_cg_test
   call psb_gefree(b,desc_a,info)
   call psb_gefree(x,desc_a,info)
   call psb_spfree(a,desc_a,info)
-  if (prec_ready) call psb_precfree(prec,info)
+  call psb_precfree(prec,info)
   call psb_cdfree(desc_a,info)
   deallocate(setup_time,solve_time,total_time,final_error,iter_count,solve_info, &
       & prec_init_time,prec_bld_time,comm_set_time,krylov_time, &
@@ -325,7 +329,8 @@ contains
     do i = 2, size(v)
       key = v(i)
       j = i - 1
-      do while ((j >= 1).and.(v(j) > key))
+      do while (j >= 1)
+        if (v(j) <= key) exit
         v(j+1) = v(j)
         j = j - 1
       end do
@@ -428,6 +433,28 @@ contains
     end if
   end function gfun
 
+  subroutine probe_ieee(where)
+    character(len=*), intent(in) :: where
+    logical :: invalid_flag, divzero_flag, overflow_flag, underflow_flag
+
+    call ieee_get_flag(ieee_invalid, invalid_flag)
+    call ieee_get_flag(ieee_divide_by_zero, divzero_flag)
+    call ieee_get_flag(ieee_overflow, overflow_flag)
+    call ieee_get_flag(ieee_underflow, underflow_flag)
+
+    if (invalid_flag .or. divzero_flag .or. overflow_flag .or. underflow_flag) then
+      write(psb_out_unit,'("IEEE probe [",a,"] invalid=",l1,", div0=",l1,", overflow=",l1,", underflow=",l1)') &
+           trim(where), invalid_flag, divzero_flag, overflow_flag, underflow_flag
+    end if
+  end subroutine probe_ieee
+
+  subroutine clear_ieee_flags()
+    call ieee_set_flag(ieee_invalid, .false.)
+    call ieee_set_flag(ieee_divide_by_zero, .false.)
+    call ieee_set_flag(ieee_overflow, .false.)
+    call ieee_set_flag(ieee_underflow, .false.)
+  end subroutine clear_ieee_flags
+
   subroutine psb_d_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info)
     implicit none
     integer(psb_ipk_), intent(in)     :: idim
@@ -458,13 +485,55 @@ contains
 
     call psb_info(ctxt, iam, np)
 
+    if (idim <= 0) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='idim must be > 0')
+      goto 9999
+    end if
+    if (np <= 0) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name,a_err='invalid context: np <= 0')
+      goto 9999
+    end if
+    if (iam < 0) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name,a_err='invalid context: iam < 0')
+      goto 9999
+    end if
+
     deltah   = done/(idim+2)
     sqdeltah = deltah*deltah
     deltah2  = 2.d0*deltah
 
+    if (abs(deltah) <= tiny(deltah)) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='invalid mesh spacing: deltah ~ 0')
+      goto 9999
+    end if
+    if (abs(sqdeltah) <= tiny(sqdeltah)) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='invalid mesh spacing: sqdeltah ~ 0')
+      goto 9999
+    end if
+    if (abs(deltah2) <= tiny(deltah2)) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='invalid mesh spacing: deltah2 ~ 0')
+      goto 9999
+    end if
+
     m   = idim*idim*idim
     n   = m
+    if (n <= 0) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='invalid global size: n <= 0')
+      goto 9999
+    end if
     nnz = ((n*9)/(np))
+    if (nnz <= 0) then
+      info = psb_err_internal_error_
+      call psb_errpush(info,name,a_err='invalid local nnz estimate: nnz <= 0')
+      goto 9999
+    end if
     if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
     nt = (m+np-1)/np
@@ -481,8 +550,11 @@ contains
 
     call psb_barrier(ctxt)
     t0 = psb_wtime()
+    ! call probe_ieee('enter psb_cdall')
     call psb_cdall(ctxt,desc_a,info,nl=nr)
+    ! call probe_ieee('after psb_cdall')
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz)
+    ! call probe_ieee('after psb_spall')
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info)
     call psb_barrier(ctxt)
@@ -592,12 +664,30 @@ contains
       end do
 
       call psb_spins(icoeff-1,irow,icol,val,a,desc_a,info)
-      if(info /= psb_success_) exit
+      ! call probe_ieee('after psb_spins')
+      if(info /= psb_success_) then
+        write(psb_err_unit,'("INSERT FAIL rank=",i0,", call=psb_spins, ii=",i0,", ib=",i0,", icoeff=",i0)') &
+             iam, ii, ib, icoeff
+        write(psb_err_unit,'("  glob_row=",i0,", ix=",i0,", iy=",i0,", iz=",i0)') glob_row, ix, iy, iz
+        exit
+      end if
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),bv,desc_a,info)
-      if(info /= psb_success_) exit
+      ! call probe_ieee('after psb_geins bv')
+      if(info /= psb_success_) then
+        write(psb_err_unit,'("INSERT FAIL rank=",i0,", call=psb_geins bv, ii=",i0,", ib=",i0,", icoeff=",i0)') &
+             iam, ii, ib, icoeff
+        write(psb_err_unit,'("  glob_row=",i0,", ix=",i0,", iy=",i0,", iz=",i0)') glob_row, ix, iy, iz
+        exit
+      end if
       zt(:)=dzero
       call psb_geins(ib,myidx(ii:ii+ib-1),zt(1:ib),xv,desc_a,info)
-      if(info /= psb_success_) exit
+      ! call probe_ieee('after psb_geins xv')
+      if(info /= psb_success_) then
+        write(psb_err_unit,'("INSERT FAIL rank=",i0,", call=psb_geins xv, ii=",i0,", ib=",i0,", icoeff=",i0)') &
+             iam, ii, ib, icoeff
+        write(psb_err_unit,'("  glob_row=",i0,", ix=",i0,", iy=",i0,", iz=",i0)') glob_row, ix, iy, iz
+        exit
+      end if
     end do
 
     tgen = psb_wtime()-t1
@@ -612,12 +702,16 @@ contains
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
+    ! call probe_ieee('before psb_cdasb')
     call psb_cdasb(desc_a,info)
+    ! call probe_ieee('after psb_cdasb')
     tcdasb = psb_wtime()-t1
 
     call psb_barrier(ctxt)
     t1 = psb_wtime()
+    ! call probe_ieee('before psb_spasb')
     if (info == psb_success_) call psb_spasb(a,desc_a,info,afmt=afmt)
+    ! call probe_ieee('after psb_spasb')
     call psb_barrier(ctxt)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_

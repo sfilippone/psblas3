@@ -52,6 +52,7 @@ program psb_comm_test
 
   ! ---- error / reporting ----
   integer(psb_ipk_)                     :: n_pass, n_total, imode
+  logical                               :: run_baseline, run_neighbor, run_persistent
   logical                               :: comm_ok
   real(psb_dpk_)                        :: err, tol
   real(psb_dpk_)                        :: t0, t1, dt, tsum_baseline, tsum_neighbor, tsum_neighbor_persistent
@@ -93,6 +94,26 @@ program psb_comm_test
       end if
     end if
   end do
+
+  run_baseline    = .false.
+  run_neighbor    = .false.
+  run_persistent  = .false.
+  select case (trim(adjustl(mode)))
+  case ('both','all')
+    run_baseline   = .true.
+    run_neighbor   = .true.
+    run_persistent = .true.
+  case ('baseline')
+    run_baseline   = .true.
+  case ('neighbor')
+    run_neighbor   = .true.
+  case ('persistent','persistent_neighbor','persistent-neighbor')
+    run_persistent = .true.
+  case default
+    run_baseline   = .true.
+    run_neighbor   = .true.
+    run_persistent = .true.
+  end select
 
   if (idim <= 0) then
       write(*,*) 'Invalid dimension specified. Usage: --dim <positive integer>'
@@ -190,109 +211,7 @@ program psb_comm_test
   ! ==================================================================
   !  6. Baseline halo exchange  (Isend/Irecv in one call)
   ! ==================================================================
-  ! v_baseline%v is a psb_d_base_vect_type
-  call psi_swapdata( &
-    swap_status=psb_comm_status_start_, &
-    beta=dzero, &
-    y=v_baseline%v, &
-    desc_a=desc_a, &
-    info=info, &
-    data=psb_comm_halo_)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'baseline swap error:', info
-    call psb_abort(ctxt)
-  end if
-
-  call psi_swapdata( &
-      swap_status=psb_comm_status_wait_, &
-      beta=dzero, &
-      y=v_baseline%v, &
-      desc_a=desc_a, &
-      info=info, &
-      data=psb_comm_halo_)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'baseline swap error:', info
-    call psb_abort(ctxt)
-  end if
-
-
-  ! ==================================================================
-  !  7. Neighbor topology halo exchange  (start + wait)
-  ! ==================================================================
-  call psb_comm_set(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
-  if (info /= 0) then
-    write(psb_err_unit,*) my_rank, 'psb_comm_set neighbor error:', info
-    call psb_abort(ctxt)
-  end if
-  call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'neighbor start error:', info
-    call psb_abort(ctxt)
-  end if
-
-  call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'neighbor wait error:', info
-    call psb_abort(ctxt)
-  end if
-
-  ! ==================================================================
-  !  7b. Persistent-neighbor halo exchange  (start + wait)
-  ! ==================================================================
-  call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
-  if (info /= 0) then
-    write(psb_err_unit,*) my_rank, 'psb_comm_set persistent-neighbor error:', info
-    call psb_abort(ctxt)
-  end if
-  call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'persistent-neighbor start error:', info
-    call psb_abort(ctxt)
-  end if
-  call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'persistent-neighbor wait error:', info
-    call psb_abort(ctxt)
-  end if
-
-  ! ==================================================================
-  !  8. Performance: repeat exchanges and measure timings
-  ! ==================================================================
-  if (my_rank == 0) then
-    write(psb_out_unit,'("Timing: running ",i0," iterations for baseline, neighbor and persistent-neighbor")') iters
-  end if
-
-  tsum_baseline = 0.0_psb_dpk_
-  tsum_neighbor = 0.0_psb_dpk_
-  tsum_neighbor_persistent = 0.0_psb_dpk_
-
-  call psb_comm_set(psb_comm_isend_irecv_, v_baseline%v%comm_handle, info)
-  call psb_comm_set(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
-  call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
-
-  ! ---- Comm check: verify selected communication schemes ----
-  n_total = n_total + 1
-  comm_ok = allocated(v_baseline%v%comm_handle) .and. allocated(v_neighbor%v%comm_handle) .and. &
-    & allocated(v_neighbor_persistent%v%comm_handle)
-
-  if (comm_ok) then
-    comm_ok = (v_baseline%v%comm_handle%comm_type == psb_comm_isend_irecv_) .and. &
-      & (v_neighbor%v%comm_handle%comm_type == psb_comm_ineighbor_alltoallv_) .and. &
-      & (v_neighbor_persistent%v%comm_handle%comm_type == psb_comm_persistent_ineighbor_alltoallv_)
-  end if
-
-  if (my_rank == 0) then
-    if (comm_ok) then
-      write(psb_out_unit,'("  [PASS] comm scheme selection            : baseline/neighbor/persistent OK")')
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] comm scheme selection            : unexpected comm_type mapping")')
-    end if
-  end if
-
-  do i = 1, iters
-    ! baseline timing
-    t0 = psb_wtime()
+  if (run_baseline) then
     call psi_swapdata( &
       swap_status=psb_comm_status_start_, &
       beta=dzero, &
@@ -300,44 +219,124 @@ program psb_comm_test
       desc_a=desc_a, &
       info=info, &
       data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'baseline swap error:', info
+      call psb_abort(ctxt)
+    end if
+
     call psi_swapdata( &
-      swap_status=psb_comm_status_wait_, &
-      beta=dzero, &
-      y=v_baseline%v, &
-      desc_a=desc_a, &
-      info=info, &
-      data=psb_comm_halo_)
-    t1 = psb_wtime()
-    dt = t1 - t0
-    call psb_amx(ctxt, dt)
-    tsum_baseline = tsum_baseline + dt
+        swap_status=psb_comm_status_wait_, &
+        beta=dzero, &
+        y=v_baseline%v, &
+        desc_a=desc_a, &
+        info=info, &
+        data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'baseline swap error:', info
+      call psb_abort(ctxt)
+    end if
+  end if
 
-    ! neighbor timing (start + wait)
-    t0 = psb_wtime()
+
+  ! ==================================================================
+  !  7. Neighbor topology halo exchange  (start + wait)
+  ! ==================================================================
+  if (run_neighbor) then
+    call psb_comm_set(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
+    if (info /= 0) then
+      write(psb_err_unit,*) my_rank, 'psb_comm_set neighbor error:', info
+      call psb_abort(ctxt)
+    end if
     call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-    call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-    t1 = psb_wtime()
-    dt = t1 - t0
-    call psb_amx(ctxt, dt)
-    tsum_neighbor = tsum_neighbor + dt
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'neighbor start error:', info
+      call psb_abort(ctxt)
+    end if
 
-    ! persistent-neighbor timing (start + wait)
-    t0 = psb_wtime()
+    call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'neighbor wait error:', info
+      call psb_abort(ctxt)
+    end if
+  end if
+
+  ! ==================================================================
+  !  7b. Persistent-neighbor halo exchange  (start + wait)
+  ! ==================================================================
+  if (run_persistent) then
+    call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
+    if (info /= 0) then
+      write(psb_err_unit,*) my_rank, 'psb_comm_set persistent-neighbor error:', info
+      call psb_abort(ctxt)
+    end if
     call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'persistent-neighbor start error:', info
+      call psb_abort(ctxt)
+    end if
     call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
-    t1 = psb_wtime()
-    dt = t1 - t0
-    call psb_amx(ctxt, dt)
-    tsum_neighbor_persistent = tsum_neighbor_persistent + dt
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'persistent-neighbor wait error:', info
+      call psb_abort(ctxt)
+    end if
+  end if
+
+  ! ==================================================================
+  !  8. Performance: repeat exchanges and measure timings
+  ! ==================================================================
+  if (my_rank == 0) then
+    write(psb_out_unit,'("Timing: running ",i0," iterations for selected exchange mode(s)")') iters
+  end if
+
+  tsum_baseline = 0.0_psb_dpk_
+  tsum_neighbor = 0.0_psb_dpk_
+  tsum_neighbor_persistent = 0.0_psb_dpk_
+
+  do i = 1, iters
+    if (run_baseline) then
+      t0 = psb_wtime()
+      call psi_swapdata(psb_comm_status_start_, dzero, v_baseline%v, desc_a, info, data=psb_comm_halo_)
+      call psi_swapdata(psb_comm_status_wait_, dzero, v_baseline%v, desc_a, info, data=psb_comm_halo_)
+      t1 = psb_wtime()
+      dt = t1 - t0
+      call psb_amx(ctxt, dt)
+      tsum_baseline = tsum_baseline + dt
+    end if
+
+    if (run_neighbor) then
+      t0 = psb_wtime()
+      call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
+      call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
+      t1 = psb_wtime()
+      dt = t1 - t0
+      call psb_amx(ctxt, dt)
+      tsum_neighbor = tsum_neighbor + dt
+    end if
+
+    if (run_persistent) then
+      t0 = psb_wtime()
+      call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
+      call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
+      t1 = psb_wtime()
+      dt = t1 - t0
+      call psb_amx(ctxt, dt)
+      tsum_neighbor_persistent = tsum_neighbor_persistent + dt
+    end if
   end do
 
   if (my_rank == 0) then
-    write(psb_out_unit,'("  Avg baseline time  : ",es12.5)') (tsum_baseline / real(iters,psb_dpk_))
-    write(psb_out_unit,'("  Tot baseline time  : ",es12.5)') tsum_baseline
-    write(psb_out_unit,'("  Avg neighbor time  : ",es12.5)') (tsum_neighbor / real(iters,psb_dpk_))
-    write(psb_out_unit,'("  Tot neighbor time  : ",es12.5)') tsum_neighbor
-    write(psb_out_unit,'("  Avg pers-neigh time: ",es12.5)') (tsum_neighbor_persistent / real(iters,psb_dpk_))
-    write(psb_out_unit,'("  Tot pers-neigh time: ",es12.5)') tsum_neighbor_persistent
+    if (run_baseline) then
+      write(psb_out_unit,'("  Avg baseline time  : ",es12.5)') (tsum_baseline / real(iters,psb_dpk_))
+      write(psb_out_unit,'("  Tot baseline time  : ",es12.5)') tsum_baseline
+    end if
+    if (run_neighbor) then
+      write(psb_out_unit,'("  Avg neighbor time  : ",es12.5)') (tsum_neighbor / real(iters,psb_dpk_))
+      write(psb_out_unit,'("  Tot neighbor time  : ",es12.5)') tsum_neighbor
+    end if
+    if (run_persistent) then
+      write(psb_out_unit,'("  Avg pers-neigh time: ",es12.5)') (tsum_neighbor_persistent / real(iters,psb_dpk_))
+      write(psb_out_unit,'("  Tot pers-neigh time: ",es12.5)') tsum_neighbor_persistent
+    end if
   end if
 
   ! ==================================================================
@@ -347,113 +346,121 @@ program psb_comm_test
   result_neighbor = v_neighbor%get_vect()
   result_persistent = v_neighbor_persistent%get_vect()
 
-  ! ---- Test 1: cross-check baseline vs neighbor (all entries) ----
-  n_total = n_total + 1
-  err = maxval(abs(result_baseline(1:ncol) - result_neighbor(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] cross-check baseline vs neighbor : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] cross-check baseline vs neighbor : err = ",es12.5)') err
+  if (run_baseline .and. run_neighbor) then
+    n_total = n_total + 1
+    err = maxval(abs(result_baseline(1:ncol) - result_neighbor(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] cross-check baseline vs neighbor : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] cross-check baseline vs neighbor : err = ",es12.5)') err
+      end if
     end if
   end if
 
-  ! ---- Test 2: baseline absolute correctness (halo = global index) ----
-  n_total = n_total + 1
-  err = maxval(abs(result_baseline(1:ncol) - expected(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] baseline absolute correctness    : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] baseline absolute correctness    : err = ",es12.5)') err
+  if (run_baseline) then
+    n_total = n_total + 1
+    err = maxval(abs(result_baseline(1:ncol) - expected(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] baseline absolute correctness    : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] baseline absolute correctness    : err = ",es12.5)') err
+      end if
     end if
   end if
 
-  ! ---- Test 3: neighbor absolute correctness (halo = global index) ----
-  n_total = n_total + 1
-  err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] neighbor absolute correctness    : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] neighbor absolute correctness    : err = ",es12.5)') err
+  if (run_neighbor) then
+    n_total = n_total + 1
+    err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] neighbor absolute correctness    : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] neighbor absolute correctness    : err = ",es12.5)') err
+      end if
     end if
   end if
 
-  ! ---- Test 4: cross-check baseline vs persistent-neighbor (all entries) ----
-  n_total = n_total + 1
-  err = maxval(abs(result_baseline(1:ncol) - result_persistent(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] cross-check baseline vs pers-nei : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] cross-check baseline vs pers-nei : err = ",es12.5)') err
+  if (run_baseline .and. run_persistent) then
+    n_total = n_total + 1
+    err = maxval(abs(result_baseline(1:ncol) - result_persistent(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] cross-check baseline vs pers-nei : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] cross-check baseline vs pers-nei : err = ",es12.5)') err
+      end if
     end if
   end if
 
-  ! ---- Test 5: persistent-neighbor absolute correctness ----
-  n_total = n_total + 1
-  err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] pers-neigh absolute correctness  : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] pers-neigh absolute correctness  : err = ",es12.5)') err
+  if (run_persistent) then
+    n_total = n_total + 1
+    err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] pers-neigh absolute correctness  : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] pers-neigh absolute correctness  : err = ",es12.5)') err
+      end if
     end if
   end if
 
-  ! ---- Test 6: repeat neighbor exchange (topology reuse) ----
-  ! Reset halo entries to zero, run again, and check
-  do i = nrow+1, ncol
-    result_neighbor(i) = dzero
-  end do
-  call v_neighbor%set_vect(result_neighbor)
+  if (run_neighbor) then
+    ! ---- Test 6: repeat neighbor exchange (topology reuse) ----
+    do i = nrow+1, ncol
+      result_neighbor(i) = dzero
+    end do
+    call v_neighbor%set_vect(result_neighbor)
 
-  call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-  call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
+    call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
+    call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
 
-  result_neighbor = v_neighbor%get_vect()
-  n_total = n_total + 1
-  err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] neighbor topology reuse          : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] neighbor topology reuse          : err = ",es12.5)') err
+    result_neighbor = v_neighbor%get_vect()
+    n_total = n_total + 1
+    err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] neighbor topology reuse          : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] neighbor topology reuse          : err = ",es12.5)') err
+      end if
     end if
   end if
 
-  ! ---- Test 7: repeat persistent-neighbor exchange (buffer reuse) ----
-  do i = nrow+1, ncol
-    result_persistent(i) = dzero
-  end do
-  call v_neighbor_persistent%set_vect(result_persistent)
+  if (run_persistent) then
+    ! ---- Test 7: repeat persistent-neighbor exchange (buffer reuse) ----
+    do i = nrow+1, ncol
+      result_persistent(i) = dzero
+    end do
+    call v_neighbor_persistent%set_vect(result_persistent)
 
-  call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
-  call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
+    call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
+    call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
 
-  result_persistent = v_neighbor_persistent%get_vect()
-  n_total = n_total + 1
-  err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
-  call psb_amx(ctxt, err)
-  if (my_rank == 0) then
-    if (err < tol) then
-      write(psb_out_unit,'("  [PASS] pers-neigh buffer reuse          : err = ",es12.5)') err
-      n_pass = n_pass + 1
-    else
-      write(psb_out_unit,'("  [FAIL] pers-neigh buffer reuse          : err = ",es12.5)') err
+    result_persistent = v_neighbor_persistent%get_vect()
+    n_total = n_total + 1
+    err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
+    call psb_amx(ctxt, err)
+    if (my_rank == 0) then
+      if (err < tol) then
+        write(psb_out_unit,'("  [PASS] pers-neigh buffer reuse          : err = ",es12.5)') err
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] pers-neigh buffer reuse          : err = ",es12.5)') err
+      end if
     end if
   end if
 
