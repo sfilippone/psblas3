@@ -86,7 +86,6 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
   endif
 
 !!$  write(0,*) ' Remapping from ',np,' onto ', np_remap
-  mipd = ipd
   if (desc_in%get_fmt() == 'BLOCK') then
     !
     ! Should we spread the processes in the new context,
@@ -245,6 +244,7 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
     else
       naggr(me+1) = 0
     end if
+    ipd = mipd
     call psb_sum(ctxt,naggr)
     
   end block
@@ -257,3 +257,16 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
   return  
 
 end subroutine psb_d_remap
+subroutine psb_d_remap2(map_in, desc_new, map_out, flag, info)
+
+  use psb_base_mod, psb_protect_name => psb_d_remap2
+  
+  implicit none
+  !....parameters...
+  type(psb_desc_type), intent(inout)   :: desc_new
+  type(psb_dlinmap_type), intent(inout) :: map_in
+  type(psb_dlinmap_type), intent(out)   :: map_out
+  integer(psb_ipk_), intent(in)       :: flag
+  integer(psb_ipk_), intent(out)       :: info
+  
+end subroutine psb_d_remap2
