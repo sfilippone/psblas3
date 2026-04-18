@@ -524,29 +524,47 @@ contains
     real(psb_dpk_)                  :: alpha, beta
 
     type(psb_dspmat_type)           :: a
-    type(psb_d_vect_type)           :: x_baseline, x_neighbor, x_persistent
-    type(psb_d_vect_type)           :: y_baseline, y_neighbor, y_persistent
+    type(psb_d_vect_type)           :: x_isend, x_neighbor, x_persistent
+    type(psb_d_vect_type)           :: y_ov_isend, y_ov_neighbor, y_ov_persistent
+    type(psb_d_vect_type)           :: y_no_isend, y_no_neighbor, y_no_persistent
     type(psb_desc_type)             :: desc_a
 
-    character(len=:), allocatable   :: output_file_name
-    character(len=32)               :: idim_str
+    character(len=64)               :: env_buf
     real(psb_dpk_), allocatable     :: x_global(:), y_global(:)
     integer(psb_ipk_)               :: my_rank, np, info, err_act
+    integer                         :: env_len, env_status, ios
     integer(psb_ipk_)               :: n_global, idim
     integer(psb_ipk_)               :: i, times
     real(psb_dpk_)                  :: t0, t1, dt
-    real(psb_dpk_)                  :: tsum_baseline, tsum_neighbor, tsum_persistent
-    real(psb_dpk_)                  :: err_bn, err_bp, tol
-    logical                         :: tnd
+    real(psb_dpk_)                  :: t_ov_isend, t_ov_neighbor, t_ov_persistent
+    real(psb_dpk_)                  :: t_no_isend, t_no_neighbor, t_no_persistent
+    real(psb_dpk_)                  :: err_isend, err_neighbor, err_persistent, tol
+    real(psb_dpk_)                  :: avg_ov, avg_no, speedup, gain_pct
 
     info = psb_success_
     tol = 1.0d-10
     times = 100
-    tsum_baseline = 0.0_psb_dpk_
-    tsum_neighbor = 0.0_psb_dpk_
-    tsum_persistent = 0.0_psb_dpk_
-    tnd = .false.
+    t_ov_isend = 0.0_psb_dpk_
+    t_ov_neighbor = 0.0_psb_dpk_
+    t_ov_persistent = 0.0_psb_dpk_
+    t_no_isend = 0.0_psb_dpk_
+    t_no_neighbor = 0.0_psb_dpk_
+    t_no_persistent = 0.0_psb_dpk_
     idim = 10
+    call psb_erractionsave(err_act)
+
+    call get_environment_variable('IDIM', env_buf, length=env_len, status=env_status)
+    if ((env_status == 0) .and. (env_len > 0)) then
+      read(env_buf(1:env_len), *, iostat=ios) idim
+      if ((ios /= 0) .or. (idim < 2)) idim = 10
+    end if
+
+    call get_environment_variable('TIMES', env_buf, length=env_len, status=env_status)
+    if ((env_status == 0) .and. (env_len > 0)) then
+      read(env_buf(1:env_len), *, iostat=ios) times
+      if ((ios /= 0) .or. (times < 1)) times = 100
+    end if
+
     n_global = idim * idim * idim
     alpha = done
     beta = dzero
@@ -555,7 +573,7 @@ contains
 
 
     call psb_barrier(ctxt)
-    call psb_d_gen_pde3d(ctxt,idim,a,y_baseline,x_baseline,desc_a,"CSR",info,partition=1)
+    call psb_d_gen_pde3d(ctxt,idim,a,y_ov_isend,x_isend,desc_a,"CSR",info,partition=1)
     
     if (info /= psb_success_) goto 9999
     call psb_barrier(ctxt)
@@ -571,96 +589,200 @@ contains
 
     call psb_geall(x_neighbor, desc_a, info)
     call psb_geall(x_persistent, desc_a, info)
-    call psb_geall(y_neighbor, desc_a, info)
-    call psb_geall(y_persistent, desc_a, info)
+    call psb_geall(y_ov_neighbor, desc_a, info)
+    call psb_geall(y_ov_persistent, desc_a, info)
+    call psb_geall(y_no_isend, desc_a, info)
+    call psb_geall(y_no_neighbor, desc_a, info)
+    call psb_geall(y_no_persistent, desc_a, info)
     if (info /= psb_success_) goto 9999
 
-    call psb_scatter(x_global, x_baseline, desc_a, info, root=psb_root_)
+    call psb_scatter(x_global, x_isend, desc_a, info, root=psb_root_)
     call psb_scatter(x_global, x_neighbor, desc_a, info, root=psb_root_)
     call psb_scatter(x_global, x_persistent, desc_a, info, root=psb_root_)
-    call psb_scatter(y_global, y_baseline, desc_a, info, root=psb_root_)
-    call psb_scatter(y_global, y_neighbor, desc_a, info, root=psb_root_)
-    call psb_scatter(y_global, y_persistent, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_ov_isend, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_ov_neighbor, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_ov_persistent, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_no_isend, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_no_neighbor, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_no_persistent, desc_a, info, root=psb_root_)
     if (info /= psb_success_) goto 9999
 
     ! Set communication schemes on the x vectors used by psb_spmm.
-    call psb_comm_set(psb_comm_isend_irecv_, x_baseline%v%comm_handle, info)
+    call psb_comm_set(psb_comm_isend_irecv_, x_isend%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
     call psb_comm_set(psb_comm_ineighbor_alltoallv_, x_neighbor%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
     call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, x_persistent%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
 
-    ! Warm-up all schemes once.
-    call psb_spmm(alpha, a, x_baseline, beta, y_baseline, desc_a, info, doswap=.true.)
-    call psb_spmm(alpha, a, x_neighbor, beta, y_neighbor, desc_a, info, doswap=.true.)
-    call psb_spmm(alpha, a, x_persistent, beta, y_persistent, desc_a, info, doswap=.true.)
+    ! Warm-up all schemes once: overlap and non-overlap paths.
+    call psb_spmm(alpha, a, x_isend, beta, y_ov_isend, desc_a, info, doswap=.true.)
+    call psb_halo(x_isend, desc_a, info)
+    call psb_spmm(alpha, a, x_isend, beta, y_no_isend, desc_a, info, doswap=.false.)
+
+    call psb_spmm(alpha, a, x_neighbor, beta, y_ov_neighbor, desc_a, info, doswap=.true.)
+    call psb_halo(x_neighbor, desc_a, info)
+    call psb_spmm(alpha, a, x_neighbor, beta, y_no_neighbor, desc_a, info, doswap=.false.)
+
+    call psb_spmm(alpha, a, x_persistent, beta, y_ov_persistent, desc_a, info, doswap=.true.)
+    call psb_halo(x_persistent, desc_a, info)
+    call psb_spmm(alpha, a, x_persistent, beta, y_no_persistent, desc_a, info, doswap=.false.)
     if (info /= psb_success_) goto 9999
 
-    ! Restore vectors so timed loops start from same initial state.
-    call psb_scatter(x_global, x_baseline, desc_a, info, root=psb_root_)
+    ! -----------------------------
+    ! isend/irecv scheme
+    ! -----------------------------
+    call psb_scatter(x_global, x_isend, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_ov_isend, desc_a, info, root=psb_root_)
+    call psb_barrier(ctxt)
+    t0 = psb_wtime()
+    do i = 1, times
+      call psb_spmm(alpha, a, x_isend, beta, y_ov_isend, desc_a, info, doswap=.true.)
+    end do
+    t1 = psb_wtime()
+    dt = t1 - t0
+    call psb_amx(ctxt, dt)
+    t_ov_isend = dt
+
+    call psb_scatter(x_global, x_isend, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_no_isend, desc_a, info, root=psb_root_)
+    call psb_barrier(ctxt)
+    t0 = psb_wtime()
+    do i = 1, times
+      call psb_halo(x_isend, desc_a, info)
+      call psb_spmm(alpha, a, x_isend, beta, y_no_isend, desc_a, info, doswap=.false.)
+    end do
+    t1 = psb_wtime()
+    dt = t1 - t0
+    call psb_amx(ctxt, dt)
+    t_no_isend = dt
+
+    ! -----------------------------
+    ! ineighbor_alltoallv scheme
+    ! -----------------------------
     call psb_scatter(x_global, x_neighbor, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_ov_neighbor, desc_a, info, root=psb_root_)
+    call psb_barrier(ctxt)
+    t0 = psb_wtime()
+    do i = 1, times
+      call psb_spmm(alpha, a, x_neighbor, beta, y_ov_neighbor, desc_a, info, doswap=.true.)
+    end do
+    t1 = psb_wtime()
+    dt = t1 - t0
+    call psb_amx(ctxt, dt)
+    t_ov_neighbor = dt
+
+    call psb_scatter(x_global, x_neighbor, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_no_neighbor, desc_a, info, root=psb_root_)
+    call psb_barrier(ctxt)
+    t0 = psb_wtime()
+    do i = 1, times
+      call psb_halo(x_neighbor, desc_a, info)
+      call psb_spmm(alpha, a, x_neighbor, beta, y_no_neighbor, desc_a, info, doswap=.false.)
+    end do
+    t1 = psb_wtime()
+    dt = t1 - t0
+    call psb_amx(ctxt, dt)
+    t_no_neighbor = dt
+
+    ! ----------------------------------------
+    ! persistent_ineighbor_alltoallv scheme
+    ! ----------------------------------------
     call psb_scatter(x_global, x_persistent, desc_a, info, root=psb_root_)
-    call psb_scatter(y_global, y_baseline, desc_a, info, root=psb_root_)
-    call psb_scatter(y_global, y_neighbor, desc_a, info, root=psb_root_)
-    call psb_scatter(y_global, y_persistent, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_ov_persistent, desc_a, info, root=psb_root_)
+    call psb_barrier(ctxt)
+    t0 = psb_wtime()
+    do i = 1, times
+      call psb_spmm(alpha, a, x_persistent, beta, y_ov_persistent, desc_a, info, doswap=.true.)
+    end do
+    t1 = psb_wtime()
+    dt = t1 - t0
+    call psb_amx(ctxt, dt)
+    t_ov_persistent = dt
+
+    call psb_scatter(x_global, x_persistent, desc_a, info, root=psb_root_)
+    call psb_scatter(y_global, y_no_persistent, desc_a, info, root=psb_root_)
+    call psb_barrier(ctxt)
+    t0 = psb_wtime()
+    do i = 1, times
+      call psb_halo(x_persistent, desc_a, info)
+      call psb_spmm(alpha, a, x_persistent, beta, y_no_persistent, desc_a, info, doswap=.false.)
+    end do
+    t1 = psb_wtime()
+    dt = t1 - t0
+    call psb_amx(ctxt, dt)
+    t_no_persistent = dt
+
     if (info /= psb_success_) goto 9999
 
-    ! Baseline (isend/irecv) overlapped SpMV.
-    t0 = psb_wtime()
-    do i = 1, times
-      call psb_spmm(alpha, a, x_baseline, beta, y_baseline, desc_a, info, doswap=.true.)
-    end do
-    t1 = psb_wtime()
-    dt = t1 - t0
-    call psb_amx(ctxt, dt)
-    tsum_baseline = tsum_baseline + dt
-
-    ! Neighbor alltoallv overlapped SpMV.
-    t0 = psb_wtime()
-    do i = 1, times
-      call psb_spmm(alpha, a, x_neighbor, beta, y_neighbor, desc_a, info, doswap=.true.)
-    end do
-    t1 = psb_wtime()
-    dt = t1 - t0
-    call psb_amx(ctxt, dt)
-    tsum_neighbor = tsum_neighbor + dt
-
-    ! Persistent-neighbor overlapped SpMV.
-    t0 = psb_wtime()
-    do i = 1, times
-      call psb_spmm(alpha, a, x_persistent, beta, y_persistent, desc_a, info, doswap=.true.)
-    end do
-    t1 = psb_wtime()
-    dt = t1 - t0
-    call psb_amx(ctxt, dt)
-    tsum_persistent = tsum_persistent + dt
-
-    err_bn = maxval(abs(y_baseline%get_vect() - y_neighbor%get_vect()))
-    err_bp = maxval(abs(y_baseline%get_vect() - y_persistent%get_vect()))
-    call psb_amx(ctxt, err_bn)
-    call psb_amx(ctxt, err_bp)
+    err_isend = maxval(abs(y_ov_isend%get_vect() - y_no_isend%get_vect()))
+    err_neighbor = maxval(abs(y_ov_neighbor%get_vect() - y_no_neighbor%get_vect()))
+    err_persistent = maxval(abs(y_ov_persistent%get_vect() - y_no_persistent%get_vect()))
+    call psb_amx(ctxt, err_isend)
+    call psb_amx(ctxt, err_neighbor)
+    call psb_amx(ctxt, err_persistent)
 
     if (my_rank == 0) then
-      write(psb_out_unit,'("  Avg baseline time  : ",es12.5)') tsum_baseline / real(times, psb_dpk_)
-      write(psb_out_unit,'("  Tot baseline time  : ",es12.5)') tsum_baseline
-      write(psb_out_unit,'("  Avg neighbor time  : ",es12.5)') tsum_neighbor / real(times, psb_dpk_)
-      write(psb_out_unit,'("  Tot neighbor time  : ",es12.5)') tsum_neighbor
-      write(psb_out_unit,'("  Avg pers-neigh time: ",es12.5)') tsum_persistent / real(times, psb_dpk_)
-      write(psb_out_unit,'("  Tot pers-neigh time: ",es12.5)') tsum_persistent
-      write(psb_out_unit,'("  Check baseline vs neighbor   err = ",es12.5)') err_bn
-      write(psb_out_unit,'("  Check baseline vs persistent err = ",es12.5)') err_bp
-      if ((err_bn > tol) .or. (err_bp > tol)) then
+      write(psb_out_unit,'(/,"SpMV overlap benchmark")')
+      write(psb_out_unit,'("  idim            : ",i0)') idim
+      write(psb_out_unit,'("  global unknowns : ",i0)') n_global
+      write(psb_out_unit,'("  repetitions     : ",i0)') times
+      write(psb_out_unit,'("  timing metric   : max over MPI ranks")')
+      write(psb_out_unit,'("  gain(%) = 100*(1 - overlap/no_overlap)")')
+
+      write(psb_out_unit,'(/,"Scheme: isend_irecv")')
+      avg_ov = t_ov_isend / real(times, psb_dpk_)
+      avg_no = t_no_isend / real(times, psb_dpk_)
+      speedup = t_no_isend / max(t_ov_isend, tiny(done))
+      gain_pct = 100.0_psb_dpk_ * (done - (t_ov_isend / max(t_no_isend, tiny(done))))
+      write(psb_out_unit,'("  total overlap    : ",es12.5)') t_ov_isend
+      write(psb_out_unit,'("  total no_overlap : ",es12.5)') t_no_isend
+      write(psb_out_unit,'("  avg overlap      : ",es12.5)') avg_ov
+      write(psb_out_unit,'("  avg no_overlap   : ",es12.5)') avg_no
+      write(psb_out_unit,'("  speedup (no/ov)  : ",f10.4)') speedup
+      write(psb_out_unit,'("  gain (%)         : ",f10.4)') gain_pct
+      write(psb_out_unit,'("  overlap vs no_overlap err = ",es12.5)') err_isend
+
+      write(psb_out_unit,'(/,"Scheme: ineighbor_alltoallv")')
+      avg_ov = t_ov_neighbor / real(times, psb_dpk_)
+      avg_no = t_no_neighbor / real(times, psb_dpk_)
+      speedup = t_no_neighbor / max(t_ov_neighbor, tiny(done))
+      gain_pct = 100.0_psb_dpk_ * (done - (t_ov_neighbor / max(t_no_neighbor, tiny(done))))
+      write(psb_out_unit,'("  total overlap    : ",es12.5)') t_ov_neighbor
+      write(psb_out_unit,'("  total no_overlap : ",es12.5)') t_no_neighbor
+      write(psb_out_unit,'("  avg overlap      : ",es12.5)') avg_ov
+      write(psb_out_unit,'("  avg no_overlap   : ",es12.5)') avg_no
+      write(psb_out_unit,'("  speedup (no/ov)  : ",f10.4)') speedup
+      write(psb_out_unit,'("  gain (%)         : ",f10.4)') gain_pct
+      write(psb_out_unit,'("  overlap vs no_overlap err = ",es12.5)') err_neighbor
+
+      write(psb_out_unit,'(/,"Scheme: persistent_ineighbor_alltoallv")')
+      avg_ov = t_ov_persistent / real(times, psb_dpk_)
+      avg_no = t_no_persistent / real(times, psb_dpk_)
+      speedup = t_no_persistent / max(t_ov_persistent, tiny(done))
+      gain_pct = 100.0_psb_dpk_ * (done - (t_ov_persistent / max(t_no_persistent, tiny(done))))
+      write(psb_out_unit,'("  total overlap    : ",es12.5)') t_ov_persistent
+      write(psb_out_unit,'("  total no_overlap : ",es12.5)') t_no_persistent
+      write(psb_out_unit,'("  avg overlap      : ",es12.5)') avg_ov
+      write(psb_out_unit,'("  avg no_overlap   : ",es12.5)') avg_no
+      write(psb_out_unit,'("  speedup (no/ov)  : ",f10.4)') speedup
+      write(psb_out_unit,'("  gain (%)         : ",f10.4)') gain_pct
+      write(psb_out_unit,'("  overlap vs no_overlap err = ",es12.5)') err_persistent
+
+      if ((err_isend > tol) .or. (err_neighbor > tol) .or. (err_persistent > tol)) then
         write(psb_out_unit,'("  WARNING: mismatch exceeds tolerance ",es12.5)') tol
       end if
     end if
 
-    call psb_gefree(x_baseline, desc_a, info)
+    call psb_gefree(x_isend, desc_a, info)
     call psb_gefree(x_neighbor, desc_a, info)
     call psb_gefree(x_persistent, desc_a, info)
-    call psb_gefree(y_baseline, desc_a, info)
-    call psb_gefree(y_neighbor, desc_a, info)
-    call psb_gefree(y_persistent, desc_a, info)
+    call psb_gefree(y_ov_isend, desc_a, info)
+    call psb_gefree(y_ov_neighbor, desc_a, info)
+    call psb_gefree(y_ov_persistent, desc_a, info)
+    call psb_gefree(y_no_isend, desc_a, info)
+    call psb_gefree(y_no_neighbor, desc_a, info)
+    call psb_gefree(y_no_persistent, desc_a, info)
     call psb_spfree(a, desc_a, info)
     call psb_cdfree(desc_a, info)
 

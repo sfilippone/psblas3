@@ -140,6 +140,11 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info,name,a_err='invalid desc_a context in psb_dcg_vect')
+    goto 9999
+  end if
   if (.not.allocated(b%v)) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)

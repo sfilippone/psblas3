@@ -17,6 +17,7 @@
 !
 program psb_comm_test
   use psb_base_mod
+  use psb_error_mod, only: psb_set_debug_level, psb_debug_ext_
   use psi_mod
   use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
   use psb_comm_schemes_mod, only: psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_, &
@@ -30,6 +31,7 @@ program psb_comm_test
   integer(psb_ipk_)                     :: iters
   character(len=32)                     :: arg
   character(len=16)                     :: mode
+  logical                               :: debug_swapdata
 
   ! ---- descriptor / context ----
   type(psb_ctxt_type)                   :: ctxt
@@ -58,13 +60,16 @@ program psb_comm_test
   real(psb_dpk_)                        :: t0, t1, dt, tsum_baseline, tsum_neighbor, tsum_neighbor_persistent
   integer(psb_lpk_), allocatable        :: glob_col(:)
   character(len=40)                     :: name
+  real(psb_dpk_)                        :: huge_d
 
   name    = 'test_halo_new'
   tol     = 1.0d-12
+  huge_d  = huge(1.0_psb_dpk_)
   n_pass  = 0
   n_total = 0
   iters = 5
   mode = 'both'
+  debug_swapdata = .false.
 
   ! ---- parse command-line argument for idim ----
   idim = 10
@@ -92,8 +97,14 @@ program psb_comm_test
         call get_command_argument(i+1, arg)
         read(arg, *) mode
       end if
+    else if (trim(arg) == '--debug') then
+      debug_swapdata = .true.
     end if
   end do
+
+  if (debug_swapdata) then
+    call psb_set_debug_level(psb_debug_ext_)
+  end if
 
   run_baseline    = .false.
   run_neighbor    = .false.
@@ -180,11 +191,35 @@ program psb_comm_test
   !  3. Allocate two D vectors (scratch) and fill owned entries
   ! ==================================================================
   call psb_geall(v_baseline, desc_a, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geall baseline error:', info
+    call psb_abort(ctxt)
+  end if
   call psb_geall(v_neighbor, desc_a, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geall neighbor error:', info
+    call psb_abort(ctxt)
+  end if
   call psb_geall(v_neighbor_persistent, desc_a, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geall persistent-neighbor error:', info
+    call psb_abort(ctxt)
+  end if
   call psb_geasb(v_baseline, desc_a, info, scratch=.true.)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geasb baseline error:', info
+    call psb_abort(ctxt)
+  end if
   call psb_geasb(v_neighbor, desc_a, info, scratch=.true.)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geasb neighbor error:', info
+    call psb_abort(ctxt)
+  end if
   call psb_geasb(v_neighbor_persistent, desc_a, info, scratch=.true.)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geasb persistent-neighbor error:', info
+    call psb_abort(ctxt)
+  end if
 
   ! Fill owned entries with the global index value
   allocate(vals(ncol))
@@ -207,6 +242,10 @@ program psb_comm_test
   do i = 1, ncol
     expected(i) = real(glob_col(i), psb_dpk_)
   end do
+  allocate(result_baseline(ncol), result_neighbor(ncol), result_persistent(ncol))
+  result_baseline   = huge_d
+  result_neighbor   = huge_d
+  result_persistent = huge_d
 
   ! ==================================================================
   !  6. Baseline halo exchange  (Isend/Irecv in one call)
@@ -342,16 +381,33 @@ program psb_comm_test
   ! ==================================================================
   !  8. Extract results and compare
   ! ==================================================================
-  result_baseline = v_baseline%get_vect()
-  result_neighbor = v_neighbor%get_vect()
-  result_persistent = v_neighbor_persistent%get_vect()
+  result_baseline = v_baseline%v%v
+  result_neighbor = v_neighbor%v%v
+  result_persistent = v_neighbor_persistent%v%v
+
+  ! Debug: Check if results are properly populated
+  if (my_rank == 0 .and. debug_swapdata) then
+    write(psb_out_unit,'("DEBUG: ncol=",i0," nrow=",i0)') ncol, nrow
+    write(psb_out_unit,'("DEBUG: size(result_baseline)=",i0)') size(result_baseline)
+    if (ncol > 0) then
+      write(psb_out_unit,'("DEBUG: result_baseline(1:min(5,ncol))=",5(es12.5,1x))') &
+        & result_baseline(1:min(5,ncol))
+      write(psb_out_unit,'("DEBUG: expected(1:min(5,ncol))=",5(es12.5,1x))') &
+        & expected(1:min(5,ncol))
+    end if
+  end if
 
   if (run_baseline .and. run_neighbor) then
     n_total = n_total + 1
-    err = maxval(abs(result_baseline(1:ncol) - result_neighbor(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_baseline(1:ncol) - result_neighbor(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] cross-check baseline vs neighbor : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -362,10 +418,15 @@ program psb_comm_test
 
   if (run_baseline) then
     n_total = n_total + 1
-    err = maxval(abs(result_baseline(1:ncol) - expected(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_baseline(1:ncol) - expected(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] baseline absolute correctness    : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -376,10 +437,15 @@ program psb_comm_test
 
   if (run_neighbor) then
     n_total = n_total + 1
-    err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] neighbor absolute correctness    : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -390,10 +456,15 @@ program psb_comm_test
 
   if (run_baseline .and. run_persistent) then
     n_total = n_total + 1
-    err = maxval(abs(result_baseline(1:ncol) - result_persistent(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_baseline(1:ncol) - result_persistent(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] cross-check baseline vs pers-nei : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -404,10 +475,15 @@ program psb_comm_test
 
   if (run_persistent) then
     n_total = n_total + 1
-    err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] pers-neigh absolute correctness  : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -426,12 +502,17 @@ program psb_comm_test
     call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
     call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
 
-    result_neighbor = v_neighbor%get_vect()
+    result_neighbor = v_neighbor%v%v
     n_total = n_total + 1
-    err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] neighbor topology reuse          : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -450,12 +531,17 @@ program psb_comm_test
     call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
     call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
 
-    result_persistent = v_neighbor_persistent%get_vect()
+    result_persistent = v_neighbor_persistent%v%v
     n_total = n_total + 1
-    err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
+    err = huge_d
+    if (ncol > 0) then
+      err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
+    else
+      err = 0.0_psb_dpk_
+    end if
     call psb_amx(ctxt, err)
     if (my_rank == 0) then
-      if (err < tol) then
+      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
         write(psb_out_unit,'("  [PASS] pers-neigh buffer reuse          : err = ",es12.5)') err
         n_pass = n_pass + 1
       else
@@ -467,6 +553,7 @@ program psb_comm_test
   ! ==================================================================
   !  9. Summary
   ! ==================================================================
+  call psb_barrier(ctxt)
   if (my_rank == 0) then
     write(psb_out_unit,'("================================================")')
     write(psb_out_unit,'("  Results: ",i0," / ",i0," tests passed")') n_pass, n_total
@@ -477,6 +564,7 @@ program psb_comm_test
     end if
     write(psb_out_unit,'("================================================")')
   end if
+  call psb_barrier(ctxt)
 
   ! ==================================================================
   !  10. Cleanup

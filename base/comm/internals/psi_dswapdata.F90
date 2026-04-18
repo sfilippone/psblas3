@@ -82,8 +82,61 @@
 submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   use psb_desc_const_mod, only: psb_swap_start_, psb_swap_wait_
   use psb_base_mod
+  use psb_error_mod, only: psb_get_debug_level, psb_get_debug_unit, psb_debug_ext_
   use psb_comm_factory_mod
+
+  logical, save :: psb_swap_timing_inited = .false.
+  logical, save :: psb_swap_timing_enabled = .false.
+  integer(psb_ipk_), save :: psb_swap_timing_max_report = 32
+  integer(psb_ipk_), save :: psb_swap_timing_report_count = 0
+  integer(psb_ipk_), save :: psb_swap_timing_wrapper_calls = 0
+  integer(psb_ipk_), save :: psb_swap_timing_baseline_calls = 0
+  integer(psb_ipk_), save :: psb_swap_timing_neighbor_calls = 0
+
 contains
+
+  subroutine psb_swap_timing_setup()
+    implicit none
+    character(len=64) :: env_buf
+    integer(psb_ipk_) :: env_len, env_status, ios
+
+    if (psb_swap_timing_inited) return
+
+    psb_swap_timing_inited = .true.
+    psb_swap_timing_enabled = .false.
+    psb_swap_timing_max_report = 32
+
+    call get_environment_variable('PSB_SWAP_TIMING', env_buf, length=env_len, status=env_status)
+    if ((env_status == 0) .and. (env_len > 0)) then
+      select case(env_buf(1:1))
+      case('1','t','T','y','Y')
+        psb_swap_timing_enabled = .true.
+      case default
+        psb_swap_timing_enabled = .false.
+      end select
+    end if
+
+    call get_environment_variable('PSB_SWAP_TIMING_MAX_REPORT', env_buf, length=env_len, status=env_status)
+    if ((env_status == 0) .and. (env_len > 0)) then
+      read(env_buf(1:env_len), *, iostat=ios) psb_swap_timing_max_report
+      if ((ios /= 0) .or. (psb_swap_timing_max_report < 1)) psb_swap_timing_max_report = 32
+    end if
+
+  end subroutine psb_swap_timing_setup
+
+  logical function psb_swap_timing_should_report()
+    implicit none
+
+    call psb_swap_timing_setup()
+
+    psb_swap_timing_should_report = .false.
+    if (.not. psb_swap_timing_enabled) return
+    if (psb_swap_timing_report_count >= psb_swap_timing_max_report) return
+
+    psb_swap_timing_report_count = psb_swap_timing_report_count + 1
+    psb_swap_timing_should_report = .true.
+  end function psb_swap_timing_should_report
+
   module subroutine psi_dswapdata_vect(swap_status,beta,y,desc_a,info,data)
 
 #ifdef PSB_MPI_MOD
@@ -103,8 +156,14 @@ contains
 
     ! locals
     type(psb_ctxt_type)                         :: ctxt
-    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, data_, err_act
+    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, data_
     class(psb_i_base_vect_type), pointer        :: comm_indexes
+    logical                                     :: debug_on
+    integer(psb_ipk_)                           :: dbg_unit
+    logical                                     :: timing_on, timing_report
+    real(psb_dpk_)                              :: t0, t1, t_get_list, t_kernel, t_total
+    integer(psb_ipk_)                           :: call_idx
+    character(len=24)                           :: phase_name, scheme_name, exchange_name
 
     ! communication scheme/status selectors
     logical                                     :: baseline, neighbor_a2av
@@ -126,6 +185,26 @@ contains
       goto 9999
     endif
 
+    debug_on = (psb_get_debug_level() >= psb_debug_ext_)
+    call psb_swap_timing_setup()
+    timing_on = psb_swap_timing_enabled
+    timing_report = .false.
+    if (timing_on) then
+      t_get_list = dzero
+      t_kernel   = dzero
+      t_total    = dzero
+      t0 = psb_wtime()
+      call_idx = psb_swap_timing_wrapper_calls + 1
+    end if
+
+    if (debug_on) then
+      dbg_unit = psb_get_debug_unit()
+      if (dbg_unit <= 0) dbg_unit = psb_err_unit
+      write(dbg_unit,*) me, trim(name), ': enter swap_status=', swap_status, &
+           & ' data=', data_, ' local_rows=', desc_a%get_local_rows(), &
+           & ' local_cols=', desc_a%get_local_cols(), ' y_nrows=', y%get_nrows()
+    end if
+
     if (.not.psb_is_asb_desc(desc_a)) then 
       info=psb_err_invalid_cd_state_
       call psb_errpush(info,name)
@@ -138,17 +217,19 @@ contains
       data_ = psb_comm_halo_
     end if
 
+    if (timing_on) t1 = psb_wtime()
     call desc_a%get_list_p(data_,comm_indexes,num_neighbors,total_recv,total_send,info) 
+    if (timing_on) t_get_list = psb_wtime() - t1
     if (info /= psb_success_) then 
       call psb_errpush(psb_err_internal_error_,name,a_err='desc_a%get_list_p')
       goto 9999
     end if
 
-    ! Debug: report list sizes
-    ! if(me == 0) then 
-    !   write(psb_err_unit,*) me, 'DBG: get_list_p -> num_neighbors=', &
-    !   & num_neighbors, ' total_send=', total_send, ' total_recv=', total_recv
-    ! end if
+    if (debug_on) then
+      write(dbg_unit,*) me, trim(name), ': list_p num_neighbors=', num_neighbors, &
+           & ' total_send=', total_send, ' total_recv=', total_recv, &
+           & ' comm_indexes_size=', size(comm_indexes%v)
+    end if
 
 
     if( (swap_status /= psb_comm_status_start_).and.(swap_status /= psb_comm_status_wait_)&
@@ -181,6 +262,11 @@ contains
       goto 9999
     end if
 
+    if (debug_on) then
+      write(dbg_unit,*) me, trim(name), ': comm_type=', y%comm_handle%comm_type, &
+           & ' swap_status=', swap_status
+    end if
+
     ! if(me == 0) then
     !   write(psb_err_unit,*) me, 'DBG: after set_swap_status, info=', info
     ! end if
@@ -199,14 +285,18 @@ contains
     ! end if
 
     if (baseline) then 
+      if (timing_on) t1 = psb_wtime()
       call psi_dswap_baseline_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (timing_on) t_kernel = psb_wtime() - t1
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='baseline swap')
         goto 9999
       end if
     else if (neighbor_a2av) then 
+      if (timing_on) t1 = psb_wtime()
       call psi_dswap_neighbor_topology_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,&
         & total_send,total_recv,y%comm_handle,info)
+      if (timing_on) t_kernel = psb_wtime() - t1
       if (info /= psb_success_) then 
         call psb_errpush(info,name,a_err='neighbor a2av swap')
         goto 9999
@@ -215,6 +305,45 @@ contains
       info = psb_err_mpi_error_
       call psb_errpush(info,name,a_err='Incompatible swap_status settings: neither baseline nor neighbor_a2av is true')
       goto 9999
+    end if
+
+    if (timing_on) then
+      t_total = psb_wtime() - t0
+      call psb_amx(ctxt, t_get_list)
+      call psb_amx(ctxt, t_kernel)
+      call psb_amx(ctxt, t_total)
+      if (me == psb_root_) timing_report = psb_swap_timing_should_report()
+      if ((me == psb_root_) .and. timing_report) then
+        psb_swap_timing_wrapper_calls = call_idx
+        select case(swap_status)
+        case(psb_comm_status_start_)
+          phase_name = 'start'
+        case(psb_comm_status_wait_)
+          phase_name = 'wait'
+        case(psb_comm_status_sync_)
+          phase_name = 'sync'
+        case default
+          phase_name = 'unknown'
+        end select
+        if (baseline) then
+          scheme_name = 'baseline'
+        else
+          if (y%comm_handle%comm_type == psb_comm_persistent_ineighbor_alltoallv_) then
+            scheme_name = 'persistent_neighbor'
+          else
+            scheme_name = 'neighbor'
+          end if
+        end if
+        if (call_idx == 1) then
+          exchange_name = 'first'
+        else
+          exchange_name = 'steady'
+        end if
+        write(psb_out_unit,'("SWAP_TIMING wrapper scheme=",a,", phase=",a,", exchange=",a,", call=",i0)') &
+             & trim(scheme_name), trim(phase_name), trim(exchange_name), call_idx
+        write(psb_out_unit,'("  get_list=",es12.5,", kernel=",es12.5,", total=",es12.5)') &
+             & t_get_list, t_kernel, t_total
+      end if
     end if
 
     call psb_erractionrestore(err_act)
@@ -253,8 +382,15 @@ contains
     integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
         & snd_pt, rcv_pt, pnti, n
     logical :: do_send,do_recv
-    logical, parameter :: usersend=.false., debug=.false.
+    logical, parameter :: usersend=.false.
+    logical                                     :: debug
+    logical                                     :: timing_on, timing_report
+    integer(psb_ipk_)                           :: dbg_unit
     character(len=20)  :: name
+    real(psb_dpk_)                              :: t0, t1
+    real(psb_dpk_)                              :: t_buf, t_gth, t_post, t_wait, t_sct, t_dev, t_total
+    integer(psb_ipk_)                           :: call_idx
+    character(len=12)                           :: exchange_name
 
     info = psb_success_
     name = 'psi_dswap_baseline_vect'
@@ -267,6 +403,24 @@ contains
     endif
 
     icomm = ctxt%get_mpic()
+
+    debug = (psb_get_debug_level() >= psb_debug_ext_)
+    call psb_swap_timing_setup()
+    timing_on = psb_swap_timing_enabled
+    timing_report = .false.
+    if (timing_on) then
+      t_buf = dzero
+      t_gth = dzero
+      t_post = dzero
+      t_wait = dzero
+      t_sct = dzero
+      t_dev = dzero
+      t_total = dzero
+      t0 = psb_wtime()
+      call_idx = psb_swap_timing_baseline_calls + 1
+    end if
+    dbg_unit = psb_get_debug_unit()
+    if (dbg_unit <= 0) dbg_unit = psb_err_unit
 
     baseline_comm_handle => null()
     select type(ch => comm_handle)
@@ -292,7 +446,7 @@ contains
     total_send_ = total_send * n
     call comm_indexes%sync()
 
-    if (debug) write(*,*) me,'Internal buffer'
+    if (debug) write(dbg_unit,*) me,'Internal buffer'
     if (do_send) then 
       if (allocated(baseline_comm_handle%comid)) then
         if (any(baseline_comm_handle%comid /= mpi_request_null)) then 
@@ -304,13 +458,16 @@ contains
           goto 9999
         end if
       end if
-      if (debug) write(*,*) me,'do_send start'
+      if (debug) write(dbg_unit,*) me,'do_send start'
+      if (timing_on) t1 = psb_wtime()
       call y%new_buffer(ione*size(comm_indexes%v),info)
       call psb_realloc(num_neighbors,2_psb_ipk_,baseline_comm_handle%comid,info)
       baseline_comm_handle%comid = mpi_request_null
       call psb_realloc(num_neighbors,prcid,info)
+      if (timing_on) t_buf = t_buf + (psb_wtime() - t1)
       ! First I post all the non blocking receives
       pnti   = 1
+      if (timing_on) t1 = psb_wtime()
       do i=1, num_neighbors
         proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
         nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
@@ -319,7 +476,7 @@ contains
         rcv_pt = 1+pnti+psb_n_elem_recv_
         prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
         if ((nerv>0).and.(proc_to_comm /= me)) then 
-          if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
+          if (debug) write(dbg_unit,*) me,'Posting receive from',prcid(i),rcv_pt
           p2ptag = psb_double_swap_tag
             call mpi_irecv(y%combuf(rcv_pt),nerv,&
               & psb_mpi_r_dpk_,prcid(i),&
@@ -327,11 +484,13 @@ contains
         end if
         pnti   = pnti + nerv + nesd + 3
       end do
-      if (debug) write(*,*) me,' Gather '
+      if (timing_on) t_post = t_post + (psb_wtime() - t1)
+      if (debug) write(dbg_unit,*) me,' Gather '
       !
       ! Then gather for sending.
       !    
       pnti   = 1
+      if (timing_on) t1 = psb_wtime()
       do i=1, num_neighbors
         nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
         nesd = comm_indexes%v(pnti+nerv+psb_n_elem_send_)
@@ -351,13 +510,16 @@ contains
         call y%gth(idx_pt,nesd,comm_indexes)
         pnti   = pnti + nerv + nesd + 3
       end do
+      if (timing_on) t_gth = t_gth + (psb_wtime() - t1)
 
       !
       ! Then wait 
       !
+      if (timing_on) t1 = psb_wtime()
       call y%device_wait()
+      if (timing_on) t_dev = t_dev + (psb_wtime() - t1)
 
-      if (debug) write(*,*) me,' isend'
+      if (debug) write(dbg_unit,*) me,' isend'
       !
       ! Then send
       !
@@ -366,6 +528,7 @@ contains
       snd_pt = 1
       rcv_pt = 1
       p2ptag = psb_double_swap_tag
+      if (timing_on) t1 = psb_wtime()
       do i=1, num_neighbors
         proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
         nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
@@ -387,10 +550,11 @@ contains
 
         pnti   = pnti + nerv + nesd + 3
       end do
+      if (timing_on) t_post = t_post + (psb_wtime() - t1)
     end if
 
     if (do_recv) then 
-      if (debug) write(*,*) me,' do_Recv'
+      if (debug) write(dbg_unit,*) me,' do_Recv'
       if (.not.allocated(baseline_comm_handle%comid)) then 
         ! 
         ! No matching send? Something is wrong....
@@ -401,9 +565,10 @@ contains
       end if
       call psb_realloc(num_neighbors,prcid,info)
 
-      if (debug) write(*,*) me,' wait'
+      if (debug) write(dbg_unit,*) me,' wait'
       pnti   = 1
       p2ptag = psb_double_swap_tag
+      if (timing_on) t1 = psb_wtime()
       do i=1, num_neighbors
         proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
         nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
@@ -438,11 +603,13 @@ contains
         end if
         pnti   = pnti + nerv + nesd + 3
       end do
+      if (timing_on) t_wait = t_wait + (psb_wtime() - t1)
 
-      if (debug) write(*,*) me,' scatter'      
+      if (debug) write(dbg_unit,*) me,' scatter'      
       pnti   = 1
       snd_pt = 1
       rcv_pt = 1
+      if (timing_on) t1 = psb_wtime()
       do i=1, num_neighbors
         proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
         nerv = comm_indexes%v(pnti+psb_n_elem_recv_)
@@ -462,11 +629,12 @@ contains
           goto 9999
         end if
 
-        if (debug) write(0,*)me,' Received from: ',prcid(i),&
+        if (debug) write(dbg_unit,*)me,' Received from: ',prcid(i),&
             & y%combuf(rcv_pt:rcv_pt+nerv-1)        
         call y%sct(rcv_pt,nerv,comm_indexes,beta)
         pnti   = pnti + nerv + nesd + 3
       end do
+      if (timing_on) t_sct = t_sct + (psb_wtime() - t1)
       !
       ! Waited for everybody, clean up
       !
@@ -475,9 +643,10 @@ contains
       !
       ! Then wait for device
       !
-      if (debug) write(*,*) me,' wait'
+      if (debug) write(dbg_unit,*) me,' wait'
+      if (timing_on) t1 = psb_wtime()
       call y%device_wait()
-      if (debug) write(*,*) me,' free buffer'
+      if (debug) write(dbg_unit,*) me,' free buffer'
       call y%maybe_free_buffer(info)
       if (info == 0) then
         if (allocated(y%comm_handle)) call y%comm_handle%free(info)
@@ -486,7 +655,33 @@ contains
         call psb_errpush(psb_err_alloc_dealloc_,name)
         goto 9999
       end if
-      if (debug) write(*,*) me,' done'
+      if (timing_on) t_dev = t_dev + (psb_wtime() - t1)
+      if (debug) write(dbg_unit,*) me,' done'
+    end if
+
+    if (timing_on) then
+      t_total = psb_wtime() - t0
+      call psb_amx(ctxt, t_buf)
+      call psb_amx(ctxt, t_gth)
+      call psb_amx(ctxt, t_post)
+      call psb_amx(ctxt, t_wait)
+      call psb_amx(ctxt, t_sct)
+      call psb_amx(ctxt, t_dev)
+      call psb_amx(ctxt, t_total)
+      if (me == psb_root_) timing_report = psb_swap_timing_should_report()
+      if ((me == psb_root_) .and. timing_report) then
+        psb_swap_timing_baseline_calls = call_idx
+        if (call_idx == 1) then
+          exchange_name = 'first'
+        else
+          exchange_name = 'steady'
+        end if
+        write(psb_out_unit,'("SWAP_TIMING baseline phase start=",l1,", wait=",l1)') do_send, do_recv
+        write(psb_out_unit,'("  exchange=",a,", call=",i0)') trim(exchange_name), call_idx
+        write(psb_out_unit,'("  buf=",es12.5,", gth=",es12.5,", post=",es12.5,", wait=",es12.5)') &
+             & t_buf, t_gth, t_post, t_wait
+        write(psb_out_unit,'("  sct=",es12.5,", dev=",es12.5,", total=",es12.5)') t_sct, t_dev, t_total
+      end if
     end if
 
 
@@ -526,8 +721,14 @@ contains
     type(psb_comm_neighbor_handle), pointer     :: neighbor_comm_handle
     integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
     logical                                     :: do_start, do_wait
-    logical, parameter                          :: debug = .false.
+    logical                                     :: debug
+    logical                                     :: timing_on, timing_report
+    integer(psb_ipk_)                           :: dbg_unit
     character(len=30)                           :: name
+    real(psb_dpk_)                              :: t0, t1
+    real(psb_dpk_)                              :: t_topo, t_buf, t_gth, t_init, t_post, t_wait, t_sct, t_dev, t_total
+    integer(psb_ipk_)                           :: call_idx
+    character(len=12)                           :: exchange_name
 
 
     info = psb_success_
@@ -541,6 +742,25 @@ contains
     endif
 
     icomm = ctxt%get_mpic()
+    dbg_unit = psb_get_debug_unit()
+    if (dbg_unit <= 0) dbg_unit = psb_err_unit
+    debug = (psb_get_debug_level() >= psb_debug_ext_)
+    call psb_swap_timing_setup()
+    timing_on = psb_swap_timing_enabled
+    timing_report = .false.
+    if (timing_on) then
+      t_topo = dzero
+      t_buf  = dzero
+      t_gth  = dzero
+      t_init = dzero
+      t_post = dzero
+      t_wait = dzero
+      t_sct  = dzero
+      t_dev  = dzero
+      t_total = dzero
+      t0 = psb_wtime()
+      call_idx = psb_swap_timing_neighbor_calls + 1
+    end if
 
     neighbor_comm_handle => null()
     select type(ch => comm_handle)
@@ -567,7 +787,7 @@ contains
     !  START phase: build topology (if needed), gather, post MPI
     ! ---------------------------------------------------------
     if (do_start) then
-      if(debug) write(*,*) me,' nbr_vect: starting data exchange'
+      if(debug) write(dbg_unit,*) me,' nbr_vect: starting data exchange'
       if (neighbor_comm_handle%use_persistent_buffers) then
         if (neighbor_comm_handle%persistent_in_flight) then
           info = psb_err_mpi_error_
@@ -576,8 +796,10 @@ contains
         end if
       end if
       if (.not. neighbor_comm_handle%is_initialized) then
-        if (debug) write(*,*) me,' nbr_vect: building topology via handle'
+        if (debug) write(dbg_unit,*) me,' nbr_vect: building topology via handle'
+        if (timing_on) t1 = psb_wtime()
         call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
+        if (timing_on) t_topo = t_topo + (psb_wtime() - t1)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_internal_error_, name, a_err='neighbor_topology_init')
           goto 9999
@@ -592,6 +814,7 @@ contains
       buffer_size = topology_total_send + topology_total_recv
 
       if (buffer_size > 0) then
+        if (timing_on) t1 = psb_wtime()
         if (neighbor_comm_handle%use_persistent_buffers) then
           if (.not. allocated(y%combuf)) then
             neighbor_comm_handle%diag_buffer_reallocs = neighbor_comm_handle%diag_buffer_reallocs + 1
@@ -633,13 +856,16 @@ contains
             goto 9999
           end if
         end if
+        if (timing_on) t_buf = t_buf + (psb_wtime() - t1)
         neighbor_comm_handle%comm_request = mpi_request_null
 
         ! Gather send data into contiguous send buffer (polymorphic for GPU)
         if (debug) write(*,*) me,' nbr_vect: gathering send data,', topology_total_send,' elems'
+        if (timing_on) t1 = psb_wtime()
         call y%gth(int(topology_total_send,psb_mpk_), &
             & neighbor_comm_handle%send_indexes, &
             & y%combuf(1:topology_total_send))
+        if (timing_on) t_gth = t_gth + (psb_wtime() - t1)
       else
         ! No data to send/recv: ensure requests/buffers indicate idle state
         neighbor_comm_handle%comm_request = mpi_request_null
@@ -648,7 +874,9 @@ contains
       end if
 
       ! Wait for device (important for GPU subclasses)
+      if (timing_on) t1 = psb_wtime()
       call y%device_wait()
+      if (timing_on) t_dev = t_dev + (psb_wtime() - t1)
 
       if (neighbor_comm_handle%use_persistent_buffers) then
         ! Lazy persistent-init: build the request once, then reuse with START/WAIT.
@@ -656,6 +884,7 @@ contains
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
           if (buffer_size > 0) then
             if (debug) write(*,*) me,' nbr_vect: posting MPI_Neighbor_alltoallv_init'
+            if (timing_on) t1 = psb_wtime()
             call mpi_neighbor_alltoallv_init( &
                 & y%combuf(1),                          &  ! send buffer
                 & neighbor_comm_handle%send_counts,     &
@@ -668,6 +897,7 @@ contains
                 & neighbor_comm_handle%graph_comm,      &
                 & mpi_info_null,                        &
                 & neighbor_comm_handle%persistent_request, iret)
+              if (timing_on) t_init = t_init + (psb_wtime() - t1)
             if (iret /= mpi_success) then
               info = psb_err_mpi_error_
               call psb_errpush(info, name, m_err=(/iret/))
@@ -689,7 +919,9 @@ contains
 
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
         if (buffer_size > 0) then
+          if (timing_on) t1 = psb_wtime()
           call mpi_start(neighbor_comm_handle%persistent_request, iret)
+          if (timing_on) t_post = t_post + (psb_wtime() - t1)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info, name, m_err=(/iret/))
@@ -702,6 +934,7 @@ contains
         end if
 #else
         if (buffer_size > 0) then
+          if (timing_on) t1 = psb_wtime()
           call mpi_ineighbor_alltoallv( &
               & y%combuf(1),                        &  ! send buffer
               & neighbor_comm_handle%send_counts,     &
@@ -713,6 +946,7 @@ contains
               & psb_mpi_r_dpk_,                     &
               & neighbor_comm_handle%graph_comm,      &
               & neighbor_comm_handle%comm_request, iret)
+              if (timing_on) t_post = t_post + (psb_wtime() - t1)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info, name, m_err=(/iret/))
@@ -728,6 +962,7 @@ contains
         ! Post non-blocking neighborhood alltoallv
         if (debug) write(*,*) me,' nbr_vect: posting MPI_Ineighbor_alltoallv'
         if (buffer_size > 0) then
+          if (timing_on) t1 = psb_wtime()
           call mpi_ineighbor_alltoallv( &
               & y%combuf(1),                        &  ! send buffer
               & neighbor_comm_handle%send_counts,     &
@@ -739,6 +974,7 @@ contains
               & psb_mpi_r_dpk_,                     &
               & neighbor_comm_handle%graph_comm,      &
               & neighbor_comm_handle%comm_request, iret)
+              if (timing_on) t_post = t_post + (psb_wtime() - t1)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info, name, m_err=(/iret/))
@@ -788,6 +1024,7 @@ contains
       if ((topology_total_send + topology_total_recv) > 0) then
         ! Wait for the non-blocking collective to complete
         if (debug) write(*,*) me,' nbr_vect: waiting on MPI request'
+        if (timing_on) t1 = psb_wtime()
         if (neighbor_comm_handle%use_persistent_buffers) then
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
           call mpi_wait(neighbor_comm_handle%persistent_request, p2pstat, iret)
@@ -797,6 +1034,7 @@ contains
         else
           call mpi_wait(neighbor_comm_handle%comm_request, p2pstat, iret)
         end if
+        if (timing_on) t_wait = t_wait + (psb_wtime() - t1)
         if (iret /= mpi_success) then
           info = psb_err_mpi_error_
           call psb_errpush(info, name, m_err=(/iret/))
@@ -811,10 +1049,12 @@ contains
 
         ! Scatter received data to local vector positions (polymorphic for GPU)
         if (debug) write(*,*) me,' nbr_vect: scattering recv data,', topology_total_recv,' elems'
+        if (timing_on) t1 = psb_wtime()
         call y%sct(int(topology_total_recv,psb_mpk_), &
             & neighbor_comm_handle%recv_indexes, &
             & y%combuf(topology_total_send+1:topology_total_send+topology_total_recv), &
             & beta)
+        if (timing_on) t_sct = t_sct + (psb_wtime() - t1)
       else
         ! nothing to wait/scatter
       end if
@@ -825,6 +1065,7 @@ contains
         & (neighbor_comm_handle%use_persistent_buffers .and. .not. neighbor_comm_handle%persistent_request_ready)) then
         neighbor_comm_handle%comm_request = mpi_request_null
       end if
+      if (timing_on) t1 = psb_wtime()
       call y%device_wait()
       if (.not. neighbor_comm_handle%use_persistent_buffers) then
         call y%maybe_free_buffer(info)
@@ -833,9 +1074,42 @@ contains
           goto 9999
         end if
       end if
+      if (timing_on) t_dev = t_dev + (psb_wtime() - t1)
       if (debug) write(*,*) me,' nbr_vect: done'
 
     end if ! do_wait
+
+    if (timing_on) then
+      t_total = psb_wtime() - t0
+      call psb_amx(ctxt, t_topo)
+      call psb_amx(ctxt, t_buf)
+      call psb_amx(ctxt, t_gth)
+      call psb_amx(ctxt, t_init)
+      call psb_amx(ctxt, t_post)
+      call psb_amx(ctxt, t_wait)
+      call psb_amx(ctxt, t_sct)
+      call psb_amx(ctxt, t_dev)
+      call psb_amx(ctxt, t_total)
+      if (me == psb_root_) timing_report = psb_swap_timing_should_report()
+      if ((me == psb_root_) .and. timing_report) then
+        psb_swap_timing_neighbor_calls = call_idx
+        if (call_idx == 1) then
+          exchange_name = 'first'
+        else
+          exchange_name = 'steady'
+        end if
+        if (neighbor_comm_handle%use_persistent_buffers) then
+          write(psb_out_unit,'("SWAP_TIMING persistent_neighbor phase start=",l1,", wait=",l1)') do_start, do_wait
+        else
+          write(psb_out_unit,'("SWAP_TIMING neighbor phase start=",l1,", wait=",l1)') do_start, do_wait
+        end if
+        write(psb_out_unit,'("  exchange=",a,", call=",i0)') trim(exchange_name), call_idx
+        write(psb_out_unit,'("  topo=",es12.5,", buf=",es12.5,", gth=",es12.5,", init=",es12.5)') &
+             & t_topo, t_buf, t_gth, t_init
+        write(psb_out_unit,'("  post=",es12.5,", wait=",es12.5,", sct=",es12.5,", dev=",es12.5,", total=",es12.5)') &
+             & t_post, t_wait, t_sct, t_dev, t_total
+      end if
+    end if
 
     call psb_erractionrestore(err_act)
     return
