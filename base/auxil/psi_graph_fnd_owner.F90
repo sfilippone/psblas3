@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -121,7 +121,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
   call psb_erractionsave(err_act)
 
   ctxt   = idxmap%get_ctxt()
-  icomm  = idxmap%get_mpic()
+  icomm  = ctxt%get_mpic()
   mglob  = idxmap%get_gr()
   n_row  = idxmap%get_lr()
   n_col  = idxmap%get_lc()

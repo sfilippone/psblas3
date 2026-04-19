@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -83,10 +83,10 @@ subroutine psb_icdasb(desc,info,ext_hv,mold)
   debug_level = psb_get_debug_level()
 
   ctxt   = desc%get_context()
+  icomm   = ctxt%get_mpic()
   dectype = desc%get_dectype()
   n_row   = desc%get_local_rows()
   n_col   = desc%get_local_cols()
-  icomm   = desc%get_mpic()
   if ((do_timings).and.(idx_total==-1))       &
        & idx_total = psb_get_timer_idx("ICDASB: total ")
   if ((do_timings).and.(idx_phase1==-1))       &

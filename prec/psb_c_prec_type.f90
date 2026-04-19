@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -85,7 +85,7 @@ module psb_c_prec_type
            & psb_c_base_sparse_mat, psb_spk_, psb_c_base_vect_type, &
            & psb_cprec_type, psb_i_base_vect_type
       implicit none
-      type(psb_cspmat_type), intent(in), target    :: a
+      type(psb_cspmat_type), intent(inout), target :: a
       type(psb_desc_type), intent(inout), target     :: desc_a
       class(psb_cprec_type), intent(inout), target :: prec
       integer(psb_ipk_), intent(out)               :: info

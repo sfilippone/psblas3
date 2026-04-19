@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -31,11 +31,11 @@
 !    
 module psi_s_comm_a_mod
   use psi_penv_mod, only : psb_ctxt_type
-  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, psb_spk_, psb_i_base_vect_type
+  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, &
+       & psb_spk_, psb_i_base_vect_type
 
   interface psi_swapdata
-    subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
@@ -44,8 +44,7 @@ module psi_s_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_sswapdatam
-    subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       real(psb_spk_)           :: y(:), beta 
@@ -53,11 +52,9 @@ module psi_s_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_sswapdatav
-      subroutine psi_sswapidxm(ctxt,icomm,flag,n,beta,y,idx,&
+    module subroutine psi_sswapidxm(ctxt,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_mpk_), intent(in)   :: n
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
@@ -65,11 +62,9 @@ module psi_s_comm_a_mod
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_sswapidxm
-    subroutine psi_sswapidxv(ctxt,icomm,flag,beta,y,idx,&
+    module subroutine psi_sswapidxv(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_Mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
       real(psb_spk_)        :: y(:), beta
@@ -80,8 +75,7 @@ module psi_s_comm_a_mod
 
 
   interface psi_swaptran
-    subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_sswaptranm(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_Mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(out)        :: info
@@ -90,8 +84,7 @@ module psi_s_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_sswaptranm
-    subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
       real(psb_spk_)           :: y(:), beta
@@ -99,11 +92,9 @@ module psi_s_comm_a_mod
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_sswaptranv
-    subroutine psi_stranidxm(ctxt,icomm,flag,n,beta,y,idx,&
+    module subroutine psi_stranidxm(ctxt,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_mpk_), intent(in)   :: n
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
@@ -111,11 +102,9 @@ module psi_s_comm_a_mod
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_stranidxm
-    subroutine psi_stranidxv(ctxt,icomm,flag,beta,y,idx,&
+    module subroutine psi_stranidxv(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
       real(psb_spk_)        :: y(:), beta
@@ -123,17 +112,15 @@ module psi_s_comm_a_mod
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_stranidxv
   end interface psi_swaptran
-
+ 
   interface psi_ovrl_upd
-    subroutine  psi_sovrl_updr1(x,desc_a,update,info)
-      import 
+    module subroutine  psi_sovrl_updr1(x,desc_a,update,info)
       real(psb_spk_), intent(inout), target :: x(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(in)    :: update
       integer(psb_ipk_), intent(out)   :: info
     end subroutine psi_sovrl_updr1
-    subroutine  psi_sovrl_updr2(x,desc_a,update,info)
-      import 
+    module subroutine  psi_sovrl_updr2(x,desc_a,update,info)
       real(psb_spk_), intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer(psb_ipk_), intent(in)      :: update
@@ -142,15 +129,13 @@ module psi_s_comm_a_mod
   end interface psi_ovrl_upd
 
   interface psi_ovrl_save
-    subroutine  psi_sovrl_saver1(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_sovrl_saver1(x,xs,desc_a,info)
       real(psb_spk_), intent(inout) :: x(:)
       real(psb_spk_), allocatable   :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)   :: info
     end subroutine psi_sovrl_saver1
-    subroutine  psi_sovrl_saver2(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_sovrl_saver2(x,xs,desc_a,info)
       real(psb_spk_), intent(inout) :: x(:,:)
       real(psb_spk_), allocatable   :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
@@ -159,15 +144,13 @@ module psi_s_comm_a_mod
   end interface psi_ovrl_save
 
   interface psi_ovrl_restore
-    subroutine  psi_sovrl_restrr1(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_sovrl_restrr1(x,xs,desc_a,info)
       real(psb_spk_), intent(inout)  :: x(:)
       real(psb_spk_)                 :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)   :: info
     end subroutine psi_sovrl_restrr1
-    subroutine  psi_sovrl_restrr2(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_sovrl_restrr2(x,xs,desc_a,info)
       real(psb_spk_), intent(inout) :: x(:,:)
       real(psb_spk_)                :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -32,143 +32,143 @@
 ! Subroutine: psi_dovrl_update
 !   These subroutines update the overlap region of a vector; they are  used
 !   for the transpose  matrix-vector product when there is a nonempty overlap,
-!   or for the application of Additive Schwarz preconditioners.                                           
+!   or for the application of Additive Schwarz preconditioners.                    
 !    
 !    
-subroutine  psi_dovrl_updr1(x,desc_a,update,info)
-  use psi_mod, psi_protect_name =>   psi_dovrl_updr1
+submodule (psi_d_comm_a_mod)  psi_d_ovrl_upd_a_impl
+  use psb_base_mod
+contains
+  module subroutine  psi_dovrl_updr1(x,desc_a,update,info)
+    implicit none
 
-  implicit none
+    real(psb_dpk_), intent(inout), target :: x(:)
+    type(psb_desc_type), intent(in)         :: desc_a
+    integer(psb_ipk_), intent(in)                     :: update
+    integer(psb_ipk_), intent(out)                    :: info
 
-  real(psb_dpk_), intent(inout), target :: x(:)
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer(psb_ipk_), intent(in)                     :: update
-  integer(psb_ipk_), intent(out)                    :: info
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me, err_act, i, idx, ndm
+    integer(psb_ipk_) :: ierr(5)
+    character(len=20) :: name, ch_err
 
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20) :: name, ch_err
+    name='psi_dovrl_updr1'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  name='psi_dovrl_updr1'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    ! switch on update type
+    select case (update)
+    case(psb_square_root_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx) = x(idx)/real(ndm)
+      end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx) = dzero
+      end do
+    case(psb_sum_)
+      ! do nothing
 
-  ! switch on update type
-  select case (update)
-  case(psb_square_root_)
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      x(idx) = x(idx)/sqrt(real(ndm))
-    end do
-  case(psb_avg_)
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      x(idx) = x(idx)/real(ndm)
-    end do
-  case(psb_setzero_)
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      if (me /= desc_a%ovrlap_elem(i,3))&
-           & x(idx) = dzero
-    end do
-  case(psb_sum_)
-    ! do nothing
+    case default 
+      ! wrong value for choice argument
+      info = psb_err_iarg_invalid_value_
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end select
 
-  case default 
-    ! wrong value for choice argument
-    info = psb_err_iarg_invalid_value_
-    ierr(1) = 3; ierr(2)=update;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  end select
-
-  call psb_erractionrestore(err_act)
-  return  
+    call psb_erractionrestore(err_act)
+    return  
 
 9999 call psb_error_handler(ctxt,err_act)
 
-  return
-end subroutine psi_dovrl_updr1
+    return
+  end subroutine psi_dovrl_updr1
 
-subroutine  psi_dovrl_updr2(x,desc_a,update,info)
-  use psi_mod, psi_protect_name =>   psi_dovrl_updr2
+  module subroutine  psi_dovrl_updr2(x,desc_a,update,info)
+    implicit none
 
-  implicit none
+    real(psb_dpk_), intent(inout), target :: x(:,:)
+    type(psb_desc_type), intent(in)         :: desc_a
+    integer(psb_ipk_), intent(in)                     :: update
+    integer(psb_ipk_), intent(out)                    :: info
 
-  real(psb_dpk_), intent(inout), target :: x(:,:)
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer(psb_ipk_), intent(in)                     :: update
-  integer(psb_ipk_), intent(out)                    :: info
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me, err_act, i, idx, ndm
+    integer(psb_ipk_) :: ierr(5)
+    character(len=20) :: name, ch_err
 
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, ndm
-  integer(psb_ipk_) :: ierr(5)
-  character(len=20) :: name, ch_err
+    name='psi_dovrl_updr2'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  name='psi_dovrl_updr2'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    ! switch on update type
+    select case (update)
+    case(psb_square_root_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/sqrt(real(ndm))
+      end do
+    case(psb_avg_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        ndm = desc_a%ovrlap_elem(i,2)
+        x(idx,:) = x(idx,:)/real(ndm)
+      end do
+    case(psb_setzero_)
+      do i=1,size(desc_a%ovrlap_elem,1)
+        idx = desc_a%ovrlap_elem(i,1)
+        if (me /= desc_a%ovrlap_elem(i,3))&
+             & x(idx,:) = dzero
+      end do
+    case(psb_sum_)
+      ! do nothing
 
-  ! switch on update type
-  select case (update)
-  case(psb_square_root_)
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      x(idx,:) = x(idx,:)/sqrt(real(ndm))
-    end do
-  case(psb_avg_)
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      x(idx,:) = x(idx,:)/real(ndm)
-    end do
-  case(psb_setzero_)
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      if (me /= desc_a%ovrlap_elem(i,3))&
-           & x(idx,:) = dzero
-    end do
-  case(psb_sum_)
-    ! do nothing
+    case default 
+      ! wrong value for choice argument
+      info = psb_err_iarg_invalid_value_
+      ierr(1) = 3; ierr(2)=update;
+      call psb_errpush(info,name,i_err=ierr)
+      goto 9999
+    end select
 
-  case default 
-    ! wrong value for choice argument
-    info = psb_err_iarg_invalid_value_
-    ierr(1) = 3; ierr(2)=update;
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  end select
-
-  call psb_erractionrestore(err_act)
-  return  
+    call psb_erractionrestore(err_act)
+    return  
 
 9999 call psb_error_handler(ctxt,err_act)
 
-  return
-end subroutine psi_dovrl_updr2
+    return
+  end subroutine psi_dovrl_updr2
+end submodule psi_d_ovrl_upd_a_impl

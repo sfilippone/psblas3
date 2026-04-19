@@ -37,7 +37,10 @@ psb_i_t    psb_c_dgeasb_options(psb_c_dvector *xh, psb_c_descriptor *cdh, psb_i_
 psb_i_t	   psb_c_dgeasb_options_format(psb_c_dvector *xh, psb_c_descriptor *cdh,
 										psb_i_t dupl, const char *fmt);
 psb_i_t    psb_c_dgefree(psb_c_dvector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_dgereinit(psb_c_dvector *xh, psb_c_descriptor *cdh, bool clear);
 psb_d_t    psb_c_dgetelem(psb_c_dvector *xh,psb_l_t index,psb_c_descriptor *cd);
+psb_d_t	   psb_c_dmatgetelem(psb_c_dspmat *ah,psb_l_t rowindex,psb_l_t colindex,psb_c_descriptor *cdh);	
+
 
 /* sparse matrices*/
 psb_c_dspmat* psb_c_new_dspmat();

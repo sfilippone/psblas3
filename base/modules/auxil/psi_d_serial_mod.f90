@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -35,7 +35,7 @@ module psi_d_serial_mod
   interface psb_gelp 
     ! 2-D version
     subroutine psb_m_dgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       real(psb_dpk_), intent(inout)     :: x(:,:)
       integer(psb_mpk_), intent(in)      :: iperm(:)
@@ -43,7 +43,7 @@ module psi_d_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_dgelp
     subroutine psb_m_dgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_mpk_,psb_dpk_
+      import
       implicit none
       real(psb_dpk_), intent(inout)     :: x(:)
       integer(psb_mpk_), intent(in)      :: iperm(:)
@@ -51,7 +51,7 @@ module psi_d_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_dgelpv
     subroutine psb_e_dgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_epk_, psb_dpk_
+      import
       implicit none
       real(psb_dpk_), intent(inout)     :: x(:,:)
       integer(psb_epk_), intent(in)      :: iperm(:)
@@ -59,7 +59,7 @@ module psi_d_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_e_dgelp
     subroutine psb_e_dgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_epk_, psb_dpk_
+      import
       implicit none
       real(psb_dpk_), intent(inout)     :: x(:)
       integer(psb_epk_), intent(in)      :: iperm(:)
@@ -223,7 +223,7 @@ module psi_d_serial_mod
 
   interface psi_upd_xyz
     subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       real(psb_dpk_), intent(in)       :: x(:)
@@ -236,7 +236,7 @@ module psi_d_serial_mod
   
   interface psi_xyzw
     subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       real(psb_dpk_), intent(in)       :: x(:)
@@ -250,21 +250,21 @@ module psi_d_serial_mod
   
   interface psi_gth
     subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       real(psb_dpk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_dgthmv
     subroutine psi_dgthv(n,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       real(psb_dpk_) :: x(:), y(:),alpha,beta
     end subroutine psi_dgthv
     subroutine psi_dgthzmv(n,k,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -272,7 +272,7 @@ module psi_d_serial_mod
 
     end subroutine psi_dgthzmv
     subroutine psi_dgthzmm(n,k,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -280,8 +280,7 @@ module psi_d_serial_mod
 
     end subroutine psi_dgthzmm
     subroutine psi_dgthzv(n,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
-      implicit none
+      import
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       real(psb_dpk_) :: x(:), y(:)
@@ -290,21 +289,21 @@ module psi_d_serial_mod
 
   interface psi_sct
     subroutine psi_dsctmm(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       real(psb_dpk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_dsctmm
     subroutine psi_dsctmv(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       real(psb_dpk_) :: beta, x(:), y(:,:)
     end subroutine psi_dsctmv
     subroutine psi_dsctv(n,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
 
       integer(psb_mpk_) :: n
@@ -315,7 +314,7 @@ module psi_d_serial_mod
 
   interface psi_exscan
     subroutine psi_d_exscanv(n,x,info,shift)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: n
       real(psb_dpk_), intent(inout)    :: x(:)

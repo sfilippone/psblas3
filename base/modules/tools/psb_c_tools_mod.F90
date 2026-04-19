@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -440,6 +440,14 @@ Module psb_c_tools_mod
       import
       type(psb_c_vect_type), intent(inout) :: x
       integer(psb_lpk_), intent(in)          :: index
+      type(psb_desc_type), intent(inout)     :: desc_a
+      integer(psb_ipk_), intent(out)         :: info
+      complex(psb_spk_)                        :: res
+    end function
+    function psb_c_getmatelem(a,rowindex,colindex,desc_a,info) result(res)
+      import
+      type(psb_cspmat_type), intent(inout)   :: a
+      integer(psb_lpk_), intent(in)          :: rowindex, colindex
       type(psb_desc_type), intent(inout)     :: desc_a
       integer(psb_ipk_), intent(out)         :: info
       complex(psb_spk_)                        :: res

@@ -14,6 +14,7 @@ FOBJS = psb_cdall.o psb_cdals.o psb_cdalv.o psb_cd_inloc.o psb_cdins.o psb_cdprt
 	psb_dallc.o psb_dasb.o psb_dfree.o psb_dins.o \
 	psb_callc.o psb_casb.o psb_cfree.o psb_cins.o \
 	psb_zallc.o psb_zasb.o psb_zfree.o psb_zins.o \
+	psb_i2allc_a.o psb_i2asb_a.o psb_i2free_a.o psb_i2ins_a.o \
 	psb_mallc_a.o psb_masb_a.o psb_mfree_a.o psb_mins_a.o \
 	psb_eallc_a.o psb_easb_a.o psb_efree_a.o psb_eins_a.o \
 	psb_sallc_a.o psb_sasb_a.o psb_sfree_a.o psb_sins_a.o \
@@ -33,7 +34,7 @@ MPFOBJS = psb_icdasb.o psb_ssphalo.o  psb_dsphalo.o psb_csphalo.o psb_zsphalo.o 
 	psb_dcdbldext.o psb_zcdbldext.o psb_scdbldext.o psb_ccdbldext.o \
         psb_s_remote_mat.o psb_d_remote_mat.o psb_c_remote_mat.o psb_z_remote_mat.o \
         psb_s_remote_vect.o psb_d_remote_vect.o psb_c_remote_vect.o psb_z_remote_vect.o \
-        psb_e_remote_vect.o psb_m_remote_vect.o 
+        psb_e_remote_vect.o psb_m_remote_vect.o psb_i2_remote_vect.o 
 
 LIBDIR=..
 INCDIR=..

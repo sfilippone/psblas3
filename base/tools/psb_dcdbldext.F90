@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -117,7 +117,7 @@ Subroutine psb_dcdbldext(a,desc_a,novr,desc_ov,info, extype)
     goto 9999
   end if
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   Call psb_info(ctxt, me, np)
 
   If (debug_level >= psb_debug_outer_) &

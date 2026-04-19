@@ -19,7 +19,7 @@ set(PSB_cbind_source_files
   base/psb_c_psblas_cbind_mod.f90
   base/psb_d_comm_cbind_mod.f90
   base/psb_z_tools_cbind_mod.F90
-  base/psb_cpenv_mod.f90
+  base/psb_cpenv_mod.F90
   util/psb_c_util_cbind_mod.f90
   util/psb_s_util_cbind_mod.f90
   util/psb_util_cbind_mod.f90

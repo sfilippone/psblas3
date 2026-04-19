@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -127,7 +127,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -198,7 +198,7 @@ Subroutine psb_dsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
   
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
   lnr = 0
@@ -587,7 +587,7 @@ Subroutine psb_ldsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -658,7 +658,7 @@ Subroutine psb_ldsphalo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
 
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract and send/receive.
   lnr = 0 
@@ -931,7 +931,7 @@ Subroutine psb_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -1004,7 +1004,7 @@ Subroutine psb_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
   
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
   lnr = 0
@@ -1293,7 +1293,7 @@ Subroutine psb_d_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -1366,7 +1366,7 @@ Subroutine psb_d_ld_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
   idxs = 0
   idxr = 0
   
-  call desc_a%get_list(data_,pdxv,totxch,nxr,nxs,info)
+  call desc_a%get_list_p(data_,pdxv,totxch,nxr,nxs,info)
   ipdxv = pdxv%get_vect()
   ! For all rows in the halo descriptor, extract the row size
   lnr = 0

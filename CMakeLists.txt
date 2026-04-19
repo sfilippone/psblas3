@@ -4,7 +4,7 @@
 #-----------------------------------
 # Set oldest allowable CMake version
 #-----------------------------------
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.11...4.2)
 cmake_policy(VERSION 3.11.1...3.13.3)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -132,12 +132,10 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/CapitalizeString.cmake")
 message(STATUS "Using compiler ${CMAKE_C_COMPILER};")
 
 
-# Define Major and Minor Version and Patch Level, String Version
-set(PSBLASMAJOR "3")
-set(PSBLASMINOR "9")
-set(PSBLASPATCH "0")
-set(PSBLASSTRING "\"3.9.0\"")
-
+# Find PSBLAS constants
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/readPSBConst.cmake)
+_psb_read_const()
+_psb_read_desc_const()
 
 # Set default values for IPK_SIZE and LPK_SIZE
 set(DEFAULT_IPK_SIZE 4)
@@ -427,6 +425,7 @@ find_package(METIS)
 
 
 if(METIS_FOUND)
+  include(CheckTypeSize)
   message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
   # Make sure this path is correct
 #  set(METISINCFILE "metis.h")  # Adjust this to your actual path
@@ -444,6 +443,9 @@ if(METIS_FOUND)
   # Check for real sizes using try_compile
   include(CheckCSourceCompiles)
 
+
+
+#[=====[
   # Function to check the size of a type
   function(check_metis_real_type type_name)
     set(source_code "
@@ -455,25 +457,42 @@ if(METIS_FOUND)
     }")
 
     # Create a temporary source file
-    file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c" "${source_code}")
+    #file(WRITE "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c" "${source_code}")
 
     # Try to compile it
-    try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
-        "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c")
+    #try_compile(COMPILER_RESULT "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp"
+    #    "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size.c")
 
     # Check the result and read the output
-    if (COMPILER_RESULT)
+
+    set(test_file "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_metis_size.c")
+    file(WRITE "${test_file}" "${source_code}")
+
+    # Use try_run to compile AND execute
+    try_run(RUN_RESULT COMPILE_RESULT
+        "${CMAKE_BINARY_DIR}"
+        "${test_file}"
+        CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${METIS_INCLUDES}"
+        RUN_OUTPUT_VARIABLE type_size
+        COMPILE_OUTPUT_VARIABLE compile_log
+    )
+
+    if(COMPILE_RESULT AND (RUN_RESULT EQUAL 0))
+    # if (COMPILER_RESULT)
         execute_process(COMMAND "${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/test_size"
             OUTPUT_VARIABLE type_size)
         string(STRIP "${type_size}" type_size)
+        message(STATUS "Metis ?: ${type_size};")
         if (type_name STREQUAL "float")
             set(PSB_METIS_REAL_32 "${type_size}" PARENT_SCOPE)
+            message(STATUS "Metis 32: ${type_size}")
 	    #         add_definitions(-DPSB_METIS_REAL_32)
             set(CREALMETIS "#define PSB_METIS_REAL_32" PARENT_SCOPE)	
         elseif (type_name STREQUAL "double")
             set(PSB_METIS_REAL_64 "${type_size}" PARENT_SCOPE)
             #add_definitions(-DPSB_METIS_REAL_64)
-            set(CREALMETIS "#define PSB_METIS_REAL_64" PARENT_SCOPE)		    
+            set(CREALMETIS "#define PSB_METIS_REAL_64" PARENT_SCOPE)
+            message(STATUS "Metis 64: ${type_size}")		    
         endif()
     else()
         message(WARNING "Failed to compile test for type size: ${type_name}")
@@ -483,44 +502,65 @@ if(METIS_FOUND)
   # Check for both float and double
   check_metis_real_type(float)
   check_metis_real_type(double)
-
+#]=====]
   # Set HAVE_METIS if METIS is found
   #add_compile_options(-DPSB_HAVE_METIS)
   #  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DPSB_HAVE_METIS")
 
   
-  
-  
-  
-  
-  # Determine METIS_INDEX based on real type sizes
-  if(DEFINED PSB_METIS_REAL_32)
-    set(METIS_INDEX 32)
-  elseif(DEFINED PSB_METIS_REAL_64)
-    set(METIS_INDEX 64)
-  else()
-    message(WARNING "Neither METIS_REAL_32 nor METIS_REAL_64 is defined.")
-    set(METIS_INDEX 64)  # Default to 64 if not defined
-  endif()
+ # 1. Tell CMake where to find metis.h for the check
+set(CMAKE_EXTRA_INCLUDE_FILES "${METIS_INCLUDES}/metis.h")
 
-   # Check conditions for LPK_SIZE and METIS_INDEX
-  if(LPK_SIZE STREQUAL "4")
-    if(METIS_INDEX STREQUAL "64")
-        # Mismatch between METIS size and PSBLAS LPK
-      message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    set(METIS_FOUND  FALSE)  
+# 2. Check the size of Metis's own type: real_t
+# This replaces checking 'float' and 'double' separately
+check_type_size("real_t" METIS_REAL_SIZE)
+check_type_size("idx_t" METIS_IDX_SIZE)
+
+# 3. Handle the result
+if(METIS_IDX_SIZE)
+    if(METIS_IDX_SIZE EQUAL 4)
+        set(CINTMETIS "#define PSB_METIS_32")
+        message(STATUS "Metis detected as 32-bit (idx_t is 4 bytes)")
+	set(METIS_INDEX 32)
+    elseif(METIS_IDX_SIZE EQUAL 8)
+        set(CINTMETIS "#define PSB_METIS_64")
+        message(STATUS "Metis detected as 64-bit (idx_t is 8 bytes)")
+        set(METIS_INDEX 64)	
     endif()
-  endif()
-
-  if(LPK_SIZE STREQUAL "8")
-    if(METIS_INDEX STREQUAL "32")
-        # Mismatch between METIS size and PSBLAS LPK
-            message(FATAL " Mismatch between metis ${METIS_INDEX} size and psblas LPK size ${LPK_SIZE}")
-    set(METIS_FOUND  FALSE)
+else()
+    message(WARNING "Could not determine size of idx_t from metis.h. Check METIS_INCLUDES.")
+endif()
+# 3. Handle the result
+if(METIS_REAL_SIZE)
+    if(METIS_REAL_SIZE EQUAL 4)
+        set(CREALMETIS "#define PSB_METIS_REAL_32")
+        message(STATUS "Metis detected as 32-bit (real_t is 4 bytes)")
+    elseif(METIS_REAL_SIZE EQUAL 8)
+        set(CREALMETIS "#define PSB_METIS_REAL_64")
+        message(STATUS "Metis detected as 64-bit (real_t is 8 bytes)")
     endif()
-  endif()
+else()
+    message(WARNING "Could not determine size of real_t from metis.h. Check METIS_INCLUDES.")
+endif() 
+  
+# clean the variable
+set(CMAKE_EXTRA_INCLUDE_FILES "")
 
- if(METIS_FOUND)
+# Mismatch Logic Below 
+if(LPK_SIZE STREQUAL "4" AND METIS_INDEX EQUAL 64)
+    message(WARNING "Mismatch: Metis IDX  is 64-bit but PSBLAS LPK is 32-bit")
+    set(METIS_FOUND FALSE)
+    set(CREALMETIS "")
+    set(CINTMETIS "") 
+elseif(LPK_SIZE STREQUAL "8" AND METIS_INDEX EQUAL 32)
+    set(METIS_FOUND FALSE) 
+    message(WARNING "Mismatch: Metis IDX is 32-bit but PSBLAS LPK is    64-bit")
+    set(CREALMETIS "")
+    set(CINTMETIS "") 
+endif() 
+
+
+if(METIS_FOUND)
 
     # Make sure this path is correct
   set(METISINCFILE "metis.h")  # Adjust this to your actual path
@@ -539,7 +579,7 @@ if(METIS_FOUND)
 
    
   set(CHAVEMETIS "#define PSB_HAVE_METIS")
-  set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
+#  set(CINTMETIS "#define PSB_METIS_${METIS_INDEX}")
 #  set(CREALMETIS "#define PSB_METIS_REAL_${LPK_SIZE}")
   # Configure the header file
   configure_file(${HEADER_TEMPLATE} ${HEADER_OUTPUT} @ONLY)
@@ -644,7 +684,7 @@ install(EXPORT ${CMAKE_PROJECT_NAME}-targets
 include(CMakePackageConfigHelpers) # standard CMake module
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-  VERSION "${psblas_VERSION}"
+  VERSION "${VERSION}"
   COMPATIBILITY SameMajorVersion
   )
 
@@ -811,7 +851,7 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
 
 
 
-message(STATUS "fortran module direcotry ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+message(STATUS "fortran module directory ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
 
 
 include_directories(${MPI_Fortran_INCLUDE_PATH})
@@ -827,6 +867,7 @@ set_target_properties(base
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_base
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 
 target_include_directories(base PUBLIC
@@ -859,6 +900,7 @@ set_target_properties(prec
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_prec
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(prec PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -874,6 +916,7 @@ set_target_properties(linsolve
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_linsolve
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(linsolve PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -890,6 +933,7 @@ set_target_properties(ext
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_ext
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(ext PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -909,7 +953,8 @@ if(WIN32)
     set_target_properties(psb_util_C
       PROPERTIES
       LINKER_LANGUAGE C
-      POSITION_INDEPENDENT_CODE TRUE)
+      POSITION_INDEPENDENT_CODE TRUE
+      VERSION ${VERSION} SOVERSION ${SOVERSION})
     target_link_libraries(psb_util_C
       PUBLIC kernel32 user32 shell32)
   endif()
@@ -935,6 +980,7 @@ set_target_properties(util
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_util
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 target_include_directories(util PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -995,6 +1041,7 @@ set_target_properties(cbind
   POSITION_INDEPENDENT_CODE TRUE
   OUTPUT_NAME psb_cbind
   LINKER_LANGUAGE Fortran
+  VERSION ${VERSION} SOVERSION ${SOVERSION}
   )
 #target_include_directories(cbind PUBLIC
 #  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>
@@ -1141,6 +1188,7 @@ if(PSB_BUILD_CUDA)
         PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE
         OUTPUT_NAME psb_cuda
+        VERSION ${VERSION} SOVERSION ${SOVERSION}
 	LINKER_LANGUAGE C)
     
     # Include directories for the CUDA library

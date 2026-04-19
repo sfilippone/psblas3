@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -34,98 +34,100 @@
 !   for the transpose  matrix-vector product when there is a nonempty overlap.
 !                                              
 !    
-subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_zovrl_restrr1
+submodule (psi_z_comm_a_mod)  psi_z_ovrl_restr_a_impl
+  use psb_base_mod
+contains
+  module subroutine  psi_zovrl_restrr1(x,xs,desc_a,info)
 
-  implicit none
+    implicit none
 
-  complex(psb_dpk_), intent(inout)  :: x(:)
-  complex(psb_dpk_)                 :: xs(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
+    complex(psb_dpk_), intent(inout)  :: x(:)
+    complex(psb_dpk_)                 :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer(psb_ipk_), intent(out)             :: info
 
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, isz
-  character(len=20) :: name, ch_err
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
 
-  name='psi_zovrl_restrr1'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    name='psi_zovrl_restrr1'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  isz = size(desc_a%ovrlap_elem,1)
+    isz = size(desc_a%ovrlap_elem,1)
 
-  do i=1, isz
-    idx    = desc_a%ovrlap_elem(i,1)
-    x(idx) = xs(i) 
-  end do
+    do i=1, isz
+      idx    = desc_a%ovrlap_elem(i,1)
+      x(idx) = xs(i) 
+    end do
 
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-end subroutine psi_zovrl_restrr1
-
-subroutine  psi_zovrl_restrr2(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_zovrl_restrr2
-
-  implicit none
-
-  complex(psb_dpk_), intent(inout)  :: x(:,:)
-  complex(psb_dpk_)                 :: xs(:,:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
-
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, isz
-  character(len=20) :: name, ch_err
-
-  name='psi_zovrl_restrr2'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (size(x,2) /= size(xs,2)) then 
-    info = psb_err_internal_error_
-    call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
-    goto 9999
-  endif
-
-
-  isz = size(desc_a%ovrlap_elem,1)
-
-  do i=1, isz
-    idx      = desc_a%ovrlap_elem(i,1)
-    x(idx,:) = xs(i,:) 
-  end do
-
-  call psb_erractionrestore(err_act)
-  return  
+    call psb_erractionrestore(err_act)
+    return  
 
 9999 call psb_error_handler(ctxt,err_act)
 
-  return
-end subroutine psi_zovrl_restrr2
+    return
+  end subroutine psi_zovrl_restrr1
+
+  module subroutine  psi_zovrl_restrr2(x,xs,desc_a,info)
+
+    implicit none
+
+    complex(psb_dpk_), intent(inout)  :: x(:,:)
+    complex(psb_dpk_)                 :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer(psb_ipk_), intent(out)             :: info
+
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_restrr2'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    if (size(x,2) /= size(xs,2)) then 
+      info = psb_err_internal_error_
+      call psb_errpush(info,name, a_err='Mismacth columns X vs XS')
+      goto 9999
+    endif
+
+
+    isz = size(desc_a%ovrlap_elem,1)
+
+    do i=1, isz
+      idx      = desc_a%ovrlap_elem(i,1)
+      x(idx,:) = xs(i,:) 
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_zovrl_restrr2
+end submodule psi_z_ovrl_restr_a_impl
 

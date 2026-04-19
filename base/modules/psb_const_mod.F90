@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -335,16 +335,10 @@ module psb_const_mod
     integer(psb_mpk_), allocatable :: ctxt
   contains
     procedure, pass(ctxt) :: get_i_ctxt => psb_get_i_ctxt
+    procedure, pass(ctxt) :: get_mpic   => get_mpic
+    procedure, pass(ctxt) :: set_mpic   => set_mpic
   end type psb_ctxt_type
   logical, parameter :: try_newins=.true.
-
-  ! Interface for dispach of axpy-like operations.
-  interface get_axpbylike_code
-    module procedure get_axpbylike_code1
-    module procedure get_axpbylike_code2
-    module procedure get_axpbylike_code3
-  end interface get_axpbylike_code
-
 contains
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
@@ -371,8 +365,27 @@ contains
       ictxt = ctxt%ctxt
       info = psb_success_
     end if
-
   end subroutine psb_get_i_ctxt
+  
+  function get_mpic(ctxt) result(val)
+    implicit none 
+    integer(psb_mpk_) :: val 
+    class(psb_ctxt_type), intent(in) :: ctxt
+
+    if (allocated(ctxt%ctxt)) then
+      val = ctxt%ctxt
+    else
+      val = -1
+    end if
+  end function get_mpic
+  
+  subroutine set_mpic(ctxt,val)
+    implicit none 
+    integer(psb_mpk_) :: val 
+    class(psb_ctxt_type), intent(inout) :: ctxt
+
+    ctxt%ctxt = val
+  end subroutine set_mpic
 
   function get_axpbylike_code1(var) result(code)
     real(psb_dpk_), intent(in) :: var

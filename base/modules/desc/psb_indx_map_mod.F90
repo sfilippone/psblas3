@@ -15,7 +15,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -109,8 +109,6 @@ module psb_indx_map_mod
     integer(psb_ipk_)   :: state        = psb_desc_null_    
     !> Communication context
     type(psb_ctxt_type) :: ctxt        
-    !> MPI communicator
-    integer(psb_mpk_)   :: mpic         = -1
     !> Number of global rows
     integer(psb_lpk_)   :: global_rows  = -1
     !> Number of global columns
@@ -177,9 +175,7 @@ module psb_indx_map_mod
     procedure, pass(idxmap)  :: xtnd_p_adjcncy  => base_xtnd_p_adjcncy
     
     procedure, pass(idxmap)  :: set_ctxt  => base_set_ctxt
-    procedure, pass(idxmap)  :: set_mpic  => base_set_mpic
     procedure, pass(idxmap)  :: get_ctxt  => base_get_ctxt
-    procedure, pass(idxmap)  :: get_mpic  => base_get_mpic
     procedure, pass(idxmap)  :: sizeof    => base_sizeof
     procedure, pass(idxmap)  :: set_null  => base_set_null
     procedure, nopass        :: row_extendable => base_row_extendable
@@ -247,11 +243,11 @@ module psb_indx_map_mod
   private :: base_get_state, base_set_state, base_is_repl, base_is_bld,&
        & base_is_upd, base_is_asb, base_is_valid, base_is_ovl,&
        & base_get_gr, base_get_gc, base_get_lr, base_get_lc, base_get_ctxt,&
-       & base_get_mpic, base_sizeof, base_set_null, &
+       & base_sizeof, base_set_null, &
        & base_set_grl, base_set_gcl, &
        & base_set_lri, base_set_lci, base_set_lrl, base_set_lcl, &
        & base_inc_lc, base_set_ctxt,&
-       & base_set_mpic, base_get_fmt, base_asb, base_free,&
+       & base_get_fmt, base_asb, base_free,&
        & base_l2gs1, base_l2gs2, base_l2gv1, base_l2gv2,&
        & base_g2ls1, base_g2ls2, base_g2lv1, base_g2lv2,&
        & base_g2ls1_ins, base_g2ls2_ins, base_g2lv1_ins, base_g2lv2_ins, &
@@ -263,6 +259,7 @@ module psb_indx_map_mod
        & base_set_halo_owner, base_get_halo_owner, &
        & base_qry_halo_owner_s, base_qry_halo_owner_v,&
        & base_get_p_adjcncy, base_set_p_adjcncy, base_xtnd_p_adjcncy
+
   
   !> Function: psi_indx_map_fnd_owner
   !! \memberof psb_indx_map
@@ -513,17 +510,6 @@ contains
 
   end function base_get_ctxt
 
-
-  function base_get_mpic(idxmap) result(val)
-    implicit none 
-    class(psb_indx_map), intent(in) :: idxmap
-    integer(psb_mpk_) :: val
-
-    val = idxmap%mpic
-
-  end function base_get_mpic
-
-
   subroutine base_set_state(idxmap,val)
     implicit none 
     class(psb_indx_map), intent(inout) :: idxmap
@@ -643,15 +629,6 @@ contains
 
   end subroutine base_xtnd_p_adjcncy
  
-  subroutine base_set_mpic(idxmap,val)
-    implicit none 
-    class(psb_indx_map), intent(inout) :: idxmap
-    integer(psb_mpk_), intent(in)  :: val
-
-    idxmap%mpic = val
-  end subroutine base_set_mpic
-
-
   !> 
   !! \memberof psb_indx_map
   !! \brief  Is the class capable of having overlapped rows?
@@ -1341,7 +1318,6 @@ contains
     ! almost nothing to be done here
     idxmap%state          = -1 
     if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
-    idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
     idxmap%local_rows     = -1
@@ -1357,7 +1333,6 @@ contains
 
     idxmap%state          = psb_desc_null_
     if (allocated(idxmap%ctxt%ctxt)) deallocate(idxmap%ctxt%ctxt)
-    idxmap%mpic           = -1
     idxmap%global_rows    = -1
     idxmap%global_cols    = -1
     idxmap%local_rows     = -1
@@ -1444,7 +1419,6 @@ contains
 
     outmap%state       = idxmap%state      
     outmap%ctxt        = idxmap%ctxt      
-    outmap%mpic        = idxmap%mpic       
     outmap%global_rows = idxmap%global_rows
     outmap%global_cols = idxmap%global_cols
     outmap%local_rows  = idxmap%local_rows 

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -992,7 +992,6 @@ contains
 
     idxmap%ctxt = ctxt
     idxmap%state = psb_desc_bld_
-    idxmap%mpic  = psb_get_mpi_comm(ctxt)
     do i=1, n
       idxmap%glob_to_loc(i) = -1
     end do
