@@ -338,7 +338,18 @@ module psb_const_mod
     procedure, pass(ctxt) :: get_mpic   => get_mpic
     procedure, pass(ctxt) :: set_mpic   => set_mpic
   end type psb_ctxt_type
+  private :: get_mpic, set_mpic
+
   logical, parameter :: try_newins=.true.
+  
+
+  ! Interface for dispach of axpy-like operations.
+  interface get_axpbylike_code
+    module procedure get_axpbylike_code1
+    module procedure get_axpbylike_code2
+    module procedure get_axpbylike_code3
+  end interface get_axpbylike_code
+  
 contains
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
@@ -413,6 +424,5 @@ contains
             + ishft(get_axpbylike_code1(beta), 2) &
             + ishft(get_axpbylike_code1(gamma), 4)
   end function get_axpbylike_code3
- 
 
 end module psb_const_mod

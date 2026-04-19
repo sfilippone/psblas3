@@ -48,13 +48,12 @@
 !  Note: from a functional point of view, X is input, but here
 !        it's declared INOUT because of the sync() methods.
 !
-subroutine psb_daxpby_vect(alpha, x, beta, y,&
+subroutine psb_daxpby_vect(alpha, x, beta, y, &
      & desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_vect
   implicit none
-  type(psb_d_vect_type), intent(inout) :: x
-  type(psb_d_vect_type), intent(inout) :: y
   real(psb_dpk_), intent(in)           :: alpha, beta
+  type(psb_d_vect_type), intent(inout) :: x, y
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)       :: info
 
@@ -131,7 +130,7 @@ end subroutine psb_daxpby_vect
 ! Subroutines: psb_daxpby_multivect_*
 !    Adds one distributed multivector/vector to another multivector/vector,
 !
-!    Y(:) = alpha * X(:, j) + beta * Y(:)           (psb_daxpy_extract_c) 
+!    Y(:) = alpha * X(:, j) + beta * Y(:)           (psb_daxpby_extract_c) 
 
 !    Y(:, :) := beta * Y(:, :) + alpha * X          (psb_daxpby_mv_v_full)
 !    Y(:, j) := beta * Y(:, j) + alpha * X          (psb_daxpby_mv_v_idxs)
@@ -147,7 +146,7 @@ end subroutine psb_daxpby_vect
 !
 ! Arguments: ....
 !
-subroutine psb_daxbpy_extract_c(alpha, x, idx_x, beta, y, desc_a, info)
+subroutine psb_daxpby_extract_c(alpha, x, idx_x, beta, y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxbpy_extract_c
   implicit none
   real(psb_dpk_), intent(in)                :: alpha, beta
@@ -223,9 +222,9 @@ subroutine psb_daxbpy_extract_c(alpha, x, idx_x, beta, y, desc_a, info)
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
+9999 call psb_error_handler(ctxt, err_act)
   return
-end subroutine psb_daxbpy_extract_c
+end subroutine psb_daxpby_extract_c
 
 subroutine psb_daxpby_mv_v_full(alpha, x, beta, y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_v_full

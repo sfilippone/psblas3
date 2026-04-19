@@ -120,10 +120,11 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_daxpby_vect
 
-    subroutine psb_daxbpy_extract_c(alpha, x, beta, y, desc_a, info)
+    subroutine psb_daxbpy_extract_c(alpha, x, idx_x, beta, y, desc_a, info)
       import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_d_vect_type, psb_d_multivect_type
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
       type(psb_d_vect_type), intent(inout)      :: y
       type(psb_desc_type), intent(in)           :: desc_a
       integer(psb_ipk_), intent(out)            :: info
