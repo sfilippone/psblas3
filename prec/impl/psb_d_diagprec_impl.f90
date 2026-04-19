@@ -109,7 +109,7 @@ subroutine psb_d_diag_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, des
     goto 9999
   end if
 
-  call y%mlt(nrow, alpha, prec%dv, x, idx_x, idx_y, beta, info, conjgx = trans)
+  call y%mlt(nrow, alpha, prec%dv, x, idx_x, beta, idx_y, info, conjgx = trans)
 
   if (info /= psb_success_) then 
     call psb_errpush(psb_err_from_subroutine_, name, a_err = 'mvect%mlt')

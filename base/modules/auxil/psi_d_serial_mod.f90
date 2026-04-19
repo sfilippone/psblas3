@@ -207,7 +207,7 @@ module psi_d_serial_mod
       real(psb_dpk_), intent(in)      :: x(:)
       real(psb_dpk_), intent(inout)   :: y(:, :)
       integer(psb_ipk_), intent(out)  :: info
-    end subroutine psi_dmltv
+    end subroutine psi_dmltx
 
     subroutine psi_dmltx2(m, n, alpha, x, y, beta, z, info)
       import :: psb_ipk_, psb_dpk_
@@ -218,8 +218,7 @@ module psi_d_serial_mod
       real(psb_dpk_), intent(in)      :: y(:, :)
       real(psb_dpk_), intent(inout)   :: z(:, :)
       integer(psb_ipk_), intent(out)  :: info
-    end subroutine psi_dmltv2
-
+    end subroutine psi_dmltx2
   end interface psb_gemlt
 
   interface psi_upd_xyz
