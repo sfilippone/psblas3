@@ -92,6 +92,10 @@ submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   integer(psb_ipk_), save :: psb_swap_timing_wrapper_calls = 0
   integer(psb_ipk_), save :: psb_swap_timing_baseline_calls = 0
   integer(psb_ipk_), save :: psb_swap_timing_neighbor_calls = 0
+  logical, save :: psb_swap_start_debug_inited = .false.
+  logical, save :: psb_swap_start_debug_enabled = .false.
+  integer(psb_ipk_), save :: psb_swap_start_debug_max_report = 128
+  integer(psb_ipk_), save :: psb_swap_start_debug_report_count = 0
 
 contains
 
@@ -136,6 +140,47 @@ contains
     psb_swap_timing_report_count = psb_swap_timing_report_count + 1
     psb_swap_timing_should_report = .true.
   end function psb_swap_timing_should_report
+
+  subroutine psb_swap_start_debug_setup()
+    implicit none
+    character(len=64) :: env_buf
+    integer(psb_ipk_) :: env_len, env_status, ios
+
+    if (psb_swap_start_debug_inited) return
+
+    psb_swap_start_debug_inited = .true.
+    psb_swap_start_debug_enabled = .false.
+    psb_swap_start_debug_max_report = 128
+
+    call get_environment_variable('PSB_SWAP_DEBUG_START', env_buf, length=env_len, status=env_status)
+    if ((env_status == 0) .and. (env_len > 0)) then
+      select case(env_buf(1:1))
+      case('1','t','T','y','Y')
+        psb_swap_start_debug_enabled = .true.
+      case default
+        psb_swap_start_debug_enabled = .false.
+      end select
+    end if
+
+    call get_environment_variable('PSB_SWAP_DEBUG_START_MAX_REPORT', env_buf, length=env_len, status=env_status)
+    if ((env_status == 0) .and. (env_len > 0)) then
+      read(env_buf(1:env_len), *, iostat=ios) psb_swap_start_debug_max_report
+      if ((ios /= 0) .or. (psb_swap_start_debug_max_report < 1)) psb_swap_start_debug_max_report = 128
+    end if
+  end subroutine psb_swap_start_debug_setup
+
+  logical function psb_swap_start_debug_should_report()
+    implicit none
+
+    call psb_swap_start_debug_setup()
+
+    psb_swap_start_debug_should_report = .false.
+    if (.not. psb_swap_start_debug_enabled) return
+    if (psb_swap_start_debug_report_count >= psb_swap_start_debug_max_report) return
+
+    psb_swap_start_debug_report_count = psb_swap_start_debug_report_count + 1
+    psb_swap_start_debug_should_report = .true.
+  end function psb_swap_start_debug_should_report
 
   module subroutine psi_dswapdata_vect(swap_status,beta,y,desc_a,info,data)
 
@@ -919,21 +964,37 @@ contains
 
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
         if (buffer_size > 0) then
+          ! Count the attempt before MPI_Start so we can diagnose call reachability.
+          neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
+          if (psb_swap_start_debug_should_report()) then
+            write(psb_out_unit,'("SWAP_DEBUG MPI_Start(pre) kind=vect rank=",i0,", bsz=",i0,", ready=",l1)') &
+              & me, buffer_size, neighbor_comm_handle%persistent_request_ready
+            write(psb_out_unit,'("  inflight=",l1,", req_null=",l1,", dstart=",i0)') &
+              & neighbor_comm_handle%persistent_in_flight, &
+              & (neighbor_comm_handle%persistent_request == mpi_request_null), &
+              & neighbor_comm_handle%diag_start_calls
+          end if
           if (timing_on) t1 = psb_wtime()
           call mpi_start(neighbor_comm_handle%persistent_request, iret)
           if (timing_on) t_post = t_post + (psb_wtime() - t1)
+          if (psb_swap_start_debug_should_report()) then
+            write(psb_out_unit,'("SWAP_DEBUG MPI_Start(post) kind=vect rank=",i0,", iret=",i0)') &
+              & me, iret
+            write(psb_out_unit,'("  inflight=",l1,", dstart=",i0)') &
+              & neighbor_comm_handle%persistent_in_flight, neighbor_comm_handle%diag_start_calls
+          end if
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info, name, m_err=(/iret/))
             goto 9999
           end if
-          neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
           neighbor_comm_handle%persistent_in_flight = .true.
         else
           neighbor_comm_handle%persistent_in_flight = .false.
         end if
 #else
         if (buffer_size > 0) then
+          neighbor_comm_handle%diag_ineighbor_calls = neighbor_comm_handle%diag_ineighbor_calls + 1
           if (timing_on) t1 = psb_wtime()
           call mpi_ineighbor_alltoallv( &
               & y%combuf(1),                        &  ! send buffer
@@ -962,6 +1023,7 @@ contains
         ! Post non-blocking neighborhood alltoallv
         if (debug) write(*,*) me,' nbr_vect: posting MPI_Ineighbor_alltoallv'
         if (buffer_size > 0) then
+          neighbor_comm_handle%diag_ineighbor_calls = neighbor_comm_handle%diag_ineighbor_calls + 1
           if (timing_on) t1 = psb_wtime()
           call mpi_ineighbor_alltoallv( &
               & y%combuf(1),                        &  ! send buffer
@@ -1671,15 +1733,31 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
       end if
 
 #ifdef PSB_HAVE_MPI_NEIGHBOR_PERSISTENT
+      ! Count the attempt before MPI_Start so we can diagnose call reachability.
+      neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
+       if (psb_swap_start_debug_should_report()) then
+         write(psb_out_unit,'("SWAP_DEBUG MPI_Start(pre) kind=multivect rank=",i0,", bsz=",i0,", ready=",l1)') &
+           & me, buffer_size, neighbor_comm_handle%persistent_request_ready
+         write(psb_out_unit,'("  inflight=",l1,", req_null=",l1,", dstart=",i0)') &
+           & neighbor_comm_handle%persistent_in_flight, &
+           & (neighbor_comm_handle%persistent_request == mpi_request_null), &
+           & neighbor_comm_handle%diag_start_calls
+       end if
       call mpi_start(neighbor_comm_handle%persistent_request, iret)
+       if (psb_swap_start_debug_should_report()) then
+         write(psb_out_unit,'("SWAP_DEBUG MPI_Start(post) kind=multivect rank=",i0,", iret=",i0)') &
+           & me, iret
+         write(psb_out_unit,'("  inflight=",l1,", dstart=",i0)') &
+           & neighbor_comm_handle%persistent_in_flight, neighbor_comm_handle%diag_start_calls
+       end if
       if (iret /= mpi_success) then
         info = psb_err_mpi_error_
         call psb_errpush(info, name, m_err=(/iret/))
         goto 9999
       end if
-  neighbor_comm_handle%diag_start_calls = neighbor_comm_handle%diag_start_calls + 1
       neighbor_comm_handle%persistent_in_flight = .true.
 #else
+  neighbor_comm_handle%diag_ineighbor_calls = neighbor_comm_handle%diag_ineighbor_calls + 1
       call mpi_ineighbor_alltoallv( &
           & y%combuf(1),                        &  ! send buffer
           & neighbor_comm_handle%send_counts,     &
@@ -1701,6 +1779,7 @@ subroutine psi_dswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
     else
       ! Post non-blocking neighborhood alltoallv
       if (debug) write(*,*) me,' nbr_vect: posting MPI_Ineighbor_alltoallv'
+      neighbor_comm_handle%diag_ineighbor_calls = neighbor_comm_handle%diag_ineighbor_calls + 1
       call mpi_ineighbor_alltoallv( &
           & y%combuf(1),                        &  ! send buffer
           & neighbor_comm_handle%send_counts,     &

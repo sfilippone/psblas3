@@ -43,8 +43,8 @@ program psb_comm_cg_test
   itmax = 1000
   nrep = 5
   nwarm = 1
-  ! Keep itrace positive to avoid modulo-by-zero paths in convergence logging.
-  itrace = 0
+  ! Disable per-iteration tracing; avoids modulo-by-zero paths in some logging branches.
+  itrace = -1
   istop = 2
   eps = 1.d-6
   scheme_type = (/ psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
@@ -95,7 +95,7 @@ program psb_comm_cg_test
   ! call probe_ieee('before psb_init')
   call psb_init(ctxt)
   ! call probe_ieee('after psb_init')
-  ! call clear_ieee_flags()
+  call clear_ieee_flags()
   ! call probe_ieee('after clear_ieee_flags')
   call psb_info(ctxt, iam, np)
 
@@ -128,14 +128,6 @@ program psb_comm_cg_test
   call psb_d_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)
   ! call probe_ieee('after psb_d_gen_pde3d')
   if (info /= psb_success_) goto 9999
-
-  ! desc_ctxt = desc_a%get_context()
-  ! call psb_info(desc_ctxt, desc_me, desc_np)
-  ! if (desc_np == -1) then
-  !   info = psb_err_context_error_
-  !   write(psb_err_unit,*) 'Invalid descriptor context after psb_d_gen_pde3d'
-  !   goto 9999
-  ! end if
 
   do prec_idx = 1, n_precs
     do scheme_idx = 1, n_schemes
@@ -214,20 +206,20 @@ program psb_comm_cg_test
         final_error(prec_idx,scheme_idx,rep) = err
         solve_info(prec_idx,scheme_idx,rep) = info
 
-        ! if (iam == psb_root_) then
-        !   select type(ch => x%v%comm_handle)
-        !   type is(psb_comm_neighbor_handle)
-        !     write(psb_out_unit,'("DIAG_COMM scheme=",a,", prec=",a,", rep=",i0)') &
-        !          & trim(scheme_name(scheme_idx)), trim(prec_name(prec_idx)), rep
-        !     write(psb_out_unit,'("DIAG_COMM counters: init=",i0,", start=",i0,", wait=",i0,", realloc=",i0)') &
-        !       & ch%diag_init_calls, ch%diag_start_calls, ch%diag_wait_calls, &
-        !       & ch%diag_buffer_reallocs
-        !     write(psb_out_unit,'("DIAG_COMM state: ready=",l1,", bsz=",i0)') &
-        !       & ch%persistent_request_ready, ch%persistent_buffer_size
-        !   class default
-        !     continue
-        !   end select
-        ! end if
+        if (iam == psb_root_) then
+          select type(ch => x%v%comm_handle)
+          type is(psb_comm_neighbor_handle)
+            write(psb_out_unit,'("DIAG_COMM scheme=",a,", prec=",a,", rep=",i0)') &
+                 & trim(scheme_name(scheme_idx)), trim(prec_name(prec_idx)), rep
+            write(psb_out_unit,'("DIAG_COMM counters: init=",i0,", start=",i0,", ineighbor=",i0,", wait=",i0,", realloc=",i0)') &
+              & ch%diag_init_calls, ch%diag_start_calls, ch%diag_ineighbor_calls, &
+              & ch%diag_wait_calls, ch%diag_buffer_reallocs
+            write(psb_out_unit,'("DIAG_COMM state: ready=",l1,", bsz=",i0)') &
+              & ch%persistent_request_ready, ch%persistent_buffer_size
+          class default
+            continue
+          end select
+        end if
 
         if (info /= psb_success_) goto 9999
       end do

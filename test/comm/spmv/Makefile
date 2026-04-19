@@ -23,9 +23,10 @@ runsd:
 spmv_overlap: $(TOBJS)
 	$(FLINK) $(LOPT) $(TOBJS) -o spmv_overlap $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv spmv_overlap $(EXEDIR)
+	/bin/cp -f $(EXEDIR)/spmv_overlap $(EXEDIR)/psb_spmv_overlap_test
 
 clean:
-	/bin/rm -f $(TOBJS) $(TOBJS_API) *$(.mod) $(EXEDIR)/spmv_overlap
+	/bin/rm -f $(TOBJS) $(TOBJS_API) *$(.mod) $(EXEDIR)/spmv_overlap $(EXEDIR)/psb_spmv_overlap_test
 
 lib:
 	(cd ../../; make library)

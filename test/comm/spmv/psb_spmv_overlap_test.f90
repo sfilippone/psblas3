@@ -11,6 +11,7 @@ module psb_spmv_overlap_test
   use psb_comm_factory_mod, only: psb_comm_set
   use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
     & psb_comm_persistent_ineighbor_alltoallv_
+  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
 
   implicit none
 
@@ -540,6 +541,22 @@ contains
     real(psb_dpk_)                  :: t_no_isend, t_no_neighbor, t_no_persistent
     real(psb_dpk_)                  :: err_isend, err_neighbor, err_persistent, tol
     real(psb_dpk_)                  :: avg_ov, avg_no, speedup, gain_pct
+    integer(psb_ipk_)               :: n_init_neighbor_l, n_start_neighbor_l, n_wait_neighbor_l, n_realloc_neighbor_l
+    integer(psb_ipk_)               :: n_init_persist_l, n_start_persist_l, n_wait_persist_l, n_realloc_persist_l
+    integer(psb_ipk_)               :: n_init_neighbor_g, n_start_neighbor_g, n_wait_neighbor_g, n_realloc_neighbor_g
+    integer(psb_ipk_)               :: n_init_persist_g, n_start_persist_g, n_wait_persist_g, n_realloc_persist_g
+    integer(psb_ipk_)               :: n_ineighbor_neighbor_l, n_ineighbor_neighbor_g
+    integer(psb_ipk_)               :: peak_start_neighbor_l, peak_start_persist_l
+    integer(psb_ipk_)               :: peak_start_neighbor_g, peak_start_persist_g
+    integer(psb_ipk_)               :: last_start_neighbor_l, last_start_persist_l
+    integer(psb_ipk_)               :: accum_start_neighbor_l, accum_start_persist_l
+    integer(psb_ipk_)               :: accum_start_neighbor_g, accum_start_persist_g
+    integer(psb_ipk_)               :: comm_type_neighbor_l, comm_type_persist_l
+    integer(psb_ipk_)               :: comm_type_neighbor_g, comm_type_persist_g
+    integer(psb_ipk_)               :: is_neighbor_handle_l, is_persist_handle_l
+    integer(psb_ipk_)               :: is_neighbor_handle_g, is_persist_handle_g
+    integer(psb_ipk_)               :: use_persistent_neighbor_l, use_persistent_persist_l
+    integer(psb_ipk_)               :: use_persistent_neighbor_g, use_persistent_persist_g
 
     info = psb_success_
     tol = 1.0d-10
@@ -550,6 +567,19 @@ contains
     t_no_isend = 0.0_psb_dpk_
     t_no_neighbor = 0.0_psb_dpk_
     t_no_persistent = 0.0_psb_dpk_
+    peak_start_neighbor_l = 0
+    peak_start_persist_l = 0
+    n_ineighbor_neighbor_l = 0
+    last_start_neighbor_l = -1
+    last_start_persist_l = -1
+    accum_start_neighbor_l = 0
+    accum_start_persist_l = 0
+    comm_type_neighbor_l = -1
+    comm_type_persist_l = -1
+    is_neighbor_handle_l = 0
+    is_persist_handle_l = 0
+    use_persistent_neighbor_l = 0
+    use_persistent_persist_l = 0
     idim = 10
     call psb_erractionsave(err_act)
 
@@ -615,18 +645,123 @@ contains
     call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, x_persistent%v%comm_handle, info)
     if (info /= psb_success_) goto 9999
 
+    select type(ch => x_neighbor%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      is_neighbor_handle_l = 1
+      comm_type_neighbor_l = ch%comm_type
+      if (ch%use_persistent_buffers) use_persistent_neighbor_l = 1
+    class default
+      continue
+    end select
+
+    select type(ch => x_persistent%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      is_persist_handle_l = 1
+      comm_type_persist_l = ch%comm_type
+      if (ch%use_persistent_buffers) use_persistent_persist_l = 1
+    class default
+      continue
+    end select
+
     ! Warm-up all schemes once: overlap and non-overlap paths.
     call psb_spmm(alpha, a, x_isend, beta, y_ov_isend, desc_a, info, doswap=.true.)
     call psb_halo(x_isend, desc_a, info)
     call psb_spmm(alpha, a, x_isend, beta, y_no_isend, desc_a, info, doswap=.false.)
 
     call psb_spmm(alpha, a, x_neighbor, beta, y_ov_neighbor, desc_a, info, doswap=.true.)
+    select type(ch => x_neighbor%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      n_ineighbor_neighbor_l = ch%diag_ineighbor_calls
+      if (last_start_neighbor_l < 0) then
+        accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+      else if (ch%diag_start_calls >= last_start_neighbor_l) then
+        accum_start_neighbor_l = accum_start_neighbor_l + (ch%diag_start_calls - last_start_neighbor_l)
+      else
+        accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+      end if
+      last_start_neighbor_l = ch%diag_start_calls
+      peak_start_neighbor_l = max(peak_start_neighbor_l, ch%diag_start_calls)
+    class default
+      continue
+    end select
     call psb_halo(x_neighbor, desc_a, info)
+    select type(ch => x_neighbor%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      n_ineighbor_neighbor_l = ch%diag_ineighbor_calls
+      if (last_start_neighbor_l < 0) then
+        accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+      else if (ch%diag_start_calls >= last_start_neighbor_l) then
+        accum_start_neighbor_l = accum_start_neighbor_l + (ch%diag_start_calls - last_start_neighbor_l)
+      else
+        accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+      end if
+      last_start_neighbor_l = ch%diag_start_calls
+      peak_start_neighbor_l = max(peak_start_neighbor_l, ch%diag_start_calls)
+    class default
+      continue
+    end select
     call psb_spmm(alpha, a, x_neighbor, beta, y_no_neighbor, desc_a, info, doswap=.false.)
+    select type(ch => x_neighbor%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      n_ineighbor_neighbor_l = ch%diag_ineighbor_calls
+      if (last_start_neighbor_l < 0) then
+        accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+      else if (ch%diag_start_calls >= last_start_neighbor_l) then
+        accum_start_neighbor_l = accum_start_neighbor_l + (ch%diag_start_calls - last_start_neighbor_l)
+      else
+        accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+      end if
+      last_start_neighbor_l = ch%diag_start_calls
+      peak_start_neighbor_l = max(peak_start_neighbor_l, ch%diag_start_calls)
+    class default
+      continue
+    end select
 
     call psb_spmm(alpha, a, x_persistent, beta, y_ov_persistent, desc_a, info, doswap=.true.)
+    select type(ch => x_persistent%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      if (last_start_persist_l < 0) then
+        accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+      else if (ch%diag_start_calls >= last_start_persist_l) then
+        accum_start_persist_l = accum_start_persist_l + (ch%diag_start_calls - last_start_persist_l)
+      else
+        accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+      end if
+      last_start_persist_l = ch%diag_start_calls
+      peak_start_persist_l = max(peak_start_persist_l, ch%diag_start_calls)
+    class default
+      continue
+    end select
     call psb_halo(x_persistent, desc_a, info)
+    select type(ch => x_persistent%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      if (last_start_persist_l < 0) then
+        accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+      else if (ch%diag_start_calls >= last_start_persist_l) then
+        accum_start_persist_l = accum_start_persist_l + (ch%diag_start_calls - last_start_persist_l)
+      else
+        accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+      end if
+      last_start_persist_l = ch%diag_start_calls
+      peak_start_persist_l = max(peak_start_persist_l, ch%diag_start_calls)
+    class default
+      continue
+    end select
     call psb_spmm(alpha, a, x_persistent, beta, y_no_persistent, desc_a, info, doswap=.false.)
+    select type(ch => x_persistent%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      if (last_start_persist_l < 0) then
+        accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+      else if (ch%diag_start_calls >= last_start_persist_l) then
+        accum_start_persist_l = accum_start_persist_l + (ch%diag_start_calls - last_start_persist_l)
+      else
+        accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+      end if
+      last_start_persist_l = ch%diag_start_calls
+      peak_start_persist_l = max(peak_start_persist_l, ch%diag_start_calls)
+    class default
+      continue
+    end select
     if (info /= psb_success_) goto 9999
 
     ! -----------------------------
@@ -666,6 +801,20 @@ contains
     t0 = psb_wtime()
     do i = 1, times
       call psb_spmm(alpha, a, x_neighbor, beta, y_ov_neighbor, desc_a, info, doswap=.true.)
+      select type(ch => x_neighbor%v%comm_handle)
+      type is(psb_comm_neighbor_handle)
+        if (last_start_neighbor_l < 0) then
+          accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+        else if (ch%diag_start_calls >= last_start_neighbor_l) then
+          accum_start_neighbor_l = accum_start_neighbor_l + (ch%diag_start_calls - last_start_neighbor_l)
+        else
+          accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+        end if
+        last_start_neighbor_l = ch%diag_start_calls
+        peak_start_neighbor_l = max(peak_start_neighbor_l, ch%diag_start_calls)
+      class default
+        continue
+      end select
     end do
     t1 = psb_wtime()
     dt = t1 - t0
@@ -679,6 +828,20 @@ contains
     do i = 1, times
       call psb_halo(x_neighbor, desc_a, info)
       call psb_spmm(alpha, a, x_neighbor, beta, y_no_neighbor, desc_a, info, doswap=.false.)
+      select type(ch => x_neighbor%v%comm_handle)
+      type is(psb_comm_neighbor_handle)
+        if (last_start_neighbor_l < 0) then
+          accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+        else if (ch%diag_start_calls >= last_start_neighbor_l) then
+          accum_start_neighbor_l = accum_start_neighbor_l + (ch%diag_start_calls - last_start_neighbor_l)
+        else
+          accum_start_neighbor_l = accum_start_neighbor_l + ch%diag_start_calls
+        end if
+        last_start_neighbor_l = ch%diag_start_calls
+        peak_start_neighbor_l = max(peak_start_neighbor_l, ch%diag_start_calls)
+      class default
+        continue
+      end select
     end do
     t1 = psb_wtime()
     dt = t1 - t0
@@ -694,6 +857,20 @@ contains
     t0 = psb_wtime()
     do i = 1, times
       call psb_spmm(alpha, a, x_persistent, beta, y_ov_persistent, desc_a, info, doswap=.true.)
+      select type(ch => x_persistent%v%comm_handle)
+      type is(psb_comm_neighbor_handle)
+        if (last_start_persist_l < 0) then
+          accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+        else if (ch%diag_start_calls >= last_start_persist_l) then
+          accum_start_persist_l = accum_start_persist_l + (ch%diag_start_calls - last_start_persist_l)
+        else
+          accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+        end if
+        last_start_persist_l = ch%diag_start_calls
+        peak_start_persist_l = max(peak_start_persist_l, ch%diag_start_calls)
+      class default
+        continue
+      end select
     end do
     t1 = psb_wtime()
     dt = t1 - t0
@@ -707,6 +884,20 @@ contains
     do i = 1, times
       call psb_halo(x_persistent, desc_a, info)
       call psb_spmm(alpha, a, x_persistent, beta, y_no_persistent, desc_a, info, doswap=.false.)
+      select type(ch => x_persistent%v%comm_handle)
+      type is(psb_comm_neighbor_handle)
+        if (last_start_persist_l < 0) then
+          accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+        else if (ch%diag_start_calls >= last_start_persist_l) then
+          accum_start_persist_l = accum_start_persist_l + (ch%diag_start_calls - last_start_persist_l)
+        else
+          accum_start_persist_l = accum_start_persist_l + ch%diag_start_calls
+        end if
+        last_start_persist_l = ch%diag_start_calls
+        peak_start_persist_l = max(peak_start_persist_l, ch%diag_start_calls)
+      class default
+        continue
+      end select
     end do
     t1 = psb_wtime()
     dt = t1 - t0
@@ -721,6 +912,75 @@ contains
     call psb_amx(ctxt, err_isend)
     call psb_amx(ctxt, err_neighbor)
     call psb_amx(ctxt, err_persistent)
+
+    n_init_neighbor_l = 0
+    n_start_neighbor_l = 0
+    n_wait_neighbor_l = 0
+    n_realloc_neighbor_l = 0
+    n_init_persist_l = 0
+    n_start_persist_l = 0
+    n_wait_persist_l = 0
+    n_realloc_persist_l = 0
+
+    select type(ch => x_neighbor%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      n_init_neighbor_l = ch%diag_init_calls
+      n_start_neighbor_l = ch%diag_start_calls
+      n_wait_neighbor_l = ch%diag_wait_calls
+      n_realloc_neighbor_l = ch%diag_buffer_reallocs
+    class default
+      continue
+    end select
+
+    select type(ch => x_persistent%v%comm_handle)
+    type is(psb_comm_neighbor_handle)
+      n_init_persist_l = ch%diag_init_calls
+      n_start_persist_l = ch%diag_start_calls
+      n_wait_persist_l = ch%diag_wait_calls
+      n_realloc_persist_l = ch%diag_buffer_reallocs
+    class default
+      continue
+    end select
+
+    n_init_neighbor_g = n_init_neighbor_l
+    n_start_neighbor_g = n_start_neighbor_l
+    n_wait_neighbor_g = n_wait_neighbor_l
+    n_realloc_neighbor_g = n_realloc_neighbor_l
+    n_init_persist_g = n_init_persist_l
+    n_start_persist_g = n_start_persist_l
+    n_wait_persist_g = n_wait_persist_l
+    n_realloc_persist_g = n_realloc_persist_l
+    n_ineighbor_neighbor_g = n_ineighbor_neighbor_l
+    peak_start_neighbor_g = peak_start_neighbor_l
+    peak_start_persist_g = peak_start_persist_l
+    accum_start_neighbor_g = accum_start_neighbor_l
+    accum_start_persist_g = accum_start_persist_l
+    comm_type_neighbor_g = comm_type_neighbor_l
+    comm_type_persist_g = comm_type_persist_l
+    is_neighbor_handle_g = is_neighbor_handle_l
+    is_persist_handle_g = is_persist_handle_l
+    use_persistent_neighbor_g = use_persistent_neighbor_l
+    use_persistent_persist_g = use_persistent_persist_l
+
+    call psb_sum(ctxt, n_init_neighbor_g)
+    call psb_sum(ctxt, n_start_neighbor_g)
+    call psb_sum(ctxt, n_wait_neighbor_g)
+    call psb_sum(ctxt, n_realloc_neighbor_g)
+    call psb_sum(ctxt, n_init_persist_g)
+    call psb_sum(ctxt, n_start_persist_g)
+    call psb_sum(ctxt, n_wait_persist_g)
+    call psb_sum(ctxt, n_realloc_persist_g)
+    call psb_sum(ctxt, n_ineighbor_neighbor_g)
+    call psb_sum(ctxt, peak_start_neighbor_g)
+    call psb_sum(ctxt, peak_start_persist_g)
+    call psb_sum(ctxt, accum_start_neighbor_g)
+    call psb_sum(ctxt, accum_start_persist_g)
+    call psb_sum(ctxt, comm_type_neighbor_g)
+    call psb_sum(ctxt, comm_type_persist_g)
+    call psb_sum(ctxt, is_neighbor_handle_g)
+    call psb_sum(ctxt, is_persist_handle_g)
+    call psb_sum(ctxt, use_persistent_neighbor_g)
+    call psb_sum(ctxt, use_persistent_persist_g)
 
     if (my_rank == 0) then
       write(psb_out_unit,'(/,"SpMV overlap benchmark")')
@@ -768,6 +1028,21 @@ contains
       write(psb_out_unit,'("  speedup (no/ov)  : ",f10.4)') speedup
       write(psb_out_unit,'("  gain (%)         : ",f10.4)') gain_pct
       write(psb_out_unit,'("  overlap vs no_overlap err = ",es12.5)') err_persistent
+
+      write(psb_out_unit,'(/,"Communication diagnostics (global sum over MPI ranks):")')
+      write(psb_out_unit,'("  ineighbor_alltoallv:        init=",i0,", start=",i0,", wait=",i0,", realloc=",i0)') &
+        & n_init_neighbor_g, n_start_neighbor_g, n_wait_neighbor_g, n_realloc_neighbor_g
+      write(psb_out_unit,'("  ineighbor_alltoallv calls   : ",i0)') n_ineighbor_neighbor_g
+      write(psb_out_unit,'("  ineighbor peak start observed during run: ",i0)') peak_start_neighbor_g
+      write(psb_out_unit,'("  ineighbor accumulated starts (robust):   ",i0)') accum_start_neighbor_g
+      write(psb_out_unit,'("  persistent_ineighbor_a2av:  init=",i0,", start=",i0,", wait=",i0,", realloc=",i0)') &
+        & n_init_persist_g, n_start_persist_g, n_wait_persist_g, n_realloc_persist_g
+      write(psb_out_unit,'("  persistent peak start observed during run: ",i0)') peak_start_persist_g
+      write(psb_out_unit,'("  persistent accumulated starts (robust):   ",i0)') accum_start_persist_g
+      write(psb_out_unit,'("  handle check (sum over ranks): neighbor is_type=",i0,", comm_type=",i0,", use_persistent=",i0)') &
+        & is_neighbor_handle_g, comm_type_neighbor_g, use_persistent_neighbor_g
+      write(psb_out_unit,'("  handle check (sum over ranks): persistent is_type=",i0,", comm_type=",i0,", use_persistent=",i0)') &
+        & is_persist_handle_g, comm_type_persist_g, use_persistent_persist_g
 
       if ((err_isend > tol) .or. (err_neighbor > tol) .or. (err_persistent > tol)) then
         write(psb_out_unit,'("  WARNING: mismatch exceeds tolerance ",es12.5)') tol
