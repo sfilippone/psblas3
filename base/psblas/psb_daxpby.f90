@@ -52,8 +52,8 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
      & desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_vect
   implicit none
-  type(psb_d_vect_type), intent(inout) ::  x
-  type(psb_d_vect_type), intent(inout) ::  y
+  type(psb_d_vect_type), intent(inout) :: x
+  type(psb_d_vect_type), intent(inout) :: y
   real(psb_dpk_), intent(in)           :: alpha, beta
   type(psb_desc_type), intent(in)      :: desc_a
   integer(psb_ipk_), intent(out)       :: info
@@ -124,15 +124,15 @@ subroutine psb_daxpby_vect(alpha, x, beta, y,&
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
-
 end subroutine psb_daxpby_vect
 
 
 ! Subroutines: psb_daxpby_multivect_*
-!    Adds one distributed multivector to another multivector/vector,
+!    Adds one distributed multivector/vector to another multivector/vector,
 !
+!    Y(:) = alpha * X(:, j) + beta * Y(:)           (psb_daxpy_extract_c) 
+
 !    Y(:, :) := beta * Y(:, :) + alpha * X          (psb_daxpby_mv_v_full)
 !    Y(:, j) := beta * Y(:, j) + alpha * X          (psb_daxpby_mv_v_idxs)
 !    Y(:, :) := beta * Y(:, :) + alpha * X(:, :)    (psb_daxpby_mv_m_full)
@@ -147,21 +147,100 @@ end subroutine psb_daxpby_vect
 !
 ! Arguments: ....
 !
+subroutine psb_daxbpy_extract_c(alpha, x, idx_x, beta, y, desc_a, info)
+  use psb_base_mod, psb_protect_name => psb_daxbpy_extract_c
+  implicit none
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_d_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)             :: idx_x
+  type(psb_d_vect_type), intent(inout)      :: y
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  character(len=20)   :: name, ch_err
+
+  name = 'psb_daxpy_extract_c'
+  if (psb_errstatus_fatal()) return
+  
+  info = psb_success_
+  call psb_erractionsave(err_act)
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if (np == -ione) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(x%v)) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (.not. allocated(y%v)) then
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  ix = ione
+  iy = ione
+
+  m = desc_a%get_global_rows()
+
+  ! check vector correctness
+  call psb_chkvect(m, lone, x%get_nrows(), ix, lone, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 1'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+  call psb_chkvect(m, lone, y%get_nrows(), iy, lone, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect 2'
+    call psb_errpush(info, name, a_err=ch_err)
+    goto 9999
+  end if
+
+  if ((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info,name)
+  end if
+
+  if(desc_a%get_local_rows() > 0) then
+    call x%axpby(desc_a%get_local_rows(), alpha, idx_x, beta, y, info)
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt,err_act)
+  return
+end subroutine psb_daxbpy_extract_c
 
 subroutine psb_daxpby_mv_v_full(alpha, x, beta, y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_v_full
   implicit none
-  type(psb_d_vect_type), intent(inout) ::  x
-  type(psb_d_multivect_type), intent(inout) ::  y
-  real(psb_dpk_), intent(in)        :: alpha, beta
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(out)     :: info
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_d_vect_type), intent(inout)      :: x
+  type(psb_d_multivect_type), intent(inout) :: y
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, iix, jjx, iiy, jjy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  character(len=20) :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, iiy, jjy
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  character(len=20)   :: name, ch_err
 
   name = 'psb_daxpby_mv_v_full'
   if (psb_errstatus_fatal()) return
@@ -185,8 +264,8 @@ subroutine psb_daxpby_mv_v_full(alpha, x, beta, y, desc_a, info)
   endif
 
   if (.not. allocated(y%v)) then
-    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
-        call psb_errpush(info, name)
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -230,8 +309,8 @@ end subroutine psb_daxpby_mv_v_full
 subroutine psb_daxpby_mv_v_idxs(alpha, x, beta, y, idx_y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_v_idxs
   implicit none
-  type(psb_d_vect_type), intent(inout)      ::  x
-  type(psb_d_multivect_type), intent(inout) ::  y
+  type(psb_d_vect_type), intent(inout)      :: x
+  type(psb_d_multivect_type), intent(inout) :: y
   integer(psb_ipk_), intent(in)             :: idx_y
   real(psb_dpk_), intent(in)                :: alpha, beta
   type(psb_desc_type), intent(in)           :: desc_a
@@ -264,8 +343,8 @@ subroutine psb_daxpby_mv_v_idxs(alpha, x, beta, y, idx_y, desc_a, info)
     goto 9999
   endif
   if (.not. allocated(y%v)) then
-    info = psb_err_invalid_vect_state_ ! Should be psb_err_invalid_mvect_state_ 
-        call psb_errpush(info, name)
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -309,7 +388,7 @@ end subroutine psb_daxpby_mv_v_idxs
 subroutine psb_daxpby_mv_m_full(alpha, x, beta, y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_m_full
   implicit none
-  type(psb_d_multivect_type), intent(inout) ::  x, y
+  type(psb_d_multivect_type), intent(inout) :: x, y
   real(psb_dpk_), intent(in)                :: alpha, beta
   type(psb_desc_type), intent(in)           :: desc_a
   integer(psb_ipk_), intent(out)            :: info
@@ -382,7 +461,7 @@ end subroutine psb_daxpby_mv_m_full
 subroutine psb_daxpby_mv_m_idxs(alpha, x, idx_x, beta, y, idx_y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_m_idxs
   implicit none
-  type(psb_d_multivect_type), intent(inout) ::  x, y
+  type(psb_d_multivect_type), intent(inout) :: x, y
   integer(psb_ipk_), intent(in)             :: idx_x, idx_y
   real(psb_dpk_), intent(in)                :: alpha, beta
   type(psb_desc_type), intent(in)           :: desc_a
@@ -416,7 +495,7 @@ subroutine psb_daxpby_mv_m_idxs(alpha, x, idx_x, beta, y, idx_y, desc_a, info)
   endif
   if (.not. allocated(y%v)) then
     info = psb_err_invalid_mvect_state_
-        call psb_errpush(info, name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -542,8 +621,8 @@ end subroutine psb_daxpby_mv_m_full_out
 subroutine psb_daxpby_mv_vv(alpha, x, beta, y, gamma, z, idx_z, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_vv
   implicit none
-  type(psb_d_vect_type), intent(inout)      ::  x, y
-  type(psb_d_multivect_type), intent(inout) ::  z
+  type(psb_d_vect_type), intent(inout)      :: x, y
+  type(psb_d_multivect_type), intent(inout) :: z
   integer(psb_ipk_), intent(in)             :: idx_z
   real(psb_dpk_), intent(in)                :: alpha, beta, gamma
   type(psb_desc_type), intent(in)           :: desc_a
@@ -577,7 +656,7 @@ subroutine psb_daxpby_mv_vv(alpha, x, beta, y, gamma, z, idx_z, desc_a, info)
   endif
   if (.not. allocated(z%v)) then
     info = psb_err_invalid_mvect_state_
-        call psb_errpush(info, name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -630,8 +709,8 @@ end subroutine psb_daxpby_mv_vv
 subroutine psb_daxpby_mv_mv(alpha, x, beta, y, idx_y, gamma, z, idx_z, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_mv_mv
   implicit none
-  type(psb_d_vect_type), intent(inout)      ::  x
-  type(psb_d_multivect_type), intent(inout) ::  y, z
+  type(psb_d_vect_type), intent(inout)      :: x
+  type(psb_d_multivect_type), intent(inout) :: y, z
   integer(psb_ipk_), intent(in)             :: idx_y, idx_z
   real(psb_dpk_), intent(in)                :: alpha, beta, gamma
   type(psb_desc_type), intent(in)           :: desc_a
@@ -665,7 +744,7 @@ subroutine psb_daxpby_mv_mv(alpha, x, beta, y, idx_y, gamma, z, idx_z, desc_a, i
   endif
   if ((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
     info = psb_err_invalid_mvect_state_
-        call psb_errpush(info, name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -747,7 +826,7 @@ subroutine psb_daxpby_mv_mm_idxs(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_
 
   if ((.not. allocated(x%v)) .or. (.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
     info = psb_err_invalid_mvect_state_
-        call psb_errpush(info, name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -911,7 +990,7 @@ subroutine psb_daxpby_mv_mm_out(alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z
   if ((.not. allocated(x%v)) .or. (.not. allocated(y%v)) & 
         .or. (.not. allocated(z%v)) .or. (.not. allocated(w%v))) then
     info = psb_err_invalid_mvect_state_
-        call psb_errpush(info, name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -1139,7 +1218,6 @@ subroutine psb_daxpby_mv_cspan2D(x, coeff, y, desc_a, info, upd_flag)
 end subroutine psb_daxpby_mv_cspan2D
 
 
-
 !
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
@@ -1180,27 +1258,25 @@ end subroutine psb_daxpby_mv_cspan2D
 !    Z := beta * Y + alpha * X
 !
 ! Arguments:
-!    alpha  -  real,input        The scalar used to multiply each component of X
+!    alpha  - real,input            The scalar used to multiply each component of X
 !    x      - type(psb_d_vect_type) The input vector containing the entries of X
-!    beta   -  real,input        The scalar used to multiply each component of Y
-!    y      - type(psb_d_vect_type)  The input vector Y
-!    z      - type(psb_d_vect_type)  The output vector Z
-!    desc_a -  type(psb_desc_type)  The communication descriptor.
-!    info   -  integer              Return code
+!    beta   - real,input            The scalar used to multiply each component of Y
+!    y      - type(psb_d_vect_type) The input vector Y
+!    z      - type(psb_d_vect_type) The output vector Z
+!    desc_a - type(psb_desc_type)   The communication descriptor.
+!    info   - integer               Return code
 !
 !  Note: from a functional point of view, X is input, but here
 !        it's declared INOUT because of the sync() methods.
 !
-subroutine psb_daxpby_vect_out(alpha, x, beta, y,&
+subroutine psb_daxpby_vect_out(alpha, x, beta, y, &
      & z, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpby_vect_out
   implicit none
-  type(psb_d_vect_type), intent(inout) ::  x
-  type(psb_d_vect_type), intent(inout) ::  y
-  type(psb_d_vect_type), intent(inout) ::  z
-  real(psb_dpk_), intent(in)        :: alpha, beta
-  type(psb_desc_type), intent(in)      :: desc_a
-  integer(psb_ipk_), intent(out)                  :: info
+  real(psb_dpk_), intent(in)            :: alpha, beta
+  type(psb_d_vect_type), intent(inout)  :: x, y, z
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
 
   ! locals
   type(psb_ctxt_type) :: ctxt
@@ -1296,10 +1372,10 @@ end subroutine psb_daxpby_vect_out
 !    sub( Y ) denotes Y(:,JY).
 !
 ! Arguments:
-!    alpha  -  real,input        The scalar used to multiply each component of X
-!    x(:,:) -  real,input        The input vector containing the entries of X
-!    beta   -  real,input        The scalar used to multiply each component of Y
-!    y(:,:) -  real,inout        The input vector Y
+!    alpha  -  real, input          The scalar used to multiply each component of X
+!    x(:,:) -  real, input          The input vector containing the entries of X
+!    beta   -  real, input          The scalar used to multiply each component of Y
+!    y(:,:) -  real ,inout          The input vector Y
 !    desc_a -  type(psb_desc_type)  The communication descriptor.
 !    info   -  integer              Return code
 !    jx     -  integer(optional)    The column offset for X
@@ -1310,12 +1386,12 @@ subroutine psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
   use psi_d_serial_mod
   implicit none
 
-  integer(psb_ipk_), intent(in), optional   :: n, jx, jy
-  integer(psb_ipk_), intent(out)            :: info
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:, :)
+  real(psb_dpk_), intent(inout)   :: y(:, :)
   type(psb_desc_type), intent(in) :: desc_a
-  real(psb_dpk_), intent(in)    :: alpha, beta
-  real(psb_dpk_), intent(in)    :: x(:,:)
-  real(psb_dpk_), intent(inout) :: y(:,:)
+  integer(psb_ipk_), intent(out)  :: info
+  integer(psb_ipk_), intent(in), optional :: n, jx, jy
 
   ! locals
   type(psb_ctxt_type) :: ctxt
@@ -1406,9 +1482,6 @@ subroutine psb_daxpby(alpha, x, beta,y,desc_a,info, n, jx, jy)
 end subroutine psb_daxpby
 
 
-
-
-
 !!$
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
@@ -1459,11 +1532,11 @@ subroutine psb_daxpbyv(alpha, x, beta,y,desc_a,info)
   use psb_base_mod, psb_protect_name => psb_daxpbyv
   implicit none
 
-  integer(psb_ipk_), intent(out)            :: info
+  real(psb_dpk_), intent(in)      :: alpha, beta
+  real(psb_dpk_), intent(in)      :: x(:)
+  real(psb_dpk_), intent(inout)   :: y(:)
   type(psb_desc_type), intent(in) :: desc_a
-  real(psb_dpk_), intent(in)    :: alpha, beta
-  real(psb_dpk_), intent(in)    :: x(:)
-  real(psb_dpk_), intent(inout) :: y(:)
+  integer(psb_ipk_), intent(out)  :: info
 
   ! locals
   type(psb_ctxt_type) :: ctxt
@@ -1575,24 +1648,24 @@ end subroutine psb_daxpbyv
 !    info   -  integer              Return code
 !
 !
-subroutine psb_daxpbyvout(alpha, x, beta,y, z, desc_a, info)
+subroutine psb_daxpbyvout(alpha, x, beta, y, z, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_daxpbyvout
   implicit none
 
-  integer(psb_ipk_), intent(out)  :: info
-  type(psb_desc_type), intent(in) :: desc_a
   real(psb_dpk_), intent(in)      :: alpha, beta
-  real(psb_dpk_), intent(in)      :: x(:)
-  real(psb_dpk_), intent(in)      :: y(:)
+  real(psb_dpk_), intent(in)      :: x(:), y(:)
   real(psb_dpk_), intent(inout)   :: z(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, iiy, jjy, iiz, jjz, lldx, lldy, lldz
+  integer(psb_ipk_) :: np, me, err_act, &
+                  & iix, jjx, iiy, jjy, iiz, jjz, &
+                  & lldx, lldy, lldz
   integer(psb_lpk_) :: ix, ijx, iy, ijy, iz, ijz, m
-  character(len=20)        :: name, ch_err
-  logical, parameter :: debug=.false.
+  character(len=20) :: name, ch_err
+  logical, parameter :: debug = .false.
 
   name='psb_geaxpby'
   info=psb_success_
