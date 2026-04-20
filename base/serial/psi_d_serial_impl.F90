@@ -1264,6 +1264,21 @@ subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
       do i = 1, m
           z(i) = beta*y(i)
       end do
+    case(35) ! (alpha, beta, gamma) = ( -1,  *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = -x(i) + beta*y(i)
+      end do
+    case(36) ! (alpha, beta, gamma) = ( *,  1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = alpha*x(i) + y(i)
+      end do
+    case(37) ! (alpha, beta, gamma) = ( 1,  1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          z(i) = x(i) + y(i)
+      end do
     case(38) ! (alpha, beta, gamma) = ( 0,  1,  0)
       !$omp parallel do private(i)
       do i = 1, m
@@ -1643,6 +1658,21 @@ subroutine psi_daxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
       !$omp parallel do private(i)
       do i = 1, m
           w(i) = beta*y(i)
+      end do
+    case(35) ! (alpha, beta, gamma) = ( -1,  *,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          w(i) = -x(i) + beta*y(i)
+      end do
+    case(36) ! (alpha, beta, gamma) = ( *,  1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          w(i) = alpha*x(i) + y(i)
+      end do
+    case(37) ! (alpha, beta, gamma) = ( 1,  1,  0)
+      !$omp parallel do private(i)
+      do i = 1, m
+          w(i) = x(i) + y(i)
       end do
     case(38) ! (alpha, beta, gamma) = ( 0,  1,  0)
       !$omp parallel do private(i)
@@ -3763,6 +3793,27 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
         !$omp parallel do private(i)
         do i = 1, m
             z(i, j) = beta*y(i, j)
+        end do
+      end do
+    case(35) ! (alpha, beta, gamma) = ( -1,  *,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = -x(i, j) + beta*y(i, j)
+        end do
+      end do
+    case(36) ! (alpha, beta, gamma) = ( *,  1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = alpha*x(i, j) + y(i, j)
+        end do
+      end do
+    case(37) ! (alpha, beta, gamma) = ( 1,  1,  0)
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+            z(i, j) = x(i, j) + y(i, j)
         end do
       end do
     case(38) ! (alpha, beta, gamma) = ( 0,  1,  0)
