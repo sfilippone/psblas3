@@ -4,8 +4,8 @@ MODDIR=$(INSTALLDIR)/modules/
 include $(INCDIR)/Make.inc.psblas
 
 LIBDIR=$(INSTALLDIR)/lib/
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base
-LDLIBS=$(PSBLDLIBS)
+PSBLAS_LIB= -L$(LIBDIR) $(LCUDA) -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base -lpsb_cuda -lpsb_ext
+LDLIBS=$(PSBGPULDLIBS) 
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
@@ -24,7 +24,7 @@ runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
 
 psb_comm_cg_test.o: $(PROGSRC)
-	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $(PROGSRC) -o $@
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) $(FCUDEFINES) -c $(PROGSRC) -o $@
 
 $(EXE): $(TOBJS)
 	$(FLINK) $(LOPT) $(TOBJS) -o $(EXE) $(PSBLAS_LIB) $(LDLIBS)

@@ -1,5 +1,8 @@
 program psb_comm_cg_test
   use psb_base_mod
+#ifdef PSB_HAVE_CUDA
+  use psb_cuda_mod
+#endif
   use psb_prec_mod
   use psb_linsolve_mod
   use psb_comm_factory_mod
@@ -14,8 +17,14 @@ program psb_comm_cg_test
   type(psb_desc_type) :: desc_a
   type(psb_d_vect_type) :: b, x
   type(psb_dprec_type)  :: prec
+#ifdef PSB_HAVE_CUDA
+  type(psb_d_vect_cuda) :: vmold
+  type(psb_i_vect_cuda) :: imold
+  type(psb_d_cuda_hlg_sparse_mat), target :: ahlg
+  class(psb_d_base_sparse_mat), pointer :: agmold
+#endif
 
-  integer(psb_ipk_) :: info, iam, np
+  integer(psb_ipk_) :: info, my_rank, np
   integer(psb_ipk_) :: desc_me, desc_np
   integer(psb_ipk_) :: idim, itmax, itrace, istop, iter
   integer(psb_ipk_) :: scheme_idx, prec_idx, rep, nrep, nwarm
@@ -35,7 +44,9 @@ program psb_comm_cg_test
   character(len=20) :: prec_name(n_precs)
   character(len=5) :: afmt
   character(len=256) :: arg
+  character(len=16) :: gpu_arg
   logical :: setup_done
+  logical :: use_gpu
 
   info = psb_success_
   afmt = 'CSR'
@@ -47,6 +58,11 @@ program psb_comm_cg_test
   itrace = -1
   istop = 2
   eps = 1.d-6
+#ifdef PSB_HAVE_CUDA
+  use_gpu = .true.
+#else
+  use_gpu = .false.
+#endif
   scheme_type = (/ psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
        & psb_comm_persistent_ineighbor_alltoallv_ /)
   scheme_name(1) = 'isend_irecv'
@@ -89,15 +105,31 @@ program psb_comm_cg_test
       info = psb_success_
     end if
   end if
+
+  call parse_gpu_arg(use_gpu, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,'("Invalid value for --gpu option. Use --gpu=TRUE or --gpu=FALSE")')
+    stop 1
+  end if
   ! call psb_set_debug_level(psb_debug_ext_)
 
 
   ! call probe_ieee('before psb_init')
   call psb_init(ctxt)
+#ifdef PSB_HAVE_CUDA
+  if (use_gpu) call psb_cuda_init(ctxt)
+#endif
   ! call probe_ieee('after psb_init')
   call clear_ieee_flags()
   ! call probe_ieee('after clear_ieee_flags')
-  call psb_info(ctxt, iam, np)
+  call psb_info(ctxt, my_rank, np)
+
+#ifndef PSB_HAVE_CUDA
+  if (use_gpu .and. my_rank == psb_root_) then
+    write(psb_out_unit,'("Warning: --gpu=TRUE requested but this executable was built without CUDA support. Running on CPU.")')
+  end if
+  use_gpu = .false.
+#endif
 
   allocate(setup_time(n_precs,n_schemes,nrep), solve_time(n_precs,n_schemes,nrep), &
        & total_time(n_precs,n_schemes,nrep), final_error(n_precs,n_schemes,nrep), &
@@ -107,7 +139,7 @@ program psb_comm_cg_test
        & comm_set_time(n_precs,n_schemes,nrep), krylov_time(n_precs,n_schemes,nrep), stat=info)
   if (info /= psb_success_) stop 1
 
-  if (iam == psb_root_) then
+  if (my_rank == psb_root_) then
     write(psb_out_unit,*) 'Welcome to PSBLAS version: ', psb_version_string_
     write(psb_out_unit,*) 'This is the comm/cg test program'
     write(psb_out_unit,'("Grid dimensions      : ",i4," x ",i4," x ",i4)') idim,idim,idim
@@ -117,17 +149,31 @@ program psb_comm_cg_test
     write(psb_out_unit,'("Max iterations (CG)  : ",i0)') itmax
     write(psb_out_unit,'("Repetitions          : ",i0)') nrep
     write(psb_out_unit,'("Warmup solves        : ",i0)') nwarm
+    write(psb_out_unit,'("GPU enabled          : ",l1)') use_gpu
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Usage: ./psb_comm_cg_test [idim] [nrep] [nwarm] [itmax]")')
+    write(psb_out_unit,'("Usage: ./psb_comm_cg_test [idim] [nrep] [nwarm] [itmax] [--gpu=TRUE|FALSE]")')
     write(psb_out_unit,'(" ")')
   end if
 
   call psb_barrier(ctxt)
-  t_start = psb_wtime()
   ! call probe_ieee('before psb_d_gen_pde3d')
   call psb_d_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)
   ! call probe_ieee('after psb_d_gen_pde3d')
   if (info /= psb_success_) goto 9999
+
+#ifdef PSB_HAVE_CUDA
+  if (use_gpu) then
+    agmold => ahlg
+    call a%cscnv(info,mold=agmold)
+    if (info /= psb_success_) goto 9999
+    call desc_a%cnv(mold=imold)
+    if (info /= psb_success_) goto 9999
+    call psb_geasb(x,desc_a,info,mold=vmold)
+    if (info /= psb_success_) goto 9999
+    call psb_geasb(b,desc_a,info,mold=vmold)
+    if (info /= psb_success_) goto 9999
+  end if
+#endif
 
   do prec_idx = 1, n_precs
     do scheme_idx = 1, n_schemes
@@ -206,31 +252,20 @@ program psb_comm_cg_test
         final_error(prec_idx,scheme_idx,rep) = err
         solve_info(prec_idx,scheme_idx,rep) = info
 
-        if (iam == psb_root_) then
-          select type(ch => x%v%comm_handle)
-          type is(psb_comm_neighbor_handle)
-            write(psb_out_unit,'("DIAG_COMM scheme=",a,", prec=",a,", rep=",i0)') &
-                 & trim(scheme_name(scheme_idx)), trim(prec_name(prec_idx)), rep
-            write(psb_out_unit,'("DIAG_COMM counters: init=",i0,", start=",i0,", ineighbor=",i0,", wait=",i0,", realloc=",i0)') &
-              & ch%diag_init_calls, ch%diag_start_calls, ch%diag_ineighbor_calls, &
-              & ch%diag_wait_calls, ch%diag_buffer_reallocs
-            write(psb_out_unit,'("DIAG_COMM state: ready=",l1,", bsz=",i0)') &
-              & ch%persistent_request_ready, ch%persistent_buffer_size
-          class default
-            continue
-          end select
-        end if
-
         if (info /= psb_success_) goto 9999
       end do
     end do
   end do
 
-  if (iam == psb_root_) then
+  if (my_rank == psb_root_) then
     write(psb_out_unit,'(" ")')
     write(psb_out_unit,'(100("="))')
     write(psb_out_unit,'("CG TIMING STATISTICS - FINAL RESULTS TABLE")')
     write(psb_out_unit,'(100("="))')
+    write(psb_out_unit,'("Legend:")')
+    write(psb_out_unit,'("  - Each phase time for one repetition is reduced with max across MPI ranks.")')
+    write(psb_out_unit,'("  - Minimum/Average/Maximum/Std Dev are computed across repetitions.")')
+    write(psb_out_unit,'("  - KrylovPerIter = KrylovSolve/iterations; TotalPerIter = TotalTime/iterations.")')
     
     do prec_idx = 1, n_precs
       write(psb_out_unit,'(" ")')
@@ -307,6 +342,10 @@ program psb_comm_cg_test
       & prec_init_time,prec_bld_time,comm_set_time,krylov_time, &
       & krylov_it_time,total_it_time)
 
+  
+#ifdef PSB_HAVE_CUDA
+  if (use_gpu) call psb_cuda_exit()
+#endif
   call psb_exit(ctxt)
   stop
 
@@ -449,6 +488,32 @@ contains
     call ieee_set_flag(ieee_underflow, .false.)
   end subroutine clear_ieee_flags
 
+  subroutine parse_gpu_arg(use_gpu, info)
+    logical, intent(inout) :: use_gpu
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: i, argc
+    character(len=256) :: carg, uarg, val
+
+    info = psb_success_
+    argc = command_argument_count()
+    do i = 1, argc
+      call get_command_argument(i,carg)
+      uarg = psb_toupper(trim(carg))
+      if (index(uarg,'--GPU=') == 1) then
+        val = psb_toupper(adjustl(carg(7:len_trim(carg))))
+        select case (trim(val))
+        case ('TRUE','T','1','YES','Y','ON')
+          use_gpu = .true.
+        case ('FALSE','F','0','NO','N','OFF')
+          use_gpu = .false.
+        case default
+          info = psb_err_internal_error_
+          return
+        end select
+      end if
+    end do
+  end subroutine parse_gpu_arg
+
   subroutine psb_d_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info)
     implicit none
     integer(psb_ipk_), intent(in)     :: idim
@@ -464,7 +529,7 @@ contains
     integer(psb_lpk_) :: m,n,glob_row
     integer(psb_ipk_) :: nnz,nlr,i,ii,ib,k
     integer(psb_ipk_) :: ix,iy,iz
-    integer(psb_ipk_) :: np, iam, nr, nt
+    integer(psb_ipk_) :: np, my_rank, nr, nt
     integer(psb_ipk_) :: icoeff
     integer(psb_lpk_), allocatable :: irow(:),icol(:),myidx(:)
     real(psb_dpk_), allocatable :: val(:)
@@ -477,7 +542,7 @@ contains
     name = 'create_matrix'
     call psb_erractionsave(err_act)
 
-    call psb_info(ctxt, iam, np)
+    call psb_info(ctxt, my_rank, np)
 
     if (idim <= 0) then
       info = psb_err_internal_error_
@@ -489,9 +554,9 @@ contains
       call psb_errpush(info,name,a_err='invalid context: np <= 0')
       goto 9999
     end if
-    if (iam < 0) then
+    if (my_rank < 0) then
       info = psb_err_context_error_
-      call psb_errpush(info,name,a_err='invalid context: iam < 0')
+      call psb_errpush(info,name,a_err='invalid context: my_rank < 0')
       goto 9999
     end if
 
@@ -528,14 +593,14 @@ contains
       call psb_errpush(info,name,a_err='invalid local nnz estimate: nnz <= 0')
       goto 9999
     end if
-    if(iam == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
+    if(my_rank == psb_root_) write(psb_out_unit,'("Generating Matrix (size=",i0,")...")')n
 
     nt = (m+np-1)/np
-    nr = max(0,min(nt,m-(iam*nt)))
+    nr = max(0,min(nt,m-(my_rank*nt)))
     nt = nr
     call psb_sum(ctxt,nt)
     if (nt /= m) then
-      write(psb_err_unit,*) iam, 'Initialization error ',nr,nt,m
+      write(psb_err_unit,*) my_rank, 'Initialization error ',nr,nt,m
       info = -1
       call psb_barrier(ctxt)
       call psb_abort(ctxt)
@@ -661,7 +726,7 @@ contains
       ! call probe_ieee('after psb_spins')
       if(info /= psb_success_) then
         write(psb_err_unit,'("INSERT FAIL rank=",i0,", call=psb_spins, ii=",i0,", ib=",i0,", icoeff=",i0)') &
-             iam, ii, ib, icoeff
+             my_rank, ii, ib, icoeff
         write(psb_err_unit,'("  glob_row=",i0,", ix=",i0,", iy=",i0,", iz=",i0)') glob_row, ix, iy, iz
         exit
       end if
@@ -669,7 +734,7 @@ contains
       ! call probe_ieee('after psb_geins bv')
       if(info /= psb_success_) then
         write(psb_err_unit,'("INSERT FAIL rank=",i0,", call=psb_geins bv, ii=",i0,", ib=",i0,", icoeff=",i0)') &
-             iam, ii, ib, icoeff
+             my_rank, ii, ib, icoeff
         write(psb_err_unit,'("  glob_row=",i0,", ix=",i0,", iy=",i0,", iz=",i0)') glob_row, ix, iy, iz
         exit
       end if
@@ -678,7 +743,7 @@ contains
       ! call probe_ieee('after psb_geins xv')
       if(info /= psb_success_) then
         write(psb_err_unit,'("INSERT FAIL rank=",i0,", call=psb_geins xv, ii=",i0,", ib=",i0,", icoeff=",i0)') &
-             iam, ii, ib, icoeff
+             my_rank, ii, ib, icoeff
         write(psb_err_unit,'("  glob_row=",i0,", ix=",i0,", iy=",i0,", iz=",i0)') glob_row, ix, iy, iz
         exit
       end if
@@ -730,7 +795,7 @@ contains
     call psb_amx(ctxt,tgen)
     call psb_amx(ctxt,tasb)
     call psb_amx(ctxt,ttot)
-    if(iam == psb_root_) then
+    if(my_rank == psb_root_) then
       tmpfmt = a%get_fmt()
       write(psb_out_unit,'("The matrix has been generated and assembled in ",a3," format.")') tmpfmt
       write(psb_out_unit,'("-allocation  time : ",es12.5)') talc

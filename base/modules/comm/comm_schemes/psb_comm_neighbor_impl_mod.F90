@@ -30,11 +30,6 @@ module psb_comm_neighbor_impl_mod
     logical :: persistent_request_ready = .false.
     logical :: persistent_in_flight = .false.
     integer(psb_ipk_) :: persistent_buffer_size = 0
-    integer(psb_ipk_) :: diag_init_calls = 0
-    integer(psb_ipk_) :: diag_start_calls = 0
-    integer(psb_ipk_) :: diag_ineighbor_calls = 0
-    integer(psb_ipk_) :: diag_wait_calls = 0
-    integer(psb_ipk_) :: diag_buffer_reallocs = 0
   contains
     procedure, pass :: init => psb_comm_neighbor_init
     procedure, pass :: free => neighbor_topology_free
@@ -398,11 +393,6 @@ contains
     this%persistent_request_ready = .false.
     this%persistent_in_flight = .false.
     this%persistent_buffer_size = 0
-    this%diag_init_calls = 0
-    this%diag_start_calls = 0
-    this%diag_ineighbor_calls = 0
-    this%diag_wait_calls = 0
-    this%diag_buffer_reallocs = 0
     call this%free(info)
   end subroutine psb_comm_neighbor_destroy
 
@@ -440,16 +430,6 @@ contains
     this%persistent_request_ready = .false.
     this%persistent_in_flight = .false.
     this%persistent_buffer_size = 0
-    this%diag_init_calls = 0
-    this%diag_start_calls = 0
-    this%diag_ineighbor_calls = 0
-    this%diag_wait_calls = 0
-    this%diag_buffer_reallocs = 0
-    this%diag_init_calls = 0
-    this%diag_start_calls = 0
-    this%diag_ineighbor_calls = 0
-    this%diag_wait_calls = 0
-    this%diag_buffer_reallocs = 0
   end subroutine psb_comm_neighbor_init
 
 
