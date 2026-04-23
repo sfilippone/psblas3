@@ -1,5 +1,6 @@
 program psb_comm_cg_test
   use psb_base_mod
+  use psb_util_mod
 #ifdef PSB_HAVE_CUDA
   use psb_cuda_mod
 #endif
@@ -44,9 +45,12 @@ program psb_comm_cg_test
   character(len=20) :: prec_name(n_precs)
   character(len=5) :: afmt
   character(len=256) :: arg
+  character(len=256) :: matrix_file
+  character(len=2) :: matrix_fmt
   character(len=16) :: gpu_arg
   logical :: setup_done
   logical :: use_gpu
+  logical :: use_external_matrix
 
   info = psb_success_
   afmt = 'CSR'
@@ -58,6 +62,9 @@ program psb_comm_cg_test
   itrace = -1
   istop = 2
   eps = 1.d-6
+  matrix_file = ''
+  matrix_fmt = 'MM'
+  use_external_matrix = .false.
 #ifdef PSB_HAVE_CUDA
   use_gpu = .true.
 #else
@@ -111,6 +118,12 @@ program psb_comm_cg_test
     write(psb_err_unit,'("Invalid value for --gpu option. Use --gpu=TRUE or --gpu=FALSE")')
     stop 1
   end if
+  call parse_matrix_arg(matrix_file, matrix_fmt, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,'("Invalid matrix options. Use --matrix=<path> [--fmt=MM|HB]")')
+    stop 1
+  end if
+  use_external_matrix = (len_trim(matrix_file) > 0)
   ! call psb_set_debug_level(psb_debug_ext_)
 
 
@@ -142,7 +155,12 @@ program psb_comm_cg_test
   if (my_rank == psb_root_) then
     write(psb_out_unit,*) 'Welcome to PSBLAS version: ', psb_version_string_
     write(psb_out_unit,*) 'This is the comm/cg test program'
-    write(psb_out_unit,'("Grid dimensions      : ",i4," x ",i4," x ",i4)') idim,idim,idim
+    if (use_external_matrix) then
+      write(psb_out_unit,'("Input matrix         : ",a)') trim(matrix_file)
+      write(psb_out_unit,'("Input format         : ",a)') trim(matrix_fmt)
+    else
+      write(psb_out_unit,'("Grid dimensions      : ",i4," x ",i4," x ",i4)') idim,idim,idim
+    end if
     write(psb_out_unit,'("Number of processors : ",i0)') np
     write(psb_out_unit,'("Iterative method     : CG")')
     write(psb_out_unit,'("Preconditioners      : NONE, DIAG")')
@@ -151,14 +169,19 @@ program psb_comm_cg_test
     write(psb_out_unit,'("Warmup solves        : ",i0)') nwarm
     write(psb_out_unit,'("GPU enabled          : ",l1)') use_gpu
     write(psb_out_unit,'(" ")')
-    write(psb_out_unit,'("Usage: ./psb_comm_cg_test [idim] [nrep] [nwarm] [itmax] [--gpu=TRUE|FALSE]")')
+        write(psb_out_unit,'("Usage: ./psb_comm_cg_test [idim] [nrep] [nwarm] [itmax] ",&
+          &"[--gpu=TRUE|FALSE] [--matrix=<path>] [--fmt=MM|HB]")')
     write(psb_out_unit,'(" ")')
   end if
 
   call psb_barrier(ctxt)
-  ! call probe_ieee('before psb_d_gen_pde3d')
-  call psb_d_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)
-  ! call probe_ieee('after psb_d_gen_pde3d')
+  if (use_external_matrix) then
+    call load_external_matrix(ctxt, matrix_file, matrix_fmt, a, b, x, desc_a, afmt, info)
+  else
+    ! call probe_ieee('before psb_d_gen_pde3d')
+    call psb_d_gen_pde3d(ctxt,idim,a,b,x,desc_a,afmt,info)
+    ! call probe_ieee('after psb_d_gen_pde3d')
+  end if
   if (info /= psb_success_) goto 9999
 
 #ifdef PSB_HAVE_CUDA
@@ -168,9 +191,9 @@ program psb_comm_cg_test
     if (info /= psb_success_) goto 9999
     call desc_a%cnv(mold=imold)
     if (info /= psb_success_) goto 9999
-    call psb_geasb(x,desc_a,info,mold=vmold)
+    call x%cnv(mold=vmold)
     if (info /= psb_success_) goto 9999
-    call psb_geasb(b,desc_a,info,mold=vmold)
+    call b%cnv(mold=vmold)
     if (info /= psb_success_) goto 9999
   end if
 #endif
@@ -513,6 +536,113 @@ contains
       end if
     end do
   end subroutine parse_gpu_arg
+
+  subroutine parse_matrix_arg(matrix_file, matrix_fmt, info)
+    character(len=*), intent(inout) :: matrix_file
+    character(len=*), intent(inout) :: matrix_fmt
+    integer(psb_ipk_), intent(out)  :: info
+    integer(psb_ipk_) :: i, argc
+    character(len=256) :: carg, uarg, val
+
+    info = psb_success_
+    argc = command_argument_count()
+    do i = 1, argc
+      call get_command_argument(i,carg)
+      uarg = psb_toupper(trim(carg))
+
+      if (index(uarg,'--MATRIX=') == 1) then
+        matrix_file = adjustl(carg(10:len_trim(carg)))
+      else if (trim(uarg) == '--MATRIX') then
+        if (i < argc) then
+          call get_command_argument(i+1,matrix_file)
+        else
+          info = psb_err_internal_error_
+          return
+        end if
+      else if (index(uarg,'--FMT=') == 1) then
+        val = psb_toupper(adjustl(carg(7:len_trim(carg))))
+        if ((trim(val) == 'MM') .or. (trim(val) == 'HB')) then
+          matrix_fmt = trim(val)
+        else
+          info = psb_err_internal_error_
+          return
+        end if
+      else if (trim(uarg) == '--FMT') then
+        if (i < argc) then
+          call get_command_argument(i+1,val)
+          val = psb_toupper(trim(val))
+          if ((trim(val) == 'MM') .or. (trim(val) == 'HB')) then
+            matrix_fmt = trim(val)
+          else
+            info = psb_err_internal_error_
+            return
+          end if
+        else
+          info = psb_err_internal_error_
+          return
+        end if
+      end if
+    end do
+  end subroutine parse_matrix_arg
+
+  subroutine load_external_matrix(ctxt, matrix_file, matrix_fmt, a, bv, xv, desc_a, afmt, info)
+    type(psb_ctxt_type), intent(in)      :: ctxt
+    character(len=*), intent(in)         :: matrix_file
+    character(len=*), intent(in)         :: matrix_fmt
+    type(psb_dspmat_type), intent(out)   :: a
+    type(psb_d_vect_type), intent(out)   :: bv, xv
+    type(psb_desc_type), intent(out)     :: desc_a
+    character(len=*), intent(in)         :: afmt
+    integer(psb_ipk_), intent(out)       :: info
+
+    type(psb_ldspmat_type) :: aux_a
+    real(psb_dpk_), allocatable :: rhs_glob(:), x_glob(:)
+    integer(psb_lpk_) :: nrows, ncols
+
+    info = psb_success_
+
+    select case(psb_toupper(trim(matrix_fmt)))
+    case('MM')
+      call mm_mat_read(aux_a,info,filename=trim(matrix_file))
+    case('HB')
+      call hb_read(aux_a,info,filename=trim(matrix_file))
+    case default
+      info = psb_err_internal_error_
+      return
+    end select
+    if (info /= psb_success_) return
+
+    nrows = aux_a%get_nrows()
+    ncols = aux_a%get_ncols()
+    if (nrows /= ncols) then
+      write(psb_err_unit,'("Input matrix must be square for CG: ",a)') trim(matrix_file)
+      info = psb_err_internal_error_
+      return
+    end if
+
+    call psb_matdist(aux_a, a, ctxt, desc_a, info, fmt=afmt, parts=part_block)
+    if (info /= psb_success_) return
+
+    call psb_geall(xv,desc_a,info)
+    if (info /= psb_success_) return
+    call psb_geall(bv,desc_a,info)
+    if (info /= psb_success_) return
+
+    allocate(rhs_glob(nrows), x_glob(ncols), stat=info)
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
+      return
+    end if
+    rhs_glob = done
+    x_glob = dzero
+
+    call psb_scatter(rhs_glob,bv,desc_a,info,root=psb_root_)
+    if (info /= psb_success_) return
+    call psb_scatter(x_glob,xv,desc_a,info,root=psb_root_)
+    if (info /= psb_success_) return
+
+    deallocate(rhs_glob, x_glob)
+  end subroutine load_external_matrix
 
   subroutine psb_d_gen_pde3d(ctxt,idim,a,bv,xv,desc_a,afmt,info)
     implicit none

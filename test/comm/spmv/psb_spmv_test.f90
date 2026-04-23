@@ -1,8 +1,5 @@
 !> Test program for overlapping communication and computation with psb_spmm.
 !!
-!! This benchmark compares two equivalent SpMV paths:
-!!   1. Serialized halo exchange + compute
-!!   2. Overlapped psb_spmm(..., doswap=.true.)
 !!
 module psb_spmv_overlap_test
 
@@ -532,7 +529,7 @@ contains
     return
   end subroutine psb_d_gen_pde3d
 
-  subroutine run_spmv_kernel(ctxt,use_gpu)
+  subroutine run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_in,times_in,do_swap)
     use psb_base_mod
 #ifdef PSB_HAVE_CUDA
     use psb_cuda_mod
@@ -541,73 +538,112 @@ contains
 
     type(psb_ctxt_type), intent(in) :: ctxt
     logical, intent(in)             :: use_gpu
+    character(len=*), intent(in)    :: matrix_file
+    character(len=*), intent(in)    :: matrix_fmt
+    character(len=*), intent(in)    :: cpu_fmt
+    character(len=*), intent(in)    :: gpu_fmt
+    integer(psb_ipk_), intent(in)   :: idim_in, times_in
+    logical, intent(in)             :: do_swap
 
     type(psb_dspmat_type)           :: a
     type(psb_d_vect_type)           :: x, y
     type(psb_desc_type)             :: desc_a
-    character(len=5)                :: afmt
+    character(len=8)                :: afmt
     character(len=64)               :: env_buf
     integer(psb_ipk_)               :: my_rank, np, info, err_act
     integer(psb_ipk_)               :: idim, times, i, n_global
     integer                         :: env_len, env_status, ios
     real(psb_dpk_)                  :: alpha, beta, t0, t1, dt, avg_t
+    logical                         :: use_external_matrix
 
 #ifdef PSB_HAVE_CUDA
-    type(psb_d_vect_cuda)           :: vmold
-    type(psb_i_vect_cuda)           :: imold
-    type(psb_d_cuda_hlg_sparse_mat), target :: ahlg
-    class(psb_d_base_sparse_mat), pointer     :: agmold
+  type(psb_d_vect_cuda)                     :: cuda_vector_mold
+  type(psb_i_vect_cuda)                     :: cuda_index_mold
+  type(psb_d_cuda_elg_sparse_mat), target   :: cuda_ell_sparse_mold
+  type(psb_d_cuda_csrg_sparse_mat), target  :: cuda_csr_sparse_mold
+  type(psb_d_cuda_hdiag_sparse_mat), target :: cuda_hdia_sparse_mold
+  type(psb_d_cuda_hlg_sparse_mat), target   :: cuda_hll_sparse_mold
+  class(psb_d_base_sparse_mat), pointer     :: cuda_sparse_mold
 #endif
 
     info = psb_success_
-    afmt = 'CSR'
-    idim = 10
-    times = 100
+    afmt = psb_toupper(trim(cpu_fmt))
+    if (len_trim(afmt) == 0) afmt = 'CSR'
+    if (idim_in > 0) then
+      idim = idim_in
+    else
+      idim = 10
+    end if
+
+    if (times_in > 0) then
+      times = times_in
+    else
+      times = 100
+    end if
     alpha = done
     beta  = dzero
 
     call psb_erractionsave(err_act)
     call psb_info(ctxt, my_rank, np)
+    use_external_matrix = (len_trim(matrix_file) > 0)
 
-    call get_environment_variable('IDIM', env_buf, length=env_len, status=env_status)
-    if ((env_status == 0) .and. (env_len > 0)) then
-      read(env_buf(1:env_len), *, iostat=ios) idim
-      if ((ios /= 0) .or. (idim < 2)) idim = 10
-    end if
-    call get_environment_variable('TIMES', env_buf, length=env_len, status=env_status)
-    if ((env_status == 0) .and. (env_len > 0)) then
-      read(env_buf(1:env_len), *, iostat=ios) times
-      if ((ios /= 0) .or. (times < 1)) times = 100
+    if (idim_in <= 0) then
+      call get_environment_variable('IDIM', env_buf, length=env_len, status=env_status)
+      if ((env_status == 0) .and. (env_len > 0)) then
+        read(env_buf(1:env_len), *, iostat=ios) idim
+        if ((ios /= 0) .or. (idim < 2)) idim = 10
+      end if
     end if
 
-    n_global = idim * idim * idim
+    if (times_in <= 0) then
+      call get_environment_variable('TIMES', env_buf, length=env_len, status=env_status)
+      if ((env_status == 0) .and. (env_len > 0)) then
+        read(env_buf(1:env_len), *, iostat=ios) times
+        if ((ios /= 0) .or. (times < 1)) times = 100
+      end if
+    end if
 
     call psb_barrier(ctxt)
-    call psb_d_gen_pde3d(ctxt,idim,a,y,x,desc_a,afmt,info)
+    if (use_external_matrix) then
+      call load_external_matrix(ctxt, matrix_file, matrix_fmt, a, y, x, desc_a, afmt, info)
+      n_global = int(a%get_nrows(),kind=psb_ipk_)
+    else
+      call psb_d_gen_pde3d(ctxt,idim,a,y,x,desc_a,afmt,info)
+      n_global = idim * idim * idim
+    end if
     if (info /= psb_success_) goto 9999
 
 #ifdef PSB_HAVE_CUDA
     if (use_gpu) then
-      agmold => ahlg
-      call a%cscnv(info,mold=agmold)
+      select case(psb_toupper(trim(gpu_fmt)))
+      case('ELG')
+        cuda_sparse_mold => cuda_ell_sparse_mold
+      case('CSRG')
+        cuda_sparse_mold => cuda_csr_sparse_mold
+      case('HDIAG','HDIA')
+        cuda_sparse_mold => cuda_hdia_sparse_mold
+      case default
+        cuda_sparse_mold => cuda_hll_sparse_mold
+      end select
+      call a%cscnv(info,mold=cuda_sparse_mold)
       if (info /= psb_success_) goto 9999
-      call desc_a%cnv(mold=imold)
+      call desc_a%cnv(mold=cuda_index_mold)
       if (info /= psb_success_) goto 9999
-      call psb_geasb(x,desc_a,info,mold=vmold)
+      call x%cnv(mold=cuda_vector_mold)
       if (info /= psb_success_) goto 9999
-      call psb_geasb(y,desc_a,info,mold=vmold)
+      call y%cnv(mold=cuda_vector_mold)
       if (info /= psb_success_) goto 9999
     end if
 #endif
 
     ! warm-up
-    call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=.false.)
+    call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=do_swap)
     if (info /= psb_success_) goto 9999
 
     call psb_barrier(ctxt)
     t0 = psb_wtime()
     do i = 1, times
-      call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=.false.)
+      call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=do_swap)
       if (info /= psb_success_) exit
     end do
     t1 = psb_wtime()
@@ -618,8 +654,19 @@ contains
     avg_t = dt / real(times, psb_dpk_)
 
     if (my_rank == psb_root_) then
-      write(psb_out_unit,'(/,"SpMV benchmark (no overlap)")')
-      write(psb_out_unit,'("  idim            : ",i0)') idim
+      if (do_swap) then
+        write(psb_out_unit,'(/,"SpMV benchmark (overlap)")')
+      else
+        write(psb_out_unit,'(/,"SpMV benchmark (no overlap)")')
+      end if
+      write(psb_out_unit,'("  cpu matrix fmt   : ",a)') trim(afmt)
+      if (use_gpu) write(psb_out_unit,'("  gpu matrix fmt   : ",a)') trim(psb_toupper(trim(gpu_fmt)))
+      if (use_external_matrix) then
+        write(psb_out_unit,'("  matrix file     : ",a)') trim(matrix_file)
+        write(psb_out_unit,'("  matrix format   : ",a)') trim(matrix_fmt)
+      else
+        write(psb_out_unit,'("  idim            : ",i0)') idim
+      end if
       write(psb_out_unit,'("  global unknowns : ",i0)') n_global
       write(psb_out_unit,'("  repetitions     : ",i0)') times
       write(psb_out_unit,'("  total time [s]  : ",es12.5)') dt
@@ -637,6 +684,65 @@ contains
     call psb_error_handler(ctxt, err_act)
   end subroutine run_spmv_kernel
 
+  subroutine load_external_matrix(ctxt, matrix_file, matrix_fmt, a, bv, xv, desc_a, afmt, info)
+    type(psb_ctxt_type), intent(in)      :: ctxt
+    character(len=*), intent(in)         :: matrix_file
+    character(len=*), intent(in)         :: matrix_fmt
+    type(psb_dspmat_type), intent(out)   :: a
+    type(psb_d_vect_type), intent(out)   :: bv, xv
+    type(psb_desc_type), intent(out)     :: desc_a
+    character(len=*), intent(in)         :: afmt
+    integer(psb_ipk_), intent(out)       :: info
+
+    type(psb_ldspmat_type) :: aux_a
+    real(psb_dpk_), allocatable :: rhs_glob(:), x_glob(:)
+    integer(psb_lpk_) :: nrows, ncols
+
+    info = psb_success_
+
+    select case(psb_toupper(trim(matrix_fmt)))
+    case('MM')
+      call mm_mat_read(aux_a,info,filename=trim(matrix_file))
+    case('HB')
+      call hb_read(aux_a,info,filename=trim(matrix_file))
+    case default
+      info = psb_err_internal_error_
+      return
+    end select
+    if (info /= psb_success_) return
+
+    nrows = aux_a%get_nrows()
+    ncols = aux_a%get_ncols()
+    if (nrows /= ncols) then
+      write(psb_err_unit,'("Input matrix must be square: ",a)') trim(matrix_file)
+      info = psb_err_internal_error_
+      return
+    end if
+
+    call psb_matdist(aux_a, a, ctxt, desc_a, info, fmt=afmt, parts=part_block)
+    if (info /= psb_success_) return
+
+    call psb_geall(xv,desc_a,info)
+    if (info /= psb_success_) return
+    call psb_geall(bv,desc_a,info)
+    if (info /= psb_success_) return
+
+    allocate(rhs_glob(nrows), x_glob(ncols), stat=info)
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
+      return
+    end if
+    rhs_glob = done
+    x_glob = dzero
+
+    call psb_scatter(rhs_glob,bv,desc_a,info,root=psb_root_)
+    if (info /= psb_success_) return
+    call psb_scatter(x_glob,xv,desc_a,info,root=psb_root_)
+    if (info /= psb_success_) return
+
+    deallocate(rhs_glob, x_glob)
+  end subroutine load_external_matrix
+
 end module psb_spmv_overlap_test
 
 program psb_spmv_kernel
@@ -650,7 +756,22 @@ program psb_spmv_kernel
   type(psb_ctxt_type) :: ctxt
   logical :: use_gpu
   integer(psb_ipk_) :: my_rank, np, k
+  integer :: ios
   character(len=256) :: arg
+  character(len=256) :: matrix_file
+  character(len=2)   :: matrix_fmt
+  character(len=8)   :: cpu_fmt
+  character(len=8)   :: gpu_fmt
+  integer(psb_ipk_) :: idim_arg, times_arg
+  logical           :: do_swap
+  idim_arg    = -1
+  times_arg   = -1
+
+  matrix_file = ''
+  matrix_fmt  = 'MM'
+  cpu_fmt     = 'CSR'
+  gpu_fmt     = 'HLG'
+  do_swap     = .true.
 
   call psb_init(ctxt)
   call psb_info(ctxt, my_rank, np)
@@ -670,6 +791,71 @@ program psb_spmv_kernel
       case ('FALSE','F','0','NO','N','OFF')
         use_gpu = .false.
       end select
+    else if (index(psb_toupper(trim(arg)), '--MATRIX=') == 1) then
+      matrix_file = adjustl(arg(10:len_trim(arg)))
+    else if (index(psb_toupper(trim(arg)), '--FMT=') == 1) then
+      arg = psb_toupper(adjustl(arg(7:len_trim(arg))))
+      if ((trim(arg) == 'MM') .or. (trim(arg) == 'HB')) matrix_fmt = trim(arg)
+    else if (index(psb_toupper(trim(arg)), '--MTX_FMT=') == 1) then
+      arg = psb_toupper(adjustl(arg(10:len_trim(arg))))
+      if ((trim(arg) == 'MM') .or. (trim(arg) == 'HB')) matrix_fmt = trim(arg)
+    else if (index(psb_toupper(trim(arg)), '--DIM=') == 1) then
+      read(arg(7:len_trim(arg)),*,iostat=ios) idim_arg
+      if ((ios /= 0) .or. (idim_arg < 2)) idim_arg = -1
+    else if (index(psb_toupper(trim(arg)), '--TIMES=') == 1) then
+      read(arg(9:len_trim(arg)),*,iostat=ios) times_arg
+      if ((ios /= 0) .or. (times_arg < 1)) times_arg = -1
+    else if (index(psb_toupper(trim(arg)), '--ITERS=') == 1) then
+      read(arg(9:len_trim(arg)),*,iostat=ios) times_arg
+      if ((ios /= 0) .or. (times_arg < 1)) times_arg = -1
+    else if (index(psb_toupper(trim(arg)), '--CPU_FORMAT=') == 1) then
+      cpu_fmt = psb_toupper(adjustl(arg(14:len_trim(arg))))
+    else if (index(psb_toupper(trim(arg)), '--CPU_FMT=') == 1) then
+      cpu_fmt = psb_toupper(adjustl(arg(11:len_trim(arg))))
+    else if (index(psb_toupper(trim(arg)), '--GPU_FORMAT=') == 1) then
+      gpu_fmt = psb_toupper(adjustl(arg(14:len_trim(arg))))
+    else if (index(psb_toupper(trim(arg)), '--GPU_FMT=') == 1) then
+      gpu_fmt = psb_toupper(adjustl(arg(11:len_trim(arg))))
+    else if ((trim(psb_toupper(arg)) == '--NOOVERLAP') .or. (trim(psb_toupper(arg)) == '--NO_OVERLAP')) then
+      do_swap = .false.
+    else if ((trim(psb_toupper(arg)) == '--OVERLAP') .or. (trim(psb_toupper(arg)) == '--SWAP')) then
+      do_swap = .true.
+    else if (trim(psb_toupper(arg)) == '--MATRIX') then
+      if (k < command_argument_count()) call get_command_argument(k+1,matrix_file)
+    else if (trim(psb_toupper(arg)) == '--FMT') then
+      if (k < command_argument_count()) then
+        call get_command_argument(k+1,arg)
+        arg = psb_toupper(trim(arg))
+        if ((trim(arg) == 'MM') .or. (trim(arg) == 'HB')) matrix_fmt = trim(arg)
+      end if
+    else if (trim(psb_toupper(arg)) == '--MTX_FMT') then
+      if (k < command_argument_count()) then
+        call get_command_argument(k+1,arg)
+        arg = psb_toupper(trim(arg))
+        if ((trim(arg) == 'MM') .or. (trim(arg) == 'HB')) matrix_fmt = trim(arg)
+      end if
+    else if (trim(psb_toupper(arg)) == '--DIM') then
+      if (k < command_argument_count()) then
+        call get_command_argument(k+1,arg)
+        read(arg,*,iostat=ios) idim_arg
+        if ((ios /= 0) .or. (idim_arg < 2)) idim_arg = -1
+      end if
+    else if ((trim(psb_toupper(arg)) == '--TIMES') .or. (trim(psb_toupper(arg)) == '--ITERS')) then
+      if (k < command_argument_count()) then
+        call get_command_argument(k+1,arg)
+        read(arg,*,iostat=ios) times_arg
+        if ((ios /= 0) .or. (times_arg < 1)) times_arg = -1
+      end if
+    else if ((trim(psb_toupper(arg)) == '--CPU_FORMAT') .or. (trim(psb_toupper(arg)) == '--CPU_FMT')) then
+      if (k < command_argument_count()) then
+        call get_command_argument(k+1,arg)
+        cpu_fmt = psb_toupper(trim(arg))
+      end if
+    else if ((trim(psb_toupper(arg)) == '--GPU_FORMAT') .or. (trim(psb_toupper(arg)) == '--GPU_FMT')) then
+      if (k < command_argument_count()) then
+        call get_command_argument(k+1,arg)
+        gpu_fmt = psb_toupper(trim(arg))
+      end if
     end if
   end do
 
@@ -683,9 +869,12 @@ program psb_spmv_kernel
     write(psb_out_unit,*) 'Welcome to PSBLAS version: ', psb_version_string_
     write(psb_out_unit,*) 'This is the psb_spmv_kernel sample program'
     write(psb_out_unit,'("GPU enabled          : ",l1)') use_gpu
+        write(psb_out_unit,'("Usage: ./psb_spmv_kernel [--gpu=TRUE|FALSE] [--dim=N] [--times=N] ",&
+          &"[--cpu_fmt=CSR|COO|CSC|ELL|HLL] [--gpu_fmt=HLL|ELL|CSR|HDIA] [--matrix=<path>] [--fmt=MM|HB] ",&
+          &"[--overlap|--nooverlap]")')
   end if
 
-  call run_spmv_kernel(ctxt,use_gpu)
+      call run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_arg,times_arg,do_swap)
 
 #ifdef PSB_HAVE_CUDA
   if (use_gpu) call psb_cuda_exit()

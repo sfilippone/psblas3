@@ -19,3 +19,13 @@ Communication schemes compared:
 
 Unlike `swapdata/`, which checks direct halo exchange, this test covers the
 overlapped SpMV workflow.
+
+Run options
+-----------
+
+- Default PDE-generated matrix: `./runs/psb_spmv_kernel [--gpu=TRUE|FALSE] [--nooverlap]`
+- External matrix: `./runs/psb_spmv_kernel [--gpu=TRUE|FALSE] --matrix=<path> [--fmt=MM|HB] [--nooverlap]`
+
+The overlap path is enabled by default; pass `--nooverlap` to force the non-overlapped halo-update path.
+
+When `--matrix` is provided, the benchmark reads and distributes that matrix instead of generating the 3D PDE test matrix.

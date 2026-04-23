@@ -34,4 +34,12 @@ From this directory:
 - `make run` (defaults: `NP=4`, `IDIM=40`)
 - `make run NP=8 IDIM=80`
 
-The program accepts one optional CLI argument: `IDIM`.
+Default PDE-generated matrix:
+
+- `./runs/psb_comm_cg_test [idim] [nrep] [nwarm] [itmax] [--gpu=TRUE|FALSE]`
+
+External matrix input:
+
+- `./runs/psb_comm_cg_test [idim] [nrep] [nwarm] [itmax] --matrix=<path> [--fmt=MM|HB] [--gpu=TRUE|FALSE]`
+
+When `--matrix` is provided, the test reads and distributes that matrix and ignores the PDE generator.

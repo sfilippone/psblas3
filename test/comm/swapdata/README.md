@@ -17,3 +17,13 @@ Communication patterns exercised:
 
 This test validates the low-level communication behavior in isolation, without
 the full SpMV overlap pipeline.
+
+Run options
+-----------
+
+- Synthetic 3D stencil descriptor (default):
+  - `./runs/psb_comm_test [--dim N] [--iters N] [--mode both|baseline|neighbor|persistent]`
+- External matrix descriptor:
+  - `./runs/psb_comm_test [--iters N] [--mode both|baseline|neighbor|persistent] --matrix <path> [--fmt MM|HB]`
+
+With `--matrix`, the descriptor is built from the distributed input matrix pattern.

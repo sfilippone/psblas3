@@ -17,6 +17,7 @@
 !
 program psb_comm_test
   use psb_base_mod
+  use psb_util_mod
   use psb_error_mod, only: psb_set_debug_level, psb_debug_ext_
   use psi_mod
   use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
@@ -29,9 +30,12 @@ program psb_comm_test
   integer(psb_ipk_)                     :: idim
   integer(psb_ipk_)                     :: argc
   integer(psb_ipk_)                     :: iters
-  character(len=32)                     :: arg
+  character(len=256)                    :: arg
   character(len=16)                     :: mode
+  character(len=256)                    :: matrix_file
+  character(len=2)                      :: matrix_fmt
   logical                               :: debug_swapdata
+  logical                               :: use_external_matrix
 
   ! ---- descriptor / context ----
   type(psb_ctxt_type)                   :: ctxt
@@ -39,6 +43,8 @@ program psb_comm_test
   integer(psb_ipk_)                     :: my_rank, np, info, i, nr, number_of_local_rows
   integer(psb_lpk_)                     :: m, nt
   integer(psb_lpk_), allocatable        :: myidx(:)
+  type(psb_dspmat_type)                 :: a_mat
+  type(psb_ldspmat_type)                :: aux_a
 
   ! ---- vectors ----
   type(psb_d_vect_type)                 :: v_baseline, v_neighbor, v_neighbor_persistent
@@ -55,6 +61,7 @@ program psb_comm_test
   ! ---- error / reporting ----
   integer(psb_ipk_)                     :: n_pass, n_total, imode
   logical                               :: run_baseline, run_neighbor, run_persistent
+  logical                               :: mat_allocated
   logical                               :: comm_ok
   real(psb_dpk_)                        :: err, tol
   real(psb_dpk_)                        :: t0, t1, dt, tsum_baseline, tsum_neighbor, tsum_neighbor_persistent
@@ -70,6 +77,10 @@ program psb_comm_test
   iters = 5
   mode = 'both'
   debug_swapdata = .false.
+  matrix_file = ''
+  matrix_fmt = 'MM'
+  use_external_matrix = .false.
+  mat_allocated = .false.
 
   ! ---- parse command-line argument for idim ----
   idim = 10
@@ -86,8 +97,24 @@ program psb_comm_test
         call get_command_argument(i+1, arg)
         read(arg, *) iters
       end if
+    else if (index(psb_toupper(trim(arg)),'--MATRIX=') == 1) then
+      matrix_file = adjustl(arg(10:len_trim(arg)))
+    else if (trim(psb_toupper(arg)) == '--MATRIX') then
+      if (i < argc) then
+        call get_command_argument(i+1, matrix_file)
+      end if
+    else if (index(psb_toupper(trim(arg)),'--FMT=') == 1) then
+      arg = psb_toupper(adjustl(arg(7:len_trim(arg))))
+      if ((trim(arg) == 'MM') .or. (trim(arg) == 'HB')) matrix_fmt = trim(arg)
+    else if (trim(psb_toupper(arg)) == '--FMT') then
+      if (i < argc) then
+        call get_command_argument(i+1, arg)
+        arg = psb_toupper(trim(arg))
+        if ((trim(arg) == 'MM') .or. (trim(arg) == 'HB')) matrix_fmt = trim(arg)
+      end if
     end if
   end do
+  use_external_matrix = (len_trim(matrix_file) > 0)
 
   ! parse optional mode flag
   do i = 1, argc
@@ -126,7 +153,7 @@ program psb_comm_test
     run_persistent = .true.
   end select
 
-  if (idim <= 0) then
+  if ((.not.use_external_matrix) .and. (idim <= 0)) then
       write(*,*) 'Invalid dimension specified. Usage: --dim <positive integer>'
       call psb_abort(ctxt)
   end if
@@ -140,48 +167,83 @@ program psb_comm_test
     write(psb_out_unit,'("================================================")')
     write(psb_out_unit,'("  Test: D-type halo  baseline vs neighbor topo")')
     write(psb_out_unit,'("  Processes : ",i0)') np
-    write(psb_out_unit,'("  Grid      : ",i0," x ",i0," x ",i0)') idim,idim,idim
+    if (use_external_matrix) then
+      write(psb_out_unit,'("  Matrix    : ",a)') trim(matrix_file)
+      write(psb_out_unit,'("  Format    : ",a)') trim(matrix_fmt)
+    else
+      write(psb_out_unit,'("  Grid      : ",i0," x ",i0," x ",i0)') idim,idim,idim
+    end if
+        write(psb_out_unit,'("  Usage     : ./psb_comm_test [--dim N] [--iters N] [--mode ...] ",&
+          &"[--matrix <path>] [--fmt MM|HB]")')
     write(psb_out_unit,'("================================================")')
   end if
 
   ! ==================================================================
   !  2. Build descriptor with 7-point stencil connectivity
   ! ==================================================================
-  m  = (1_psb_lpk_ * idim) * idim * idim
-  nt = (m + np - 1) / np
-  nr = max(0, min(int(nt,psb_ipk_), int(m - (my_rank * nt),psb_ipk_)))
+  if (use_external_matrix) then
+    select case(psb_toupper(trim(matrix_fmt)))
+    case('MM')
+      call mm_mat_read(aux_a,info,filename=trim(matrix_file))
+    case('HB')
+      call hb_read(aux_a,info,filename=trim(matrix_file))
+    case default
+      info = psb_err_internal_error_
+    end select
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'matrix read error:', info
+      call psb_abort(ctxt)
+    end if
+    if (aux_a%get_nrows() /= aux_a%get_ncols()) then
+      write(psb_err_unit,*) my_rank, 'matrix must be square for this test'
+      call psb_abort(ctxt)
+    end if
+    m = aux_a%get_nrows()
+    call psb_matdist(aux_a, a_mat, ctxt, desc_a, info, fmt='CSR', parts=part_block)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'matdist error:', info
+      call psb_abort(ctxt)
+    end if
+    mat_allocated = .true.
+    myidx = desc_a%get_global_indices()
+    number_of_local_rows = size(myidx)
+  else
+    m  = (1_psb_lpk_ * idim) * idim * idim
+    nt = (m + np - 1) / np
+    nr = max(0, min(int(nt,psb_ipk_), int(m - (my_rank * nt),psb_ipk_)))
 
-  call psb_cdall(ctxt, desc_a, info, nl=nr)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'cdall error:', info
-    call psb_abort(ctxt)
-  end if
+    call psb_cdall(ctxt, desc_a, info, nl=nr)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'cdall error:', info
+      call psb_abort(ctxt)
+    end if
 
-  myidx = desc_a%get_global_indices()
-  number_of_local_rows   = size(myidx)
+    myidx = desc_a%get_global_indices()
+    number_of_local_rows   = size(myidx)
 
-  do i = 1, number_of_local_rows
-    call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)/), desc_a, info)
-    if (myidx(i) > 1) &
-         & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)-1/), desc_a, info)
-    if (myidx(i) < m) &
-         & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)+1/), desc_a, info)
-    if (myidx(i) > idim) &
-         & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)-idim/), desc_a, info)
-    if (myidx(i) + idim <= m) &
-         & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)+idim/), desc_a, info)
-    if (myidx(i) > int(idim,psb_lpk_)*idim) &
-         & call psb_cdins(1_psb_ipk_, (/myidx(i)/), &
-         &   (/myidx(i) - int(idim,psb_lpk_)*idim/), desc_a, info)
-    if (myidx(i) + int(idim,psb_lpk_)*idim <= m) &
-         & call psb_cdins(1_psb_ipk_, (/myidx(i)/), &
-         &   (/myidx(i) + int(idim,psb_lpk_)*idim/), desc_a, info)
-  end do
+    do i = 1, number_of_local_rows
+      call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)/), desc_a, info)
+      if (myidx(i) > 1) &
+           & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)-1/), desc_a, info)
+      if (myidx(i) < m) &
+           & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)+1/), desc_a, info)
+      if (myidx(i) > idim) &
+           & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)-idim/), desc_a, info)
+      if (myidx(i) + idim <= m) &
+           & call psb_cdins(1_psb_ipk_, (/myidx(i)/), (/myidx(i)+idim/), desc_a, info)
+      if (myidx(i) > int(idim,psb_lpk_)*idim) &
+           & call psb_cdins(1_psb_ipk_, (/myidx(i)/), &
+           &   (/myidx(i) - int(idim,psb_lpk_)*idim/), desc_a, info)
+      if (myidx(i) + int(idim,psb_lpk_)*idim <= m) &
+           & call psb_cdins(1_psb_ipk_, (/myidx(i)/), &
+           &   (/myidx(i) + int(idim,psb_lpk_)*idim/), desc_a, info)
+    end do
 
-  call psb_cdasb(desc_a, info)
-  if (info /= psb_success_) then
-    write(psb_err_unit,*) my_rank, 'cdasb error:', info
-    call psb_abort(ctxt)
+    call psb_cdasb(desc_a, info)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'cdasb error:', info
+      call psb_abort(ctxt)
+    end if
   end if
 
   nrow = desc_a%get_local_rows()   ! owned
@@ -574,6 +636,7 @@ program psb_comm_test
 9999 call psb_gefree(v_baseline, desc_a, info)
   call psb_gefree(v_neighbor, desc_a, info)
   call psb_gefree(v_neighbor_persistent, desc_a, info)
+  if (mat_allocated) call psb_spfree(a_mat, desc_a, info)
   call psb_cdfree(desc_a, info)
   call psb_exit(ctxt)
 
