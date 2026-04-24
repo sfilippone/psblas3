@@ -11,6 +11,8 @@ module psb_comm_schemes_mod
     enumerator psb_comm_isend_irecv_
     enumerator psb_comm_ineighbor_alltoallv_
     enumerator psb_comm_persistent_ineighbor_alltoallv_
+    enumerator psb_comm_rma_pull_
+    enumerator psb_comm_rma_push_
   end enum
 
   enum, bind(c)

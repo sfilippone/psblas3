@@ -2,10 +2,12 @@ module psb_comm_factory_mod
   use psb_const_mod
   use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, &
     & psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_, &
+    & psb_comm_rma_pull_, psb_comm_rma_push_, &
     & psb_comm_unknown_, psb_comm_status_start_, psb_comm_status_wait_, &
     & psb_comm_status_sync_, psb_comm_status_unknown_
   use psb_comm_baseline_mod, only: psb_comm_baseline_handle
   use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
+  use psb_comm_rma_mod, only: psb_comm_rma_handle
   implicit none
 
 contains
@@ -37,6 +39,8 @@ contains
         type is(psb_comm_neighbor_handle)
           h%comm_type = comm_type
           h%use_persistent_buffers = (comm_type == psb_comm_persistent_ineighbor_alltoallv_)
+        type is(psb_comm_rma_handle)
+          h%comm_type = comm_type
         class default
           ! nothing else to configure
         end select
@@ -59,6 +63,17 @@ contains
       type is(psb_comm_neighbor_handle)
         h%comm_type = comm_type
         h%use_persistent_buffers = (comm_type == psb_comm_persistent_ineighbor_alltoallv_)
+      end select
+    case(psb_comm_rma_pull_, psb_comm_rma_push_)
+      allocate(psb_comm_rma_handle :: handle, stat=info)
+      if (info /= 0) return
+      call handle%init(info)
+      if (info /= 0) return
+      handle%id = old_id
+      handle%swap_status = old_swap_status
+      select type(h => handle)
+      type is(psb_comm_rma_handle)
+        h%comm_type = comm_type
       end select
     case default
       allocate(psb_comm_baseline_handle :: handle, stat=info)

@@ -29,7 +29,7 @@ program psb_comm_cg_test
   integer(psb_ipk_) :: desc_me, desc_np
   integer(psb_ipk_) :: idim, itmax, itrace, istop, iter
   integer(psb_ipk_) :: scheme_idx, prec_idx, rep, nrep, nwarm
-  integer(psb_ipk_), parameter :: n_schemes=3, n_precs=2
+  integer(psb_ipk_), parameter :: n_schemes=5, n_precs=2
   integer(psb_ipk_), allocatable :: iter_count(:,:,:), solve_info(:,:,:)
   integer(psb_ipk_) :: scheme_type(n_schemes)
   real(psb_dpk_) :: eps, err, t_start, t_elapsed
@@ -71,10 +71,13 @@ program psb_comm_cg_test
   use_gpu = .false.
 #endif
   scheme_type = (/ psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
-       & psb_comm_persistent_ineighbor_alltoallv_ /)
+       & psb_comm_persistent_ineighbor_alltoallv_ , psb_comm_rma_pull_, psb_comm_rma_push_ /)
   scheme_name(1) = 'isend_irecv'
   scheme_name(2) = 'ineighbor_alltoallv'
   scheme_name(3) = 'persistent_ineighbor_a2av'
+  scheme_name(4) = 'psb_comm_rma_pull_'
+  scheme_name(5) = 'psb_comm_rma_push_'
+
   prec_type(1) = 'NONE'
   prec_type(2) = 'DIAG'
   prec_name(1) = 'none'
@@ -201,6 +204,10 @@ program psb_comm_cg_test
   do prec_idx = 1, n_precs
     do scheme_idx = 1, n_schemes
       do rep = 1, nrep
+        t_start = psb_wtime()
+        call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
+        comm_set_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+        
         call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
         if (info /= psb_success_) goto 9999
 
@@ -225,9 +232,7 @@ program psb_comm_cg_test
           goto 9999
         end if
 
-        t_start = psb_wtime()
-        call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
-        comm_set_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
+
         call psb_amx(ctxt,comm_set_time(prec_idx,scheme_idx,rep))
 
         if (info /= psb_success_) goto 9999

@@ -16,6 +16,7 @@ set(PSB_base_source_files
   comm/internals/psi_lovrl_upd.f90
   comm/internals/psi_dswapdata_a.F90
   comm/internals/psi_movrl_upd_a.f90
+  modules/comm/comm_schemes/psb_comm_rma_mod.F90
 #  comm/internals/psi_i2swaptran_a.F90
   comm/internals/psi_dswaptran.F90
   comm/internals/psi_covrl_save_a.f90

@@ -31,6 +31,7 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	comm/comm_schemes/psb_comm_schemes_mod.o \
 	comm/comm_schemes/psb_comm_baseline_mod.o \
 	comm/comm_schemes/psb_comm_neighbor_impl_mod.o \
+	comm/comm_schemes/psb_comm_rma_mod.o \
 	comm/comm_schemes/psb_comm_factory_mod.o \
 	serial/psb_i_base_vect_mod.o serial/psb_i_vect_mod.o\
 	serial/psb_l_base_vect_mod.o serial/psb_l_vect_mod.o\
@@ -193,7 +194,9 @@ comm/comm_schemes/psb_comm_baseline_mod.o: comm/comm_schemes/psb_comm_schemes_mo
 
 comm/comm_schemes/psb_comm_neighbor_impl_mod.o: psb_const_mod.o desc/psb_desc_const_mod.o comm/comm_schemes/psb_comm_schemes_mod.o
 
-comm/comm_schemes/psb_comm_factory_mod.o: comm/comm_schemes/psb_comm_schemes_mod.o comm/comm_schemes/psb_comm_baseline_mod.o comm/comm_schemes/psb_comm_neighbor_impl_mod.o
+comm/comm_schemes/psb_comm_rma_mod.o: comm/comm_schemes/psb_comm_schemes_mod.o psb_const_mod.o desc/psb_desc_const_mod.o
+
+comm/comm_schemes/psb_comm_factory_mod.o: comm/comm_schemes/psb_comm_schemes_mod.o comm/comm_schemes/psb_comm_baseline_mod.o comm/comm_schemes/psb_comm_neighbor_impl_mod.o comm/comm_schemes/psb_comm_rma_mod.o
 
 comm/psb_neighbor_topology_mod.o: psb_const_mod.o desc/psb_desc_const_mod.o
 

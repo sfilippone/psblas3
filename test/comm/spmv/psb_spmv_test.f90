@@ -5,10 +5,12 @@ module psb_spmv_overlap_test
 
   use psb_base_mod
   use psb_util_mod
-  use psb_comm_factory_mod, only: psb_comm_set
   use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
-    & psb_comm_persistent_ineighbor_alltoallv_
+    & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_, &
+    & psb_comm_handle_type
+  use psb_comm_baseline_mod, only: psb_comm_baseline_handle
   use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
+  use psb_comm_rma_mod, only: psb_comm_rma_handle
 #ifdef PSB_HAVE_CUDA
   use psb_cuda_mod
 #endif
@@ -529,7 +531,7 @@ contains
     return
   end subroutine psb_d_gen_pde3d
 
-  subroutine run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_in,times_in,do_swap)
+  subroutine run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_in,times_in,do_swap,comm_mode)
     use psb_base_mod
 #ifdef PSB_HAVE_CUDA
     use psb_cuda_mod
@@ -544,6 +546,7 @@ contains
     character(len=*), intent(in)    :: gpu_fmt
     integer(psb_ipk_), intent(in)   :: idim_in, times_in
     logical, intent(in)             :: do_swap
+    character(len=*), intent(in)    :: comm_mode
 
     type(psb_dspmat_type)           :: a
     type(psb_d_vect_type)           :: x, y
@@ -556,15 +559,35 @@ contains
     real(psb_dpk_)                  :: alpha, beta, t0, t1, dt, avg_t
     logical                         :: use_external_matrix
 
+    integer(psb_ipk_)               :: comm_type
+
 #ifdef PSB_HAVE_CUDA
-  type(psb_d_vect_cuda)                     :: cuda_vector_mold
-  type(psb_i_vect_cuda)                     :: cuda_index_mold
-  type(psb_d_cuda_elg_sparse_mat), target   :: cuda_ell_sparse_mold
-  type(psb_d_cuda_csrg_sparse_mat), target  :: cuda_csr_sparse_mold
-  type(psb_d_cuda_hdiag_sparse_mat), target :: cuda_hdia_sparse_mold
-  type(psb_d_cuda_hlg_sparse_mat), target   :: cuda_hll_sparse_mold
-  class(psb_d_base_sparse_mat), pointer     :: cuda_sparse_mold
+    type(psb_d_vect_cuda)                     :: cuda_vector_mold
+    type(psb_i_vect_cuda)                     :: cuda_index_mold
+    type(psb_d_cuda_elg_sparse_mat), target   :: cuda_ell_sparse_mold
+    type(psb_d_cuda_csrg_sparse_mat), target  :: cuda_csr_sparse_mold
+    type(psb_d_cuda_hdiag_sparse_mat), target :: cuda_hdia_sparse_mold
+    type(psb_d_cuda_hlg_sparse_mat), target   :: cuda_hll_sparse_mold
+    class(psb_d_base_sparse_mat), pointer     :: cuda_sparse_mold
 #endif
+
+    select case(psb_toupper(trim(comm_mode)))
+    case('P2P','ISEND_IRECV')
+      comm_type = psb_comm_isend_irecv_
+    case('NEIGHBOR','INEIGHBOR_ALLTOALLV')
+      comm_type = psb_comm_ineighbor_alltoallv_
+    case('PNEIGHBOR','PERSISTENT','PERSISTENT_INEIGHBOR_A2AV')
+      comm_type = psb_comm_persistent_ineighbor_alltoallv_
+    case('MPI_GET','RMA_PULL')
+      comm_type = psb_comm_rma_pull_
+    case('MPI_PUT','RMA_PUSH')
+      comm_type = psb_comm_rma_push_
+    case default
+      comm_type = psb_comm_isend_irecv_
+      if (my_rank == psb_root_) then
+        write(psb_err_unit,'("Unknown comm backend: ",a,", defaulting to P2P")') trim(comm_mode)
+      end if
+    end select
 
     info = psb_success_
     afmt = psb_toupper(trim(cpu_fmt))
@@ -611,6 +634,9 @@ contains
       call psb_d_gen_pde3d(ctxt,idim,a,y,x,desc_a,afmt,info)
       n_global = idim * idim * idim
     end if
+    if (info /= psb_success_) goto 9999
+
+    call psb_comm_set(comm_type,x%v%comm_handle,info)
     if (info /= psb_success_) goto 9999
 
 #ifdef PSB_HAVE_CUDA
@@ -669,6 +695,7 @@ contains
       end if
       write(psb_out_unit,'("  global unknowns : ",i0)') n_global
       write(psb_out_unit,'("  repetitions     : ",i0)') times
+      write(psb_out_unit,'("  comm backend    : ",a)') trim(psb_toupper(trim(comm_mode)))
       write(psb_out_unit,'("  total time [s]  : ",es12.5)') dt
       write(psb_out_unit,'("  avg time   [s]  : ",es12.5)') avg_t
     end if
@@ -764,8 +791,13 @@ program psb_spmv_kernel
   character(len=8)   :: gpu_fmt
   integer(psb_ipk_) :: idim_arg, times_arg
   logical           :: do_swap
-  idim_arg    = -1
-  times_arg   = -1
+  integer :: kmode
+  integer, parameter :: n_comm_modes = 5
+  character(len=20), parameter :: comm_modes(n_comm_modes) = [character(len=20) :: &
+    & 'P2P', 'NEIGHBOR', 'PNEIGHBOR', 'MPI_GET', 'MPI_PUT']
+
+  idim_arg  = -1
+  times_arg = -1
 
   matrix_file = ''
   matrix_fmt  = 'MM'
@@ -869,12 +901,18 @@ program psb_spmv_kernel
     write(psb_out_unit,*) 'Welcome to PSBLAS version: ', psb_version_string_
     write(psb_out_unit,*) 'This is the psb_spmv_kernel sample program'
     write(psb_out_unit,'("GPU enabled          : ",l1)') use_gpu
-        write(psb_out_unit,'("Usage: ./psb_spmv_kernel [--gpu=TRUE|FALSE] [--dim=N] [--times=N] ",&
-          &"[--cpu_fmt=CSR|COO|CSC|ELL|HLL] [--gpu_fmt=HLL|ELL|CSR|HDIA] [--matrix=<path>] [--fmt=MM|HB] ",&
-          &"[--overlap|--nooverlap]")')
+    write(psb_out_unit,'("Usage: ./psb_spmv_kernel [--gpu=TRUE|FALSE] [--dim=N] [--times=N] ",&
+      &"[--cpu_fmt=CSR|COO|CSC|ELL|HLL] [--gpu_fmt=HLL|ELL|CSR|HDIA] [--matrix=<path>] [--fmt=MM|HB] ",&
+      &"[--overlap|--nooverlap] (runs all comm backends)")')
   end if
 
-      call run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_arg,times_arg,do_swap)
+  do kmode = 1, n_comm_modes
+    if (my_rank == psb_root_) then
+      write(psb_out_unit,'(/,"=== Backend sweep: ",a," ===")') trim(comm_modes(kmode))
+    end if
+    call run_spmv_kernel(ctxt, use_gpu, matrix_file, matrix_fmt, cpu_fmt, gpu_fmt, &
+      & idim_arg, times_arg, do_swap, comm_modes(kmode))
+  end do
 
 #ifdef PSB_HAVE_CUDA
   if (use_gpu) call psb_cuda_exit()

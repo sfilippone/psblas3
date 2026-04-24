@@ -22,7 +22,7 @@ program psb_comm_test
   use psi_mod
   use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
   use psb_comm_schemes_mod, only: psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_, &
-    & psb_comm_isend_irecv_
+    & psb_comm_isend_irecv_, psb_comm_rma_pull_, psb_comm_rma_push_
   use psb_comm_schemes_mod, only: psb_comm_status_start_, psb_comm_status_wait_, psb_comm_status_unknown_
   implicit none
 
@@ -47,11 +47,12 @@ program psb_comm_test
   type(psb_ldspmat_type)                :: aux_a
 
   ! ---- vectors ----
-  type(psb_d_vect_type)                 :: v_baseline, v_neighbor, v_neighbor_persistent
+  type(psb_d_vect_type)                 :: v_baseline, v_neighbor, v_neighbor_persistent, v_rma_get, v_rma_put
 
   ! ---- temporary / comparison arrays ----
   real(psb_dpk_), allocatable           :: vals(:)
-  real(psb_dpk_), allocatable           :: result_baseline(:), result_neighbor(:), result_persistent(:)
+  real(psb_dpk_), allocatable           :: result_baseline(:), result_neighbor(:), result_persistent(:), &
+    & result_rma_get(:), result_rma_put(:)
   real(psb_dpk_), allocatable           :: expected(:)
 
   ! ---- halo index bookkeeping ----
@@ -60,11 +61,16 @@ program psb_comm_test
 
   ! ---- error / reporting ----
   integer(psb_ipk_)                     :: n_pass, n_total, imode
-  logical                               :: run_baseline, run_neighbor, run_persistent
+  logical                               :: run_baseline, run_neighbor, run_persistent, run_rma_get, run_rma_put
   logical                               :: mat_allocated
   logical                               :: comm_ok
   real(psb_dpk_)                        :: err, tol
-  real(psb_dpk_)                        :: t0, t1, dt, tsum_baseline, tsum_neighbor, tsum_neighbor_persistent
+  real(psb_dpk_)                        :: first_swap_baseline, first_swap_neighbor, first_swap_persistent, &
+    & first_swap_rma_get, first_swap_rma_put
+  real(psb_dpk_)                        :: comm_setup_time_baseline, comm_setup_time_neighbor, comm_setup_time_persistent, &
+    & comm_setup_time_rma_get, comm_setup_time_rma_put
+  real(psb_dpk_)                        :: t0, t1, dt, tsum_baseline, tsum_neighbor, tsum_neighbor_persistent, &
+    & tsum_rma_get, tsum_rma_put
   integer(psb_lpk_), allocatable        :: glob_col(:)
   character(len=40)                     :: name
   real(psb_dpk_)                        :: huge_d
@@ -136,21 +142,33 @@ program psb_comm_test
   run_baseline    = .false.
   run_neighbor    = .false.
   run_persistent  = .false.
+  run_rma_get     = .false.
+  run_rma_put     = .false.
+
+
   select case (trim(adjustl(mode)))
   case ('both','all')
-    run_baseline   = .true.
-    run_neighbor   = .true.
-    run_persistent = .true.
+    run_baseline    = .true.
+    run_neighbor    = .true.
+    run_persistent  = .true.
+    run_rma_get     = .true.
+    run_rma_put     = .true.
   case ('baseline')
     run_baseline   = .true.
   case ('neighbor')
     run_neighbor   = .true.
   case ('persistent','persistent_neighbor','persistent-neighbor')
     run_persistent = .true.
+  case ('rma_get')
+    run_rma_get = .true.
+  case ('rma_put')
+    run_rma_put = .true.
   case default
     run_baseline   = .true.
     run_neighbor   = .true.
     run_persistent = .true.
+    run_rma_get    = .true.
+    run_rma_put    = .true.
   end select
 
   if ((.not.use_external_matrix) .and. (idim <= 0)) then
@@ -267,6 +285,18 @@ program psb_comm_test
     write(psb_err_unit,*) my_rank, 'geall persistent-neighbor error:', info
     call psb_abort(ctxt)
   end if
+  call psb_geall(v_rma_get, desc_a, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geall rma-get error:', info
+    call psb_abort(ctxt)
+  end if
+  call psb_geall(v_rma_put, desc_a, info)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geall rma-put error:', info
+    call psb_abort(ctxt)
+  end if
+  
+  
   call psb_geasb(v_baseline, desc_a, info, scratch=.true.)
   if (info /= psb_success_) then
     write(psb_err_unit,*) my_rank, 'geasb baseline error:', info
@@ -282,6 +312,18 @@ program psb_comm_test
     write(psb_err_unit,*) my_rank, 'geasb persistent-neighbor error:', info
     call psb_abort(ctxt)
   end if
+  call psb_geasb(v_rma_get, desc_a, info, scratch=.true.)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geasb rma-get error:', info
+    call psb_abort(ctxt)
+  end if
+  call psb_geasb(v_rma_put, desc_a, info, scratch=.true.)
+  if (info /= psb_success_) then
+    write(psb_err_unit,*) my_rank, 'geasb rma-put error:', info
+    call psb_abort(ctxt)
+  end if
+
+
 
   ! Fill owned entries with the global index value
   allocate(vals(ncol))
@@ -292,6 +334,8 @@ program psb_comm_test
   call v_baseline%set_vect(vals)
   call v_neighbor%set_vect(vals)
   call v_neighbor_persistent%set_vect(vals)
+  call v_rma_get%set_vect(vals)
+  call v_rma_put%set_vect(vals)
   deallocate(vals)
 
   ! ==================================================================
@@ -304,15 +348,39 @@ program psb_comm_test
   do i = 1, ncol
     expected(i) = real(glob_col(i), psb_dpk_)
   end do
-  allocate(result_baseline(ncol), result_neighbor(ncol), result_persistent(ncol))
+  allocate(result_baseline(ncol), result_neighbor(ncol), result_persistent(ncol), &
+    & result_rma_get(ncol), result_rma_put(ncol))
   result_baseline   = huge_d
   result_neighbor   = huge_d
   result_persistent = huge_d
+  result_rma_get    = huge_d
+  result_rma_put    = huge_d
+
+  first_swap_baseline = 0.0_psb_dpk_
+  first_swap_neighbor = 0.0_psb_dpk_
+  first_swap_persistent = 0.0_psb_dpk_
+  first_swap_rma_get = 0.0_psb_dpk_
+  first_swap_rma_put = 0.0_psb_dpk_
+
+  comm_setup_time_baseline = 0.0_psb_dpk_
+  comm_setup_time_neighbor = 0.0_psb_dpk_
+  comm_setup_time_persistent = 0.0_psb_dpk_
+  comm_setup_time_rma_get = 0.0_psb_dpk_
+  comm_setup_time_rma_put = 0.0_psb_dpk_
 
   ! ==================================================================
   !  6. Baseline halo exchange  (Isend/Irecv in one call)
   ! ==================================================================
   if (run_baseline) then
+    comm_setup_time_baseline = psb_wtime()
+    call psb_comm_set(psb_comm_isend_irecv_, v_baseline%v%comm_handle, info)
+    if (info /= 0) then
+      write(psb_err_unit,*) my_rank, 'psb_comm_set baseline error:', info
+      call psb_abort(ctxt)
+    end if
+    comm_setup_time_baseline = psb_wtime() - comm_setup_time_baseline
+
+    first_swap_baseline = psb_wtime()
     call psi_swapdata( &
       swap_status=psb_comm_status_start_, &
       beta=dzero, &
@@ -336,6 +404,7 @@ program psb_comm_test
       write(psb_err_unit,*) my_rank, 'baseline swap error:', info
       call psb_abort(ctxt)
     end if
+    first_swap_baseline = psb_wtime() - first_swap_baseline
   end if
 
 
@@ -343,11 +412,16 @@ program psb_comm_test
   !  7. Neighbor topology halo exchange  (start + wait)
   ! ==================================================================
   if (run_neighbor) then
+    comm_setup_time_neighbor = psb_wtime()
     call psb_comm_set(psb_comm_ineighbor_alltoallv_, v_neighbor%v%comm_handle, info)
     if (info /= 0) then
       write(psb_err_unit,*) my_rank, 'psb_comm_set neighbor error:', info
       call psb_abort(ctxt)
     end if
+    comm_setup_time_neighbor = psb_wtime() - comm_setup_time_neighbor
+
+
+    first_swap_neighbor = psb_wtime()
     call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
     if (info /= psb_success_) then
       write(psb_err_unit,*) my_rank, 'neighbor start error:', info
@@ -359,17 +433,23 @@ program psb_comm_test
       write(psb_err_unit,*) my_rank, 'neighbor wait error:', info
       call psb_abort(ctxt)
     end if
+    first_swap_neighbor = psb_wtime() - first_swap_neighbor
   end if
 
   ! ==================================================================
   !  7b. Persistent-neighbor halo exchange  (start + wait)
   ! ==================================================================
   if (run_persistent) then
+    comm_setup_time_persistent = psb_wtime()
     call psb_comm_set(psb_comm_persistent_ineighbor_alltoallv_, v_neighbor_persistent%v%comm_handle, info)
     if (info /= 0) then
       write(psb_err_unit,*) my_rank, 'psb_comm_set persistent-neighbor error:', info
       call psb_abort(ctxt)
     end if
+    comm_setup_time_persistent = psb_wtime() - comm_setup_time_persistent
+
+
+    first_swap_persistent = psb_wtime()
     call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
     if (info /= psb_success_) then
       write(psb_err_unit,*) my_rank, 'persistent-neighbor start error:', info
@@ -380,7 +460,61 @@ program psb_comm_test
       write(psb_err_unit,*) my_rank, 'persistent-neighbor wait error:', info
       call psb_abort(ctxt)
     end if
+    first_swap_persistent = psb_wtime() - first_swap_persistent
   end if
+
+
+
+  if(run_rma_get) then 
+    comm_setup_time_rma_get = psb_wtime()
+    call psb_comm_set(psb_comm_rma_pull_, v_rma_get%v%comm_handle, info)
+    if (info /= 0) then
+      write(psb_err_unit,*) my_rank, 'psb_comm_set RMA get error:', info
+      call psb_abort(ctxt)
+    end if
+    comm_setup_time_rma_get = psb_wtime() - comm_setup_time_rma_get
+
+    first_swap_rma_get = psb_wtime()
+    call psi_swapdata(psb_comm_status_start_, dzero, v_rma_get%v, desc_a, info, data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'RMA get start error:', info
+      call psb_abort(ctxt)
+    end if
+    call psi_swapdata(psb_comm_status_wait_, dzero, v_rma_get%v, desc_a, info, data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'RMA get wait error:', info
+      call psb_abort(ctxt)
+    end if
+    first_swap_rma_get = psb_wtime() - first_swap_rma_get
+  end if
+
+
+
+
+    if(run_rma_put) then 
+    comm_setup_time_rma_put = psb_wtime()
+    call psb_comm_set(psb_comm_rma_push_, v_rma_put%v%comm_handle, info)
+    if (info /= 0) then
+      write(psb_err_unit,*) my_rank, 'psb_comm_set RMA put error:', info
+      call psb_abort(ctxt)
+    end if
+    comm_setup_time_rma_put = psb_wtime() - comm_setup_time_rma_put
+
+    first_swap_rma_put = psb_wtime()
+    call psi_swapdata(psb_comm_status_start_, dzero, v_rma_put%v, desc_a, info, data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'RMA put start error:', info
+      call psb_abort(ctxt)
+    end if
+    call psi_swapdata(psb_comm_status_wait_, dzero, v_rma_put%v, desc_a, info, data=psb_comm_halo_)
+    if (info /= psb_success_) then
+      write(psb_err_unit,*) my_rank, 'RMA put wait error:', info
+      call psb_abort(ctxt)
+    end if
+    first_swap_rma_put = psb_wtime() - first_swap_rma_put
+  end if
+
+
 
   ! ==================================================================
   !  8. Performance: repeat exchanges and measure timings
@@ -392,6 +526,8 @@ program psb_comm_test
   tsum_baseline = 0.0_psb_dpk_
   tsum_neighbor = 0.0_psb_dpk_
   tsum_neighbor_persistent = 0.0_psb_dpk_
+  tsum_rma_get = 0.0_psb_dpk_
+  tsum_rma_put = 0.0_psb_dpk_
 
   do i = 1, iters
     if (run_baseline) then
@@ -423,194 +559,119 @@ program psb_comm_test
       call psb_amx(ctxt, dt)
       tsum_neighbor_persistent = tsum_neighbor_persistent + dt
     end if
+
+
+    if (run_rma_get) then
+      t0 = psb_wtime()
+      call psi_swapdata(psb_comm_status_start_, dzero, v_rma_get%v, desc_a, info, data=psb_comm_halo_)
+      call psi_swapdata(psb_comm_status_wait_, dzero, v_rma_get%v, desc_a, info, data=psb_comm_halo_)
+      t1 = psb_wtime()
+      dt = t1 - t0
+      call psb_amx(ctxt, dt)
+      tsum_rma_get = tsum_rma_get + dt
+    end if
+
+
+    if (run_rma_put) then
+      t0 = psb_wtime()
+      call psi_swapdata(psb_comm_status_start_, dzero, v_rma_put%v, desc_a, info, data=psb_comm_halo_)
+      call psi_swapdata(psb_comm_status_wait_, dzero, v_rma_put%v, desc_a, info, data=psb_comm_halo_)
+      t1 = psb_wtime()
+      dt = t1 - t0
+      call psb_amx(ctxt, dt)
+      tsum_rma_put = tsum_rma_put + dt
+    end if
+
+
   end do
 
+
+
+  call psb_amx(ctxt, tsum_baseline)
+  call psb_amx(ctxt, tsum_neighbor)
+  call psb_amx(ctxt, tsum_neighbor_persistent)
+  call psb_amx(ctxt, first_swap_baseline)
+  call psb_amx(ctxt, first_swap_neighbor)
+  call psb_amx(ctxt, first_swap_persistent)
+  call psb_amx(ctxt, comm_setup_time_baseline)
+  call psb_amx(ctxt, comm_setup_time_neighbor)
+  call psb_amx(ctxt, comm_setup_time_persistent)
+  call psb_amx(ctxt, comm_setup_time_rma_get)
+  call psb_amx(ctxt, comm_setup_time_rma_put)
+
+
+
+  
   if (my_rank == 0) then
     if (run_baseline) then
       write(psb_out_unit,'("  Avg baseline time  : ",es12.5)') (tsum_baseline / real(iters,psb_dpk_))
       write(psb_out_unit,'("  Tot baseline time  : ",es12.5)') tsum_baseline
+      write(psb_out_unit,'("  First baseline time: ",es12.5)') first_swap_baseline
+      write(psb_out_unit,'("  Baseline comm setup: ",es12.5)') comm_setup_time_baseline
     end if
     if (run_neighbor) then
       write(psb_out_unit,'("  Avg neighbor time  : ",es12.5)') (tsum_neighbor / real(iters,psb_dpk_))
       write(psb_out_unit,'("  Tot neighbor time  : ",es12.5)') tsum_neighbor
+      write(psb_out_unit,'("  First neighbor time: ",es12.5)') first_swap_neighbor
+      write(psb_out_unit,'("  Neighbor comm setup: ",es12.5)') comm_setup_time_neighbor
     end if
     if (run_persistent) then
       write(psb_out_unit,'("  Avg pers-neigh time: ",es12.5)') (tsum_neighbor_persistent / real(iters,psb_dpk_))
       write(psb_out_unit,'("  Tot pers-neigh time: ",es12.5)') tsum_neighbor_persistent
+      write(psb_out_unit,'("  First pers-neigh time: ",es12.5)') first_swap_persistent
+      write(psb_out_unit,'("  Persistent comm setup: ",es12.5)') comm_setup_time_persistent
+    end if
+    if (run_rma_get) then
+      write(psb_out_unit,'("  Avg RMA get time   : ",es12.5)') (tsum_rma_get / real(iters,psb_dpk_))
+      write(psb_out_unit,'("  Tot RMA get time   : ",es12.5)') tsum_rma_get
+      write(psb_out_unit,'("  First RMA get time : ",es12.5)') first_swap_rma_get
+      write(psb_out_unit,'("  RMA get comm setup : ",es12.5)') comm_setup_time_rma_get
+    end if
+    if (run_rma_put) then
+      write(psb_out_unit,'("  Avg RMA put time   : ",es12.5)') (tsum_rma_put / real(iters,psb_dpk_))
+      write(psb_out_unit,'("  Tot RMA put time   : ",es12.5)') tsum_rma_put
+      write(psb_out_unit,'("  First RMA put time : ",es12.5)') first_swap_rma_put
+      write(psb_out_unit,'("  RMA put comm setup : ",es12.5)') comm_setup_time_rma_put
     end if
   end if
 
   ! ==================================================================
   !  8. Extract results and compare
   ! ==================================================================
-  result_baseline = v_baseline%v%v
-  result_neighbor = v_neighbor%v%v
+  result_baseline   = v_baseline%v%v
+  result_neighbor   = v_neighbor%v%v
   result_persistent = v_neighbor_persistent%v%v
+  result_rma_get    = v_rma_get%v%v
+  result_rma_put    = v_rma_put%v%v
 
-  ! Debug: Check if results are properly populated
-  if (my_rank == 0 .and. debug_swapdata) then
-    write(psb_out_unit,'("DEBUG: ncol=",i0," nrow=",i0)') ncol, nrow
-    write(psb_out_unit,'("DEBUG: size(result_baseline)=",i0)') size(result_baseline)
-    if (ncol > 0) then
-      write(psb_out_unit,'("DEBUG: result_baseline(1:min(5,ncol))=",5(es12.5,1x))') &
-        & result_baseline(1:min(5,ncol))
-      write(psb_out_unit,'("DEBUG: expected(1:min(5,ncol))=",5(es12.5,1x))') &
-        & expected(1:min(5,ncol))
-    end if
-  end if
+  ! --- Cross Checks ---
+  if (run_baseline .and. run_neighbor) &
+    call check_result("cross-check baseline vs neighbor", result_baseline, result_neighbor, ncol, tol)
 
-  if (run_baseline .and. run_neighbor) then
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_baseline(1:ncol) - result_neighbor(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] cross-check baseline vs neighbor : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] cross-check baseline vs neighbor : err = ",es12.5)') err
-      end if
-    end if
-  end if
+  if (run_baseline .and. run_persistent) &
+    call check_result("cross-check baseline vs pers-nei", result_baseline, result_persistent, ncol, tol)
 
-  if (run_baseline) then
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_baseline(1:ncol) - expected(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] baseline absolute correctness    : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] baseline absolute correctness    : err = ",es12.5)') err
-      end if
-    end if
-  end if
+  if (run_baseline .and. run_rma_get) &
+    call check_result("cross-check baseline vs rma-get", result_baseline, result_rma_get, ncol, tol)
+  
+  if (run_baseline .and. run_rma_put) &
+    call check_result("cross-check baseline vs rma-put", result_baseline, result_rma_put, ncol, tol)
 
-  if (run_neighbor) then
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] neighbor absolute correctness    : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] neighbor absolute correctness    : err = ",es12.5)') err
-      end if
-    end if
-  end if
+  ! --- Absolute Correctness Checks against Expected ---
+  if (run_baseline) &
+    call check_result("baseline absolute correctness", result_baseline, expected, ncol, tol)
+    
+  if (run_neighbor) &
+    call check_result("neighbor absolute correctness", result_neighbor, expected, ncol, tol)
+    
+  if (run_persistent) &
+    call check_result("pers-neigh absolute correctness", result_persistent, expected, ncol, tol)
 
-  if (run_baseline .and. run_persistent) then
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_baseline(1:ncol) - result_persistent(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] cross-check baseline vs pers-nei : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] cross-check baseline vs pers-nei : err = ",es12.5)') err
-      end if
-    end if
-  end if
+  if (run_rma_get) &
+    call check_result("rma_get absolute correctness", result_rma_get, expected, ncol, tol)
 
-  if (run_persistent) then
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] pers-neigh absolute correctness  : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] pers-neigh absolute correctness  : err = ",es12.5)') err
-      end if
-    end if
-  end if
-
-  if (run_neighbor) then
-    ! ---- Test 6: repeat neighbor exchange (topology reuse) ----
-    do i = nrow+1, ncol
-      result_neighbor(i) = dzero
-    end do
-    call v_neighbor%set_vect(result_neighbor)
-
-    call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-    call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor%v, desc_a, info, data=psb_comm_halo_)
-
-    result_neighbor = v_neighbor%v%v
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_neighbor(1:ncol) - expected(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] neighbor topology reuse          : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] neighbor topology reuse          : err = ",es12.5)') err
-      end if
-    end if
-  end if
-
-  if (run_persistent) then
-    ! ---- Test 7: repeat persistent-neighbor exchange (buffer reuse) ----
-    do i = nrow+1, ncol
-      result_persistent(i) = dzero
-    end do
-    call v_neighbor_persistent%set_vect(result_persistent)
-
-    call psi_swapdata(psb_comm_status_start_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
-    call psi_swapdata(psb_comm_status_wait_, dzero, v_neighbor_persistent%v, desc_a, info, data=psb_comm_halo_)
-
-    result_persistent = v_neighbor_persistent%v%v
-    n_total = n_total + 1
-    err = huge_d
-    if (ncol > 0) then
-      err = maxval(abs(result_persistent(1:ncol) - expected(1:ncol)))
-    else
-      err = 0.0_psb_dpk_
-    end if
-    call psb_amx(ctxt, err)
-    if (my_rank == 0) then
-      if ((err >= 0.0_psb_dpk_) .and. (err < tol)) then
-        write(psb_out_unit,'("  [PASS] pers-neigh buffer reuse          : err = ",es12.5)') err
-        n_pass = n_pass + 1
-      else
-        write(psb_out_unit,'("  [FAIL] pers-neigh buffer reuse          : err = ",es12.5)') err
-      end if
-    end if
-  end if
+  if (run_rma_put) &
+    call check_result("rma_put absolute correctness", result_rma_put, expected, ncol, tol)
 
   ! ==================================================================
   !  9. Summary
@@ -639,5 +700,37 @@ program psb_comm_test
   if (mat_allocated) call psb_spfree(a_mat, desc_a, info)
   call psb_cdfree(desc_a, info)
   call psb_exit(ctxt)
+
+
+contains 
+
+  ! Helper routine to compare two arrays, reduce the error across MPI ranks, and print the result
+  subroutine check_result(test_name, arr1, arr2, n, tolerance)
+    character(len=*), intent(in) :: test_name
+    real(psb_dpk_), intent(in)   :: arr1(:), arr2(:)
+    integer(psb_ipk_), intent(in):: n
+    real(psb_dpk_), intent(in)   :: tolerance
+    real(psb_dpk_)               :: err_val
+
+    n_total = n_total + 1
+    
+    if (n > 0) then
+      err_val = maxval(abs(arr1(1:n) - arr2(1:n)))
+    else
+      err_val = 0.0_psb_dpk_
+    end if
+    
+    ! Get max error across all processes
+    call psb_amx(ctxt, err_val)
+
+    if (my_rank == 0) then
+      if ((err_val >= 0.0_psb_dpk_) .and. (err_val < tolerance)) then
+        write(psb_out_unit,'("  [PASS] ", a, t45, ": err = ",es12.5)') test_name, err_val
+        n_pass = n_pass + 1
+      else
+        write(psb_out_unit,'("  [FAIL] ", a, t45, ": err = ",es12.5)') test_name, err_val
+      end if
+    end if
+  end subroutine check_result
 
 end program psb_comm_test

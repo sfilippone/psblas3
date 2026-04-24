@@ -534,7 +534,7 @@ contains
     if (allocated(a%irn)) deallocate(a%irn)
     if (allocated(a%ja))  deallocate(a%ja)
     if (allocated(a%val)) deallocate(a%val)
-    if (allocated(a%val)) deallocate(a%hkoffs)
+    if (allocated(a%hkoffs)) deallocate(a%hkoffs)
     call a%set_null()
     call a%set_nrows(izero)
     call a%set_ncols(izero)
