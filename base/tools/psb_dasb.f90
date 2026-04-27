@@ -55,12 +55,12 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch, dupl)
   use psb_base_mod, psb_protect_name => psb_dasb_vect
   implicit none
 
-  type(psb_desc_type), intent(in)      ::  desc_a
-  type(psb_d_vect_type), intent(inout) ::  x
-  integer(psb_ipk_), intent(out)                 ::  info
+  type(psb_d_vect_type), intent(inout) :: x
+  type(psb_desc_type), intent(in)      :: desc_a
+  integer(psb_ipk_), intent(out)                    :: info
   class(psb_d_base_vect_type), intent(in), optional :: mold
-  logical, intent(in), optional        :: scratch
-  integer(psb_ipk_), optional, intent(in) :: dupl
+  logical, intent(in), optional                     :: scratch
+  integer(psb_ipk_), optional, intent(in)           :: dupl
 
   ! local variables
   type(psb_ctxt_type) :: ctxt
@@ -192,12 +192,12 @@ subroutine psb_dasb_vect_r2(x, desc_a, info, mold, scratch,dupl)
   use psb_base_mod, psb_protect_name => psb_dasb_vect_r2
   implicit none
 
-  type(psb_desc_type), intent(in)      ::  desc_a
-  type(psb_d_vect_type), intent(inout) ::  x(:)
-  integer(psb_ipk_), intent(out)                 ::  info
+  type(psb_desc_type), intent(in)      :: desc_a
+  type(psb_d_vect_type), intent(inout) :: x(:)
+  integer(psb_ipk_), intent(out)       :: info
   class(psb_d_base_vect_type), intent(in), optional :: mold
-  logical, intent(in), optional        :: scratch
-  integer(psb_ipk_), optional, intent(in) :: dupl
+  logical, intent(in), optional                     :: scratch
+  integer(psb_ipk_), optional, intent(in)           :: dupl
 
   ! local variables
   type(psb_ctxt_type) :: ctxt
@@ -246,32 +246,31 @@ subroutine psb_dasb_vect_r2(x, desc_a, info, mold, scratch,dupl)
 end subroutine psb_dasb_vect_r2
 
 
-subroutine psb_dasb_multivect(x, desc_a, info, mold, scratch,n)
+subroutine psb_dasb_multivect(x, desc_a, info, mold, scratch, n)
   use psb_base_mod, psb_protect_name => psb_dasb_multivect
   implicit none
+  type(psb_d_multivect_type), intent(inout) :: x
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  class(psb_d_base_multivect_type), intent(in), optional  :: mold
+  logical, intent(in), optional                           :: scratch
+  integer(psb_ipk_), intent(in), optional                 :: n    
 
-  type(psb_desc_type), intent(in)      ::  desc_a
-  type(psb_d_multivect_type), intent(inout) ::  x
-  integer(psb_ipk_), intent(out)                 ::  info
-  class(psb_d_base_multivect_type), intent(in), optional :: mold
-  integer(psb_ipk_), optional, intent(in)   :: n    
-  logical, intent(in), optional        :: scratch
-
-  ! local variables
+  ! Local variables
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: i1sz,nrow,ncol, err_act, n_, dupl_
+  integer(psb_ipk_)   :: np, me
+  integer(psb_ipk_)   :: i1sz, nrow, ncol, err_act, n_, dupl_
   logical :: scratch_
   
-  integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)    :: name,ch_err
+  integer(psb_ipk_)   :: debug_level, debug_unit
+  character(len=20)   :: name, ch_err
 
   info = psb_success_
   if (psb_errstatus_fatal()) return 
 
   name = 'psb_dgeasb'
 
-  ctxt       = desc_a%get_context()
+  ctxt        = desc_a%get_context()
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
@@ -293,45 +292,43 @@ subroutine psb_dasb_multivect(x, desc_a, info, mold, scratch,n)
   !     ....verify blacs grid correctness..
   if (np == -1) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
-  else   if (.not.desc_a%is_ok()) then
+  else if (.not. desc_a%is_ok()) then
     info = psb_err_invalid_cd_state_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   nrow = desc_a%get_local_rows()
   ncol = desc_a%get_local_cols()
   if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
+      & write(debug_unit,*) me, ' ', trim(name), ': sizes: ', nrow, ncol
 
   dupl_ = x%get_dupl()
-  if (scratch_) then 
+  if (scratch_) then
     call x%free(info)
-    call x%bld(ncol,n_,mold=mold)
+    call x%bld(ncol, n_, mold = mold, scratch = .true.)
   else
-    call x%asb(ncol,n_,info)
+    call x%asb(ncol, n_, info)
     ! ..update halo elements..
-    call psb_halo(x,desc_a,info)
+    call psb_halo(x, desc_a, info)
     if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      call psb_errpush(info,name,a_err='psb_halo')
+      info = psb_err_from_subroutine_
+      call psb_errpush(info, name, a_err = 'psb_halo')
       goto 9999
     end if
-    if (present(mold)) then 
+    if (present(mold)) then
       call x%cnv(mold)
     end if
   end if
+
   if (debug_level >= psb_debug_ext_) &
-       & write(debug_unit,*) me,' ',trim(name),': end'
+      & write(debug_unit,*) me, ' ', trim(name), ': end'
 
   call psb_erractionrestore(err_act)
   return
 
 9999 call psb_error_handler(ctxt,err_act)
-
   return
-
 end subroutine psb_dasb_multivect
-

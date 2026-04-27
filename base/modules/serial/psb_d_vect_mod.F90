@@ -1758,38 +1758,39 @@ contains
     end if
   end subroutine d_mvect_clone
 
-  subroutine d_mvect_bld_x(x,invect,mold)
-    real(psb_dpk_), intent(in)          :: invect(:,:)
-    class(psb_d_multivect_type), intent(out) :: x
+  subroutine d_mvect_bld_x(x, invect, mold)
+    class(psb_d_multivect_type), intent(out)  :: x
+    real(psb_dpk_), intent(in)                :: invect(:, :)
     class(psb_d_base_multivect_type), intent(in), optional :: mold
-    integer(psb_ipk_) :: info
-    class(psb_d_base_multivect_type), pointer :: mld
 
+    integer(psb_ipk_) :: info
     info = psb_success_
+
     if (present(mold)) then
-      allocate(x%v,stat=info,mold=mold)
+      allocate(x%v, stat = info, mold = mold)
     else
-      allocate(x%v,stat=info, mold=psb_d_get_base_multivect_default())
+      allocate(x%v, stat = info, mold = psb_d_get_base_multivect_default())
     endif
 
     if (info == psb_success_) call x%v%bld(invect)
-
   end subroutine d_mvect_bld_x
 
-  subroutine d_mvect_bld_n(x,m,n,mold)
-    integer(psb_ipk_), intent(in) :: m,n
-    class(psb_d_multivect_type), intent(out) :: x
-    class(psb_d_base_multivect_type), intent(in), optional :: mold
+  subroutine d_mvect_bld_n(x, m, n, mold, scratch)
+    class(psb_d_multivect_type), intent(out)  :: x
+    integer(psb_ipk_), intent(in)             :: m, n
+    class(psb_d_base_multivect_type), intent(in), optional  :: mold
+    logical, intent(in), optional                           :: scratch
+
     integer(psb_ipk_) :: info
-
     info = psb_success_
-    if (present(mold)) then
-      allocate(x%v,stat=info,mold=mold)
-    else
-      allocate(x%v,stat=info, mold=psb_d_get_base_multivect_default())
-    endif
-    if (info == psb_success_) call x%v%bld(m,n)
 
+    if (present(mold)) then
+      allocate(x%v, stat = info, mold = mold)
+    else
+      allocate(x%v, stat = info, mold = psb_d_get_base_multivect_default())
+    endif
+
+    if (info == psb_success_) call x%v%bld(m, n, scratch = scratch)
   end subroutine d_mvect_bld_n
 
   function d_mvect_get_vect(x) result(res)
@@ -2200,11 +2201,11 @@ contains
     use psi_serial_mod
     use psb_d_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m, idx_y
-    class(psb_d_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: m, idx_y
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x
     class(psb_d_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent(in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)          :: info
+    integer(psb_ipk_), intent(out)              :: info
 
     if (.not. allocated(x%v)) then
       info = psb_err_invalid_vect_state_
@@ -2233,11 +2234,11 @@ contains
     use psi_serial_mod
     use psb_d_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m
-    class(psb_d_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x
     class(psb_d_multivect_type), intent(inout)  :: y
-    real(psb_dpk_), intent(in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(out)              :: info
 
     if (.not. allocated(x%v)) then
       info = psb_err_invalid_vect_state_ 
@@ -2255,9 +2256,9 @@ contains
   subroutine d_mvect_axpby_m_idxs(m, alpha, x, idx_x, beta, y, idx_y, info)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m, idx_x, idx_y
+    integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y
+    real(psb_dpk_), intent(in)                  :: alpha, beta
     class(psb_d_multivect_type), intent(inout)  :: x, y
-    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
@@ -2281,9 +2282,9 @@ contains
   subroutine d_mvect_axpby_m_full(m, alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
     class(psb_d_multivect_type), intent(inout)  :: x, y
-    real(psb_dpk_), intent(in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
@@ -2304,8 +2305,8 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_d_multivect_type), intent(inout)  :: x, y, z
     real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_multivect_type), intent(inout)  :: x, y, z
     integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v)) .or. (.not. allocated(y%v))) then
@@ -2326,12 +2327,11 @@ contains
     use psi_serial_mod
     use psb_d_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m, idx_z
-    class(psb_d_vect_type), intent(inout)  :: x
-    class(psb_d_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(in)               :: m, idx_z
+    real(psb_dpk_), intent(in)                  :: alpha, beta, gamma
+    class(psb_d_vect_type), intent(inout)       :: x, y
     class(psb_d_multivect_type), intent(inout)  :: z
-    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
-    integer(psb_ipk_), intent(out)          :: info
+    integer(psb_ipk_), intent(out)              :: info
 
     if ((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
       info = psb_err_invalid_vect_state_
@@ -2360,10 +2360,10 @@ contains
     use psi_serial_mod
     use psb_d_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m, idx_y, idx_z
-    class(psb_d_vect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: m, idx_y, idx_z
+    real(psb_dpk_), intent(in)                  :: alpha, beta, gamma
+    class(psb_d_vect_type), intent(inout)       :: x
     class(psb_d_multivect_type), intent(inout)  :: y, z
-    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)              :: info
 
     if(.not. allocated(x%v)) then
@@ -2392,9 +2392,9 @@ contains
   subroutine d_mvect_axpbycz_mm_idxs(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, info)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_), intent(in)          :: m, idx_x, idx_y, idx_z
+    integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y, idx_z
+    real(psb_dpk_), intent(in)                  :: alpha, beta, gamma
     class(psb_d_multivect_type), intent(inout)  :: x, y, z
-    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)              :: info
 
     if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
@@ -2440,8 +2440,8 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y, idx_z, idx_w
-    class(psb_d_multivect_type), intent(inout)  :: x, y, z, w
     real(psb_dpk_), intent(in)                  :: alpha, beta, gamma
+    class(psb_d_multivect_type), intent(inout)  :: x, y, z, w
     integer(psb_ipk_), intent(out)              :: info
 
     if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) & 
@@ -2470,7 +2470,7 @@ contains
     implicit none
     integer(psb_ipk_), intent(in)               :: m
     class(psb_d_multivect_type), intent(inout)  :: x
-    real(psb_dpk_), intent(in)               :: coeff(:)
+    real(psb_dpk_), intent(in)                  :: coeff(:)
     class(psb_d_vect_type), intent(inout)       :: y 
     integer(psb_ipk_), intent(out)              :: info
     logical, intent(in)                         :: upd_flag
@@ -2733,7 +2733,7 @@ contains
       info = psb_err_invalid_mvect_size_
       return
     endif
-
+    
     call z%v%mlt(m, alpha, x%v, y%v, beta, info, conjgx, conjgy)
   end subroutine d_mvect_mlt_m_full_out
 
