@@ -3798,9 +3798,9 @@ contains
     use psb_d_base_vect_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m, idx_y
+    real(psb_dpk_), intent(in)                      :: alpha, beta
     class(psb_d_base_vect_type), intent(inout)      :: x
     class(psb_d_base_multivect_type), intent(inout) :: y
-    real(psb_dpk_), intent(in)                      :: alpha, beta
     integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
@@ -3816,9 +3816,9 @@ contains
     use psb_d_base_vect_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
     class(psb_d_base_vect_type), intent(inout)      :: x
     class(psb_d_base_multivect_type), intent(inout) :: y
-    real(psb_dpk_), intent(in)                      :: alpha, beta
     integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
@@ -3834,8 +3834,8 @@ contains
     use psb_d_base_vect_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y
-    class(psb_d_base_multivect_type), intent(inout) :: x, y
     real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
     integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
@@ -3850,8 +3850,8 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
-    class(psb_d_base_multivect_type), intent(inout) :: x, y
     real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
     integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
@@ -3866,8 +3866,8 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
-    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
     real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
     integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
@@ -3883,9 +3883,9 @@ contains
     use psb_d_base_vect_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m, idx_z
+    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
     type(psb_d_base_vect_type), intent(inout)       :: x, y
     class(psb_d_base_multivect_type), intent(inout) :: z
-    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)                  :: info
 
     ! The type check is enforced via the argument types
@@ -3896,11 +3896,11 @@ contains
     use psi_serial_mod
     use psb_d_base_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m, idx_y, idx_z
-    type(psb_d_base_vect_type), intent(inout)  :: x
-    class(psb_d_base_multivect_type), intent(inout)  :: y, z
-    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m, idx_y, idx_z
+    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    type(psb_d_base_vect_type), intent(inout)       :: x
+    class(psb_d_base_multivect_type), intent(inout) :: y, z
+    integer(psb_ipk_), intent(out)                  :: info
 
     ! The type check is enforced via the argument types
     call psb_geaxpby(m, alpha, x%v, beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
@@ -3909,10 +3909,10 @@ contains
   subroutine d_base_mvect_axpbycz_mm_idxs(m, alpha, x, idx_x, beta, y, idx_y, z, gamma, idx_z, info)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m, idx_x, idx_y, idx_z
-    class(psb_d_base_multivect_type), intent(inout)  :: x, y, z
-    real(psb_dpk_), intent(in)       :: alpha, beta, gamma
-    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z
+    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(out)                  :: info
 
     ! The type check is enforced via the argument types
     call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
@@ -3922,8 +3922,8 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
-    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
     real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_d_base_multivect_type), intent(inout) :: x, y, z
     integer(psb_ipk_), intent(out)                  :: info
 
     select type(x)
@@ -3938,8 +3938,8 @@ contains
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z, idx_w
+    real(psb_dpk_), intent(in)                      :: alpha, beta, gamma
     class(psb_d_base_multivect_type), intent(inout) :: x, y, z, w
-    real(psb_dpk_), intent(in)                     :: alpha, beta, gamma
     integer(psb_ipk_), intent(out)                  :: info
 
     ! The type check is enforced via the argument types
@@ -3987,7 +3987,7 @@ contains
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
     class(psb_d_base_multivect_type), intent(inout) :: x, y
-    real(psb_dpk_), intent(in)                   :: coeff(:, :)
+    real(psb_dpk_), intent(in)                      :: coeff(:, :)
     integer(psb_ipk_), intent(out)                  :: info
     logical, intent(in)                             :: upd_flag
 
@@ -4068,7 +4068,6 @@ contains
 
     call dgemv('T', nrx, ncx, done, x%v, nrx, y%v, 1, dzero, res, 1)
   end subroutine d_base_mvect_dot_mv
-
 
   subroutine d_base_mvect_mlt_v_full(m, alpha, x, y, beta, info, conjgx, conjgy)
     use psi_serial_mod
@@ -4220,7 +4219,7 @@ contains
       info = psb_err_invalid_mvect_state_
       return
     end if
-
+    
     call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)
   end subroutine d_base_mvect_mlt_m_full_out
 

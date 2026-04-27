@@ -181,12 +181,12 @@ subroutine psb_d_apply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work)
     goto 9999
   end if
 
-  call psb_geasb(tmp, desc_data, info, n = 1, mold = x%v, scratch = .true.)
+  call psb_geasb(tmp, desc_data, info, n = ione, mold = x%v, scratch = .true.)
 
-  if (info == psb_success_) call prec%prec%apply(done, x, idx_x, dzero, tmp, 1, desc_data, info, & 
+  if (info == psb_success_) call prec%prec%apply(done, x, idx_x, dzero, tmp, ione, desc_data, info, & 
                                                   & trans = trans_, work = work_)
 
-  if (info == psb_success_) call psb_geaxpby(done, tmp, dzero, x, desc_data, info)
+  if (info == psb_success_) call psb_geaxpby(done, tmp, ione, dzero, x, idx_x, desc_data, info)
   
   call psb_gefree(tmp, desc_data, info)
 

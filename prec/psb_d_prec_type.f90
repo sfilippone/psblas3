@@ -115,16 +115,16 @@ module psb_d_prec_type
     module procedure psb_dprec_sizeof
   end interface
 
-  
+
   interface
     subroutine psb_d_apply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
-      type(psb_desc_type), intent(in)           :: desc_data
       class(psb_dprec_type), intent(inout)      :: prec
       type(psb_d_multivect_type), intent(inout) :: x, y
       integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+      type(psb_desc_type), intent(in)           :: desc_data
       integer(psb_ipk_), intent(out)            :: info
-      character(len=1), optional                :: trans
+      character(len=1), optional                      :: trans
       real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2_mvect_col
   end interface
@@ -132,12 +132,12 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply1_mvect_col(prec, x, idx_x, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
-      type(psb_desc_type), intent(in)           :: desc_data
       class(psb_dprec_type), intent(inout)      :: prec
       type(psb_d_multivect_type), intent(inout) :: x
       integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_desc_type), intent(in)           :: desc_data
       integer(psb_ipk_), intent(out)            :: info
-      character(len=1), optional                :: trans
+      character(len=1), optional                      :: trans
       real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply1_mvect_col
   end interface
@@ -339,9 +339,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_d_allocate_wrk
 
   subroutine psb_d_free_wrk(prec,info)
@@ -373,9 +372,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_d_free_wrk
 
   function psb_d_is_allocated_wrk(prec) result(res)
@@ -414,10 +412,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
-
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_d_precfree
 
   subroutine psb_d_prec_free(prec,info)
@@ -445,10 +441,8 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
-
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_d_prec_free
 
   function psb_dprec_sizeof(prec, global) result(val)
