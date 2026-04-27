@@ -147,7 +147,7 @@ end subroutine psb_daxpby_vect
 ! Arguments: ....
 !
 subroutine psb_daxpby_extract_c(alpha, x, idx_x, beta, y, desc_a, info)
-  use psb_base_mod, psb_protect_name => psb_daxbpy_extract_c
+  use psb_base_mod, psb_protect_name => psb_daxpby_extract_c
   implicit none
   real(psb_dpk_), intent(in)                :: alpha, beta
   type(psb_d_multivect_type), intent(inout) :: x
