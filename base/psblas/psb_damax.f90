@@ -689,11 +689,11 @@ function psb_dmin_vect(x, desc_a, info,global) result(res)
     goto 9999
   end if
 
-  ! compute local max
+  ! compute local min
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = x%minreal(desc_a%get_local_rows())
   else
-    res = dzero
+    res = HUGE(done)
   end if
 
   ! compute global min
