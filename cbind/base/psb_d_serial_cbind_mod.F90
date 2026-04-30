@@ -170,6 +170,7 @@ contains
       return
     end if
 
+    write(0,*) ' Calling XP%set ',val
     call xp%set(val)
 
     info = 0
@@ -200,6 +201,51 @@ contains
 
   end function psb_c_dvect_set_vect
 
+  function psb_c_dvect_set_entry(x,index,val) bind(c) result(info)
+    use psb_base_mod
+    implicit none
+
+    type(psb_c_dvector) :: x
+    type(psb_d_vect_type), pointer :: xp
+    integer(psb_c_ipk_) :: info
+    integer(psb_c_ipk_), value :: index
+    real(c_double), value :: val
+    integer(psb_c_ipk_) :: ixb
+
+    info = -1;
+
+    if (c_associated(x%item)) then
+      call c_f_pointer(x%item,xp)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    call xp%set_entry((index+(1-ixb)),val)
+    info = 0
+
+  end function psb_c_dvect_set_entry
+  
+  
+  function psb_c_dvect_get_entry(x,index) bind(c) result(res)
+    use psb_base_mod
+    implicit none
+
+    type(psb_c_dvector) :: x
+    type(psb_d_vect_type), pointer :: xp
+    integer(psb_c_ipk_), value :: index
+    real(c_double) :: res
+    integer(psb_c_ipk_) :: ixb
+    
+    if (c_associated(x%item)) then
+      call c_f_pointer(x%item,xp)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    res = xp%get_entry((index+(1-ixb)))
+  end function psb_c_dvect_get_entry
 
   function psb_c_dvect_clone(xh,yh) bind(c) result(info)
     implicit none
