@@ -60,6 +60,8 @@ psb_i_t		 psb_c_zcopy_mat(psb_c_zspmat *ah,psb_c_zspmat *bh,psb_c_descriptor *cd
 psb_i_t    psb_c_zsprn(psb_c_zspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_zmat_name_print(psb_c_zspmat *mh, char *name);
 psb_i_t		 psb_c_zvect_set_scal(psb_c_zvector *xh, psb_z_t val);
+psb_i_t	   psb_c_zvect_set_scal_bound(psb_c_zvector *xh, psb_z_t val,
+				      psb_i_t ifirst, psb_i_t ilast);
 psb_i_t		 psb_c_zvect_set_vect(psb_c_zvector *xh, psb_z_t *val, psb_i_t n);
 psb_z_t    psb_c_zvect_get_entry(psb_c_zvector *xh, psb_i_t index);
 psb_i_t    psb_c_zvect_set_entry(psb_c_zvector *xh, psb_i_t index, psb_z_t val);

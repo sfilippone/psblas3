@@ -180,6 +180,30 @@ contains
 
   end function psb_c_zvect_set_scal
 
+  function psb_c_zvect_set_scal_bound(x,val,ifirst,ilast) bind(c) result(info)
+    use psb_base_mod
+    implicit none
+
+    type(psb_c_zvector) :: x
+    type(psb_z_vect_type), pointer :: xp
+    integer(psb_c_ipk_) :: info
+    integer(psb_c_ipk_), value :: ifirst, ilast 
+    complex(c_double_complex)    :: val
+
+    info = -1;
+
+    if (c_associated(x%item)) then
+      call c_f_pointer(x%item,xp)
+    else
+      return
+    end if
+
+    call xp%set(val,first=ifirst,last=ilast)
+
+    info = 0
+
+  end function psb_c_zvect_set_scal_bound
+
   function psb_c_zvect_set_vect(x,val,n) bind(c) result(info)
     use psb_base_mod
     implicit none
@@ -203,7 +227,6 @@ contains
     info = 0
 
   end function psb_c_zvect_set_vect
-
 
   function psb_c_zvect_set_entry(x,index,val) bind(c) result(info)
     use psb_base_mod

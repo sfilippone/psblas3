@@ -59,6 +59,8 @@ psb_i_t		 psb_c_dcopy_mat(psb_c_dspmat *ah,psb_c_dspmat *bh,psb_c_descriptor *cd
 psb_i_t    psb_c_dsprn(psb_c_dspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_dmat_name_print(psb_c_dspmat *mh, char *name);
 psb_i_t		 psb_c_dvect_set_scal(psb_c_dvector *xh, psb_d_t val);
+psb_i_t	   psb_c_dvect_set_scal_bound(psb_c_dvector *xh, psb_d_t val,
+				      psb_i_t ifirst, psb_i_t ilast);
 psb_i_t		 psb_c_dvect_set_vect(psb_c_dvector *xh, psb_d_t *val, psb_i_t n);
 psb_d_t    psb_c_dvect_get_entry(psb_c_dvector *xh, psb_i_t index);
 psb_i_t    psb_c_dvect_set_entry(psb_c_dvector *xh, psb_i_t index, psb_d_t val);
