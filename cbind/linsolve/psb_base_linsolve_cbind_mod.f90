@@ -15,7 +15,6 @@ contains
     implicit none 
     type(solveroptions)   :: options
     integer(psb_c_ipk_) :: res
-
     options%itmax  = 1000
     options%itrace = 0
     options%istop  = 2
@@ -24,6 +23,21 @@ contains
 
     res            = 0
   end function psb_c_DefaultSolverOptions
+
+  function psb_c_PrintSolverOptions(options)&
+       &   bind(c,name='psb_c_PrintSolverOptions') result(res)
+    implicit none 
+    type(solveroptions)   :: options
+    integer(psb_c_ipk_) :: res
+
+    write(*,*) 'PSBLAS C Interface Solver Options '
+    write(*,*) '   Maximum number of iterations  :', options%itmax
+    write(*,*) '   Tracing                       :', options%itrace
+    write(*,*) '   Stopping Criterion            :', options%istop
+    write(*,*) '   Restart                       :', options%irst
+    write(*,*) '   EPS (tolerance)               :', options%eps  
+    res            = 0
+  end function psb_c_PrintSolverOptions
     
 
 end module psb_base_linsolve_cbind_mod
