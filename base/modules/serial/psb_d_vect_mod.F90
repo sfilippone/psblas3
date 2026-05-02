@@ -1637,20 +1637,27 @@ module psb_d_multivect_mod
     generic, public    :: dot     => dot_mm, dot_mv
 
     ! Element wise multiplication operations with in place output
-    procedure, pass(y) :: mlt_v_f    => d_mvect_mlt_v_full
-    procedure, pass(y) :: mlt_v_i    => d_mvect_mlt_v_idxs
-    procedure, pass(y) :: mlt_m_f    => d_mvect_mlt_m_full
-    procedure, pass(y) :: mlt_m_i    => d_mvect_mlt_m_idxs
+    procedure, pass(y) :: mlt_v_f     => d_mvect_mlt_v_full
+    procedure, pass(y) :: mlt_v_i     => d_mvect_mlt_v_idxs
+    procedure, pass(y) :: mlt_m_f     => d_mvect_mlt_m_full
+    procedure, pass(y) :: mlt_m_i     => d_mvect_mlt_m_idxs
     ! Element wise multiplication operations with separate output
-    procedure, pass(z) :: mlt_v_f_o  => d_mvect_mlt_v_full_out
-    procedure, pass(z) :: mlt_v_i_o  => d_mvect_mlt_v_idxs_out
-    procedure, pass(z) :: mlt_m_f_o  => d_mvect_mlt_m_full_out
-    procedure, pass(z) :: mlt_m_i_o  => d_mvect_mlt_m_idxs_out
+    procedure, pass(z) :: mlt_vv_f_o  => d_mvect_mlt_vv_full_out
+    procedure, pass(z) :: mlt_vv_i_o  => d_mvect_mlt_vv_idxs_out
+    procedure, pass(z) :: mlt_vm_f_o  => d_mvect_mlt_vm_full_out
+    procedure, pass(z) :: mlt_vm_i_o  => d_mvect_mlt_vm_idxs_out
+    procedure, pass(z) :: mlt_mm_f_o  => d_mvect_mlt_mm_full_out
+    procedure, pass(z) :: mlt_mm_i_o  => d_mvect_mlt_mm_idxs_out
+    ! Element wise multiplication operations with externel vector output
+    procedure, pass(y) :: mlt_vm_e    => d_mvect_mlt_vm_ext
+    procedure, pass(y) :: mlt_mm_e    => d_mvect_mlt_mm_ext
     ! All procedures exported as mlt
-    generic, public    :: mlt        => mlt_v_f, mlt_v_i, &
-                                        mlt_m_f, mlt_m_i, &
-                                        mlt_v_f_o, mlt_v_i_o, &
-                                        mlt_m_f_o, mlt_m_i_o  
+    generic, public    :: mlt         => mlt_v_f, mlt_v_i, &
+                                          mlt_m_f, mlt_m_i, &
+                                          mlt_vv_f_o, mlt_vv_i_o, &
+                                          mlt_vm_f_o, mlt_vm_i_o, &
+                                          mlt_mm_f_o, mlt_mm_i_o, &
+                                          mlt_vm_e, mlt_mm_e
 
     !!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
     !!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
@@ -2651,7 +2658,68 @@ contains
     call y%v%mlt(m, alpha, x%v, idx_x, idx_y, beta, info, conjgx, conjgy)
   end subroutine d_mvect_mlt_m_idxs
 
-  subroutine d_mvect_mlt_v_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+  subroutine d_mvect_mlt_vv_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x, y
+    class(psb_d_multivect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call z%v%mlt(m, alpha, x%v, y%v, beta, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_vv_full_out
+
+  subroutine d_mvect_mlt_vv_idxs_out(m, alpha, x, y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x, y
+    class(psb_d_multivect_type), intent(inout)  :: z
+    integer(psb_ipk_), intent(in)               :: idx_z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if(idx_z < 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_z > z%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call z%v%mlt(m, alpha, x%v, y%v, beta, idx_z, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_vv_idxs_out
+
+  subroutine d_mvect_mlt_vm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
     use psi_serial_mod
     use psb_d_vect_mod
     implicit none
@@ -2674,9 +2742,9 @@ contains
     end if
 
     call z%v%mlt(m, alpha, x%v, y%v, beta, info, conjgx, conjgy)
-  end subroutine d_mvect_mlt_v_full_out
+  end subroutine d_mvect_mlt_vm_full_out
 
-  subroutine d_mvect_mlt_v_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+  subroutine d_mvect_mlt_vm_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
     use psi_serial_mod
     use psb_d_vect_mod
     implicit none
@@ -2710,9 +2778,9 @@ contains
     endif
 
     call z%v%mlt(m, alpha, x%v, y%v, idx_y, beta, idx_z, info, conjgx, conjgy)
-  end subroutine d_mvect_mlt_v_idxs_out
+  end subroutine d_mvect_mlt_vm_idxs_out
 
-  subroutine d_mvect_mlt_m_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+  subroutine d_mvect_mlt_mm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
@@ -2735,9 +2803,9 @@ contains
     endif
     
     call z%v%mlt(m, alpha, x%v, y%v, beta, info, conjgx, conjgy)
-  end subroutine d_mvect_mlt_m_full_out
+  end subroutine d_mvect_mlt_mm_full_out
 
-  subroutine d_mvect_mlt_m_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+  subroutine d_mvect_mlt_mm_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
@@ -2766,8 +2834,80 @@ contains
     endif
 
     call z%v%mlt(m, alpha, x%v, idx_x, y%v, idx_y, beta, idx_z, info, conjgx, conjgy)
-  end subroutine d_mvect_mlt_m_idxs_out
+  end subroutine d_mvect_mlt_mm_idxs_out
   
+  subroutine d_mvect_mlt_vm_ext(m, alpha, x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_vect_type), intent(inout)       :: x, z
+    class(psb_d_multivect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(in)               :: idx_y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if(idx_y < 0) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if(idx_y > y%get_ncols()) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call y%v%mlt(m, alpha, x%v, idx_y, beta, z%v, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_vm_ext
+  
+  subroutine d_mvect_mlt_mm_ext(m, alpha, x, idx_x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    use psb_d_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    real(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_d_multivect_type), intent(inout)  :: x, y
+    integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+    class(psb_d_vect_type), intent(inout)       :: z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((idx_y < 0) .or. (idx_x < 0)) then
+      info = psb_err_iarg_neg_
+      return
+    endif
+
+    if((idx_y > y%get_ncols()) .or. (idx_x > x%get_ncols())) then
+      info = psb_err_entry_out_of_bounds_
+      return
+    endif
+
+    call y%v%mlt(m, alpha, x%v, idx_x, idx_y, beta, z%v, info, conjgx, conjgy)
+  end subroutine d_mvect_mlt_mm_ext
+
   !!$  function d_mvect_dot_v(n,x,y) result(res)
   !!$    implicit none
   !!$    class(psb_d_multivect_type), intent(inout) :: x, y

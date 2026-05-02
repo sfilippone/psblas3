@@ -2777,15 +2777,22 @@ module psb_d_base_multivect_mod
     procedure, pass(y) :: mlt_m_f    => d_base_mvect_mlt_m_full
     procedure, pass(y) :: mlt_m_i    => d_base_mvect_mlt_m_idxs
     ! two input with separate output
-    procedure, pass(z) :: mlt_v_f_o  => d_base_mvect_mlt_v_full_out
-    procedure, pass(z) :: mlt_v_i_o  => d_base_mvect_mlt_v_idxs_out
-    procedure, pass(z) :: mlt_m_f_o  => d_base_mvect_mlt_m_full_out
-    procedure, pass(z) :: mlt_m_i_o  => d_base_mvect_mlt_m_idxs_out
+    procedure, pass(z) :: mlt_vv_f_o  => d_base_mvect_mlt_vv_full_out
+    procedure, pass(z) :: mlt_vv_i_o  => d_base_mvect_mlt_vv_idxs_out
+    procedure, pass(z) :: mlt_vm_f_o  => d_base_mvect_mlt_vm_full_out
+    procedure, pass(z) :: mlt_vm_i_o  => d_base_mvect_mlt_vm_idxs_out
+    procedure, pass(z) :: mlt_mm_f_o  => d_base_mvect_mlt_mm_full_out
+    procedure, pass(z) :: mlt_mm_i_o  => d_base_mvect_mlt_mm_idxs_out
+    ! Element wise multiplication operations with externel vector output
+    procedure, pass(y) :: mlt_vm_e    => d_base_mvect_mlt_vm_ext
+    procedure, pass(y) :: mlt_mm_e    => d_base_mvect_mlt_mm_ext
     ! All procedures exported as mlt
-    generic, public    :: mlt        => mlt_v_f, mlt_v_i, &
-                                        mlt_m_f, mlt_m_i, &
-                                        mlt_v_f_o, mlt_v_i_o, &
-                                        mlt_m_f_o, mlt_m_i_o
+    generic, public    :: mlt         => mlt_v_f, mlt_v_i, &
+                                          mlt_m_f, mlt_m_i, &
+                                          mlt_vv_f_o, mlt_vv_i_o, &
+                                          mlt_vm_f_o, mlt_vm_i_o, &
+                                          mlt_mm_f_o, mlt_mm_i_o, &
+                                          mlt_vm_e, mlt_mm_e
 
     ! OLD routine for Element wise multiplication operations.
     ! Remove after wecheck there are really not used
@@ -4155,7 +4162,56 @@ contains
     call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, info)
   end subroutine d_base_mvect_mlt_m_idxs
 
-  subroutine d_base_mvect_mlt_v_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+  subroutine d_base_mvect_mlt_vv_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x, y
+    class(psb_d_base_multivect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)    
+  end subroutine d_base_mvect_mlt_vv_full_out
+
+  subroutine d_base_mvect_mlt_vv_idxs_out(m, alpha, x, y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x, y
+    class(psb_d_base_multivect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(in)                   :: idx_z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v, y%v, beta, z%v(:, idx_z), info)
+  end subroutine d_base_mvect_mlt_vv_idxs_out
+
+  subroutine d_base_mvect_mlt_vm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
@@ -4177,9 +4233,9 @@ contains
     end if
 
     call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)    
-  end subroutine d_base_mvect_mlt_v_full_out
+  end subroutine d_base_mvect_mlt_vm_full_out
 
-  subroutine d_base_mvect_mlt_v_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+  subroutine d_base_mvect_mlt_vm_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
@@ -4202,9 +4258,9 @@ contains
     end if
 
     call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, z%v(:, idx_z), info)
-  end subroutine d_base_mvect_mlt_v_idxs_out
+  end subroutine d_base_mvect_mlt_vm_idxs_out
 
-  subroutine d_base_mvect_mlt_m_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+  subroutine d_base_mvect_mlt_mm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
@@ -4221,9 +4277,9 @@ contains
     end if
     
     call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)
-  end subroutine d_base_mvect_mlt_m_full_out
+  end subroutine d_base_mvect_mlt_mm_full_out
 
-  subroutine d_base_mvect_mlt_m_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+  subroutine d_base_mvect_mlt_mm_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                   :: m
@@ -4241,7 +4297,57 @@ contains
     end if
 
     call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, z%v(:, idx_z), info)
-  end subroutine d_base_mvect_mlt_m_idxs_out
+  end subroutine d_base_mvect_mlt_mm_idxs_out
+
+  subroutine d_base_mvect_mlt_vm_ext(m, alpha, x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_vect_type), intent(inout)      :: x, z
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)                   :: idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+    
+    call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, z%v, info)
+  end subroutine d_base_mvect_mlt_vm_ext
+
+  subroutine d_base_mvect_mlt_mm_ext(m, alpha, x, idx_x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    real(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_d_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+    class(psb_d_base_vect_type), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+    
+    call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, z%v, info)
+  end subroutine d_base_mvect_mlt_mm_ext
 
 
   !   !
