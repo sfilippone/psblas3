@@ -287,6 +287,12 @@ set(PSB_base_source_files
   serial/impl/psb_z_base_vect_impl.F90
   serial/impl/psb_s_base_vect_impl.F90
   serial/impl/psb_d_base_vect_impl.F90			
+  serial/impl/psb_i_vect_impl.F90
+  serial/impl/psb_l_vect_impl.F90
+  serial/impl/psb_c_vect_impl.F90
+  serial/impl/psb_z_vect_impl.F90
+  serial/impl/psb_s_vect_impl.F90
+  serial/impl/psb_d_vect_impl.F90			
   serial/impl/psb_c_coo_impl.F90
   serial/impl/psb_d_coo_impl.F90
   serial/impl/psb_d_csc_impl.F90

@@ -4,293 +4,110 @@ module psb_c_serial_cbind_mod
   use psb_objhandle_mod
   use psb_base_tools_cbind_mod
 
-contains
 
-
-  function psb_c_cvect_get_nrows(xh) bind(c) result(res)
-    implicit none
-
-    integer(psb_c_ipk_) :: res
-    type(psb_c_cvector) :: xh
-
-    type(psb_c_vect_type), pointer :: vp
-    integer(psb_c_ipk_)               :: info
-
-    res = -1
-
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,vp)
-      res = vp%get_nrows()
-    end if
-
-  end function psb_c_cvect_get_nrows
-
-  function psb_c_cvect_f_get_cpy(v,xh) bind(c) result(res)
-    implicit none
-
-    integer(psb_c_ipk_)    :: res
-    complex(c_float_complex)    :: v(*)
-    type(psb_c_cvector) :: xh
-
-    type(psb_c_vect_type), pointer :: vp
-    complex(psb_spk_), allocatable :: fv(:)
-    integer(psb_c_ipk_)           :: info, sz
-
-    res = -1
-
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,vp)
-      fv = vp%get_vect()
-      sz = size(fv)
-      v(1:sz) = fv(1:sz)
-    end if
-
-  end function psb_c_cvect_f_get_cpy
-
-
-  function psb_c_cvect_zero(xh) bind(c) result(res)
-    implicit none
-
-    integer(psb_c_ipk_)    :: res
-    type(psb_c_cvector) :: xh
-
-    type(psb_c_vect_type), pointer :: vp
-    integer(psb_c_ipk_)               :: info
-
-    res = -1
-
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,vp)
-      call vp%zero()
-    end if
-
-  end function psb_c_cvect_zero
-
-  function psb_c_cvect_f_get_pnt(xh) bind(c) result(res)
-    implicit none
-
-    type(c_ptr)        :: res
-    type(psb_c_cvector) :: xh
-
-    type(psb_c_vect_type), pointer :: vp
-
-    res = c_null_ptr
-
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,vp)
-      if(vp%is_dev()) call vp%sync()
-      res = c_loc(vp%v%v)
-    end if
-
-  end function psb_c_cvect_f_get_pnt
-
-
-  function psb_c_cmat_get_nrows(mh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    implicit none
-    integer(psb_c_ipk_) :: res
-
-    type(psb_c_cspmat) :: mh
-    type(psb_cspmat_type), pointer :: ap
-    integer(psb_c_ipk_)               ::  info
-
-    res = 0
-    if (c_associated(mh%item)) then
-      call c_f_pointer(mh%item,ap)
-    else
-      return
-    end if
-
-    res = ap%get_nrows()
-
-  end function psb_c_cmat_get_nrows
-
-
-  function psb_c_cmat_get_ncols(mh) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    implicit none
-    integer(psb_c_ipk_) :: res
-
-    type(psb_c_cspmat) :: mh
-    type(psb_cspmat_type), pointer :: ap
-    integer(psb_c_ipk_)               ::  info
-
-    res = 0
-    if (c_associated(mh%item)) then
-      call c_f_pointer(mh%item,ap)
-    else
-      return
-    end if
-
-    res = ap%get_ncols()
-
-  end function psb_c_cmat_get_ncols
-
-
-  function psb_c_cmat_name_print(mh,name) bind(c) result(res)
-    use psb_base_mod
-    use psb_objhandle_mod
-    implicit none
-    integer(psb_c_ipk_) :: res
-
-    character(c_char)        :: name(*)
-    type(psb_c_cspmat) :: mh
-    type(psb_cspmat_type), pointer :: ap
-    integer(psb_c_ipk_)      ::  info
-    character(1024)         :: fname
-
-    res = 0
-    if (c_associated(mh%item)) then
-      call c_f_pointer(mh%item,ap)
-    else
-      return
-    end if
-    call psb_stringc2f(name,fname)
-
-    call ap%print(fname,head='PSBLAS Cbinding Interface')
-
-  end function psb_c_cmat_name_print
-
-  function psb_c_cvect_set_scal(x,val) bind(c) result(info)
-    use psb_base_mod
-    implicit none
-
-    type(psb_c_cvector) :: x
-    type(psb_c_vect_type), pointer :: xp
-    integer(psb_c_ipk_) :: info
-    complex(c_float_complex), value :: val
-
-    info = -1;
-
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    call xp%set(val)
-
-    info = 0
-
-  end function psb_c_cvect_set_scal
-
-  function psb_c_cvect_set_scal_bound(x,val,ifirst,ilast) bind(c) result(info)
-    use psb_base_mod
-    implicit none
-
-    type(psb_c_cvector) :: x
-    type(psb_c_vect_type), pointer :: xp
-    integer(psb_c_ipk_) :: info
-    integer(psb_c_ipk_), value :: ifirst, ilast 
-    complex(c_float_complex)    :: val
-
-    info = -1;
-
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    call xp%set(val,first=ifirst,last=ilast)
-
-    info = 0
-
-  end function psb_c_cvect_set_scal_bound
-
-  function psb_c_cvect_set_vect(x,val,n) bind(c) result(info)
-    use psb_base_mod
-    implicit none
-
-    type(psb_c_cvector) :: x
-    type(psb_c_vect_type), pointer :: xp
-    integer(psb_c_ipk_) :: info
-    integer(psb_c_ipk_), value :: n
-    complex(c_float_complex)    :: val(*)
-
-    info = -1;
-
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    call xp%set(val(1:n))
-
-    info = 0
-
-  end function psb_c_cvect_set_vect
-
-  function psb_c_cvect_set_entry(x,index,val) bind(c) result(info)
-    use psb_base_mod
-    implicit none
-
-    type(psb_c_cvector) :: x
-    type(psb_c_vect_type), pointer :: xp
-    integer(psb_c_ipk_) :: info
-    integer(psb_c_ipk_), value :: index
-    complex(c_float_complex), value :: val
-    integer(psb_c_ipk_) :: ixb
-
-    info = -1;
-
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    ixb = psb_c_get_index_base()
-    call xp%set_entry((index+(1-ixb)),val)
-    info = 0
-
-  end function psb_c_cvect_set_entry
+  interface
+    module function psb_c_cvect_get_nrows(xh) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      type(psb_c_cvector) :: xh
+      
+      type(psb_c_vect_type), pointer :: vp
+      integer(psb_c_ipk_)               :: info
+    end function psb_c_cvect_get_nrows
+  end interface
+  
+  interface
+    module function psb_c_cvect_f_get_cpy(v,xh) bind(c) result(res)
+      integer(psb_c_ipk_)    :: res
+      complex(c_float_complex)    :: v(*)
+      type(psb_c_cvector) :: xh
+    end function psb_c_cvect_f_get_cpy
+  end interface
+  
+
+  interface
+    module function psb_c_cvect_zero(xh) bind(c) result(res)
+      integer(psb_c_ipk_)    :: res
+      type(psb_c_cvector) :: xh
+    end function psb_c_cvect_zero
+  end interface
+  
+  interface
+    module function psb_c_cvect_f_get_pnt(xh) bind(c) result(res)
+      type(c_ptr)        :: res
+      type(psb_c_cvector) :: xh
+    end function psb_c_cvect_f_get_pnt
+  end interface
+
+  interface
+    module function psb_c_cmat_get_nrows(mh) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      type(psb_c_cspmat) :: mh
+    end function psb_c_cmat_get_nrows
+  end interface
+
+  interface
+    module function psb_c_cmat_get_ncols(mh) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      type(psb_c_cspmat) :: mh
+    end function psb_c_cmat_get_ncols
+  end interface
+
+  interface
+    module function psb_c_cmat_name_print(mh,name) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      type(psb_c_cspmat) :: mh
+      character(c_char)        :: name(*)
+    end function psb_c_cmat_name_print
+  end interface
+
+  interface
+    module function psb_c_cvect_set_scal(x,val) bind(c) result(info)
+      type(psb_c_cvector) :: x
+      integer(psb_c_ipk_) :: info
+      complex(c_float_complex), value :: val
+    end function psb_c_cvect_set_scal
+  end interface
+
+  interface
+    module function psb_c_cvect_set_scal_bound(x,val,ifirst,ilast) bind(c) result(info)
+      type(psb_c_cvector) :: x
+      integer(psb_c_ipk_) :: info
+      integer(psb_c_ipk_), value :: ifirst, ilast 
+      complex(c_float_complex)    :: val
+    end function psb_c_cvect_set_scal_bound
+  end interface
+
+  interface
+    module function psb_c_cvect_set_vect(x,val,n) bind(c) result(info)
+      type(psb_c_cvector) :: x
+      integer(psb_c_ipk_) :: info
+      integer(psb_c_ipk_), value :: n
+      complex(c_float_complex)    :: val(*)
+    end function psb_c_cvect_set_vect
+  end interface
+
+  interface
+    module function psb_c_cvect_set_entry(x,index,val) bind(c) result(info)
+      type(psb_c_cvector) :: x
+      integer(psb_c_ipk_) :: info
+      integer(psb_c_ipk_), value :: index
+      complex(c_float_complex), value :: val
+    end function psb_c_cvect_set_entry
+  end interface
  
-  function psb_c_cvect_get_entry(x,index) bind(c) result(res)
-    use psb_base_mod
-    implicit none
+  interface
+    module function psb_c_cvect_get_entry(x,index) bind(c) result(res)
+      type(psb_c_cvector) :: x
+      integer(psb_c_ipk_), value :: index
+      complex(c_float_complex) :: res
+    end function psb_c_cvect_get_entry
+  end interface
 
-    type(psb_c_cvector) :: x
-    type(psb_c_vect_type), pointer :: xp
-    integer(psb_c_ipk_), value :: index
-    complex(c_float_complex) :: res
-    integer(psb_c_ipk_) :: ixb
-    
-    if (c_associated(x%item)) then
-      call c_f_pointer(x%item,xp)
-    else
-      return
-    end if
-
-    ixb = psb_c_get_index_base()
-    res = xp%get_entry((index+(1-ixb)))
-  end function psb_c_cvect_get_entry
-
-  function psb_c_cvect_clone(xh,yh) bind(c) result(info)
-    implicit none
-
-    integer(psb_c_ipk_) :: info
-    type(psb_c_cvector) :: xh,yh
-
-    type(psb_c_vect_type), pointer :: xp,yp
-
-    info = -1
-
-    if (c_associated(xh%item)) then
-      call c_f_pointer(xh%item,xp)
-    else
-      return      
-    end if
-    if (c_associated(yh%item)) then
-      call c_f_pointer(yh%item,yp)
-    else
-      return      
-    end if
-    call xp%clone(yp,info)
-    
-  end function psb_c_cvect_clone
+  interface
+    module function psb_c_cvect_clone(xh,yh) bind(c) result(info)
+      integer(psb_c_ipk_) :: info
+      type(psb_c_cvector) :: xh,yh
+    end function psb_c_cvect_clone
+  end interface
 
 end module psb_c_serial_cbind_mod
