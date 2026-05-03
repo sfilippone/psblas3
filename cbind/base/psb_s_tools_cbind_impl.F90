@@ -1,0 +1,742 @@
+submodule ( psb_s_tools_cbind_mod)  psb_s_tools_cbind_impl
+  use iso_c_binding
+  use psb_base_mod
+  use psb_cpenv_mod
+  use psb_objhandle_mod
+  use psb_base_tools_cbind_mod
+#ifdef PSB_HAVE_CUDA
+  use psb_cuda_mod
+#endif
+  
+contains
+
+  ! Should define   geall_opt  with DUPL argument
+  module function psb_c_sgeall(xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      return
+    end if
+    allocate(xp)
+    call psb_geall(xp,descp,info)
+    xh%item = c_loc(xp)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeall
+
+  module function psb_c_sgeall_remote(xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      return
+    end if
+    allocate(xp)
+    call psb_geall(xp,descp,info,bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+    xh%item = c_loc(xp)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeall_remote
+
+  module function psb_c_sgeall_remote_options(xh,cdh,bldmode,dupl) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+    integer(psb_c_ipk_), value :: dupl
+    integer(psb_c_ipk_), value :: bldmode
+
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      return
+    end if
+    allocate(xp)
+    call psb_geall(xp,descp,info,bldmode=bldmode,dupl=dupl)
+    xh%item = c_loc(xp)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeall_remote_options
+
+  module function psb_c_sgeasb(xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_geasb(xp,descp,info)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeasb
+
+  module function psb_c_sgeasb_options(xh,cdh,dupl) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+    integer(psb_c_ipk_), value :: dupl
+
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_d_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_geasb(xp,descp,info,dupl=dupl)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeasb_options
+
+  module function psb_c_sgeasb_options_format(xh,cdh,dupl,format) bind(c) result(res)
+    ! Takes into account format argument as a c string, and uses it to call the appropriate psb_geasb
+    ! with mold argument
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+    character(kind=c_char), dimension(*) :: format
+    integer(psb_c_ipk_), value :: dupl
+
+    ! Local variables
+    character(len=6) :: fformat
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+    ! mold variables
+#ifdef PSB_HAVE_CUDA
+    type(psb_s_vect_cuda), target   :: vgpu
+#endif
+    type(psb_s_base_vect_type), target   :: vect
+    class(psb_s_base_vect_type), pointer :: vmold
+
+    ! Select mold based on format
+    call psb_stringc2f(format,fformat)
+
+    select case (psb_toupper(fformat))
+#ifdef PSB_HAVE_CUDA  
+    case('GPU','DEVICE')
+      vmold => vgpu
+#endif  
+    case('CPU','HOST')
+      vmold => vect
+    case default
+      write(psb_out_unit,*) 'psb_c_sgeasb_options_format: Unknown format ',fformat
+      vmold => vect
+    end select
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_geasb(xp,descp,info,dupl=dupl,mold=vmold)
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeasb_options_format
+
+ 
+  module function psb_c_sgefree(xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    call psb_gefree(xp,descp,info)
+    res = min(0,info)
+    deallocate(xp,stat=info)
+    res = min(0,info)
+    xh%item = c_null_ptr
+
+    return
+  end function psb_c_sgefree
+
+
+  module function psb_c_sgeins(nz,irw,val,xh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    integer(psb_c_ipk_), value :: nz
+    integer(psb_c_lpk_)        :: irw(*)
+    real(c_float)        :: val(*)
+    type(psb_c_svector) :: xh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_s_vect_type), pointer :: xp
+    integer(psb_c_ipk_)               :: ixb, info
+
+    res = -1
+    info = 0 
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      call psb_geins(nz,irw(1:nz),val(1:nz),&
+           & xp,descp,info)
+    else
+      call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
+           & xp,descp,info)
+    end if
+
+    res = min(0,info)
+
+    return
+  end function psb_c_sgeins
+
+ module function psb_c_sspall(mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      return
+    end if
+    allocate(ap)
+    call psb_spall(ap,descp,info)
+    mh%item = c_loc(ap)
+    res = min(0,info)
+
+    return
+  end function psb_c_sspall
+
+
+ module function psb_c_sspall_remote(mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      return
+    end if
+    allocate(ap)
+    call psb_spall(ap,descp,info,bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+    mh%item = c_loc(ap)
+    res = min(0,info)
+
+    return
+  end function psb_c_sspall_remote
+
+ module function psb_c_sspasb(mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      call c_f_pointer(mh%item,ap)
+    else
+      return
+    end if
+
+    call psb_spasb(ap,descp,info)
+    res = min(0,info)
+    return
+  end function psb_c_sspasb
+
+  module function psb_c_sspfree(mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      call c_f_pointer(mh%item,ap)
+    else
+      return
+    end if
+
+    call psb_spfree(ap,descp,info)
+    res = min(0,info)
+    deallocate(ap,stat=info)
+    mh%item=c_null_ptr
+    return
+  end function psb_c_sspfree
+
+
+
+
+  module function psb_c_sspasb_opt(mh,cdh,afmt,upd,dupl) bind(c) result(res)
+
+#if 0
+#ifdef PSB_HAVE_LIBRSB 
+    use psb_s_rsb_mat_mod
+#endif
+#endif
+#if defined(PSB_HAVE_CUDA)
+    use psb_cuda_mod
+#endif
+    use psb_ext_mod
+    implicit none
+    integer(psb_c_ipk_) :: res
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+    integer(psb_c_ipk_), value :: upd,dupl
+    character(c_char)     :: afmt(*)
+    integer(psb_c_ipk_)    :: info,n
+    character(len=5)      :: fafmt
+    integer(psb_ipk_), parameter :: hksz = 32
+    ! mold variables
+#if 0
+#ifdef PSB_HAVE_LIBRSB
+    type(psb_s_rsb_sparse_mat) :: arsb
+#endif
+#endif
+    type(psb_s_ell_sparse_mat), target    :: aell
+    type(psb_s_csr_sparse_mat), target   :: acsr
+    type(psb_s_csc_sparse_mat), target   :: acsc
+    type(psb_s_coo_sparse_mat), target   :: acoo
+    type(psb_s_hll_sparse_mat), target    :: ahll
+    type(psb_s_hdia_sparse_mat), target  :: ahdia
+    type(psb_s_dns_sparse_mat), target   :: adns
+#if defined(PSB_HAVE_CUDA)
+    type(psb_s_cuda_hlg_sparse_mat), target   :: ahlg
+    type(psb_s_cuda_hdiag_sparse_mat), target :: ahdiag
+    type(psb_s_cuda_csrg_sparse_mat), target   :: acsrg
+    type(psb_s_cuda_elg_sparse_mat), target    :: aelg
+#endif
+    class(psb_s_base_sparse_mat), pointer :: amold
+    !Local variables
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      call c_f_pointer(mh%item,ap)
+    else
+      return
+    end if    
+    call psb_stringc2f(afmt,fafmt)
+
+    ! Set the mold variable based on afmt
+    select case (psb_toupper(fafmt))
+#if defined(PSB_HAVE_CUDA)
+    case('ELG')
+      amold => aelg
+    case('HLG')
+      call psi_set_hksz(hksz)
+      amold => ahlg
+    case('HDIAG')
+      amold => ahdiag
+    case('CSRG')
+      amold => acsrg
+    case('ELL')
+      amold => aell
+    case('HLL')
+      call psi_set_hksz(hksz)
+      amold => ahll
+    case('HDIA')
+      amold => ahdia
+    case('CSR')
+      amold => acsr
+    case('CSC')
+      amold => acsc
+    case('DNS')
+      amold => adns
+    case default
+      write(*,*) 'Unknown format defaulting to HLG'
+      amold => ahlg
+#else
+    case('ELL')
+      amold => aell
+    case('HLL')
+      call psi_set_hksz(hksz)
+      amold => ahll
+    case('HDIA')
+      amold => ahdia
+    case('CSR')
+      amold => acsr
+    case('CSC')
+      amold => acsc
+    case('DNS')
+      amold => adns
+    case default
+      write(*,*) 'Unknown format defaulting to CSR'
+      amold => acsr
+#endif
+  end select
+
+    select case(fafmt)
+#if 0
+#ifdef PSB_HAVE_LIBRSB
+    case('RSB')
+      call psb_spasb(double_spmat_pool(mh)%item,descriptor_pool(cdh)%item,info,&
+           & upd=upd,mold=arsb)
+#endif
+#endif
+    case('ELL','HLL','CSR','DNS','CSC')
+      call psb_spasb(ap,descp,info,upd=upd,mold=amold)
+    case('HDIA')
+      call psb_spasb(ap,descp,info,upd=upd,mold=amold)
+#if defined(PSB_HAVE_CUDA)
+    case('ELG','HLG','CSRG')
+      call psb_spasb(ap,descp,info,upd=upd,mold=amold)
+    case('HDIAG')
+      call psb_spasb(ap,descp,info,upd=upd,mold=amold)
+#endif  
+    case default
+      write(psb_out_unit,*) 'psb_c_sspasb_opt: Unknown format ',fafmt
+      call psb_spasb(ap,descp,info,afmt=fafmt,upd=upd,dupl=dupl)
+    end select
+
+    res = min(0,info)
+
+    return
+  end function psb_c_sspasb_opt
+
+
+  module function psb_c_sspins(nz,irw,icl,val,mh,cdh) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    integer(psb_c_ipk_), value :: nz
+    integer(psb_c_lpk_)      :: irw(*), icl(*)
+    real(c_float)        :: val(*)
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)               :: ixb,info,n
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      call c_f_pointer(mh%item,ap)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      call psb_spins(nz,irw(1:nz),icl(1:nz),val(1:nz),ap,descp,info)
+    else
+      call psb_spins(nz,(irw(1:nz)+(1-ixb)),(icl(1:nz)+(1-ixb)),val(1:nz),ap,descp,info)
+    end if
+    res = min(0,info)
+    return
+  end function psb_c_sspins
+
+
+  module function psb_c_ssprn(mh,cdh,clear) bind(c) result(res)
+
+    implicit none
+    integer(psb_c_ipk_) :: res
+    logical(c_bool), value :: clear
+    type(psb_c_sspmat) :: mh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer :: descp
+    type(psb_sspmat_type), pointer :: ap
+    integer(psb_c_ipk_)     :: info
+    logical                :: fclear
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(mh%item)) then
+      call c_f_pointer(mh%item,ap)
+    else
+      return
+    end if
+
+    fclear = clear
+    call psb_sprn(ap,descp,info,clear=fclear)
+    res = min(0,info)
+
+    return
+  end function psb_c_ssprn
+!!$
+!!$  module function psb_c_sspprint(mh) bind(c) result(res)
+!!$
+!!$    implicit none
+!!$    integer(psb_c_ipk_) :: res
+!!$    integer(psb_c_ipk_),  value :: mh
+!!$    integer(psb_c_ipk_)         :: info
+!!$
+!!$
+!!$    res = -1
+!!$    call psb_check_double_spmat_handle(mh,info)
+!!$    if (info < 0) return
+!!$
+!!$    call psb_csprt(0,double_spmat_pool(mh)%item,head='Debug mat')
+!!$
+!!$    res = 0
+!!$
+!!$    return
+!!$  end function psb_c_sspprint
+
+  function psb_c_sgetelem(xh,index,cdh) bind(c) result(res)
+    implicit none
+
+    type(psb_c_svector)      :: xh
+    integer(psb_c_lpk_), value :: index
+    type(psb_c_descriptor)     :: cdh
+    real(c_float)           :: res
+
+    type(psb_s_vect_type), pointer :: xp
+    type(psb_desc_type), pointer     :: descp
+    integer(psb_c_ipk_)              :: info, ixb
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      res = psb_getelem(xp,index,descp,info)
+    else
+      res = psb_getelem(xp,index+(1-ixb),descp,info)
+    end if
+
+    return
+
+  end function psb_c_sgetelem
+
+  module function psb_c_ssetelem(index,val,xh,cdh) bind(c) result(res)
+    implicit none
+
+    type(psb_c_svector)      :: xh
+    integer(psb_c_lpk_), value :: index
+    type(psb_c_descriptor)     :: cdh
+    real(c_float), value    :: val
+    integer(psb_c_ipk_) :: res
+
+    type(psb_s_vect_type), pointer :: xp
+    type(psb_desc_type), pointer     :: descp
+    integer(psb_c_ipk_)              :: info, ixb
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      call  psb_setelem(index,val,xp,descp,info)
+    else
+      call psb_setelem(index+(1-ixb),val,xp,descp,info)
+    end if
+    res=info
+    return
+
+  end function psb_c_ssetelem
+
+  module function psb_c_smatgetelem(ah,rowindex,colindex,cdh) bind(c) result(res)
+    implicit none
+
+    type(psb_c_sspmat)      :: ah
+    integer(psb_c_lpk_), value :: rowindex, colindex
+    type(psb_c_descriptor)     :: cdh
+    real(c_float)           :: res
+    type(psb_sspmat_type), pointer :: ap
+    type(psb_desc_type), pointer     :: descp
+    integer(psb_c_ipk_)              :: info, ixb
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      res = psb_getelem(ap,rowindex,colindex,descp,info)
+    else
+      res = psb_getelem(ap,rowindex+(1-ixb),colindex+(1-ixb),descp,info)
+    end if
+
+    return
+
+  end function psb_c_smatgetelem
+
+end submodule psb_s_tools_cbind_impl
