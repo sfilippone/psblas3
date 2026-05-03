@@ -266,6 +266,7 @@ contains
     end if
 
     ixb = psb_c_get_index_base()
+    write(0,*) 'C_get_entry: ',index,(index+(1-ixb))
     res = xp%get_entry((index+(1-ixb)))
   end function psb_c_dvect_get_entry
 

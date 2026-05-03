@@ -279,6 +279,7 @@ contains
     info = 0
     if (psb_errstatus_fatal()) return
 
+    write(0,*) 'd_base_ins_a: ',n
     if (try_newins) then 
       if (x%is_bld()) then
         ncfs_ = x%get_ncfs()
@@ -1023,6 +1024,7 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
+    write(0,*)'d_base%set_scal ',val,first_,last_
 #if defined(PSB_OPENMP)
     !$omp parallel do private(i)
     do i = first_, last_        
@@ -1031,8 +1033,11 @@ contains
 #else
     x%v(first_:last_) = val
 #endif
+    write(0,*) 'end of set_scal',&
+         & ((last_-first_+1)/2+first_),&
+         & x%v((last_-first_+1)/2+first_)
     call x%set_host()
-
+ 
   end subroutine d_base_set_scal
   
 
@@ -1093,16 +1098,18 @@ contains
   !! \brief  Get one entry from the vector
   !!
   !
-module function d_base_get_entry(x, index) result(res)
+  module function d_base_get_entry(x, index) result(res)
     implicit none
     class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
     real(psb_dpk_)                           :: res
 
     res = dzero
+    write(0,*) 'base%get_entry ',allocated(x%v),index
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
       res = x%v(index)
+      write(0,*) 'base%get_entry out',index,res
     end if
 
   end function d_base_get_entry
