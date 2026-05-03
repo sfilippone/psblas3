@@ -669,6 +669,42 @@ contains
 
   end function psb_c_sgetelem
 
+  function psb_c_ssetelem(index,val,xh,cdh) bind(c) result(res)
+    implicit none
+
+    type(psb_c_svector)      :: xh
+    integer(psb_c_lpk_), value :: index
+    type(psb_c_descriptor)     :: cdh
+    real(c_float), value    :: val
+    integer(psb_c_ipk_) :: res
+
+    type(psb_s_vect_type), pointer :: xp
+    type(psb_desc_type), pointer     :: descp
+    integer(psb_c_ipk_)              :: info, ixb
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(xh%item)) then
+      call c_f_pointer(xh%item,xp)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      call  psb_setelem(index,val,xp,descp,info)
+    else
+      call psb_setelem(index+(1-ixb),val,xp,descp,info)
+    end if
+    res=info
+    return
+
+  end function psb_c_ssetelem
+
   function psb_c_smatgetelem(ah,rowindex,colindex,cdh) bind(c) result(res)
     implicit none
 
@@ -676,7 +712,6 @@ contains
     integer(psb_c_lpk_), value :: rowindex, colindex
     type(psb_c_descriptor)     :: cdh
     real(c_float)           :: res
-
     type(psb_sspmat_type), pointer :: ap
     type(psb_desc_type), pointer     :: descp
     integer(psb_c_ipk_)              :: info, ixb

@@ -4,7 +4,11 @@ include ../../../Make.inc
 # The object files
 #
 BOBJS=psb_base_mat_impl.o \
-  psb_s_base_mat_impl.o psb_d_base_mat_impl.o psb_c_base_mat_impl.o psb_z_base_mat_impl.o
+  psb_s_base_mat_impl.o psb_d_base_mat_impl.o psb_c_base_mat_impl.o psb_z_base_mat_impl.o \
+  psb_i_base_vect_impl.o psb_l_base_vect_impl.o  \
+  psb_s_base_vect_impl.o psb_d_base_vect_impl.o  \
+  psb_c_base_vect_impl.o psb_z_base_vect_impl.o  
+
 #\
   psb_s_lbase_mat_impl.o psb_d_lbase_mat_impl.o psb_c_lbase_mat_impl.o psb_z_lbase_mat_impl.o 
 SOBJS=psb_s_csr_impl.o psb_s_coo_impl.o psb_s_csc_impl.o psb_s_mat_impl.o\

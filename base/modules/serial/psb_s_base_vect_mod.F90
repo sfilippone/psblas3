@@ -157,6 +157,7 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: set_vect => s_base_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: get_entry=> s_base_get_entry
+    procedure, pass(x) :: set_entry=> s_base_set_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -257,8 +258,6 @@ module psb_s_base_vect_mod
     module procedure constructor, size_const
   end interface psb_s_base_vect
 
-contains
-
   !
   ! Constructors.
   !
@@ -267,30 +266,31 @@ contains
   !! \brief     Constructor from an array
   !!  \param   x(:)  input array to be copied
   !!
-  function constructor(x) result(this)
-    real(psb_spk_)   :: x(:)
-    type(psb_s_base_vect_type) :: this
-    integer(psb_ipk_) :: info
+  interface
+    module function constructor(x) result(this)
+      real(psb_spk_)   :: x(:)
+      type(psb_s_base_vect_type) :: this
+      integer(psb_ipk_) :: info
 
-    this%v = x
-    call this%asb(size(x,kind=psb_ipk_),info)
-  end function constructor
+    end function constructor
+  end interface
 
 
   !> Function  constructor:
   !! \brief     Constructor from size
   !!  \param    n   Size of vector to be built.
   !!
-  function size_const(n) result(this)
-    integer(psb_ipk_), intent(in) :: n
-    type(psb_s_base_vect_type) :: this
-    integer(psb_ipk_) :: info
-
-    call this%asb(n,info)
-
-  end function size_const
+  interface
+    module function size_const(n) result(this)
+      integer(psb_ipk_), intent(in) :: n
+      type(psb_s_base_vect_type) :: this
+      integer(psb_ipk_) :: info
+      
+    end function size_const
+  end interface
 
   !
+
   ! Build from a sample
   !
 
@@ -299,36 +299,13 @@ contains
   !! \brief     Build method from an array
   !!  \param   x(:)  input array to be copied
   !!
-  subroutine s_base_bld_x(x,this,scratch)
-    use psb_realloc_mod
-    implicit none
-    real(psb_spk_), intent(in) :: this(:)
-    class(psb_s_base_vect_type), intent(inout) :: x
-    logical, intent(in), optional        :: scratch
-
-    logical :: scratch_
-    integer(psb_ipk_) :: info
-    integer(psb_ipk_) :: i
-    
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
-    call psb_realloc(size(this),x%v,info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
-      return
-    end if
-#if defined (PSB_OPENMP)
-    !$omp parallel do private(i)
-    do i = 1, size(this)
-      x%v(i) = this(i)
-    end do
-#else
-    x%v(:)  = this(:)
-#endif
-  end subroutine s_base_bld_x
+  interface
+    module subroutine s_base_bld_x(x,this,scratch)
+      real(psb_spk_), intent(in) :: this(:)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_bld_x
+  end interface
 
   !
   ! Create with size, but no initialization
@@ -339,50 +316,26 @@ contains
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated.
   !!
-  subroutine s_base_bld_mn(x,n,scratch)
-    use psb_realloc_mod
-    implicit none
-    integer(psb_mpk_), intent(in) :: n
-    class(psb_s_base_vect_type), intent(inout) :: x
-    logical, intent(in), optional        :: scratch
-
-    logical :: scratch_
-    integer(psb_ipk_) :: info
-
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
-    call psb_realloc(n,x%v,info)
-    call x%asb(n,info,scratch=scratch_)
-
-  end subroutine s_base_bld_mn
+  interface
+    module subroutine s_base_bld_mn(x,n,scratch)
+      integer(psb_mpk_), intent(in) :: n
+      class(psb_s_base_vect_type), intent(inout) :: x
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_bld_mn
+  end interface
 
   !> Function  bld_en:
   !! \memberof  psb_s_base_vect_type
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated.
   !!
-  subroutine s_base_bld_en(x,n,scratch)
-    use psb_realloc_mod
-    implicit none
-    integer(psb_epk_), intent(in) :: n
-    class(psb_s_base_vect_type), intent(inout) :: x
-    logical, intent(in), optional        :: scratch
-
-    logical :: scratch_
-    integer(psb_ipk_) :: info
-
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
-    call psb_realloc(n,x%v,info)
-    call x%asb(n,info,scratch=scratch_)
-
-  end subroutine s_base_bld_en
+  interface
+    module subroutine s_base_bld_en(x,n,scratch)
+      integer(psb_epk_), intent(in) :: n
+      class(psb_s_base_vect_type), intent(inout) :: x
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_bld_en
+  end interface
 
   !> Function  base_all:
   !! \memberof  psb_s_base_vect_type
@@ -391,21 +344,13 @@ contains
   !!  \param    n    size to be allocated.
   !!  \param info  return code
   !!
-  subroutine s_base_all(n, x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: n
-    class(psb_s_base_vect_type), intent(out)    :: x
-    integer(psb_ipk_), intent(out)              :: info
-
-    call psb_realloc(n,x%v,info)
-    if (try_newins) then
-      call psb_realloc(n,x%iv,info)
-      call x%set_ncfs(0)
-    end if
-
-  end subroutine s_base_all
+  interface
+    module subroutine s_base_all(n, x, info)
+      integer(psb_ipk_), intent(in)               :: n
+      class(psb_s_base_vect_type), intent(out)    :: x
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_all
+  end interface
 
   !> Function  base_mold:
   !! \memberof  psb_s_base_vect_type
@@ -413,43 +358,22 @@ contains
   !!  \param    y returned variable
   !!  \param info  return code
   !!
-  subroutine s_base_mold(x, y, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(in)   :: x
-    class(psb_s_base_vect_type), intent(out), allocatable :: y
-    integer(psb_ipk_), intent(out)              :: info
+  interface
+    module subroutine s_base_mold(x, y, info)
+      class(psb_s_base_vect_type), intent(in)   :: x
+      class(psb_s_base_vect_type), intent(out), allocatable :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mold
+  end interface
 
-    allocate(psb_s_base_vect_type :: y, stat=info)
-
-  end subroutine s_base_mold
-
-  subroutine s_base_reinit(x, info,clear)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)    :: x
-    integer(psb_ipk_), intent(out)              :: info
-    logical, intent(in), optional               :: clear
-    logical :: clear_
-
-    info =  0
-    if (present(clear)) then
-      clear_ = clear
-    else
-      clear_ = .true.
-    end if
-
-    if (allocated(x%v)) then 
-      if (x%is_dev()) call x%sync()
-      if (clear_) x%v(:) = szero
-      call x%set_host()
-      call x%set_upd()
-    end if
-
-  end subroutine s_base_reinit
-
+  interface
+    module subroutine s_base_reinit(x, info,clear)
+      class(psb_s_base_vect_type), intent(inout)    :: x
+      integer(psb_ipk_), intent(out)              :: info
+      logical, intent(in), optional               :: clear
+    end subroutine s_base_reinit
+  end interface
+  
   !
   ! Insert a bunch of values at specified positions.
   !
@@ -477,153 +401,25 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_ins_a(n,irl,val,dupl,x,maxr,info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl, maxr
-    integer(psb_ipk_), intent(in)               :: irl(:)
-    real(psb_spk_), intent(in)        :: val(:)
-    integer(psb_ipk_), intent(out)              :: info
+  interface
+    module subroutine s_base_ins_a(n,irl,val,dupl,x,maxr,info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      integer(psb_ipk_), intent(in)               :: n, dupl, maxr
+      integer(psb_ipk_), intent(in)               :: irl(:)
+      real(psb_spk_), intent(in)        :: val(:)
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_ins_a
+  end interface
 
-    integer(psb_ipk_) :: i, isz, dupl_, ncfs_, k
-
-    info = 0
-    if (psb_errstatus_fatal()) return
-
-    if (try_newins) then 
-      if (x%is_bld()) then
-        ncfs_ = x%get_ncfs()
-        isz = ncfs_ + n
-        call psb_ensure_size(isz,x%v,info)
-        call psb_ensure_size(isz,x%iv,info)
-        k   = ncfs_
-        do i = 1, n
-          !loop over all val's rows
-          ! row actual block row
-          if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-            k  = k + 1 
-            ! this row belongs to me
-            ! copy i-th row of block val in x
-            x%v(k)  = val(i)
-            x%iv(k) = irl(i)
-          end if
-        enddo
-        call x%set_ncfs(k)      
-
-      else if (x%is_upd()) then
-
-        dupl_ = x%get_dupl()
-        if (.not.allocated(x%v)) then
-          info = psb_err_invalid_vect_state_
-        else if (n > min(size(irl),size(val))) then
-          info = psb_err_invalid_input_
-        else
-          isz = size(x%v)
-          select case(dupl_)
-          case(psb_dupl_ovwrt_)
-            do i = 1, n
-              !loop over all val's rows
-              ! row actual block row
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-                ! this row belongs to me
-                ! copy i-th row of block val in x
-                x%v(irl(i)) = val(i)
-              end if
-            enddo
-
-          case(psb_dupl_add_)
-
-            do i = 1, n
-              !loop over all val's rows
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-                ! this row belongs to me
-                ! copy i-th row of block val in x
-                x%v(irl(i)) = x%v(irl(i)) +  val(i)
-              end if
-            enddo
-
-          case default
-            info = 321
-            ! !$      call psb_errpush(info,name)
-            ! !$      goto 9999
-          end select
-        end if
-      else
-        info = psb_err_invalid_vect_state_
-      end if
-    else
-      if (.not.allocated(x%v)) then
-        info = psb_err_invalid_vect_state_
-      else if (n > min(size(irl),size(val))) then
-        info = psb_err_invalid_input_
-
-      else
-        isz = size(x%v)
-        select case(dupl)
-        case(psb_dupl_ovwrt_)
-          do i = 1, n
-            !loop over all val's rows
-            ! row actual block row
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i)) = val(i)
-            end if
-          enddo
-
-        case(psb_dupl_add_)
-
-          do i = 1, n
-            !loop over all val's rows
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i)) = x%v(irl(i)) +  val(i)
-            end if
-          enddo
-
-        case default
-          info = 321
-          ! !$      call psb_errpush(info,name)
-          ! !$      goto 9999
-        end select
-      end if
-    end if
-    call x%set_host()
-    if (info /= 0) then
-      call psb_errpush(info,'base_vect_ins')
-      return
-    end if
-
-  end subroutine s_base_ins_a
-
-  subroutine s_base_ins_v(n,irl,val,dupl,x,maxr,info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl, maxr
-    class(psb_i_base_vect_type), intent(inout)  :: irl
-    class(psb_s_base_vect_type), intent(inout)  :: val
-    integer(psb_ipk_), intent(out)              :: info
-
-    integer(psb_ipk_) :: isz
-
-    info = 0
-    if (psb_errstatus_fatal()) return
-
-    if (irl%is_dev()) call irl%sync()
-    if (val%is_dev()) call val%sync()
-    if (x%is_dev())   call x%sync()
-    call x%ins(n,irl%v,val%v,dupl,maxr,info)
-
-    if (info /= 0) then
-      call psb_errpush(info,'base_vect_ins')
-      return
-    end if
-
-  end subroutine s_base_ins_v
-
+  interface
+    module subroutine s_base_ins_v(n,irl,val,dupl,x,maxr,info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      integer(psb_ipk_), intent(in)               :: n, dupl, maxr
+      class(psb_i_base_vect_type), intent(inout)  :: irl
+      class(psb_s_base_vect_type), intent(inout)  :: val
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_ins_v
+  end interface
 
   !
   !> Function  base_zero
@@ -631,18 +427,11 @@ contains
   !! \brief Zero out contents
   !!
   !
-  subroutine s_base_zero(x)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)    :: x
-
-    if (allocated(x%v)) then
-      !$omp workshare
-      x%v(:)=szero
-      !$omp end workshare
-    end if
-    call x%set_host()
-  end subroutine s_base_zero
+  interface
+    module subroutine s_base_zero(x)
+      class(psb_s_base_vect_type), intent(inout)    :: x
+    end subroutine s_base_zero
+  end interface
 
 
   !
@@ -658,75 +447,14 @@ contains
   !!  \param info  return code
   !!
   !
-
-  subroutine s_base_asb_m(n, x, info, scratch)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    integer(psb_mpk_), intent(in)              :: n
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-    logical, intent(in), optional        :: scratch
-
-    logical :: scratch_
-    integer(psb_ipk_) :: i, ncfs, xvsz
-    real(psb_spk_), allocatable ::  vv(:)
-
-    info = 0
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
-    if (try_newins) then 
-      if (x%is_bld()) then
-        ncfs = x%get_ncfs()
-        xvsz = psb_size(x%v)
-        call psb_realloc(n,vv,info)
-        vv(:) = szero
-        select case(x%get_dupl())
-        case(psb_dupl_add_)
-          do i=1,ncfs
-            vv(x%iv(i)) = vv(x%iv(i)) + x%v(i)
-          end do
-        case(psb_dupl_ovwrt_)
-          do i=1,ncfs
-            vv(x%iv(i)) = x%v(i)
-          end do
-        case(psb_dupl_err_)
-          do i=1,ncfs
-            if (vv(x%iv(i)).ne. szero) then
-              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
-              return
-            else
-              vv(x%iv(i)) = x%v(i)
-            end if
-          end do
-        case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
-          info =-7
-        end select
-        call psb_move_alloc(vv,x%v,info)
-        if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < n) &
-             & call psb_realloc(n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-      else
-        info = psb_err_invalid_vect_state_        
-        call psb_errpush(info,'vect_asb')
-      end if
-    else
-      if (x%get_nrows() < n) &
-           & call psb_realloc(n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-    end if
-    call x%set_host()
-    call x%set_asb()
-    call x%sync()
-  end subroutine s_base_asb_m
+  interface
+    module subroutine s_base_asb_m(n, x, info, scratch)
+      integer(psb_mpk_), intent(in)              :: n
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_asb_m
+  end interface
 
   !
   ! Assembly.
@@ -741,75 +469,14 @@ contains
   !!  \param info  return code
   !!
   !
-
-  subroutine s_base_asb_e(n, x, info, scratch)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    integer(psb_epk_), intent(in)              :: n
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-    logical, intent(in), optional        :: scratch
-
-    logical :: scratch_
-    integer(psb_ipk_) :: i, ncfs, xvsz
-    real(psb_spk_), allocatable ::  vv(:)
-
-    info = 0
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
-    if (try_newins) then
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb unhandled')    
-      if (x%is_bld()) then
-        call psb_realloc(n,vv,info)
-        vv(:) =  szero
-        select case(x%get_dupl())
-        case(psb_dupl_add_)
-          do i=1,x%get_ncfs()
-            vv(x%iv(i)) = vv(x%iv(i)) + x%v(i)
-          end do
-        case(psb_dupl_ovwrt_)
-          do i=1,x%get_ncfs()
-            vv(x%iv(i)) = x%v(i)
-          end do
-        case(psb_dupl_err_)
-          do i=1,x%get_ncfs()
-            if (vv(x%iv(i)).ne. szero) then
-              call psb_errpush(psb_err_duplicate_coo,'vect_asb')
-              return
-            else
-              vv(x%iv(i)) = x%v(i)
-            end if
-          end do
-        case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
-          info =-7
-        end select
-        call psb_move_alloc(vv,x%v,info)
-        if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < n) &
-             & call psb_realloc(n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-      else
-        info = psb_err_invalid_vect_state_        
-        call psb_errpush(info,'vect_asb')
-      end if
-    else
-      if (x%get_nrows() < n) &
-           & call psb_realloc(n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
-    end if
-    call x%set_host()
-    call x%set_asb()
-    call x%sync()
-  end subroutine s_base_asb_e
+  interface
+    module subroutine s_base_asb_e(n, x, info, scratch)
+      integer(psb_epk_), intent(in)              :: n
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_asb_e
+  end interface
 
   !
   !> Function  base_free:
@@ -819,22 +486,12 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_free(x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(out)              :: info
-
-    info = 0
-    if (allocated(x%v)) deallocate(x%v, stat=info)
-    if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
-    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
-    if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)    
-    if (info /= 0) call &
-         & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
-    call x%set_null()
-  end subroutine s_base_free
+  interface
+    module subroutine s_base_free(x, info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_free
+  end interface
 
   !
   !> Function  base_free_buffer:
@@ -844,15 +501,12 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_free_buffer(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%combuf)) &
-         &  deallocate(x%combuf,stat=info)
-  end subroutine s_base_free_buffer
+  interface
+    module subroutine s_base_free_buffer(x,info)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_free_buffer
+  end interface
 
   !
   !> Function  base_maybe_free_buffer:
@@ -865,17 +519,12 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_maybe_free_buffer(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    info = 0
-    if (psb_get_maybe_free_buffer())&
-         &  call x%free_buffer(info)
-
-  end subroutine s_base_maybe_free_buffer
+  interface
+    module subroutine s_base_maybe_free_buffer(x,info)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_maybe_free_buffer
+  end interface
 
   !
   !> Function  base_free_comid:
@@ -885,113 +534,106 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_free_comid(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
-  end subroutine s_base_free_comid
+  interface
+    module subroutine s_base_free_comid(x,info)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_free_comid
+  end interface
   
-  function s_base_get_ncfs(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%ncfs
-  end function s_base_get_ncfs
+  interface
+    module   function s_base_get_ncfs(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_get_ncfs
+  end interface
 
-  function s_base_get_dupl(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%dupl
-  end function s_base_get_dupl
+  interface
+    module function s_base_get_dupl(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_get_dupl
+  end interface
 
-  function s_base_get_state(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%bldstate 
-  end function s_base_get_state
+  interface
+    module function s_base_get_state(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_get_state
+  end interface
 
-  function s_base_is_null(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_null_)
-  end function s_base_is_null
+  interface
+    module function s_base_is_null(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical :: res
+    end function s_base_is_null
+  end interface
 
-  function s_base_is_bld(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_bld_)
-  end function s_base_is_bld
+  interface
+    module function s_base_is_bld(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical :: res
+    end function s_base_is_bld
+  end interface
 
-  function s_base_is_upd(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_upd_)
-  end function s_base_is_upd
+  interface
+    module function s_base_is_upd(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical :: res
+    end function s_base_is_upd
+  end interface
 
-  function s_base_is_asb(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_asb_)
-  end function s_base_is_asb
+  interface
+    module function s_base_is_asb(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical :: res
+    end function s_base_is_asb
+  end interface
 
-  subroutine  s_base_set_ncfs(n,x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n
-    x%ncfs = n
-  end subroutine s_base_set_ncfs
+  interface
+    module subroutine  s_base_set_ncfs(n,x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine s_base_set_ncfs
+  end interface
 
-  subroutine  s_base_set_dupl(n,x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n
-    x%dupl = n
-  end subroutine s_base_set_dupl
+  interface
+    module subroutine  s_base_set_dupl(n,x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine s_base_set_dupl
+  end interface
 
-  subroutine  s_base_set_state(n,x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n
-    x%bldstate = n
-  end subroutine s_base_set_state
+  interface
+    module subroutine  s_base_set_state(n,x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine s_base_set_state
+  end interface
 
-  subroutine  s_base_set_null(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
+  interface
+    module subroutine  s_base_set_null(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_null
+  end interface
 
-    x%bldstate = psb_vect_null_
-  end subroutine s_base_set_null
+  interface
+    module subroutine  s_base_set_bld(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_bld
+  end interface
 
-  subroutine  s_base_set_bld(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
+  interface
+    module subroutine  s_base_set_upd(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_upd
+  end interface
 
-    x%bldstate = psb_vect_bld_
-  end subroutine s_base_set_bld
-
-  subroutine  s_base_set_upd(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-    x%bldstate = psb_vect_upd_
-  end subroutine s_base_set_upd
-
-  subroutine  s_base_set_asb(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-    x%bldstate = psb_vect_asb_
-  end subroutine s_base_set_asb
+  interface
+    module subroutine  s_base_set_asb(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_asb
+  end interface
 
   !
   ! The base version of SYNC & friends does nothing, it's just
@@ -1003,11 +645,11 @@ contains
   !! \brief Sync: base version is a no-op.
   !!
   !
-  subroutine s_base_sync(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-  end subroutine s_base_sync
+  interface
+    module subroutine s_base_sync(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_sync
+  end interface
 
   !
   !> Function  base_set_host:
@@ -1015,11 +657,11 @@ contains
   !! \brief Set_host: base version is a no-op.
   !!
   !
-  subroutine s_base_set_host(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-  end subroutine s_base_set_host
+  interface
+    module subroutine s_base_set_host(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_host
+  end interface
 
   !
   !> Function  base_set_dev:
@@ -1027,11 +669,11 @@ contains
   !! \brief Set_dev: base version is a no-op.
   !!
   !
-  subroutine s_base_set_dev(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-  end subroutine s_base_set_dev
+  interface
+    module subroutine s_base_set_dev(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_dev
+  end interface
 
   !
   !> Function  base_set_sync:
@@ -1039,11 +681,11 @@ contains
   !! \brief Set_sync: base version is a no-op.
   !!
   !
-  subroutine s_base_set_sync(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-  end subroutine s_base_set_sync
+  interface
+    module subroutine s_base_set_sync(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_set_sync
+  end interface
 
   !
   !> Function  base_is_dev:
@@ -1051,13 +693,12 @@ contains
   !! \brief Is  vector on external device    .
   !!
   !
-  function s_base_is_dev(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical  :: res
-
-    res = .false.
-  end function s_base_is_dev
+  interface
+    module   function s_base_is_dev(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical  :: res
+    end function s_base_is_dev
+  end interface
 
   !
   !> Function  base_is_host
@@ -1065,13 +706,12 @@ contains
   !! \brief Is  vector on standard memory    .
   !!
   !
-  function s_base_is_host(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical  :: res
-
-    res = .true.
-  end function s_base_is_host
+  interface
+    module function s_base_is_host(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical  :: res
+    end function s_base_is_host
+  end interface
 
   !
   !> Function  base_is_sync
@@ -1079,32 +719,24 @@ contains
   !! \brief Is  vector on sync               .
   !!
   !
-  function s_base_is_sync(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    logical  :: res
-
-    res = .true.
-  end function s_base_is_sync
+  interface
+    module function s_base_is_sync(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      logical  :: res
+    end function s_base_is_sync
+  end interface
 
   !> Function  base_cpy:
   !! \memberof  psb_d_base_vect_type
   !! \brief     base_cpy: copy base contents
   !!  \param    y returned variable
   !!
-  subroutine s_base_cpy(x, y)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(in)   :: x
-    class(psb_s_base_vect_type), intent(out)  :: y
-
-    if (allocated(x%v)) call y%bld(x%v)
-    call y%set_state(x%get_state())
-    call y%set_dupl(x%get_dupl())
-    call y%set_ncfs(x%get_ncfs())
-    if (allocated(x%iv)) y%iv = x%iv
-  end subroutine s_base_cpy
+  interface
+    module subroutine s_base_cpy(x, y)
+      class(psb_s_base_vect_type), intent(in)   :: x
+      class(psb_s_base_vect_type), intent(out)  :: y
+    end subroutine s_base_cpy
+  end interface
 
   !
   ! Size info.
@@ -1115,15 +747,12 @@ contains
   !! \brief  Number of entries
   !!
   !
-  function s_base_get_nrows(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-
-    res = 0
-    if (allocated(x%v)) res = size(x%v)
-
-  end function s_base_get_nrows
+  interface
+    module   function s_base_get_nrows(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_get_nrows
+  end interface
 
   !
   !> Function  base_get_sizeof
@@ -1131,15 +760,12 @@ contains
   !! \brief  Size in bytes
   !!
   !
-  function s_base_sizeof(x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    integer(psb_epk_) :: res
-
-    ! Force 8-byte integers.
-    res = (1_psb_epk_ * psb_sizeof_sp) * x%get_nrows()
-
-  end function s_base_sizeof
+  interface
+    module function s_base_sizeof(x) result(res)
+      class(psb_s_base_vect_type), intent(in) :: x
+      integer(psb_epk_) :: res
+    end function s_base_sizeof
+  end interface
 
   !
   !> Function  base_get_fmt
@@ -1147,12 +773,11 @@ contains
   !! \brief  Format
   !!
   !
-  function s_base_get_fmt() result(res)
-    implicit none
-    character(len=5) :: res
-    res = 'BASE'
-  end function s_base_get_fmt
-
+  interface
+    module function s_base_get_fmt() result(res)
+      character(len=5) :: res
+    end function s_base_get_fmt
+  end interface
 
   !
   !
@@ -1162,33 +787,14 @@ contains
   !! \brief  Extract a copy of the contents
   !!
   !
-  function  s_base_get_vect(x,n) result(res)
-    class(psb_s_base_vect_type), intent(inout) :: x
-    real(psb_spk_), allocatable                 :: res(:)
-    integer(psb_ipk_) :: info
-    integer(psb_ipk_), optional :: n
-    ! Local variables
-    integer(psb_ipk_) :: isz, i
-
-    if (.not.allocated(x%v)) return
-    if (.not.x%is_host()) call x%sync()
-    isz = x%get_nrows()
-    if (present(n)) isz = max(0,min(isz,n))
-    allocate(res(isz),stat=info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
-      return
-    end if
-    if (.false.) then 
-      res(1:isz) = x%v(1:isz)
-    else
-      !$omp parallel do private(i)
-      do i=1, isz
-        res(i) = x%v(i)
-      end do
-    end if
-    
-  end function s_base_get_vect
+  interface
+    module function  s_base_get_vect(x,n) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      real(psb_spk_), allocatable                 :: res(:)
+      integer(psb_ipk_) :: info
+      integer(psb_ipk_), optional :: n
+    end function s_base_get_vect
+  end interface
 
   !
   ! Reset all values
@@ -1199,32 +805,13 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine s_base_set_scal(x,val,first,last)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in) :: val
-    integer(psb_ipk_), optional :: first, last
-
-    integer(psb_ipk_) :: first_, last_, i
-
-    first_=1
-    last_=size(x%v)
-    if (present(first)) first_ = max(1,first)
-    if (present(last))  last_  = min(last,last_)
-
-    if (x%is_dev()) call x%sync()
-#if defined(PSB_OPENMP)
-    !$omp parallel do private(i)
-    do i = first_, last_        
-      x%v(i) = val
-    end do
-#else
-    x%v(first_:last_) = val
-#endif
-    call x%set_host()
-
-  end subroutine s_base_set_scal
-
+  interface
+    module subroutine s_base_set_scal(x,val,first,last)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      real(psb_spk_), intent(in) :: val
+      integer(psb_ipk_), optional :: first, last
+    end subroutine s_base_set_scal
+  end interface
 
   !
   !> Function  base_set_vect
@@ -1232,43 +819,19 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in
   !!
-  subroutine s_base_set_vect(x,val,first,last)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in) :: val(:)
-    integer(psb_ipk_), optional :: first, last
+  interface
+    module subroutine s_base_set_vect(x,val,first,last)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      real(psb_spk_), intent(in) :: val(:)
+      integer(psb_ipk_), optional :: first, last
+    end subroutine s_base_set_vect
+  end interface
 
-    integer(psb_ipk_) :: first_, last_, i,  info
-
-    if (.not.allocated(x%v)) then
-      call psb_realloc(size(val),x%v,info)
-    end if
-    
-    first_                     = 1
-    if (present(first)) first_ = max(1,first)
-    last_                      = min(psb_size(x%v),first_+size(val)-1)
-    if (present(last))  last_  = min(last,last_)
-
-    if (x%is_dev()) call x%sync()
-
-#if defined(PSB_OPENMP)
-      !$omp parallel do private(i)
-      do i  = first_, last_
-        x%v(i) = val(i-first_+1)
-      end do
-#else
-      x%v(first_:last_) = val(1:last_-first_+1)
-#endif
-    call x%set_host()
-
-  end subroutine s_base_set_vect
-
-  subroutine s_base_check_addr(x)
-    class(psb_s_base_vect_type), intent(inout) :: x
-
-    write(0,*) 'Check addr: base version, do nothing'
-
-  end subroutine s_base_check_addr
+  interface
+    module subroutine s_base_check_addr(x)
+      class(psb_s_base_vect_type), intent(inout) :: x
+    end subroutine s_base_check_addr
+  end interface
 
 
   !
@@ -1280,16 +843,21 @@ contains
   !! \brief  Get one entry from the vector
   !!
   !
-  function s_base_get_entry(x, index) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
-    integer(psb_ipk_), intent(in)             :: index
-    real(psb_spk_)                           :: res
-
-    res = 0
-    if (allocated(x%v)) res = x%v(index)
-
-  end function s_base_get_entry
+  interface
+    module function s_base_get_entry(x, index) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: index
+      real(psb_spk_)                           :: res
+    end function s_base_get_entry
+  end interface
+  
+  interface
+    module subroutine  s_base_set_entry(x, index, val)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: index
+      real(psb_spk_)                           :: val
+    end subroutine s_base_set_entry
+  end interface
 
   !
   ! Overwrite with absolute value
@@ -1299,39 +867,18 @@ contains
   !! \memberof  psb_s_base_vect_type
   !! \brief  Set all entries to their respective absolute values.
   !!
-  subroutine s_base_absval1(x)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
+  interface
+    module subroutine s_base_absval1(x)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+    end subroutine s_base_absval1
+  end interface
 
-    integer(psb_ipk_) :: i
-    
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
-#if defined(PSB_OPENMP)
-      !$omp parallel do private(i)
-      do i=1, size(x%v)
-        x%v(i) =  abs(x%v(i))
-      end do
-#else
-      x%v =  abs(x%v)
-#endif
-      call x%set_host()
-    end if
-
-  end subroutine s_base_absval1
-
-  subroutine s_base_absval2(x,y)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    class(psb_s_base_vect_type), intent(inout) :: y
-    integer(psb_ipk_) :: info
-    if (.not.x%is_host()) call x%sync()
-    if (allocated(x%v)) then
-      call y%axpby(ione*min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
-      call y%absval()
-    end if
-
-  end subroutine s_base_absval2
+  interface
+    module subroutine s_base_absval2(x,y)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      class(psb_s_base_vect_type), intent(inout) :: y
+    end subroutine s_base_absval2
+  end interface
 
   !
   ! Dot products
@@ -1343,30 +890,14 @@ contains
   !! \param n    Number of entries to be considered
   !! \param y    The other (base_vect) to be multiplied by
   !!
-  function s_base_dot_v(n,x,y) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_)                :: res
-    real(psb_spk_), external      :: sdot
-
-    res = szero
-    !
-    ! Note: this is the base implementation.
-    !  When we get here, we are sure that X is of
-    !  TYPE psb_s_base_vect.
-    !  If Y is not, throw the burden on it, implicitly
-    !  calling dot_a
-    !
-    select type(yy => y)
-    type is (psb_s_base_vect_type)
-      res = sdot(n,x%v,1,y%v,1)
-    class default
-      res = y%dot(n,x%v)
-    end select
-
-  end function s_base_dot_v
-
+  interface
+    module   function s_base_dot_v(n,x,y) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_)                :: res
+    end function s_base_dot_v
+  end interface
+  
   !
   ! Base workhorse is good old BLAS1
   !
@@ -1377,17 +908,14 @@ contains
   !! \param n    Number of entries to be considered
   !! \param y(:) The array to be multiplied by
   !!
-  function s_base_dot_a(n,x,y) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    real(psb_spk_), intent(in)    :: y(:)
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_)                :: res
-    real(psb_spk_), external      :: sdot
-
-    res = sdot(n,y,1,x%v,1)
-
-  end function s_base_dot_a
+  interface
+    module function s_base_dot_a(n,x,y) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      real(psb_spk_), intent(in)    :: y(:)
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_)                :: res
+    end function s_base_dot_a
+  end interface
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -1403,20 +931,15 @@ contains
   !! \param beta scalar beta
   !! \param info   return code
   !!
-  subroutine s_base_axpby_v(m,alpha, x, beta, y, info)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    real(psb_spk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-
-    if (x%is_dev()) call x%sync()
-
-    call y%axpby(m,alpha,x%v,beta,info)
-
-  end subroutine s_base_axpby_v
+  interface
+    module subroutine s_base_axpby_v(m,alpha, x, beta, y, info)
+      integer(psb_ipk_), intent(in)               :: m
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_axpby_v
+  end interface
 
   !
   ! AXPBY is invoked via Z, hence the structure below.
@@ -1434,21 +957,16 @@ contains
   !! \param z     The class(base_vect) to be returned
   !! \param info   return code
   !!
-  subroutine s_base_axpby_v2(m,alpha, x, beta, y, z, info)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    real(psb_spk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-
-    if (x%is_dev()) call x%sync()
-
-    call z%axpby(m,alpha,x%v,beta,y%v,info)
-
-  end subroutine s_base_axpby_v2
+  interface
+    module subroutine s_base_axpby_v2(m,alpha, x, beta, y, z, info)
+      integer(psb_ipk_), intent(in)               :: m
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_axpby_v2
+  end interface
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -1463,20 +981,15 @@ contains
   !! \param beta scalar beta
   !! \param info   return code
   !!
-  subroutine s_base_axpby_a(m,alpha, x, beta, y, info)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    real(psb_spk_), intent(in)        :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    real(psb_spk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-
-    if (y%is_dev()) call y%sync()
-    call psb_geaxpby(m,alpha,x,beta,y%v,info)
-    call y%set_host()
-
-  end subroutine s_base_axpby_a
+  interface
+    module subroutine s_base_axpby_a(m,alpha, x, beta, y, info)
+      integer(psb_ipk_), intent(in)               :: m
+      real(psb_spk_), intent(in)        :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_axpby_a
+  end interface
 
   !
   ! AXPBY is invoked via Z, hence the structure below.
@@ -1492,21 +1005,16 @@ contains
   !! \param y(:) The array to be added
   !! \param info   return code
   !!
-  subroutine s_base_axpby_a2(m,alpha, x, beta, y, z, info)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)                :: m
-    real(psb_spk_), intent(in)                  :: x(:)
-    real(psb_spk_), intent(in)                  :: y(:)
-    class(psb_s_base_vect_type), intent(inout) :: z
-    real(psb_spk_), intent (in)                 :: alpha, beta
-    integer(psb_ipk_), intent(out)               :: info
-
-    if (z%is_dev()) call z%sync()
-    call psb_geaxpby(m,alpha,x,beta,y,z%v,info)
-    call z%set_host()
-
-  end subroutine s_base_axpby_a2
+  interface
+    module subroutine s_base_axpby_a2(m,alpha, x, beta, y, z, info)
+      integer(psb_ipk_), intent(in)                :: m
+      real(psb_spk_), intent(in)                  :: x(:)
+      real(psb_spk_), intent(in)                  :: y(:)
+      class(psb_s_base_vect_type), intent(inout) :: z
+      real(psb_spk_), intent (in)                 :: alpha, beta
+      integer(psb_ipk_), intent(out)               :: info
+    end subroutine s_base_axpby_a2
+  end interface
 
   !
   ! UPD_XYZ is invoked via Z, hence the structure below.
@@ -1525,47 +1033,28 @@ contains
   !! \param z     The class(base_vect) to be added
   !! \param info   return code
   !!
-  subroutine s_base_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    real(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
-    integer(psb_ipk_), intent(out)              :: info
+  interface
+    module subroutine s_base_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+      integer(psb_ipk_), intent(in)               :: m
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      real(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_upd_xyz
+  end interface
 
-    if (x%is_dev().and.(alpha/=szero)) call x%sync()
-    if (y%is_dev().and.(beta/=szero))   call y%sync()
-    if (z%is_dev().and.(delta/=szero))  call z%sync()
-    call psi_upd_xyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
-    call y%set_host()
-    call z%set_host()
-        
-  end subroutine s_base_upd_xyz
-
-  subroutine s_base_xyzw(m,a,b,c,d,e,f,x, y, z, w,info)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    class(psb_s_base_vect_type), intent(inout)  :: w
-    real(psb_spk_), intent (in)                :: a,b,c,d,e,f
-    integer(psb_ipk_), intent(out)              :: info
-
-    if (x%is_dev().and.(a/=szero)) call x%sync()
-    if (y%is_dev().and.(b/=szero)) call y%sync()
-    if (z%is_dev().and.(d/=szero)) call z%sync()
-    if (w%is_dev().and.(f/=szero)) call w%sync()
-    call psi_xyzw(m,a,b,c,d,e,f,x%v, y%v, z%v, w%v, info)
-    call y%set_host()
-    call z%set_host()
-    call w%set_host()
-    
-  end subroutine s_base_xyzw
-
+  interface
+    module subroutine s_base_xyzw(m,a,b,c,d,e,f,x, y, z, w,info)
+      integer(psb_ipk_), intent(in)               :: m
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      class(psb_s_base_vect_type), intent(inout)  :: w
+      real(psb_spk_), intent (in)                :: a,b,c,d,e,f
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_xyzw
+  end interface
 
   !
   !  Multiple variants of two operations:
@@ -1582,19 +1071,13 @@ contains
   !! \param x   The class(base_vect) to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlt_v(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
-
-  end subroutine s_base_mlt_v
+  interface
+    module subroutine s_base_mlt_v(x, y, info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlt_v
+  end interface
 
   !
   !> Function  base_mlt_a
@@ -1603,25 +1086,13 @@ contains
   !! \param x(:) The array to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlt_a(x, y, info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (y%is_dev()) call y%sync()
-    n = min(size(y%v), size(x))
-    !$omp parallel do private(i)    
-    do i=1, n
-      y%v(i) = y%v(i)*x(i)
-    end do
-    call y%set_host()
-
-  end subroutine s_base_mlt_a
-
+  interface
+    module subroutine s_base_mlt_a(x, y, info)
+      real(psb_spk_), intent(in)        :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlt_a
+  end interface
 
   !
   !> Function  base_mlt_a_2
@@ -1634,87 +1105,16 @@ contains
   !! \param y(:) The array to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlt_a_2(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: alpha,beta
-    real(psb_spk_), intent(in)        :: y(:)
-    real(psb_spk_), intent(in)        :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (z%is_dev()) call z%sync()
-
-    n = min(size(z%v), size(x), size(y))
-    if (alpha == szero) then
-      if (beta == sone) then
-        return
-      else
-        !$omp parallel do private(i)     shared(beta)
-        do i=1, n
-          z%v(i) = beta*z%v(i)
-        end do
-      end if
-    else
-      if (alpha == sone) then
-        if (beta == szero) then
-          !$omp parallel do private(i)    
-          do i=1, n
-            z%v(i) = y(i)*x(i)
-          end do
-        else if (beta == sone) then
-          !$omp parallel do private(i)
-          do i=1, n
-            z%v(i) = z%v(i) + y(i)*x(i)
-          end do
-        else
-          !$omp parallel do private(i)     shared(beta)
-          do i=1, n
-            z%v(i) = beta*z%v(i) + y(i)*x(i)
-          end do
-        end if
-      else if (alpha == -sone) then
-        if (beta == szero) then
-          !$omp parallel do private(i)
-          do i=1, n
-            z%v(i) = -y(i)*x(i)
-          end do
-        else if (beta == sone) then
-          !$omp parallel do private(i)
-          do i=1, n
-            z%v(i) = z%v(i) - y(i)*x(i)
-          end do
-        else
-          !$omp parallel do private(i)    shared(beta)
-          do i=1, n
-            z%v(i) = beta*z%v(i) - y(i)*x(i)
-          end do
-        end if
-      else
-        if (beta == szero) then
-          !$omp parallel do private(i)    shared(alpha)
-          do i=1, n
-            z%v(i) = alpha*y(i)*x(i)
-          end do
-        else if (beta == sone) then
-          !$omp parallel do private(i)  shared(alpha)
-          do i=1, n
-            z%v(i) = z%v(i) + alpha*y(i)*x(i)
-          end do
-        else
-          !$omp parallel do private(i)  shared(alpha, beta)
-          do i=1, n
-            z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
-          end do
-        end if
-      end if
-    end if
-    call z%set_host()
-
-  end subroutine s_base_mlt_a_2
-
+  interface
+    module subroutine s_base_mlt_a_2(alpha,x,y,beta,z,info)
+      real(psb_spk_), intent(in)        :: alpha,beta
+      real(psb_spk_), intent(in)        :: y(:)
+      real(psb_spk_), intent(in)        :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlt_a_2
+  end interface
+  
   !
   !> Function  base_mlt_v_2
   !! \memberof  psb_s_base_vect_type
@@ -1726,68 +1126,36 @@ contains
   !! \param y  The class(base_vect) to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-    use psi_serial_mod
-    use psb_string_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: alpha,beta
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    character(len=1), intent(in), optional     :: conjgx, conjgy
-    integer(psb_ipk_) :: i, n
-    logical :: conjgx_, conjgy_
+  interface
+    module subroutine s_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+      real(psb_spk_), intent(in)        :: alpha,beta
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional     :: conjgx, conjgy
+    end subroutine s_base_mlt_v_2
+  end interface
+  
+  interface
+    module subroutine s_base_mlt_av(alpha,x,y,beta,z,info)
+      real(psb_spk_), intent(in)        :: alpha,beta
+      real(psb_spk_), intent(in)        :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlt_av
+  end interface
 
-    info = 0
-    if (y%is_dev()) call y%sync()
-    if (x%is_dev()) call x%sync()
-    if (.not.psb_s_is_complex_) then
-      call z%mlt(alpha,x%v,y%v,beta,info)
-    else
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-      call z%mlt(alpha,x%v,y%v,beta,info)
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-    end if
-  end subroutine s_base_mlt_v_2
-
-  subroutine s_base_mlt_av(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: alpha,beta
-    real(psb_spk_), intent(in)        :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (y%is_dev()) call y%sync()
-    call z%mlt(alpha,x,y%v,beta,info)
-
-  end subroutine s_base_mlt_av
-
-  subroutine s_base_mlt_va(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: alpha,beta
-    real(psb_spk_), intent(in)        :: y(:)
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call z%mlt(alpha,y,x,beta,info)
-
-  end subroutine s_base_mlt_va
+  interface
+    module subroutine s_base_mlt_va(alpha,x,y,beta,z,info)
+      real(psb_spk_), intent(in)        :: alpha,beta
+      real(psb_spk_), intent(in)        :: y(:)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlt_va
+  end interface
   !
   !> Function  base_div_v
   !! \memberof  psb_s_base_vect_type
@@ -1795,19 +1163,13 @@ contains
   !! \param y The array to be divided by
   !! \param info   return code
   !!
-  subroutine s_base_div_v(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call x%div(x%v,y%v,info)
-
-  end subroutine s_base_div_v
+  interface
+    module subroutine s_base_div_v(x, y, info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_div_v
+  end interface
   !
   !> Function  base_div_v2
   !! \memberof  psb_s_base_vect_type
@@ -1815,21 +1177,14 @@ contains
   !! \param y The array to be divided by
   !! \param info   return code
   !!
-  subroutine s_base_div_v2(x, y, z, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (z%is_dev()) call z%sync()
-    call z%div(x%v,y%v,info)
-
-
-  end subroutine s_base_div_v2
+  interface
+    module subroutine s_base_div_v2(x, y, z, info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_div_v2
+  end interface
   !
   !> Function  base_div_v_check
   !! \memberof  psb_s_base_vect_type
@@ -1837,20 +1192,14 @@ contains
   !! \param y The array to be divided by
   !! \param info   return code
   !!
-  subroutine s_base_div_v_check(x, y, info, flag)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-    logical, intent(in) :: flag
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call x%div(x%v,y%v,info,flag)
-
-  end subroutine s_base_div_v_check
+  interface
+    module subroutine s_base_div_v_check(x, y, info, flag)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+      logical, intent(in) :: flag
+    end subroutine s_base_div_v_check
+  end interface
   !
   !> Function  base_div_v2_check
   !! \memberof  psb_s_base_vect_type
@@ -1858,21 +1207,15 @@ contains
   !! \param y The array to be divided by
   !! \param info   return code
   !!
-  subroutine s_base_div_v2_check(x, y, z, info, flag)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-    logical, intent(in) :: flag
-
-    info = 0
-    if (z%is_dev()) call z%sync()
-    call z%div(x%v,y%v,info,flag)
-
-  end subroutine s_base_div_v2_check
+  interface
+    module subroutine s_base_div_v2_check(x, y, z, info, flag)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+      logical, intent(in) :: flag
+    end subroutine s_base_div_v2_check
+  end interface
   !
   !> Function  base_div_a2
   !! \memberof  psb_s_base_vect_type
@@ -1880,25 +1223,14 @@ contains
   !! \param y(:) The array to be divided by
   !! \param info   return code
   !!
-  subroutine s_base_div_a2(x, y, z, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    real(psb_spk_), intent(in) :: x(:)
-    real(psb_spk_), intent(in)    :: y(:)
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (z%is_dev()) call z%sync()
-
-    n = min(size(y), size(x))
-    !$omp parallel do private(i)
-    do i=1, n
-      z%v(i) = x(i)/y(i)
-    end do
-
-  end subroutine s_base_div_a2
+  interface
+    module subroutine s_base_div_a2(x, y, z, info)
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      real(psb_spk_), intent(in) :: x(:)
+      real(psb_spk_), intent(in)    :: y(:)
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_div_a2
+  end interface
   !
   !> Function  base_div_a2_check
   !! \memberof  psb_s_base_vect_type
@@ -1907,35 +1239,15 @@ contains
   !! \param y(:) The array to be dived by
   !! \param info   return code
   !!
-  subroutine s_base_div_a2_check(x, y, z, info, flag)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    real(psb_spk_), intent(in) :: x(:)
-    real(psb_spk_), intent(in)    :: y(:)
-    integer(psb_ipk_), intent(out)              :: info
-    logical, intent(in)              :: flag
-    integer(psb_ipk_) :: i, n
-
-    if (flag .eqv. .false.) then
-      call s_base_div_a2(x, y, z, info)
-    else
-      info = 0
-      if (z%is_dev()) call z%sync()
-
-      n = min(size(y), size(x))
-      !  $omp parallel do private(i)
-      do i=1, n
-        if (y(i) /= 0) then
-          z%v(i) = x(i)/y(i)
-        else
-          info = 1
-          exit
-        end if
-      end do
-    end if
-
-  end subroutine s_base_div_a2_check
+  interface
+    module subroutine s_base_div_a2_check(x, y, z, info, flag)
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      real(psb_spk_), intent(in) :: x(:)
+      real(psb_spk_), intent(in)    :: y(:)
+      integer(psb_ipk_), intent(out)              :: info
+      logical, intent(in)              :: flag
+    end subroutine s_base_div_a2_check
+  end interface
   !
   !> Function  base_inv_v
   !! \memberof  psb_s_base_vect_type
@@ -1943,20 +1255,13 @@ contains
   !! \param x The vector to be inverted
   !! \param y The vector containing the inverted vector
   !! \param info return code
-  subroutine s_base_inv_v(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (y%is_dev()) call y%sync()
-    call y%inv(x%v,info)
-
-
-  end subroutine s_base_inv_v
+  interface
+    module subroutine s_base_inv_v(x, y, info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_inv_v
+  end interface
   !
   !> Function  base_inv_v_check
   !! \memberof  psb_s_base_vect_type
@@ -1965,20 +1270,14 @@ contains
   !! \param y The vector containing the inverted vector
   !! \param info return code
   !! \param flag if true does the check, otherwise call base_inv_v
-  subroutine s_base_inv_v_check(x, y, info, flag)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-    logical, intent(in) :: flag
-
-    info = 0
-    if (y%is_dev()) call y%sync()
-    call y%inv(x%v,info,flag)
-
-  end subroutine s_base_inv_v_check
+  interface
+    module subroutine s_base_inv_v_check(x, y, info, flag)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+      logical, intent(in) :: flag
+    end subroutine s_base_inv_v_check
+  end interface
   !
   !> Function  base_inv_a2
   !! \memberof  psb_s_base_vect_type
@@ -1987,24 +1286,13 @@ contains
   !! \param y The vector containing the inverted vector
   !! \param info return code
   !
-  subroutine s_base_inv_a2(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    real(psb_spk_), intent(in) :: x(:)
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    if (y%is_dev()) call y%sync()
-
-    n = size(x)
-    !$omp parallel do private(i)
-    do i=1, n
-      y%v(i) = 1_psb_spk_/x(i)
-    end do
-
-  end subroutine s_base_inv_a2
+  interface
+    module subroutine s_base_inv_a2(x, y, info)
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      real(psb_spk_), intent(in) :: x(:)
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_inv_a2
+  end interface
   !
   !> Function  base_inv_a2_check
   !! \memberof  psb_s_base_vect_type
@@ -2014,35 +1302,14 @@ contains
   !! \param info return code
   !! \param flag if true does the check, otherwise call base_inv_v
   !
-  subroutine s_base_inv_a2_check(x, y, info, flag)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    real(psb_spk_), intent(inout) :: x(:)
-    integer(psb_ipk_), intent(out)              :: info
-    logical, intent(in)              :: flag
-    integer(psb_ipk_) :: i, n
-
-    if (flag .eqv. .false.) then
-      call s_base_inv_a2(x, y, info)
-    else
-      info = 0
-      if (y%is_dev()) call y%sync()
-
-      n = size(x)
-      !$omp parallel do private(i)
-      do i=1, n
-        if (x(i) /= 0) then
-          y%v(i) = 1_psb_spk_/x(i)
-        else
-          info = 1
-          y%v(i) = 0_psb_spk_
-        end if
-      end do
-    end if
-
-
-  end subroutine s_base_inv_a2_check
+  interface
+    module subroutine s_base_inv_a2_check(x, y, info, flag)
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      real(psb_spk_), intent(inout) :: x(:)
+      integer(psb_ipk_), intent(out)              :: info
+      logical, intent(in)              :: flag
+    end subroutine s_base_inv_a2_check
+  end interface
 
   !
   !> Function  base_inv_a2_check
@@ -2053,29 +1320,14 @@ contains
   !! \param c The comparison term
   !! \param info return code
   !
-  subroutine s_base_acmp_a2(x,c,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)             :: c
-    real(psb_spk_), intent(inout)           :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)           :: info
-    integer(psb_ipk_) :: i, n
-
-    if (z%is_dev()) call z%sync()
-
-    n = size(x)
-    !$omp parallel do private(i)
-    do i = 1, n, 1
-      if ( abs(x(i)).ge.c ) then
-        z%v(i) = 1_psb_spk_
-      else
-        z%v(i) = 0_psb_spk_
-      end if
-    end do
-    info = 0
-
-  end subroutine s_base_acmp_a2
+  interface
+    module subroutine s_base_acmp_a2(x,c,z,info)
+      real(psb_spk_), intent(in)             :: c
+      real(psb_spk_), intent(inout)           :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)           :: info
+    end subroutine s_base_acmp_a2
+  end interface
   !
   !> Function  base_cmp_v2
   !! \memberof  psb_s_base_vect_type
@@ -2085,19 +1337,14 @@ contains
   !! \param c The comparison term
   !! \param info return code
   !
-  subroutine s_base_acmp_v2(x,c,z,info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in)                  :: c
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)           :: info
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call z%acmp(x%v,c,info)
-  end subroutine s_base_acmp_v2
-
+  interface
+    module subroutine s_base_acmp_v2(x,c,z,info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      real(psb_spk_), intent(in)                  :: c
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)           :: info
+    end subroutine s_base_acmp_v2
+  end interface
   !
   ! Simple scaling
   !
@@ -2106,25 +1353,12 @@ contains
   !! \brief Scale all entries  x = alpha*x
   !! \param alpha   The multiplier
   !!
-  subroutine s_base_scal(alpha, x)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent (in)       :: alpha
-    integer(psb_ipk_) :: i
-
-    if (allocated(x%v)) then
-#if defined(PSB_OPENMP)
-      !$omp parallel do private(i)
-      do i=1,size(x%v)
-        x%v(i) = alpha*x%v(i)
-      end do
-#else
-      x%v = alpha*x%v
-#endif
-    end if
-    call x%set_host()
-  end subroutine s_base_scal
+  interface
+    module subroutine s_base_scal(alpha, x)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      real(psb_spk_), intent (in)       :: alpha
+    end subroutine s_base_scal
+  end interface
   
   !
   ! Norms 1, 2 and infinity
@@ -2133,70 +1367,40 @@ contains
   !! \memberof  psb_s_base_vect_type
   !! \brief 2-norm |x(1:n)|_2
   !! \param n  how many entries to consider
-  function s_base_nrm2(n,x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_)                :: res
-    real(psb_spk_), external      :: snrm2
-
-    if (x%is_dev()) call x%sync()
-    res =  snrm2(n,x%v,1)
-
-  end function s_base_nrm2
+  interface
+    module   function s_base_nrm2(n,x) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_)                :: res
+    end function s_base_nrm2
+  end interface
 
   !
   !> Function  base_amax
   !! \memberof  psb_s_base_vect_type
   !! \brief infinity-norm |x(1:n)|_\infty
   !! \param n  how many entries to consider
-  function s_base_amax(n,x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_)                :: res
-    integer(psb_ipk_) :: i
-
-    if (x%is_dev()) call x%sync()
-#if defined(PSB_OPENMP)
-    res = szero
-    !$omp parallel do private(i) reduction(max: res)
-    do i=1, n
-      res = max(res,abs(x%v(i)))
-    end do
-#else
-    res =  maxval(abs(x%v(1:n)))
-#endif
-  end function s_base_amax
+  interface
+    module function s_base_amax(n,x) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_)                :: res
+    end function s_base_amax
+  end interface
 
   !
   !> Function  base_min
   !! \memberof  psb_s_base_vect_type
   !! \brief min x(1:n)
   !! \param n  how many entries to consider
-  function s_base_min(n,x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_)                :: res
-    integer(psb_ipk_) :: i
-
-    if (x%is_dev()) call x%sync()
-#if defined(PSB_OPENMP)
-    res = HUGE(sone)
-    !$omp parallel do private(i) reduction(min: res)
-    do i=1, n
-      res = min(res,abs(x%v(i)))
-    end do
-#else
-    !
-    ! From M&R: if the array is of size zero, MINVAL
-    !           returns the largest positive value
-    !
-    res =  minval(x%v(1:n))
-#endif
-  end function s_base_min
-
+  interface
+    module   function s_base_min(n,x) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_)                :: res
+    end function s_base_min
+  end interface
+  
   !
   !> Function  base_minquotient_v
   !! \memberof  psb_s_base_vect_type
@@ -2205,21 +1409,14 @@ contains
   !! \param y The denumerator vector
   !! \param info   return code
   !!
-  function s_base_minquotient_v(x, y, info) result(z)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: y
-    real(psb_spk_)                              :: z
-    integer(psb_ipk_), intent(out)                :: info
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    if (y%is_dev()) call y%sync()
-
-    z = x%minquotient(y%v,info)
-
-  end function s_base_minquotient_v
+  interface
+    module function s_base_minquotient_v(x, y, info) result(z)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: y
+      real(psb_spk_)                              :: z
+      integer(psb_ipk_), intent(out)                :: info
+    end function s_base_minquotient_v
+  end interface
 
   !
   !> Function  base_minquotient_a2
@@ -2229,29 +1426,14 @@ contains
   !! \param y The denumerator array
   !! \param info   return code
   !!
-  function s_base_minquotient_a2(x, y, info) result(z)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    real(psb_spk_), intent(in)                 :: y(:)
-    real(psb_spk_)                             :: z
-    integer(psb_ipk_), intent(out)               :: info
-    integer(psb_ipk_) :: i, n
-    real(psb_spk_)                             :: temp
-
-    info = 0
-
-    z = huge(z)
-    n = min(size(y), size(x%v))
-    !$omp parallel do private(i,temp) reduction(min: z)
-    do i=1, n
-      if ( y(i) /= szero ) then
-        temp = x%v(i)/y(i)
-        z = min(z,temp)
-      end if
-    end do
-
-  end function s_base_minquotient_a2
+  interface
+    module function s_base_minquotient_a2(x, y, info) result(z)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      real(psb_spk_), intent(in)                 :: y(:)
+      real(psb_spk_)                             :: z
+      integer(psb_ipk_), intent(out)               :: info
+    end function s_base_minquotient_a2
+  end interface
 
 
   !
@@ -2259,24 +1441,13 @@ contains
   !! \memberof  psb_s_base_vect_type
   !! \brief 1-norm |x(1:n)|_1
   !! \param n  how many entries to consider
-  function s_base_asum(n,x) result(res)
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_)                :: res
-    integer(psb_ipk_) :: i
-    
-    if (x%is_dev()) call x%sync()
-#if defined(PSB_OPENMP)
-    res=szero
-    !$omp parallel do private(i) reduction(+: res)
-    do i= 1, size(x%v)
-      res = res + abs(x%v(i))
-    end do
-#else
-    res =  sum(abs(x%v(1:n)))
-#endif
-  end function s_base_asum
+  interface
+    module   function s_base_asum(n,x) result(res)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_)                :: res
+    end function s_base_asum
+  end interface
 
 
   !
@@ -2291,18 +1462,14 @@ contains
   !! \param idx(:) indices
   !! \param alpha
   !! \param beta
-  subroutine s_base_gthab(n,idx,alpha,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) :: alpha, beta, y(:)
-    class(psb_s_base_vect_type) :: x
-
-    if (x%is_dev()) call x%sync()
-    call psi_gth(n,idx,alpha,x%v,beta,y)
-
-  end subroutine s_base_gthab
+  interface
+    module subroutine s_base_gthab(n,idx,alpha,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) :: alpha, beta, y(:)
+      class(psb_s_base_vect_type) :: x
+    end subroutine s_base_gthab
+  end interface
   !
   ! shortcut alpha=1 beta=0
   !
@@ -2312,77 +1479,59 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine s_base_gthzv_x(i,n,idx,x,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_) :: i
-    integer(psb_mpk_) :: n
-    class(psb_i_base_vect_type) :: idx
-    real(psb_spk_) ::  y(:)
-    class(psb_s_base_vect_type) :: x
-
-    if (idx%is_dev()) call idx%sync()
-    call x%gth(n,idx%v(i:),y)
-
-  end subroutine s_base_gthzv_x
+  interface
+    module subroutine s_base_gthzv_x(i,n,idx,x,y)
+      integer(psb_ipk_) :: i
+      integer(psb_mpk_) :: n
+      class(psb_i_base_vect_type) :: idx
+      real(psb_spk_) ::  y(:)
+      class(psb_s_base_vect_type) :: x
+    end subroutine s_base_gthzv_x
+  end interface
 
   !
   ! New comm internals impl.
   !
-  subroutine s_base_gthzbuf(i,n,idx,x)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_) :: i
-    integer(psb_mpk_) :: n
-    class(psb_i_base_vect_type) :: idx
-    class(psb_s_base_vect_type) :: x
-
-    if (.not.allocated(x%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
-      return
-    end if
-    if (idx%is_dev()) call idx%sync()
-    if (x%is_dev()) call x%sync()
-    call x%gth(n,idx%v(i:),x%combuf(i:))
-
-  end subroutine s_base_gthzbuf
+  interface
+    module subroutine s_base_gthzbuf(i,n,idx,x)
+      integer(psb_ipk_) :: i
+      integer(psb_mpk_) :: n
+      class(psb_i_base_vect_type) :: idx
+      class(psb_s_base_vect_type) :: x
+    end subroutine s_base_gthzbuf
+  end interface
   !
   !> Function  base_device_wait:
   !! \memberof  psb_s_base_vect_type
   !! \brief device_wait: base version is a no-op.
   !!
   !
-  subroutine s_base_device_wait()
-    implicit none
+  interface
+    module subroutine s_base_device_wait()
+    end subroutine s_base_device_wait
+  end interface
 
-  end subroutine s_base_device_wait
+  interface
+    module   function s_base_use_buffer() result(res)
+      logical :: res
+    end function s_base_use_buffer
+  end interface
+  
+  interface
+    module subroutine s_base_new_buffer(n,x,info)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)              :: n
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_new_buffer
+  end interface
 
-  function s_base_use_buffer() result(res)
-    logical :: res
-
-    res = .true.
-  end function s_base_use_buffer
-
-  subroutine s_base_new_buffer(n,x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
-
-    call psb_realloc(n,x%combuf,info)
-  end subroutine s_base_new_buffer
-
-  subroutine s_base_new_comid(n,x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
-
-    call psb_realloc(n,2_psb_ipk_,x%comid,info)
-  end subroutine s_base_new_comid
-
+  interface
+    module subroutine s_base_new_comid(n,x,info)
+      class(psb_s_base_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)              :: n
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_new_comid
+  end interface
 
   !
   ! shortcut alpha=1 beta=0
@@ -2393,18 +1542,14 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine s_base_gthzv(n,idx,x,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) ::  y(:)
-    class(psb_s_base_vect_type) :: x
-
-    if (x%is_dev()) call x%sync()
-    call psi_gth(n,idx,x%v,y)
-
-  end subroutine s_base_gthzv
+  interface
+    module subroutine s_base_gthzv(n,idx,x,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) ::  y(:)
+      class(psb_s_base_vect_type) :: x
+    end subroutine s_base_gthzv
+  end interface
 
   !
   ! Scatter:
@@ -2419,55 +1564,34 @@ contains
   !! \param idx(:) indices
   !! \param beta
   !! \param x(:)
-  subroutine s_base_sctb(n,idx,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) :: beta, x(:)
-    class(psb_s_base_vect_type) :: y
+  interface
+    module subroutine s_base_sctb(n,idx,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) :: beta, x(:)
+      class(psb_s_base_vect_type) :: y
+    end subroutine s_base_sctb
+  end interface
 
-    if (y%is_dev()) call y%sync()
-    call psi_sct(n,idx,x,beta,y%v)
-    call y%set_host()
-
-  end subroutine s_base_sctb
-
-  subroutine s_base_sctb_x(i,n,idx,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
-    class(psb_i_base_vect_type) :: idx
-    real(psb_spk_) :: beta, x(:)
-    class(psb_s_base_vect_type) :: y
-
-    if (idx%is_dev()) call idx%sync()
-    call y%sct(n,idx%v(i:),x,beta)
-    call y%set_host()
-
-  end subroutine s_base_sctb_x
-
-  subroutine s_base_sctb_buf(i,n,idx,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
-    class(psb_i_base_vect_type) :: idx
-    real(psb_spk_) :: beta
-    class(psb_s_base_vect_type) :: y
-
-
-    if (.not.allocated(y%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
-      return
-    end if
-    if (y%is_dev()) call y%sync()
-    if (idx%is_dev()) call idx%sync()
-    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
-    call y%set_host()
-
-  end subroutine s_base_sctb_buf
+  interface
+    module subroutine s_base_sctb_x(i,n,idx,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: i
+      class(psb_i_base_vect_type) :: idx
+      real(psb_spk_) :: beta, x(:)
+      class(psb_s_base_vect_type) :: y
+    end subroutine s_base_sctb_x
+  end interface
+  
+  interface
+    module subroutine s_base_sctb_buf(i,n,idx,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: i
+      class(psb_i_base_vect_type) :: idx
+      real(psb_spk_) :: beta
+      class(psb_s_base_vect_type) :: y
+    end subroutine s_base_sctb_buf
+  end interface
 
   !
   !> Function  base_mask_a
@@ -2482,56 +1606,15 @@ contains
   !! \param t logical resulting from an and operation on all the tests
   !! \param info return code
   !
-  subroutine s_base_mask_a(c,x,m,t,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(inout)               :: c(:)
-    real(psb_spk_), intent(inout)               :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: m
-    integer(psb_ipk_), intent(out)                :: info
-    logical, intent(out)                          :: t
-    integer(psb_ipk_) :: i, n
-
-    if (m%is_dev()) call m%sync()
-    t = .true.
-
-    n = size(x)
-    do i = 1, n, 1
-      if (c(i).eq.2_psb_spk_) then
-        if ( x(i) > szero ) then
-          m%v(i) = 0_psb_spk_
-        else
-          m%v(i) = 1_psb_spk_
-          t = .false.
-        end if
-      elseif (c(i).eq.1_psb_spk_) then
-        if ( x(i) >= szero ) then
-          m%v(i) = 0_psb_spk_
-        else
-          m%v(i) = 1_psb_spk_
-          t = .false.
-        end if
-      elseif (c(i).eq.-1_psb_spk_) then
-        if ( x(i) <= szero ) then
-          m%v(i) = 0_psb_spk_
-        else
-          m%v(i) = 1_psb_spk_
-          t = .false.
-        end if
-      elseif (c(i).eq.-2_psb_spk_) then
-        if ( x(i) < szero ) then
-          m%v(i) = 0_psb_spk_
-        else
-          m%v(i) = 1_psb_spk_
-          t = .false.
-        end if
-      else
-          m%v(i) = 0_psb_spk_
-      end if
-    end do
-    info = 0
-
-  end subroutine s_base_mask_a
+  interface
+    module   subroutine s_base_mask_a(c,x,m,t,info)
+      real(psb_spk_), intent(inout)               :: c(:)
+      real(psb_spk_), intent(inout)               :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: m
+      integer(psb_ipk_), intent(out)                :: info
+      logical, intent(out)                          :: t
+    end subroutine s_base_mask_a
+  end interface
   !
   !> Function  base_mask_v
   !! \memberof  psb_s_base_vect_type
@@ -2545,21 +1628,15 @@ contains
   !! \param t logical resulting from an and operation on all the tests
   !! \param info return code
   !
-  subroutine s_base_mask_v(c,x,m,t,info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: c
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_vect_type), intent(inout)  :: m
-    integer(psb_ipk_), intent(out)                :: info
-    logical, intent(out)                          :: t
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    if (c%is_dev()) call c%sync()
-
-    call m%mask(x%v,c%v,t,info)
-  end subroutine s_base_mask_v
+  interface
+    module subroutine s_base_mask_v(c,x,m,t,info)
+      class(psb_s_base_vect_type), intent(inout)  :: c
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_vect_type), intent(inout)  :: m
+      integer(psb_ipk_), intent(out)                :: info
+      logical, intent(out)                          :: t
+    end subroutine s_base_mask_v
+  end interface
 
 
   !
@@ -2571,28 +1648,14 @@ contains
   !! \param b The added term
   !! \param info return code
   !
-  subroutine s_base_addconst_a2(x,b,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)                  :: b
-    real(psb_spk_), intent(inout)                :: x(:)
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)                :: info
-    integer(psb_ipk_) :: i, n
-
-    if (z%is_dev()) call z%sync()
-#if defined(PSB_OPENMP)
-    n = size(x)
-    !$omp parallel do private(i)
-    do i = 1, n
-      z%v(i) = x(i) + b
-    end do
-#else
-    z%v = x + b
-#endif
-    info = 0
-    
-  end subroutine s_base_addconst_a2
+  interface
+    module   subroutine s_base_addconst_a2(x,b,z,info)
+      real(psb_spk_), intent(in)                  :: b
+      real(psb_spk_), intent(inout)                :: x(:)
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine s_base_addconst_a2
+  end interface
   !
   !> Function  _base_addconst_v2
   !! \memberof  psb_s_base_vect_type
@@ -2602,18 +1665,14 @@ contains
   !! \param b The added term
   !! \param info return code
   !
-  subroutine s_base_addconst_v2(x,b,z,info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in)                  :: b
-    class(psb_s_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)                :: info
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call z%addconst(x%v,b,info)
-  end subroutine s_base_addconst_v2
+  interface
+    module subroutine s_base_addconst_v2(x,b,z,info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      real(psb_spk_), intent(in)                  :: b
+      class(psb_s_base_vect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)                :: info
+    end subroutine s_base_addconst_v2
+  end interface
 end module psb_s_base_vect_mod
 
 
@@ -2785,8 +1844,6 @@ module psb_s_base_multivect_mod
     module procedure constructor, size_const
   end interface psb_s_base_multivect
 
-contains
-
   !
   ! Constructors.
   !
@@ -2795,29 +1852,23 @@ contains
   !! \brief     Constructor from an array
   !!  \param   x(:)  input array to be copied
   !!
-  function constructor(x) result(this)
-    real(psb_spk_)   :: x(:,:)
-    type(psb_s_base_multivect_type) :: this
-    integer(psb_ipk_) :: info
-
-    this%v = x
-    call this%asb(size(x,dim=1,kind=psb_ipk_),&
-         & size(x,dim=2,kind=psb_ipk_),info)
-  end function constructor
-
-
+  interface
+    module   function constructor(x) result(this)
+      real(psb_spk_)   :: x(:,:)
+      type(psb_s_base_multivect_type) :: this
+    end function constructor
+  end interface
+  
   !> Function  constructor:
   !! \brief     Constructor from size
   !!  \param    n   Size of vector to be built.
   !!
-  function size_const(m,n) result(this)
-    integer(psb_ipk_), intent(in) :: m,n
-    type(psb_s_base_multivect_type) :: this
-    integer(psb_ipk_) :: info
-
-    call this%asb(m,n,info)
-
-  end function size_const
+  interface
+    module function size_const(m,n) result(this)
+      integer(psb_ipk_), intent(in) :: m,n
+      type(psb_s_base_multivect_type) :: this
+    end function size_const
+  end interface
 
   !
   ! Build from a sample
@@ -2828,20 +1879,12 @@ contains
   !! \brief     Build method from an array
   !!  \param   x(:)  input array to be copied
   !!
-  subroutine s_base_mlv_bld_x(x,this)
-    use psb_realloc_mod
-    real(psb_spk_), intent(in) :: this(:,:)
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_) :: info
-
-    call psb_realloc(size(this,1),size(this,2),x%v,info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_vect_bld')
-      return
-    end if
-    x%v(:,:)  = this(:,:)
-
-  end subroutine s_base_mlv_bld_x
+  interface
+    module subroutine s_base_mlv_bld_x(x,this)
+      real(psb_spk_), intent(in) :: this(:,:)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_bld_x
+  end interface
 
   !
   ! Create with size, but no initialization
@@ -2852,17 +1895,13 @@ contains
   !! \brief     Build method with size (uninitialized data)
   !!  \param    n    size to be allocated.
   !!
-  subroutine s_base_mlv_bld_n(x,m,n,scratch)
-    use psb_realloc_mod
-    integer(psb_ipk_), intent(in) :: m,n
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_) :: info
-    logical, intent(in), optional        :: scratch
-
-    call psb_realloc(m,n,x%v,info)
-    call x%asb(m,n,info,scratch=scratch)
-
-  end subroutine s_base_mlv_bld_n
+  interface
+    module subroutine s_base_mlv_bld_n(x,m,n,scratch)
+      integer(psb_ipk_), intent(in) :: m,n
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_mlv_bld_n
+  end interface
 
   !> Function  base_mlv_all:
   !! \memberof  psb_s_base_multivect_type
@@ -2871,21 +1910,13 @@ contains
   !!  \param    n    size to be allocated.
   !!  \param info  return code
   !!
-  subroutine s_base_mlv_all(m,n, x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m,n
-    class(psb_s_base_multivect_type), intent(out) :: x
-    integer(psb_ipk_), intent(out)              :: info
-
-    call psb_realloc(m,n,x%v,info)
-    if (try_newins) then
-      call psb_realloc(n,x%iv,info)
-      call x%set_ncfs(0)
-    end if
-
-  end subroutine s_base_mlv_all
+  interface
+    module subroutine s_base_mlv_all(m,n, x, info)
+      integer(psb_ipk_), intent(in)               :: m,n
+      class(psb_s_base_multivect_type), intent(out) :: x
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_all
+  end interface
 
   !> Function  base_mlv_mold:
   !! \memberof  psb_s_base_multivect_type
@@ -2893,34 +1924,20 @@ contains
   !!  \param    y returned variable
   !!  \param info  return code
   !!
-  subroutine s_base_mlv_mold(x, y, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(in)   :: x
-    class(psb_s_base_multivect_type), intent(out), allocatable :: y
-    integer(psb_ipk_), intent(out)              :: info
+  interface
+    module subroutine s_base_mlv_mold(x, y, info)
+      class(psb_s_base_multivect_type), intent(in)   :: x
+      class(psb_s_base_multivect_type), intent(out), allocatable :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_mold
+  end interface
 
-    allocate(psb_s_base_multivect_type :: y, stat=info)
-
-  end subroutine s_base_mlv_mold
-
-  subroutine s_base_mlv_reinit(x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(out)    :: x
-    integer(psb_ipk_), intent(out)              :: info
-
-    info = 0
-    if (allocated(x%v)) then 
-      call x%sync()
-      x%v(:,:) = szero
-      call x%set_host()
-      call x%set_upd()
-    end if
-
-  end subroutine s_base_mlv_reinit
+  interface
+    module subroutine s_base_mlv_reinit(x, info)
+      class(psb_s_base_multivect_type), intent(out)    :: x
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_reinit
+  end interface
 
   !
   ! Insert a bunch of values at specified positions.
@@ -2949,129 +1966,15 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_mlv_ins(n,irl,val,dupl,x,maxr,info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
-    integer(psb_ipk_), intent(in)               :: irl(:)
-    real(psb_spk_), intent(in)        :: val(:,:)
-    integer(psb_ipk_), intent(out)              :: info
-
-    integer(psb_ipk_) :: i, isz, nc, dupl_, ncfs_, k
-
-    info = 0
-    if (psb_errstatus_fatal()) return
-
-    if (try_newins) then 
-      if (x%is_bld()) then
-        nc = size(x%v,2)
-        ncfs_ = x%get_ncfs()
-        isz = ncfs_ + n
-        call psb_realloc(isz,nc,x%v,info)
-        call psb_ensure_size(isz,x%iv,info)
-        k   = ncfs_
-        do i = 1, n
-          !loop over all val's rows
-          ! row actual block row
-          if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-            k  = k + 1 
-            ! this row belongs to me
-            ! copy i-th row of block val in x
-            x%v(k,:)  = val(i,:)
-            x%iv(k) = irl(i)
-          end if
-        enddo
-        call x%set_ncfs(k)      
-
-      else if (x%is_upd()) then
-
-        dupl_ = x%get_dupl()
-        if (.not.allocated(x%v)) then
-          info = psb_err_invalid_vect_state_
-        else if (n > min(size(irl),size(val))) then
-          info = psb_err_invalid_input_
-        else
-          isz = size(x%v,1)
-          nc = size(x%v,2)
-          select case(dupl_)
-          case(psb_dupl_ovwrt_)
-            do i = 1, n
-              !loop over all val's rows
-              ! row actual block row
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-                ! this row belongs to me
-                ! copy i-th row of block val in x
-                x%v(irl(i),:) = val(i,:)
-              end if
-            enddo
-
-          case(psb_dupl_add_)
-
-            do i = 1, n
-              !loop over all val's rows
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-                ! this row belongs to me
-                ! copy i-th row of block val in x
-                x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
-              end if
-            enddo
-
-          case default
-            info = 321
-            ! !$      call psb_errpush(info,name)
-            ! !$      goto 9999
-          end select
-        end if
-      else
-        info = psb_err_invalid_vect_state_
-      end if
-    else
-      if (.not.allocated(x%v)) then
-        info = psb_err_invalid_vect_state_
-      else if (n > min(size(irl),size(val))) then
-        info = psb_err_invalid_input_
-
-      else
-        isz = size(x%v,1)
-        nc = size(x%v,2)
-        select case(dupl)
-        case(psb_dupl_ovwrt_)
-          do i = 1, n
-            !loop over all val's rows
-            ! row actual block row
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i),:) = val(i,:)
-            end if
-          enddo
-
-        case(psb_dupl_add_)
-
-          do i = 1, n
-            !loop over all val's rows
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
-            end if
-          enddo
-
-        case default
-          info = 321
-          ! !$      call psb_errpush(info,name)
-          ! !$      goto 9999
-        end select
-      end if
-    end if
-    call x%set_host()
-    if (info /= 0) then
-      call psb_errpush(info,'base_mlv_vect_ins')
-      return
-    end if
-
-  end subroutine s_base_mlv_ins
+  interface
+    module subroutine s_base_mlv_ins(n,irl,val,dupl,x,maxr,info)
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      integer(psb_ipk_), intent(in)               :: n, dupl,maxr
+      integer(psb_ipk_), intent(in)               :: irl(:)
+      real(psb_spk_), intent(in)        :: val(:,:)
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_ins
+  end interface
 
   !
   !> Function  base_mlv_zero
@@ -3079,16 +1982,11 @@ contains
   !! \brief Zero out contents
   !!
   !
-  subroutine s_base_mlv_zero(x)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)    :: x
-
-    if (allocated(x%v)) x%v=szero
-    call x%set_host()
-
-  end subroutine s_base_mlv_zero
-
+  interface
+    module subroutine s_base_mlv_zero(x)
+      class(psb_s_base_multivect_type), intent(inout)    :: x
+    end subroutine s_base_mlv_zero
+  end interface
 
   !
   ! Assembly.
@@ -3103,81 +2001,14 @@ contains
   !!  \param info  return code
   !!
   !
-
-  subroutine s_base_mlv_asb(m,n, x, info, scratch)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    integer(psb_ipk_), intent(in)              :: m,n
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-    logical, intent(in), optional        :: scratch
-
-    logical :: scratch_
-    integer(psb_ipk_) :: i, ncfs, xvsz
-    real(psb_spk_), allocatable ::  vv(:,:)
-
-    info = 0
-    if (present(scratch)) then
-      scratch_ = scratch
-    else
-      scratch_ = .false.
-    end if
-    if (try_newins) then 
-      if (x%is_bld()) then
-        ncfs = x%get_ncfs()
-        xvsz = psb_size(x%v)
-        call psb_realloc(m,n,vv,info)
-        vv(:,:) = szero
-        select case(x%get_dupl())
-        case(psb_dupl_add_)
-          do i=1,ncfs
-            vv(x%iv(i),:) = vv(x%iv(i),:) + x%v(i,:)
-          end do
-        case(psb_dupl_ovwrt_)
-          do i=1,ncfs
-            vv(x%iv(i),:) = x%v(i,:)
-          end do
-        case(psb_dupl_err_)
-          do i=1,ncfs
-            if (any(vv(x%iv(i),:).ne.szero)) then
-              info = psb_err_duplicate_coo
-              call psb_errpush(info,'mvect-asb')
-              return
-            else
-              vv(x%iv(i),:) = x%v(i,:)
-            end if
-          end do
-        case default
-          write(psb_err_unit,*) 'Error in mvect_asb: unsafe dupl',x%get_dupl()
-          info =-7
-        end select
-        call psb_move_alloc(vv,x%v,info)
-        if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
-             & call psb_realloc(m,n,x%v,info)
-        if (info /= 0) then
-          info = psb_err_alloc_dealloc_
-          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
-        end if
-      else
-        info = psb_err_invalid_vect_state_        
-        call psb_errpush(info,'vect_asb')
-      end if
-    else
-      if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
-           & call psb_realloc(m,n,x%v,info)
-      if (info /= 0) then
-          info = psb_err_alloc_dealloc_
-          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
-        end if
-    end if
-    call x%set_host()
-    call x%set_asb()
-    call x%sync()
-  end subroutine s_base_mlv_asb
-
+  interface
+    module subroutine s_base_mlv_asb(m,n, x, info, scratch)
+      integer(psb_ipk_), intent(in)              :: m,n
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+      logical, intent(in), optional        :: scratch
+    end subroutine s_base_mlv_asb
+  end interface
 
   !
   !> Function  base_mlv_free:
@@ -3187,118 +2018,106 @@ contains
   !!  \param info  return code
   !!
   !
-  subroutine s_base_mlv_free(x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(out)              :: info
+  interface
+    module subroutine s_base_mlv_free(x, info)
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_free
+  end interface
+  
+  interface
+    module   function s_base_mlv_get_ncfs(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_mlv_get_ncfs
+  end interface
 
-    info = 0
-    if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info /= 0) call &
-         & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
+  interface
+    module function s_base_mlv_get_dupl(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_mlv_get_dupl
+  end interface
+  
+  interface
+    module function s_base_mlv_get_state(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_mlv_get_state
+  end interface
 
-  end subroutine s_base_mlv_free
+  interface
+    module function s_base_mlv_is_null(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical :: res
+    end function s_base_mlv_is_null
+  end interface
 
-  function s_base_mlv_get_ncfs(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%ncfs
-  end function s_base_mlv_get_ncfs
+  interface
+    module function s_base_mlv_is_bld(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical :: res
+    end function s_base_mlv_is_bld
+  end interface
 
-  function s_base_mlv_get_dupl(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%dupl
-  end function s_base_mlv_get_dupl
+  interface
+    module function s_base_mlv_is_upd(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical :: res
+    end function s_base_mlv_is_upd
+  end interface
 
-  function s_base_mlv_get_state(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-    res = x%bldstate 
-  end function s_base_mlv_get_state
+  interface
+    module function s_base_mlv_is_asb(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical :: res
+    end function s_base_mlv_is_asb
+  end interface
 
-  function s_base_mlv_is_null(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_null_)
-  end function s_base_mlv_is_null
+  interface
+    module subroutine  s_base_mlv_set_ncfs(n,x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine s_base_mlv_set_ncfs
+  end interface
 
-  function s_base_mlv_is_bld(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_bld_)
-  end function s_base_mlv_is_bld
+  interface
+    module subroutine  s_base_mlv_set_dupl(n,x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine s_base_mlv_set_dupl
+  end interface
 
-  function s_base_mlv_is_upd(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_upd_)
-  end function s_base_mlv_is_upd
+  interface
+    module subroutine  s_base_mlv_set_state(n,x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in) :: n
+    end subroutine s_base_mlv_set_state
+  end interface
 
-  function s_base_mlv_is_asb(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical :: res
-    res = (x%bldstate == psb_vect_asb_)
-  end function s_base_mlv_is_asb
+  interface
+    module subroutine  s_base_mlv_set_null(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_null
+  end interface
 
-  subroutine  s_base_mlv_set_ncfs(n,x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n
-    x%ncfs = n
-  end subroutine s_base_mlv_set_ncfs
+  interface
+    module subroutine  s_base_mlv_set_bld(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_bld
+  end interface
 
-  subroutine  s_base_mlv_set_dupl(n,x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n
-    x%dupl = n
-  end subroutine s_base_mlv_set_dupl
+  interface
+    module subroutine  s_base_mlv_set_upd(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_upd
+  end interface
 
-  subroutine  s_base_mlv_set_state(n,x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in) :: n
-    x%bldstate = n
-  end subroutine s_base_mlv_set_state
-
-  subroutine  s_base_mlv_set_null(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-    x%bldstate = psb_vect_null_
-  end subroutine s_base_mlv_set_null
-
-  subroutine  s_base_mlv_set_bld(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-    x%bldstate = psb_vect_bld_
-  end subroutine s_base_mlv_set_bld
-
-  subroutine  s_base_mlv_set_upd(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-    x%bldstate = psb_vect_upd_
-  end subroutine s_base_mlv_set_upd
-
-  subroutine  s_base_mlv_set_asb(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-    x%bldstate = psb_vect_asb_
-  end subroutine s_base_mlv_set_asb
-
+  interface
+    module subroutine  s_base_mlv_set_asb(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_asb
+  end interface
 
   !
   ! The base version of SYNC & friends does nothing, it's just
@@ -3310,11 +2129,11 @@ contains
   !! \brief Sync: base version is a no-op.
   !!
   !
-  subroutine s_base_mlv_sync(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-  end subroutine s_base_mlv_sync
+  interface
+    module subroutine s_base_mlv_sync(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_sync
+  end interface
 
   !
   !> Function  base_mlv_set_host:
@@ -3322,11 +2141,11 @@ contains
   !! \brief Set_host: base version is a no-op.
   !!
   !
-  subroutine s_base_mlv_set_host(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-  end subroutine s_base_mlv_set_host
+  interface
+    module subroutine s_base_mlv_set_host(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_host
+  end interface
 
   !
   !> Function  base_mlv_set_dev:
@@ -3334,11 +2153,11 @@ contains
   !! \brief Set_dev: base version is a no-op.
   !!
   !
-  subroutine s_base_mlv_set_dev(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-  end subroutine s_base_mlv_set_dev
+  interface
+    module subroutine s_base_mlv_set_dev(x)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_dev
+  end interface
 
   !
   !> Function  base_mlv_set_sync:
@@ -3346,11 +2165,12 @@ contains
   !! \brief Set_sync: base version is a no-op.
   !!
   !
-  subroutine s_base_mlv_set_sync(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-
-  end subroutine s_base_mlv_set_sync
+  interface
+    module subroutine s_base_mlv_set_sync(x)
+      implicit none
+      class(psb_s_base_multivect_type), intent(inout) :: x
+    end subroutine s_base_mlv_set_sync
+  end interface
 
   !
   !> Function  base_mlv_is_dev:
@@ -3358,13 +2178,12 @@ contains
   !! \brief Is  vector on external device    .
   !!
   !
-  function s_base_mlv_is_dev(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical  :: res
-
-    res = .false.
-  end function s_base_mlv_is_dev
+  interface
+    module   function s_base_mlv_is_dev(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical  :: res
+    end function s_base_mlv_is_dev
+  end interface
 
   !
   !> Function  base_mlv_is_host
@@ -3372,13 +2191,12 @@ contains
   !! \brief Is  vector on standard memory    .
   !!
   !
-  function s_base_mlv_is_host(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical  :: res
-
-    res = .true.
-  end function s_base_mlv_is_host
+  interface
+    module function s_base_mlv_is_host(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical  :: res
+    end function s_base_mlv_is_host
+  end interface
 
   !
   !> Function  base_mlv_is_sync
@@ -3386,34 +2204,25 @@ contains
   !! \brief Is  vector on sync               .
   !!
   !
-  function s_base_mlv_is_sync(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    logical  :: res
-
-    res = .true.
-  end function s_base_mlv_is_sync
+  interface
+    module function s_base_mlv_is_sync(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      logical  :: res
+    end function s_base_mlv_is_sync
+  end interface
 
   !> Function  base_cpy:
   !! \memberof  psb_d_base_vect_type
   !! \brief     base_cpy: copy base contents
   !!  \param    y returned variable
   !!
-  subroutine s_base_mlv_cpy(x, y)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(in)   :: x
-    class(psb_s_base_multivect_type), intent(out)  :: y
-
-    if (allocated(x%v)) call y%bld(x%v)
-    call y%set_state(x%get_state())
-    call y%set_dupl(x%get_dupl())
-    call y%set_ncfs(x%get_ncfs())
-    if (allocated(x%iv)) y%iv = x%iv
-  end subroutine s_base_mlv_cpy
-
-
+  interface
+    module subroutine s_base_mlv_cpy(x, y)
+      class(psb_s_base_multivect_type), intent(in)   :: x
+      class(psb_s_base_multivect_type), intent(out)  :: y
+    end subroutine s_base_mlv_cpy
+  end interface
+  
   !
   ! Size info.
   !
@@ -3423,25 +2232,19 @@ contains
   !! \brief  Number of entries
   !!
   !
-  function s_base_mlv_get_nrows(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
+  interface
+    module   function s_base_mlv_get_nrows(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_mlv_get_nrows
+  end interface
 
-    res = 0
-    if (allocated(x%v)) res = size(x%v,1)
-
-  end function s_base_mlv_get_nrows
-
-  function s_base_mlv_get_ncols(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    integer(psb_ipk_) :: res
-
-    res = 0
-    if (allocated(x%v)) res = size(x%v,2)
-
-  end function s_base_mlv_get_ncols
+  interface
+    module function s_base_mlv_get_ncols(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      integer(psb_ipk_) :: res
+    end function s_base_mlv_get_ncols
+  end interface
 
   !
   !> Function  base_mlv_get_sizeof
@@ -3449,15 +2252,12 @@ contains
   !! \brief  Size in bytesa
   !!
   !
-  function s_base_mlv_sizeof(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(in) :: x
-    integer(psb_epk_) :: res
-
-    ! Force 8-byte integers.
-    res = (1_psb_epk_ * psb_sizeof_sp) * x%get_nrows() * x%get_ncols()
-
-  end function s_base_mlv_sizeof
+  interface
+    module function s_base_mlv_sizeof(x) result(res)
+      class(psb_s_base_multivect_type), intent(in) :: x
+      integer(psb_epk_) :: res
+    end function s_base_mlv_sizeof
+  end interface
 
   !
   !> Function  base_mlv_get_fmt
@@ -3465,13 +2265,12 @@ contains
   !! \brief  Format
   !!
   !
-  function s_base_mlv_get_fmt() result(res)
-    implicit none
-    character(len=5) :: res
-    res = 'BASE'
-  end function s_base_mlv_get_fmt
-
-
+  interface
+    module function s_base_mlv_get_fmt() result(res)
+      character(len=5) :: res
+    end function s_base_mlv_get_fmt
+  end interface
+  
   !
   !
   !
@@ -3480,22 +2279,12 @@ contains
   !! \brief  Extract a copy of the contents
   !!
   !
-  function  s_base_mlv_get_vect(x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    real(psb_spk_), allocatable                 :: res(:,:)
-    integer(psb_ipk_) :: info,m,n
-    m = x%get_nrows()
-    n = x%get_ncols()
-    if (.not.allocated(x%v)) return
-    call x%sync()
-    allocate(res(m,n),stat=info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_get_vect')
-      return
-    end if
-    res(1:m,1:n) = x%v(1:m,1:n)
-  end function s_base_mlv_get_vect
+  interface
+    module function  s_base_mlv_get_vect(x) result(res)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      real(psb_spk_), allocatable                 :: res(:,:)
+    end function s_base_mlv_get_vect
+  end interface
 
   !
   ! Reset all values
@@ -3506,15 +2295,13 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine s_base_mlv_set_scal(x,val)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in) :: val
-
-    integer(psb_ipk_) :: info
-    x%v = val
-
-  end subroutine s_base_mlv_set_scal
+  interface
+    module subroutine s_base_mlv_set_scal(x,val)
+      implicit none
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      real(psb_spk_), intent(in) :: val
+    end subroutine s_base_mlv_set_scal
+  end interface
 
   !
   !> Function  base_mlv_set_vect
@@ -3522,23 +2309,12 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in
   !!
-  subroutine s_base_mlv_set_vect(x,val)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    real(psb_spk_), intent(in) :: val(:,:)
-    integer(psb_ipk_) :: nr, nc
-    integer(psb_ipk_) :: info
-
-    if (allocated(x%v)) then
-      nr = min(size(x%v,1),size(val,1))
-      nc = min(size(x%v,2),size(val,2))
-
-      x%v(1:nr,1:nc) = val(1:nr,1:nc)
-    else
-      x%v = val
-    end if
-
-  end subroutine s_base_mlv_set_vect
+  interface
+    module subroutine s_base_mlv_set_vect(x,val)
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      real(psb_spk_), intent(in) :: val(:,:)
+    end subroutine s_base_mlv_set_vect
+  end interface
 
   !
   ! Dot products
@@ -3550,36 +2326,13 @@ contains
   !! \param n    Number of entries to be considered
   !! \param y    The other (base_mlv_vect) to be multiplied by
   !!
-  function s_base_mlv_dot_v(n,x,y) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_), allocatable   :: res(:)
-    real(psb_spk_), external      :: sdot
-    integer(psb_ipk_) :: j,nc
-
-    if (x%is_dev()) call x%sync()
-    res = szero
-    !
-    ! Note: this is the base implementation.
-    !  When we get here, we are sure that X is of
-    !  TYPE psb_s_base_mlv_vect (or its class does not care).
-    !  If Y is not, throw the burden on it, implicitly
-    !  calling dot_a
-    !
-    select type(yy => y)
-    type is (psb_s_base_multivect_type)
-      if (y%is_dev()) call y%sync()
-      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
-      allocate(res(nc))
-      do j=1,nc
-        res(j) = sdot(n,x%v(:,j),1,y%v(:,j),1)
-      end do
-      class default
-      res = y%dot(n,x%v)
-    end select
-
-  end function s_base_mlv_dot_v
+  interface
+    module   function s_base_mlv_dot_v(n,x,y) result(res)
+      class(psb_s_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_), allocatable   :: res(:)
+    end function s_base_mlv_dot_v
+  end interface
 
   !
   ! Base workhorse is good old BLAS1
@@ -3591,23 +2344,14 @@ contains
   !! \param n    Number of entries to be considered
   !! \param y(:) The array to be multiplied by
   !!
-  function s_base_mlv_dot_a(n,x,y) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    real(psb_spk_), intent(in)    :: y(:,:)
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_), allocatable     :: res(:)
-    real(psb_spk_), external      :: sdot
-    integer(psb_ipk_) :: j,nc
-
-    if (x%is_dev()) call x%sync()
-    nc = min(psb_size(x%v,2_psb_ipk_),size(y,2_psb_ipk_))
-    allocate(res(nc))
-    do j=1,nc
-      res(j) = sdot(n,x%v(:,j),1,y(:,j),1)
-    end do
-
-  end function s_base_mlv_dot_a
+  interface
+    module function s_base_mlv_dot_a(n,x,y) result(res)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      real(psb_spk_), intent(in)    :: y(:,:)
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_), allocatable     :: res(:)
+    end function s_base_mlv_dot_a
+  end interface
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -3623,30 +2367,16 @@ contains
   !! \param beta scalar alpha
   !! \param info   return code
   !!
-  subroutine s_base_mlv_axpby_v(m,alpha, x, beta, y, info, n)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    real(psb_spk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_), intent(in), optional     :: n
-    integer(psb_ipk_)  :: nc
-
-    if (present(n)) then
-      nc = n
-    else
-      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
-    end if
-    select type(xx => x)
-    type is (psb_s_base_multivect_type)
-      call psb_geaxpby(m,nc,alpha,x%v,beta,y%v,info)
-      class default
-      call y%axpby(m,alpha,x%v,beta,info,n=n)
-    end select
-
-  end subroutine s_base_mlv_axpby_v
+  interface
+    module subroutine s_base_mlv_axpby_v(m,alpha, x, beta, y, info, n)
+      integer(psb_ipk_), intent(in)               :: m
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional     :: n
+    end subroutine s_base_mlv_axpby_v
+  end interface
 
   !
   ! AXPBY is invoked via Y, hence the structure below.
@@ -3661,26 +2391,16 @@ contains
   !! \param beta scalar alpha
   !! \param info   return code
   !!
-  subroutine s_base_mlv_axpby_a(m,alpha, x, beta, y, info,n)
-    use psi_serial_mod
-    implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    real(psb_spk_), intent(in)        :: x(:,:)
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    real(psb_spk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_), intent(in), optional     :: n
-    integer(psb_ipk_)  :: nc
-    if (present(n)) then
-      nc = n
-    else
-      nc = min(size(x,2),psb_size(y%v,2_psb_ipk_))
-    end if
-
-    call psb_geaxpby(m,nc,alpha,x,beta,y%v,info)
-
-  end subroutine s_base_mlv_axpby_a
-
+  interface
+    module subroutine s_base_mlv_axpby_a(m,alpha, x, beta, y, info,n)
+      integer(psb_ipk_), intent(in)               :: m
+      real(psb_spk_), intent(in)        :: x(:,:)
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      real(psb_spk_), intent (in)       :: alpha, beta
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional     :: n
+    end subroutine s_base_mlv_axpby_a
+  end interface
 
   !
   !  Multiple variants of two operations:
@@ -3697,31 +2417,21 @@ contains
   !! \param x   The class(base_mlv_vect) to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlv_mlt_mv(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
+  interface
+    module subroutine s_base_mlv_mlt_mv(x, y, info)
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_mlt_mv
+  end interface
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
-
-  end subroutine s_base_mlv_mlt_mv
-
-  subroutine s_base_mlv_mlt_mv_v(x, y, info)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_vect_type), intent(inout)  :: x
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
-
-  end subroutine s_base_mlv_mlt_mv_v
+  interface
+    module subroutine s_base_mlv_mlt_mv_v(x, y, info)
+      class(psb_s_base_vect_type), intent(inout)  :: x
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_mlt_mv_v
+  end interface
 
   !
   !> Function  base_mlv_mlt_ar1
@@ -3730,21 +2440,13 @@ contains
   !! \param x(:) The array to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlv_mlt_ar1(x, y, info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: x(:)
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
-
-    info = 0
-    n = min(psb_size(y%v,1_psb_ipk_), size(x))
-    do i=1, n
-      y%v(i,:) = y%v(i,:)*x(i)
-    end do
-
-  end subroutine s_base_mlv_mlt_ar1
+  interface
+    module subroutine s_base_mlv_mlt_ar1(x, y, info)
+      real(psb_spk_), intent(in)        :: x(:)
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_mlt_ar1
+  end interface
 
   !
   !> Function  base_mlv_mlt_ar2
@@ -3753,21 +2455,13 @@ contains
   !! \param x(:,:) The array to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlv_mlt_ar2(x, y, info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: x(:,:)
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, nr,nc
-
-    info = 0
-    nr   = min(psb_size(y%v,1_psb_ipk_), size(x,1))
-    nc   = min(psb_size(y%v,2_psb_ipk_), size(x,2))
-    y%v(1:nr,1:nc) = y%v(1:nr,1:nc)*x(1:nr,1:nc)
-
-  end subroutine s_base_mlv_mlt_ar2
-
+  interface
+    module subroutine s_base_mlv_mlt_ar2(x, y, info)
+      real(psb_spk_), intent(in)        :: x(:,:)
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_mlt_ar2
+  end interface
 
   !
   !> Function  base_mlv_mlt_a_2
@@ -3780,53 +2474,15 @@ contains
   !! \param y(:) The array to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: alpha,beta
-    real(psb_spk_), intent(in)        :: y(:,:)
-    real(psb_spk_), intent(in)        :: x(:,:)
-    class(psb_s_base_multivect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, nr, nc
-
-    info = 0
-    nr = min(psb_size(z%v,1_psb_ipk_), size(x,1), size(y,1))
-    nc = min(psb_size(z%v,2_psb_ipk_), size(x,2), size(y,2))
-    if (alpha == szero) then
-      if (beta == sone) then
-        return
-      else
-        z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc)
-      end if
-    else
-      if (alpha == sone) then
-        if (beta == szero) then
-          z%v(1:nr,1:nc) = y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == sone) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      else if (alpha == -sone) then
-        if (beta == szero) then
-          z%v(1:nr,1:nc) = -y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == sone) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      else
-        if (beta == szero) then
-          z%v(1:nr,1:nc) = alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == sone) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      end if
-    end if
-  end subroutine s_base_mlv_mlt_a_2
+  interface
+    module subroutine s_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
+      real(psb_spk_), intent(in)        :: alpha,beta
+      real(psb_spk_), intent(in)        :: y(:,:)
+      real(psb_spk_), intent(in)        :: x(:,:)
+      class(psb_s_base_multivect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+    end subroutine s_base_mlv_mlt_a_2
+  end interface
 
   !
   !> Function  base_mlv_mlt_v_2
@@ -3839,40 +2495,18 @@ contains
   !! \param y  The class(base_mlv_vect) to be multiplied by
   !! \param info   return code
   !!
-  subroutine s_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-    use psi_serial_mod
-    use psb_string_mod
-    implicit none
-    real(psb_spk_), intent(in)        :: alpha,beta
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    class(psb_s_base_multivect_type), intent(inout)  :: y
-    class(psb_s_base_multivect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    character(len=1), intent(in), optional     :: conjgx, conjgy
-    integer(psb_ipk_) :: i, n
-    logical :: conjgx_, conjgy_
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    if (y%is_dev()) call y%sync()
-    if (z%is_dev()) call z%sync()
-    if (.not.psb_s_is_complex_) then
-      call z%mlt(alpha,x%v,y%v,beta,info)
-    else
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-      call z%mlt(alpha,x%v,y%v,beta,info)
-      if (conjgx_) x%v=(x%v)
-      if (conjgy_) y%v=(y%v)
-    end if
-  end subroutine s_base_mlv_mlt_v_2
+  interface
+    module subroutine s_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+      real(psb_spk_), intent(in)        :: alpha,beta
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      class(psb_s_base_multivect_type), intent(inout)  :: y
+      class(psb_s_base_multivect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional     :: conjgx, conjgy
+    end subroutine s_base_mlv_mlt_v_2
+  end interface
 !!$
 !!$  subroutine s_base_mlv_mlt_av(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
 !!$    implicit none
 !!$    real(psb_spk_), intent(in)        :: alpha,beta
 !!$    real(psb_spk_), intent(in)        :: x(:)
@@ -3888,7 +2522,6 @@ contains
 !!$  end subroutine s_base_mlv_mlt_av
 !!$
 !!$  subroutine s_base_mlv_mlt_va(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
 !!$    implicit none
 !!$    real(psb_spk_), intent(in)        :: alpha,beta
 !!$    real(psb_spk_), intent(in)        :: y(:)
@@ -3912,16 +2545,12 @@ contains
   !! \brief Scale all entries  x = alpha*x
   !! \param alpha   The multiplier
   !!
-  subroutine s_base_mlv_scal(alpha, x)
-    use psi_serial_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
-    real(psb_spk_), intent (in)       :: alpha
-
-    if (x%is_dev()) call x%sync()
-    if (allocated(x%v)) x%v = alpha*x%v
-
-  end subroutine s_base_mlv_scal
+  interface
+    module subroutine s_base_mlv_scal(alpha, x)
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+      real(psb_spk_), intent (in)       :: alpha
+    end subroutine s_base_mlv_scal
+  end interface
 
   !
   ! Norms 1, 2 and infinity
@@ -3930,64 +2559,39 @@ contains
   !! \memberof  psb_s_base_multivect_type
   !! \brief 2-norm |x(1:n)|_2
   !! \param n  how many entries to consider
-  function s_base_mlv_nrm2(n,x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_), allocatable    :: res(:)
-    real(psb_spk_), external      :: snrm2
-    integer(psb_ipk_) :: j, nc
-
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  snrm2(n,x%v(:,j),1)
-    end do
-
-  end function s_base_mlv_nrm2
+  interface
+    module   function s_base_mlv_nrm2(n,x) result(res)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_), allocatable    :: res(:)
+    end function
+  end interface
 
   !
   !> Function  base_mlv_amax
   !! \memberof  psb_s_base_multivect_type
   !! \brief infinity-norm |x(1:n)|_\infty
   !! \param n  how many entries to consider
-  function s_base_mlv_amax(n,x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_), allocatable    :: res(:)
-    integer(psb_ipk_) :: j, nc
-
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  maxval(abs(x%v(1:n,j)))
-    end do
-
-  end function s_base_mlv_amax
+  interface
+    module function s_base_mlv_amax(n,x) result(res)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_), allocatable    :: res(:)
+    end function s_base_mlv_amax
+  end interface
 
   !
   !> Function  base_mlv_asum
   !! \memberof  psb_s_base_multivect_type
   !! \brief 1-norm |x(1:n)|_1
   !! \param n  how many entries to consider
-  function s_base_mlv_asum(n,x) result(res)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_spk_), allocatable    :: res(:)
-    integer(psb_ipk_) :: j, nc
-
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  sum(abs(x%v(1:n,j)))
-    end do
-
-  end function s_base_mlv_asum
+  interface
+    module function s_base_mlv_asum(n,x) result(res)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)           :: n
+      real(psb_spk_), allocatable    :: res(:)
+    end function s_base_mlv_asum
+  end interface
   !
   ! Overwrite with absolute value
   !
@@ -3996,96 +2600,62 @@ contains
   !! \memberof  psb_s_base_vect_type
   !! \brief  Set all entries to their respective absolute values.
   !!
-  subroutine s_base_mlv_absval1(x)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout)  :: x
+  interface
+    module subroutine s_base_mlv_absval1(x)
+      class(psb_s_base_multivect_type), intent(inout)  :: x
+    end subroutine s_base_mlv_absval1
+  end interface
 
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
-      x%v =  abs(x%v)
-      call x%set_host()
-    end if
-
-  end subroutine s_base_mlv_absval1
-
-  subroutine s_base_mlv_absval2(x,y)
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    class(psb_s_base_multivect_type), intent(inout) :: y
-    integer(psb_ipk_) :: info
-
-    if (x%is_dev()) call x%sync()
-    if (allocated(x%v)) then
-      call y%axpby(min(x%get_nrows(),y%get_nrows()),sone,x,szero,info)
-      call y%absval()
-    end if
-
-  end subroutine s_base_mlv_absval2
+  interface
+    module subroutine s_base_mlv_absval2(x,y)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      class(psb_s_base_multivect_type), intent(inout) :: y
+    end subroutine s_base_mlv_absval2
+  end interface
 
 
-  function s_base_mlv_use_buffer() result(res)
-    implicit none
-    logical :: res
+  interface
+    module   function s_base_mlv_use_buffer() result(res)
+      logical :: res
+    end function s_base_mlv_use_buffer
+  end interface
+  
+  interface
+    module subroutine s_base_mlv_new_buffer(n,x,info)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)              :: n
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_mlv_new_buffer
+  end interface
 
-    res = .true.
-  end function s_base_mlv_use_buffer
+  interface
+    module subroutine s_base_mlv_new_comid(n,x,info)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)              :: n
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_mlv_new_comid
+  end interface
 
-  subroutine s_base_mlv_new_buffer(n,x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
+  interface
+    module subroutine s_base_mlv_maybe_free_buffer(x,info)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_mlv_maybe_free_buffer
+  end interface
 
-    integer(psb_ipk_)               :: nc
-    nc = x%get_ncols()
-    call psb_realloc(n*nc,x%combuf,info)
-  end subroutine s_base_mlv_new_buffer
+  interface
+    module subroutine s_base_mlv_free_buffer(x,info)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_mlv_free_buffer
+  end interface
 
-  subroutine s_base_mlv_new_comid(n,x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
-
-    call psb_realloc(n,2_psb_ipk_,x%comid,info)
-  end subroutine s_base_mlv_new_comid
-
-
-  subroutine s_base_mlv_maybe_free_buffer(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-
-    info = 0
-    if (psb_get_maybe_free_buffer())&
-         &  call x%free_buffer(info)
-
-  end subroutine s_base_mlv_maybe_free_buffer
-
-  subroutine s_base_mlv_free_buffer(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%combuf)) &
-         &  deallocate(x%combuf,stat=info)
-  end subroutine s_base_mlv_free_buffer
-
-  subroutine s_base_mlv_free_comid(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_s_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
-  end subroutine s_base_mlv_free_comid
-
+  interface
+    module subroutine s_base_mlv_free_comid(x,info)
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(out)             :: info
+    end subroutine s_base_mlv_free_comid
+  end interface
 
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
@@ -4099,23 +2669,14 @@ contains
   !! \param idx(:) indices
   !! \param alpha
   !! \param beta
-  subroutine s_base_mlv_gthab(n,idx,alpha,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) :: alpha, beta, y(:)
-    class(psb_s_base_multivect_type) :: x
-    integer(psb_mpk_) :: nc
-
-    if (x%is_dev()) call x%sync()
-    if (.not.allocated(x%v)) then
-      return
-    end if
-    nc = psb_size(x%v,2_psb_ipk_)
-    call psi_gth(n,nc,idx,alpha,x%v,beta,y)
-
-  end subroutine s_base_mlv_gthab
+  interface
+    module subroutine s_base_mlv_gthab(n,idx,alpha,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) :: alpha, beta, y(:)
+      class(psb_s_base_multivect_type) :: x
+    end subroutine s_base_mlv_gthab
+  end interface
   !
   ! shortcut alpha=1 beta=0
   !
@@ -4125,19 +2686,15 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine s_base_mlv_gthzv_x(i,n,idx,x,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
-    class(psb_i_base_vect_type) :: idx
-    real(psb_spk_) ::  y(:)
-    class(psb_s_base_multivect_type) :: x
-
-    if (x%is_dev()) call x%sync()
-    call x%gth(n,idx%v(i:),y)
-
-  end subroutine s_base_mlv_gthzv_x
+  interface
+    module subroutine s_base_mlv_gthzv_x(i,n,idx,x,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: i
+      class(psb_i_base_vect_type) :: idx
+      real(psb_spk_) ::  y(:)
+      class(psb_s_base_multivect_type) :: x
+    end subroutine s_base_mlv_gthzv_x
+  end interface
 
   !
   ! shortcut alpha=1 beta=0
@@ -4148,24 +2705,14 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine s_base_mlv_gthzv(n,idx,x,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) ::  y(:)
-    class(psb_s_base_multivect_type) :: x
-    integer(psb_mpk_) :: nc
-
-    if (x%is_dev()) call x%sync()
-    if (.not.allocated(x%v)) then
-      return
-    end if
-    nc = psb_size(x%v,2_psb_ipk_)
-
-    call psi_gth(n,nc,idx,x%v,y)
-
-  end subroutine s_base_mlv_gthzv
+  interface
+    module subroutine s_base_mlv_gthzv(n,idx,x,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) ::  y(:)
+      class(psb_s_base_multivect_type) :: x
+    end subroutine s_base_mlv_gthzv
+  end interface
   !
   ! shortcut alpha=1 beta=0
   !
@@ -4175,47 +2722,26 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine s_base_mlv_gthzm(n,idx,x,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) ::  y(:,:)
-    class(psb_s_base_multivect_type) :: x
-    integer(psb_mpk_) :: nc
-
-    if (x%is_dev()) call x%sync()
-    if (.not.allocated(x%v)) then
-      return
-    end if
-    nc = psb_size(x%v,2_psb_ipk_)
-
-    call psi_gth(n,nc,idx,x%v,y)
-
-  end subroutine s_base_mlv_gthzm
+  interface
+    module subroutine s_base_mlv_gthzm(n,idx,x,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) ::  y(:,:)
+      class(psb_s_base_multivect_type) :: x
+    end subroutine s_base_mlv_gthzm
+  end interface
 
   !
   ! New comm internals impl.
   !
-  subroutine s_base_mlv_gthzbuf(i,ixb,n,idx,x)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i, ixb
-    class(psb_i_base_vect_type) :: idx
-    class(psb_s_base_multivect_type) :: x
-    integer(psb_ipk_) :: nc
-
-    if (.not.allocated(x%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
-      return
-    end if
-    if (idx%is_dev()) call idx%sync()
-    if (x%is_dev()) call x%sync()
-    nc = x%get_ncols()
-    call x%gth(n,idx%v(i:),x%combuf(ixb:))
-
-  end subroutine s_base_mlv_gthzbuf
+  interface
+    module subroutine s_base_mlv_gthzbuf(i,ixb,n,idx,x)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: i, ixb
+      class(psb_i_base_vect_type) :: idx
+      class(psb_s_base_multivect_type) :: x
+    end subroutine s_base_mlv_gthzbuf
+  end interface
 
   !
   ! Scatter:
@@ -4230,72 +2756,43 @@ contains
   !! \param idx(:) indices
   !! \param beta
   !! \param x(:)
-  subroutine s_base_mlv_sctb(n,idx,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) :: beta, x(:)
-    class(psb_s_base_multivect_type) :: y
-    integer(psb_mpk_) :: nc
+  interface
+    module subroutine s_base_mlv_sctb(n,idx,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) :: beta, x(:)
+      class(psb_s_base_multivect_type) :: y
+    end subroutine s_base_mlv_sctb
+  end interface
 
-    if (y%is_dev()) call y%sync()
-    nc = psb_size(y%v,2_psb_ipk_)
-    call psi_sct(n,nc,idx,x,beta,y%v)
-    call y%set_host()
+  interface
+    module subroutine s_base_mlv_sctbr2(n,idx,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: idx(:)
+      real(psb_spk_) :: beta, x(:,:)
+      class(psb_s_base_multivect_type) :: y
+    end subroutine s_base_mlv_sctbr2
+  end interface
 
-  end subroutine s_base_mlv_sctb
+  interface
+    module subroutine s_base_mlv_sctb_x(i,n,idx,x,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: i
+      class(psb_i_base_vect_type) :: idx
+      real( psb_spk_) :: beta, x(:)
+      class(psb_s_base_multivect_type) :: y
+    end subroutine s_base_mlv_sctb_x
+  end interface
 
-  subroutine s_base_mlv_sctbr2(n,idx,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    real(psb_spk_) :: beta, x(:,:)
-    class(psb_s_base_multivect_type) :: y
-    integer(psb_mpk_) :: nc
-
-    if (y%is_dev()) call y%sync()
-    nc = y%get_ncols()
-    call psi_sct(n,nc,idx,x,beta,y%v)
-    call y%set_host()
-
-  end subroutine s_base_mlv_sctbr2
-
-  subroutine s_base_mlv_sctb_x(i,n,idx,x,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
-    class(psb_i_base_vect_type) :: idx
-    real( psb_spk_) :: beta, x(:)
-    class(psb_s_base_multivect_type) :: y
-
-    call y%sct(n,idx%v(i:),x,beta)
-
-  end subroutine s_base_mlv_sctb_x
-
-  subroutine s_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
-    use psi_serial_mod
-    implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i, iyb
-    class(psb_i_base_vect_type) :: idx
-    real(psb_spk_) :: beta
-    class(psb_s_base_multivect_type) :: y
-    integer(psb_ipk_) :: nc
-
-    if (.not.allocated(y%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
-      return
-    end if
-    if (y%is_dev()) call y%sync()
-    if (idx%is_dev()) call idx%sync()
-    nc = y%get_ncols()
-    call y%sct(n,idx%v(i:),y%combuf(iyb:),beta)
-    call y%set_host()
-
-  end subroutine s_base_mlv_sctb_buf
+  interface
+    module subroutine s_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
+      integer(psb_mpk_) :: n
+      integer(psb_ipk_) :: i, iyb
+      class(psb_i_base_vect_type) :: idx
+      real(psb_spk_) :: beta
+      class(psb_s_base_multivect_type) :: y
+    end subroutine s_base_mlv_sctb_buf
+  end interface
 
   !
   !> Function  base_device_wait:
@@ -4303,9 +2800,9 @@ contains
   !! \brief device_wait: base version is a no-op.
   !!
   !
-  subroutine s_base_mlv_device_wait()
-    implicit none
-
-  end subroutine s_base_mlv_device_wait
+  interface
+    module subroutine s_base_mlv_device_wait()
+    end subroutine s_base_mlv_device_wait
+  end interface
 
 end module psb_s_base_multivect_mod

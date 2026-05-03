@@ -281,6 +281,12 @@ set(PSB_base_source_files
   serial/psb_dnumbmm.f90
   serial/psb_damax_s.f90
   serial/psb_zgeprt.f90
+  serial/impl/psb_i_base_vect_impl.F90
+  serial/impl/psb_l_base_vect_impl.F90
+  serial/impl/psb_c_base_vect_impl.F90
+  serial/impl/psb_z_base_vect_impl.F90
+  serial/impl/psb_s_base_vect_impl.F90
+  serial/impl/psb_d_base_vect_impl.F90			
   serial/impl/psb_c_coo_impl.F90
   serial/impl/psb_d_coo_impl.F90
   serial/impl/psb_d_csc_impl.F90
@@ -460,6 +466,7 @@ set(PSB_base_source_files
   modules/comm/psb_d_comm_mod.f90
   modules/comm/psi_e_comm_a_mod.f90
   modules/comm/psb_c_comm_a_mod.f90
+  modules/comm/psi_i2_comm_a_mod.f90
   modules/comm/psb_linmap_mod.f90
   modules/comm/psb_z_comm_a_mod.f90
   modules/comm/psi_c_comm_a_mod.f90

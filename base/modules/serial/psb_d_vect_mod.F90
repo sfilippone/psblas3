@@ -108,6 +108,7 @@ module psb_d_vect_mod
     procedure, pass(x) :: check_addr => d_vect_check_addr
 
     procedure, pass(x) :: get_entry => d_vect_get_entry
+    procedure, pass(x) :: set_entry => d_vect_set_entry
 
     procedure, pass(x) :: dot_v    => d_vect_dot_v
     procedure, pass(x) :: dot_a    => d_vect_dot_a
@@ -862,12 +863,21 @@ contains
 
   function d_vect_get_entry(x,index) result(res)
     implicit none
-    class(psb_d_vect_type), intent(in) :: x
+    class(psb_d_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index
     real(psb_dpk_) :: res
-    res = 0
+    res = dzero
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function d_vect_get_entry
+
+  subroutine d_vect_set_entry(x,index,val) 
+    implicit none
+    class(psb_d_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: index
+    real(psb_dpk_) :: val
+
+    if (allocated(x%v)) call x%v%set_entry(index,val)
+  end subroutine d_vect_set_entry
 
   function d_vect_dot_v(n,x,y) result(res)
     implicit none
@@ -1430,7 +1440,7 @@ contains
     if (allocated(x%v)) then
       res = x%v%minreal(n)
     else
-      res = dzero
+      res = HUGE(dzero)
     end if
 
   end function d_vect_min
