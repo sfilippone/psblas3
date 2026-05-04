@@ -65,8 +65,6 @@ contains
     this%v = x
     call this%asb(size(x,kind=psb_ipk_),info)
   end function constructor
-  
-
 
   !> Function  constructor:
   !! \brief     Constructor from size
@@ -998,7 +996,6 @@ contains
     end if
     
   end function z_base_get_vect
-  
 
   !
   ! Reset all values
@@ -1031,11 +1028,13 @@ contains
 #else
     x%v(first_:last_) = val
 #endif
+    !
+    ! Should we set as ASSEMBLED? Looks like
+    !
+    call x%set_asb()
     call x%set_host()
 
   end subroutine z_base_set_scal
-  
-
 
   !
   !> Function  base_set_vect
@@ -1093,7 +1092,7 @@ contains
   !! \brief  Get one entry from the vector
   !!
   !
-module function z_base_get_entry(x, index) result(res)
+  module function z_base_get_entry(x, index) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
@@ -1120,7 +1119,6 @@ module function z_base_get_entry(x, index) result(res)
       call x%set_host()
     end if
   end subroutine z_base_set_entry
-  
 
   !
   ! Overwrite with absolute value
@@ -1251,7 +1249,6 @@ module function z_base_get_entry(x, index) result(res)
     call y%axpby(m,alpha,x%v,beta,info)
 
   end subroutine z_base_axpby_v
-  
 
   !
   ! AXPBY is invoked via Z, hence the structure below.

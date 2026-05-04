@@ -65,8 +65,6 @@ contains
     this%v = x
     call this%asb(size(x,kind=psb_ipk_),info)
   end function constructor
-  
-
 
   !> Function  constructor:
   !! \brief     Constructor from size
@@ -998,7 +996,6 @@ contains
     end if
     
   end function l_base_get_vect
-  
 
   !
   ! Reset all values
@@ -1031,11 +1028,13 @@ contains
 #else
     x%v(first_:last_) = val
 #endif
+    !
+    ! Should we set as ASSEMBLED? Looks like
+    !
+    call x%set_asb()
     call x%set_host()
 
   end subroutine l_base_set_scal
-  
-
 
   !
   !> Function  base_set_vect

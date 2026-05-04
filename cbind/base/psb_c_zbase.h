@@ -21,7 +21,7 @@ psb_i_t    psb_c_zvect_get_nrows(psb_c_zvector *xh);
 psb_z_t   *psb_c_zvect_get_cpy(psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_f_get_cpy(psb_z_t  *v, psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_zero(psb_c_zvector *xh);
-psb_i_t   *psb_c_zvect_f_get_pnt(psb_c_zvector *xh);
+psb_z_t   *psb_c_zvect_f_get_pnt(psb_c_zvector *xh);
 psb_i_t    psb_c_zvect_clone(psb_c_zvector *xh, psb_c_zvector *yh);
 
 psb_i_t    psb_c_zgeall(psb_c_zvector *xh, psb_c_descriptor *cdh);
@@ -35,13 +35,13 @@ psb_i_t    psb_c_zgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_z_t *val,
 psb_i_t    psb_c_zgeasb(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgeasb_options(psb_c_zvector *xh, psb_c_descriptor *cdh, psb_i_t dupl);
 psb_i_t	   psb_c_zgeasb_options_format(psb_c_zvector *xh, psb_c_descriptor *cdh,
-	    				const char *fmt, psb_i_t dupl);	
+	    				psb_i_t dupl, const char *fmt);	
 
 psb_i_t    psb_c_zgefree(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_zgereinit(psb_c_zvector *xh, psb_c_descriptor *cdh, bool clear);
 psb_z_t    psb_c_zgetelem(psb_c_zvector *xh,psb_l_t index,psb_c_descriptor *cd);
 psb_z_t	   psb_c_zmatgetelem(psb_c_zspmat *ah,psb_l_t rowindex,psb_l_t colindex,psb_c_descriptor *cdh);	
-psb_i_t    psb_c_zsetelem(psb_l_t index, psb_c_t val,
+psb_i_t    psb_c_zsetelem(psb_l_t index, psb_z_t val,
 			  psb_c_zvector *xh, psb_c_descriptor *cd);
 
 
@@ -69,18 +69,18 @@ psb_i_t	   psb_c_zcopy_mat(psb_c_zspmat *ah,psb_c_zspmat *bh,psb_c_descriptor *c
 psb_i_t    psb_c_zsprn(psb_c_zspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_zmat_name_print(psb_c_zspmat *mh, char *name);
 psb_i_t	   psb_c_zvect_set_scal(psb_c_zvector *xh, psb_z_t val);
-psb_i_t	   psb_c_zvect_set_scal_bound(psb_c_zvector *xh, psb_c_t val,
+psb_i_t	   psb_c_zvect_set_scal_bound(psb_c_zvector *xh, psb_z_t val,
 				      psb_i_t ifirst, psb_i_t ilast);
 psb_i_t	   psb_c_zvect_set_vect(psb_c_zvector *xh, psb_z_t *val, psb_i_t n);
 psb_z_t    psb_c_zvect_get_entry(psb_c_zvector *xh, psb_i_t index);
-psb_i_t    psb_c_zvect_set_entry(psb_c_zvector *xh, psb_i_t index, psb_c_t val);
+psb_i_t    psb_c_zvect_set_entry(psb_c_zvector *xh, psb_i_t index, psb_z_t val);
 
 /* psblas computational routines */
 psb_z_t psb_c_zgedot(psb_c_zvector *xh, psb_c_zvector *yh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgeamax(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgeasum(psb_c_zvector *xh, psb_c_descriptor *cdh);
-psb_d_t psb_c_zgenrmi(psb_c_zspmat *ah, psb_c_descriptor *cdh);
+psb_d_t psb_c_zgenrmi(psb_c_zvector *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaxpby(psb_z_t alpha, psb_c_zvector *xh,
 		       psb_z_t beta, psb_c_zvector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaxpbyz(psb_z_t alpha, psb_c_zvector *xh,
@@ -101,13 +101,16 @@ psb_i_t psb_c_zgediv2(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *zh,psb_
 psb_i_t psb_c_zgediv2_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *zh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_zgeinv(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeinv_check(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_descriptor *cdh, bool flag);
-psb_i_t psb_c_zgeabs(psb_c_zvector *xh,psb_c_zvector *yh,psb_c_zvector *cdh);
+psb_i_t psb_c_zgeabs(psb_c_zvector *xh,psb_c_zvector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_zgecmp(psb_c_zvector *xh,psb_d_t ch,psb_c_zvector *zh,psb_c_descriptor *cdh);
 bool    psb_c_zgecmpmat(psb_c_zspmat *ah,psb_c_zspmat *bh,psb_d_t tol,psb_c_descriptor *cdh);
 bool    psb_c_zgecmpmat_val(psb_c_zspmat *ah,psb_z_t val,psb_d_t tol,psb_c_descriptor *cdh);
 psb_i_t psb_c_zgeaddconst(psb_c_zvector *xh,psb_z_t bh,psb_c_zvector *zh,psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2_weight(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2_weightmask(psb_c_zvector *xh,psb_c_zvector *wh,psb_c_zvector *idvh,psb_c_descriptor *cdh);
+psb_i_t psb_c_zmask(psb_c_zvector *ch,psb_c_zvector *xh,psb_c_zvector *mh, bool *t, psb_c_descriptor *cdh);
+psb_z_t psb_c_zgemin(psb_c_zvector *xh,psb_c_descriptor *cdh);
+psb_z_t psb_c_zminquotient(psb_c_zvector *xh,psb_c_zvector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_zspscal(psb_z_t alpha, psb_c_zspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_zspscalpid(psb_z_t alpha, psb_c_zspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_zspaxpby(psb_z_t alpha, psb_c_zspmat *ah, psb_z_t beta, psb_c_zspmat *bh, psb_c_descriptor *cdh);

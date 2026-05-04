@@ -65,8 +65,6 @@ contains
     this%v = x
     call this%asb(size(x,kind=psb_ipk_),info)
   end function constructor
-  
-
 
   !> Function  constructor:
   !! \brief     Constructor from size
@@ -279,7 +277,6 @@ contains
     info = 0
     if (psb_errstatus_fatal()) return
 
-    write(0,*) 'd_base_ins_a: ',n
     if (try_newins) then 
       if (x%is_bld()) then
         ncfs_ = x%get_ncfs()
@@ -999,7 +996,6 @@ contains
     end if
     
   end function d_base_get_vect
-  
 
   !
   ! Reset all values
@@ -1024,7 +1020,6 @@ contains
     if (present(last))  last_  = min(last,last_)
 
     if (x%is_dev()) call x%sync()
-    write(0,*)'d_base%set_scal ',val,first_,last_
 #if defined(PSB_OPENMP)
     !$omp parallel do private(i)
     do i = first_, last_        
@@ -1033,14 +1028,13 @@ contains
 #else
     x%v(first_:last_) = val
 #endif
-    write(0,*) 'end of set_scal',&
-         & ((last_-first_+1)/2+first_),&
-         & x%v((last_-first_+1)/2+first_)
+    !
+    ! Should we set as ASSEMBLED? Looks like
+    !
+    call x%set_asb()
     call x%set_host()
- 
-  end subroutine d_base_set_scal
-  
 
+  end subroutine d_base_set_scal
 
   !
   !> Function  base_set_vect
@@ -1105,11 +1099,9 @@ contains
     real(psb_dpk_)                           :: res
 
     res = dzero
-    write(0,*) 'base%get_entry ',allocated(x%v),index
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
       res = x%v(index)
-      write(0,*) 'base%get_entry out',index,res
     end if
 
   end function d_base_get_entry
@@ -1127,7 +1119,6 @@ contains
       call x%set_host()
     end if
   end subroutine d_base_set_entry
-  
 
   !
   ! Overwrite with absolute value
@@ -1258,7 +1249,6 @@ contains
     call y%axpby(m,alpha,x%v,beta,info)
 
   end subroutine d_base_axpby_v
-  
 
   !
   ! AXPBY is invoked via Z, hence the structure below.
