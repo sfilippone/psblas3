@@ -18,16 +18,16 @@ typedef struct PSB_C_SSPMAT {
 /* dense vectors */
 psb_c_svector* psb_c_new_svector();
 psb_i_t    psb_c_svect_get_nrows(psb_c_svector *xh);
-psb_s_t   *psb_c_svect_get_cpy( psb_c_svector *xh);
-psb_i_t    psb_c_svect_f_get_cpy(psb_s_t *v, psb_c_svector *xh);
+psb_s_t   *psb_c_svect_get_cpy(psb_c_svector *xh);
+psb_i_t    psb_c_svect_f_get_cpy(psb_s_t  *v, psb_c_svector *xh);
 psb_i_t    psb_c_svect_zero(psb_c_svector *xh);
-psb_s_t	  *psb_c_svect_f_get_pnt( psb_c_svector *xh);
-psb_i_t    psb_c_svect_clone(psb_c_svector *xh,psb_c_svector *yh);
+psb_i_t   *psb_c_svect_f_get_pnt(psb_c_svector *xh);
+psb_i_t    psb_c_svect_clone(psb_c_svector *xh, psb_c_svector *yh);
 
 psb_i_t    psb_c_sgeall(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeall_remote(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeall_remote_options(psb_c_svector *xh, psb_c_descriptor *cdh,
-				       psb_i_t bldmode, psb_i_t duple);
+	   				 psb_i_t bldmode, psb_i_t dupl);
 psb_i_t    psb_c_sgeins(psb_i_t nz, const psb_l_t *irw, const psb_s_t *val,
 		    psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_s_t *val,
@@ -35,14 +35,15 @@ psb_i_t    psb_c_sgeins_add(psb_i_t nz, const psb_l_t *irw, const psb_s_t *val,
 psb_i_t    psb_c_sgeasb(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgeasb_options(psb_c_svector *xh, psb_c_descriptor *cdh, psb_i_t dupl);
 psb_i_t	   psb_c_sgeasb_options_format(psb_c_svector *xh, psb_c_descriptor *cdh,
-				       const char *fmt, psb_i_t dupl);
+	    				const char *fmt, psb_i_t dupl);	
+
 psb_i_t    psb_c_sgefree(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgereinit(psb_c_svector *xh, psb_c_descriptor *cdh, bool clear);
 psb_s_t    psb_c_sgetelem(psb_c_svector *xh,psb_l_t index,psb_c_descriptor *cd);
-psb_s_t	   psb_c_smatgetelem(psb_c_sspmat *ah,psb_l_t rowindex,
-			     psb_l_t colindex,psb_c_descriptor *cdh);	
-psb_i_t    psb_c_ssetelem(psb_l_t index, psb_s_t val,
+psb_s_t	   psb_c_smatgetelem(psb_c_sspmat *ah,psb_l_t rowindex,psb_l_t colindex,psb_c_descriptor *cdh);	
+psb_i_t    psb_c_ssetelem(psb_l_t index, psb_c_t val,
 			  psb_c_svector *xh, psb_c_descriptor *cd);
+
 
 /* sparse matrices*/
 psb_c_sspmat* psb_c_new_sspmat();
@@ -55,24 +56,24 @@ psb_i_t    psb_c_sspins(psb_i_t nz, const psb_l_t *irw, const psb_l_t *icl,
 psb_i_t    psb_c_smat_get_nrows(psb_c_sspmat *mh);
 psb_i_t    psb_c_smat_get_ncols(psb_c_sspmat *mh);
 psb_l_t    psb_c_snnz(psb_c_sspmat *mh,psb_c_descriptor *cdh);
-bool    	 psb_c_sis_matupd(psb_c_sspmat *mh,psb_c_descriptor *cdh);
-bool    	 psb_c_sis_matasb(psb_c_sspmat *mh,psb_c_descriptor *cdh);
-bool    	 psb_c_sis_matbld(psb_c_sspmat *mh,psb_c_descriptor *cdh);
+bool       psb_c_sis_matupd(psb_c_sspmat *mh,psb_c_descriptor *cdh);
+bool       psb_c_sis_matasb(psb_c_sspmat *mh,psb_c_descriptor *cdh);
+bool       psb_c_sis_matbld(psb_c_sspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_sset_matupd(psb_c_sspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_sset_matasb(psb_c_sspmat *mh,psb_c_descriptor *cdh);
 psb_i_t    psb_c_sset_matbld(psb_c_sspmat *mh,psb_c_descriptor *cdh);
-psb_i_t		 psb_c_scopy_mat(psb_c_sspmat *ah,psb_c_sspmat *bh,psb_c_descriptor *cdh);
-	
- psb_i_t    psb_c_sspasb_opt(psb_c_sspmat *mh, psb_c_descriptor *cdh,
- 			const char *afmt, psb_i_t upd, psb_i_t dupl); 
+psb_i_t	   psb_c_scopy_mat(psb_c_sspmat *ah,psb_c_sspmat *bh,psb_c_descriptor *cdh);
+
+/* psb_i_t    psb_c_sspasb_opt(psb_c_sspmat *mh, psb_c_descriptor *cdh,  */
+/* 			const char *afmt, psb_i_t upd, psb_i_t dupl); */
 psb_i_t    psb_c_ssprn(psb_c_sspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_smat_name_print(psb_c_sspmat *mh, char *name);
-psb_i_t		 psb_c_svect_set_scal(psb_c_svector *xh, psb_s_t val);
-psb_i_t	   psb_c_svect_set_scal_bound(psb_c_svector *xh, psb_s_t val,
+psb_i_t	   psb_c_svect_set_scal(psb_c_svector *xh, psb_s_t val);
+psb_i_t	   psb_c_svect_set_scal_bound(psb_c_svector *xh, psb_c_t val,
 				      psb_i_t ifirst, psb_i_t ilast);
-psb_i_t		 psb_c_svect_set_vect(psb_c_svector *xh, psb_s_t *val, psb_i_t n);
+psb_i_t	   psb_c_svect_set_vect(psb_c_svector *xh, psb_s_t *val, psb_i_t n);
 psb_s_t    psb_c_svect_get_entry(psb_c_svector *xh, psb_i_t index);
-psb_i_t    psb_c_svect_set_entry(psb_c_svector *xh, psb_i_t index, psb_s_t val);
+psb_i_t    psb_c_svect_set_entry(psb_c_svector *xh, psb_i_t index, psb_c_t val);
 
 /* psblas computational routines */
 psb_s_t psb_c_sgedot(psb_c_svector *xh, psb_c_svector *yh, psb_c_descriptor *cdh);
@@ -83,7 +84,7 @@ psb_s_t psb_c_sgenrmi(psb_c_sspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_sgeaxpby(psb_s_t alpha, psb_c_svector *xh,
 		       psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_sgeaxpbyz(psb_s_t alpha, psb_c_svector *xh,
-		       psb_s_t beta, psb_c_svector *yh, psb_c_svector *zh, psb_c_descriptor *cdh);
+ 		       psb_s_t beta, psb_c_svector *yh, psb_c_svector *zh, psb_c_descriptor *cdh);
 psb_i_t psb_c_sspmm(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh,
 		    psb_s_t beta, psb_c_svector *yh, psb_c_descriptor *cdh);
 psb_i_t psb_c_sspmm_opt(psb_s_t alpha, psb_c_sspmat *ah, psb_c_svector *xh,
@@ -100,18 +101,17 @@ psb_i_t psb_c_sgediv2(psb_c_svector *xh,psb_c_svector *yh,psb_c_svector *zh,psb_
 psb_i_t psb_c_sgediv2_check(psb_c_svector *xh,psb_c_svector *yh,psb_c_svector *zh,psb_c_descriptor *cdh, bool flag);
 psb_i_t psb_c_sgeinv(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
 psb_i_t psb_c_sgeinv_check(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh, bool flag);
-psb_i_t psb_c_sgeabs(psb_c_svector *xh,psb_c_svector *yh,psb_c_descriptor *cdh);
+psb_i_t psb_c_sgeabs(psb_c_svector *xh,psb_c_svector *yh,psb_c_svector *cdh);
 psb_i_t psb_c_sgecmp(psb_c_svector *xh,psb_s_t ch,psb_c_svector *zh,psb_c_descriptor *cdh);
-bool psb_c_sgecmpmat(psb_c_sspmat *ah,psb_c_sspmat *bh,psb_s_t tol,psb_c_descriptor *cdh);
-bool psb_c_sgecmpmat_val(psb_c_sspmat *ah,psb_s_t val,psb_s_t tol,psb_c_descriptor *cdh);
+bool    psb_c_sgecmpmat(psb_c_sspmat *ah,psb_c_sspmat *bh,psb_s_t tol,psb_c_descriptor *cdh);
+bool    psb_c_sgecmpmat_val(psb_c_sspmat *ah,psb_s_t val,psb_s_t tol,psb_c_descriptor *cdh);
 psb_i_t psb_c_sgeaddconst(psb_c_svector *xh,psb_s_t bh,psb_c_svector *zh,psb_c_descriptor *cdh);
 psb_s_t psb_c_sgenrm2_weight(psb_c_svector *xh,psb_c_svector *wh,psb_c_descriptor *cdh);
 psb_s_t psb_c_sgenrm2_weightmask(psb_c_svector *xh,psb_c_svector *wh,psb_c_svector *idvh,psb_c_descriptor *cdh);
-psb_i_t psb_c_smask(psb_c_svector *ch,psb_c_svector *xh,psb_c_svector *mh, bool *t, psb_c_descriptor *cdh);
-psb_s_t psb_c_sgemin(psb_c_svector *xh,psb_c_descriptor *cdh);
 psb_i_t psb_c_sspscal(psb_s_t alpha, psb_c_sspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_sspscalpid(psb_s_t alpha, psb_c_sspmat *ah, psb_c_descriptor *cdh);
 psb_i_t psb_c_sspaxpby(psb_s_t alpha, psb_c_sspmat *ah, psb_s_t beta, psb_c_sspmat *bh, psb_c_descriptor *cdh);
+
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */

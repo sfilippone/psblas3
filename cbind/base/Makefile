@@ -48,7 +48,7 @@ $(FOBJS): $(FMODS)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) $(FCUDEFINES) -c $< -o $@
 
 
-objs:  $(OBJS) $(CMOD)
+objs:  $(OBJS) 
 	/bin/cp -p  *$(.mod) $(CMOD) $(HERE)
 lib:  objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
