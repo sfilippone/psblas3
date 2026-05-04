@@ -162,7 +162,6 @@ contains
       return
     end if
 
-    write(0,*) 'C_set_scal ',val,size(xp%v%v)
     call xp%set(val)
 
     info = 0
