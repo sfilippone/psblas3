@@ -157,6 +157,7 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: set_vect => s_base_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: get_entry=> s_base_get_entry
+    procedure, pass(x) :: set_entry=> s_base_set_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -1282,14 +1283,32 @@ contains
   !
   function s_base_get_entry(x, index) result(res)
     implicit none
-    class(psb_s_base_vect_type), intent(in) :: x
+    class(psb_s_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
     real(psb_spk_)                           :: res
 
     res = 0
-    if (allocated(x%v)) res = x%v(index)
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      res = x%v(index)
+    end if
 
   end function s_base_get_entry
+
+  subroutine s_base_set_entry(x, index, val)
+    implicit none
+    class(psb_s_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    real(psb_spk_)                           :: val
+
+
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      x%v(index) =val
+      call x%set_host()
+    end if
+
+  end subroutine s_base_set_entry
 
   !
   ! Overwrite with absolute value
@@ -2190,7 +2209,7 @@ contains
     end do
 #else
     !
-    ! From M&R: if the array is of size zero, MINVAL
+    ! From M&R&C: if the array is of size zero, MINVAL
     !           returns the largest positive value
     !
     res =  minval(x%v(1:n))

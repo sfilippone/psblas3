@@ -157,6 +157,7 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: set_vect => z_base_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: get_entry=> z_base_get_entry
+    procedure, pass(x) :: set_entry=> z_base_set_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -1275,14 +1276,32 @@ contains
   !
   function z_base_get_entry(x, index) result(res)
     implicit none
-    class(psb_z_base_vect_type), intent(in) :: x
+    class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
     complex(psb_dpk_)                           :: res
 
     res = 0
-    if (allocated(x%v)) res = x%v(index)
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      res = x%v(index)
+    end if
 
   end function z_base_get_entry
+
+  subroutine z_base_set_entry(x, index, val)
+    implicit none
+    class(psb_z_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    complex(psb_dpk_)                           :: val
+
+
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      x%v(index) =val
+      call x%set_host()
+    end if
+
+  end subroutine z_base_set_entry
 
   !
   ! Overwrite with absolute value

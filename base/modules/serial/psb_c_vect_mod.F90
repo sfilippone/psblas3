@@ -108,6 +108,7 @@ module psb_c_vect_mod
     procedure, pass(x) :: check_addr => c_vect_check_addr
 
     procedure, pass(x) :: get_entry => c_vect_get_entry
+    procedure, pass(x) :: set_entry => c_vect_set_entry
 
     procedure, pass(x) :: dot_v    => c_vect_dot_v
     procedure, pass(x) :: dot_a    => c_vect_dot_a
@@ -855,12 +856,20 @@ contains
 
   function c_vect_get_entry(x,index) result(res)
     implicit none
-    class(psb_c_vect_type), intent(in) :: x
+    class(psb_c_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index
     complex(psb_spk_) :: res
-    res = 0
+    res = czero
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function c_vect_get_entry
+
+  subroutine c_vect_set_entry(x,index,val)
+    implicit none
+    class(psb_c_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: index
+    complex(psb_spk_) :: val
+    if (allocated(x%v)) call x%v%set_entry(index,val)
+  end subroutine c_vect_set_entry
 
   function c_vect_dot_v(n,x,y) result(res)
     implicit none
