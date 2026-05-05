@@ -230,7 +230,7 @@ contains
       f_ => s_null_func_2d
     end if
 
-    deltah   = sone/(idim+1)
+    deltah   = sone/(idim+2)
     sqdeltah = deltah*deltah
     deltah2  = (2*sone)* deltah
 
@@ -467,8 +467,8 @@ contains
           ! compute gridpoint coordinates
           call idx2ijk(ix,iy,glob_row,idim,idim)
           ! x, y coordinates
-          x = (ix-1)*deltah
-          y = (iy-1)*deltah
+          x = (ix)*deltah
+          y = (iy)*deltah
           
           zt(k) = f_(x,y)
           ! internal point: build discretization
