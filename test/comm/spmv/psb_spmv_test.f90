@@ -554,7 +554,7 @@ contains
     character(len=8)                :: afmt
     character(len=64)               :: env_buf
     integer(psb_ipk_)               :: my_rank, np, info, err_act
-    integer(psb_ipk_)               :: idim, times, i, n_global
+    integer(psb_ipk_)               :: idim, times, i
     integer                         :: env_len, env_status, ios
     real(psb_dpk_)                  :: alpha, beta, t0, t1, dt, avg_t
     logical                         :: use_external_matrix
@@ -629,10 +629,8 @@ contains
     call psb_barrier(ctxt)
     if (use_external_matrix) then
       call load_external_matrix(ctxt, matrix_file, matrix_fmt, a, y, x, desc_a, afmt, info)
-      n_global = int(a%get_nrows(),kind=psb_ipk_)
     else
       call psb_d_gen_pde3d(ctxt,idim,a,y,x,desc_a,afmt,info)
-      n_global = idim * idim * idim
     end if
     if (info /= psb_success_) goto 9999
 
@@ -693,7 +691,9 @@ contains
       else
         write(psb_out_unit,'("  idim            : ",i0)') idim
       end if
-      write(psb_out_unit,'("  global unknowns : ",i0)') n_global
+      write(psb_out_unit,'("  global non zeros : ",i0)') a%get_nzeros()
+      write(psb_out_unit,'("  global rows     : ",i0)') a%get_nrows()
+      write(psb_out_unit,'("  global cols     : ",i0)') a%get_ncols()
       write(psb_out_unit,'("  repetitions     : ",i0)') times
       write(psb_out_unit,'("  comm backend    : ",a)') trim(psb_toupper(trim(comm_mode)))
       write(psb_out_unit,'("  total time [s]  : ",es12.5)') dt
@@ -790,7 +790,7 @@ program psb_spmv_kernel
   character(len=8)   :: cpu_fmt
   character(len=8)   :: gpu_fmt
   integer(psb_ipk_) :: idim_arg, times_arg
-  logical           :: do_swap
+  logical           :: do_overlap
   integer :: kmode
   integer, parameter :: n_comm_modes = 5
   character(len=20), parameter :: comm_modes(n_comm_modes) = [character(len=20) :: &
@@ -803,7 +803,7 @@ program psb_spmv_kernel
   matrix_fmt  = 'MM'
   cpu_fmt     = 'CSR'
   gpu_fmt     = 'HLG'
-  do_swap     = .true.
+  do_overlap  = .true.
 
   call psb_init(ctxt)
   call psb_info(ctxt, my_rank, np)
@@ -849,9 +849,9 @@ program psb_spmv_kernel
     else if (index(psb_toupper(trim(arg)), '--GPU_FMT=') == 1) then
       gpu_fmt = psb_toupper(adjustl(arg(11:len_trim(arg))))
     else if ((trim(psb_toupper(arg)) == '--NOOVERLAP') .or. (trim(psb_toupper(arg)) == '--NO_OVERLAP')) then
-      do_swap = .false.
+      do_overlap = .false.
     else if ((trim(psb_toupper(arg)) == '--OVERLAP') .or. (trim(psb_toupper(arg)) == '--SWAP')) then
-      do_swap = .true.
+      do_overlap = .true.
     else if (trim(psb_toupper(arg)) == '--MATRIX') then
       if (k < command_argument_count()) call get_command_argument(k+1,matrix_file)
     else if (trim(psb_toupper(arg)) == '--FMT') then
@@ -911,7 +911,7 @@ program psb_spmv_kernel
       write(psb_out_unit,'(/,"=== Backend sweep: ",a," ===")') trim(comm_modes(kmode))
     end if
     call run_spmv_kernel(ctxt, use_gpu, matrix_file, matrix_fmt, cpu_fmt, gpu_fmt, &
-      & idim_arg, times_arg, do_swap, comm_modes(kmode))
+      & idim_arg, times_arg, do_overlap, comm_modes(kmode))
   end do
 
 #ifdef PSB_HAVE_CUDA

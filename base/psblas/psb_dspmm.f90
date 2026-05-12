@@ -176,7 +176,11 @@ subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if (do_timings) call psb_barrier(ctxt)
         if (do_timings) call psb_tic(mv_phase1)
-        if (doswap_) call psi_swapdata(psb_comm_status_start_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
+        if (doswap_) then
+          call psi_swapdata(psb_comm_status_start_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
+        else
+          call psi_swapdata(psb_comm_status_sync_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
+        end if
         if (do_timings) call psb_toc(mv_phase1)
         if (do_timings) call psb_tic(mv_phase2)          
         call a%ad%spmm(alpha,x%v,beta,y%v,info)
@@ -195,9 +199,7 @@ subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         if (do_timings) call psb_barrier(ctxt)
         
         if (do_timings) call psb_tic(mv_phase11)          
-          if (doswap_) then
-            call psi_swapdata(psb_comm_status_sync_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
-          end if
+        call psi_swapdata(psb_comm_status_sync_, dzero, x%v, desc_a, info, data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase11)
         if (do_timings) call psb_tic(mv_phase12)          
         call psb_csmm(alpha,a,x,beta,y,info)
