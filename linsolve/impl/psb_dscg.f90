@@ -37,10 +37,10 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   type(psb_itconv_type)         :: stopdat
   real(psb_dpk_)                :: derr 
 
-  integer(psb_ipk_), parameter  :: lapackLU = izero
-  integer(psb_ipk_), parameter  :: forwardGS = ione
-  integer(psb_ipk_), parameter  :: Gram_solver_type = forwardGS
-
+  integer(psb_ipk_), parameter  :: forwardGS = izero
+  integer(psb_ipk_), parameter  :: lapackLU = ione
+  integer(psb_ipk_), parameter  :: lapackCC = itwo
+  integer(psb_ipk_), parameter  :: Gram_solver_type = lapackLU
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -189,13 +189,15 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     W = temp_fa(:, 1 : s)
     alpha = temp_fa(:, s + 1)
 
-    ! Factor matrix W (if soving with LU factorization)
+    ! Factor matrix W (if soving with LU or Cholesky factorization)
     if(Gram_solver_type == lapackLU) call dgetrf(s, s, W, s, pW, info)
+    if(Gram_solver_type == lapackCC) call dpotrf('L', s, W, s, info)
 
     ! Solve for alpha
     select case(Gram_solver_type)
-      case(lapackLU);   call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
       case(forwardGS);  call inner_solver_fgs_1D(W, alpha)
+      case(lapackLU);   call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
+      case(lapackCC);   call dpotrs('L', s, 1, W, s, alpha, s, info)
     end select
 
     ! Update solution and residual
@@ -215,8 +217,9 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
 
     ! Solve for beta
     select case(Gram_solver_type)
-      case(lapackLU);   call dgetrs('N', s, s, W, s, pW, beta, s, info)
       case(forwardGS);  call inner_solver_fgs_2D(W, beta)
+      case(lapackLU);   call dgetrs('N', s, s, W, s, pW, beta, s, info)
+      case(lapackCC);   call dpotrs('L', s, s, W, s, beta, s, info)
     end select
 
     ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
