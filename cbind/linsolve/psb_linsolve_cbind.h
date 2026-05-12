@@ -24,8 +24,8 @@ typedef struct psb_c_solveroptions {
   double err;     /* Convergence indicator on exit */
 } psb_c_SolverOptions; 
 
-psb_c_i_t psb_c_DefaultSolverOptions(psb_c_SolverOptions *opt);
-psb_c_i_t psb_c_PrintSolverOptions(psb_c_SolverOptions *opt);
+int psb_c_DefaultSolverOptions(psb_c_SolverOptions *opt);
+int psb_c_PrintSolverOptions(psb_c_SolverOptions opt);
 
 psb_c_i_t psb_c_skrylov(const char *method, psb_c_sspmat *ah, psb_c_sprec *ph, 
 		  psb_c_svector *bh, psb_c_svector *xh,
