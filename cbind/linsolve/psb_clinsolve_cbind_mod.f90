@@ -32,6 +32,7 @@ contains
   function  psb_c_ckrylov_opt(methd,&
        & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
     use psb_base_mod
+    use psb_error_mod
     use psb_prec_mod
     use psb_linsolve_mod
     use psb_objhandle_mod
@@ -53,7 +54,7 @@ contains
     type(psb_cprec_type), pointer  :: precp
     type(psb_c_vect_type), pointer :: xp, bp
 
-    integer(psb_c_ipk_)  :: info,fitmax,fitrace,first,fistop,fiter
+    integer(psb_c_ipk_)  :: info,fitmax,fitrace,first,fistop,fiter,err_act
     character(len=20)   :: fmethd
     real(psb_spk_)       :: feps,ferr
 
@@ -91,7 +92,8 @@ contains
     fitrace = itrace
     first   = irst
     fistop  = istop
-
+    err_act = psb_act_abort_
+    if (psb_errstatus_fatal()) call psb_error_handler(err_act)
     call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
          & descp, info,&
          & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
@@ -99,6 +101,7 @@ contains
     iter = fiter
     err  = ferr
     res = info
+    if (psb_errstatus_fatal()) call psb_error_handler(err_act)
     
   end function psb_c_ckrylov_opt
 

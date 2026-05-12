@@ -27,7 +27,7 @@ contains
   function psb_c_PrintSolverOptions(options)&
        &   bind(c,name='psb_c_PrintSolverOptions') result(res)
     implicit none 
-    type(solveroptions)   :: options
+    type(solveroptions), value   :: options
     integer(psb_c_ipk_) :: res
 
     write(*,*) 'PSBLAS C Interface Solver Options '
