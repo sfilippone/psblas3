@@ -2201,7 +2201,7 @@ contains
       return
     endif
     
-    call x%v%axpby_v2(m, alpha, idx_x, beta, y%v, info)
+    call x%v%axpby(m, alpha, idx_x, beta, y%v, info)
   end subroutine d_mvect_extract_col
 
   subroutine d_mvect_axpby_v_idxs(m, alpha, x, beta, y, idx_y, info)
@@ -2234,7 +2234,7 @@ contains
       return
     endif
     
-    call y%v%axpby_v2(m, alpha, x%v, beta, idx_y, info)
+    call y%v%axpby(m, alpha, x%v, beta, idx_y, info)
   end subroutine d_mvect_axpby_v_idxs
   
   subroutine d_mvect_axpby_v_full(m, alpha, x, beta, y, info)
@@ -2257,7 +2257,7 @@ contains
       return
     endif
     
-    call y%v%axpby_v2(m, alpha, x%v, beta, info)
+    call y%v%axpby(m, alpha, x%v, beta, info)
   end subroutine d_mvect_axpby_v_full
   
   subroutine d_mvect_axpby_m_idxs(m, alpha, x, idx_x, beta, y, idx_y, info)
@@ -2283,7 +2283,7 @@ contains
       return
     endif
     
-    call y%v%axpby_v2(m, alpha, x%v, idx_x, beta, idx_y, info)
+    call y%v%axpby(m, alpha, x%v, idx_x, beta, idx_y, info)
   end subroutine d_mvect_axpby_m_idxs
   
   subroutine d_mvect_axpby_m_full(m, alpha, x, beta, y, info)
@@ -2305,7 +2305,7 @@ contains
       return
     endif
     
-    call y%v%axpby_v2(m, alpha, x%v, beta, info)
+    call y%v%axpby(m, alpha, x%v, beta, info)
   end subroutine d_mvect_axpby_m_full
 
   subroutine d_mvect_axpby_m_full_out(m, alpha, x, beta, y, z, info)
@@ -2327,7 +2327,7 @@ contains
       return
     endif
     
-    call z%v%axpby_v2(m, alpha, x%v, beta, y%v, info)
+    call z%v%axpby(m, alpha, x%v, beta, y%v, info)
   end subroutine d_mvect_axpby_m_full_out
   
   subroutine d_mvect_axpbycz_vv(m, alpha, x, beta, y, gamma, z, idx_z, info)
@@ -2360,7 +2360,7 @@ contains
       return
     endif
     
-    call z%v%axpby_v2(m, alpha, x%v, beta, y%v, gamma, idx_z, info)
+    call z%v%axpby(m, alpha, x%v, beta, y%v, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_vv
 
   subroutine d_mvect_axpbycz_mv(m, alpha, x, beta, y, idx_y, gamma, z, idx_z, info)
@@ -2393,7 +2393,7 @@ contains
       return
     endif
     
-    call z%v%axpby_v2(m, alpha, x%v, beta, y%v, idx_y, gamma, idx_z, info)
+    call z%v%axpby(m, alpha, x%v, beta, y%v, idx_y, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_mv
 
   subroutine d_mvect_axpbycz_mm_idxs(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, info)
@@ -2419,7 +2419,7 @@ contains
       return
     endif
     
-    call z%v%axpby_v2(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, idx_z, info)
+    call z%v%axpby(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, idx_z, info)
   end subroutine d_mvect_axpbycz_mm_idxs
 
   subroutine d_mvect_axpbycz_mm_full(m, alpha, x, beta, y, gamma, z, info)
@@ -2440,7 +2440,7 @@ contains
       return
     endif
     
-    call z%v%axpby_v2(m, alpha, x%v, beta, y%v, gamma, info)
+    call z%v%axpby(m, alpha, x%v, beta, y%v, gamma, info)
   end subroutine d_mvect_axpbycz_mm_full
   
   subroutine d_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
@@ -2468,7 +2468,7 @@ contains
       return
     endif
     
-    call w%v%axpby_v2(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, z%v, idx_z, idx_w, info)
+    call w%v%axpby(m, alpha, x%v, idx_x, beta, y%v, idx_y, gamma, z%v, idx_z, idx_w, info)
   end subroutine d_mvect_axpbycz_mm_out
   
   subroutine d_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
@@ -2492,7 +2492,7 @@ contains
       return
     endif
 
-    call x%v%axpby_v2(m, coeff, y%v, info, upd_flag)
+    call x%v%axpby(m, coeff, y%v, info, upd_flag)
   end subroutine d_mvect_colspan1D
 
   subroutine d_mvect_colspan2D(m, x, coeff, y, info, upd_flag)
@@ -2509,7 +2509,7 @@ contains
       return
     endif
 
-    call x%v%axpby_v2(m, coeff, y%v, info, upd_flag)
+    call x%v%axpby(m, coeff, y%v, info, upd_flag)
   end subroutine d_mvect_colspan2D
 
   subroutine d_mvect_dot_mm(m, x, y, res, info)

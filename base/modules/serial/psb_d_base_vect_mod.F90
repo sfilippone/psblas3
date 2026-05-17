@@ -2752,7 +2752,7 @@ module psb_d_base_multivect_mod
     procedure, pass(x) :: colspan1D     => d_base_mvect_colspan1D
     procedure, pass(x) :: colspan2D     => d_base_mvect_colspan2D
     ! all generics exported as axpby
-    generic, public    :: axpby_v2      => extract_col, &
+    generic, public    :: axpby         => extract_col, &
                                             axpby_v_i, axpby_v_f, &
                                             axpby_m_i, axpby_m_f, &
                                             axpby_m_f_o, &
@@ -4686,7 +4686,7 @@ contains
 
     if (x%is_dev()) call x%sync()
     if (allocated(x%v)) then
-      call y%axpby_v2(min(x%get_nrows(),y%get_nrows()),done,x,dzero,info)
+      call y%axpby(min(x%get_nrows(),y%get_nrows()),done,x,dzero,info)
       call y%absval()
     end if
 
