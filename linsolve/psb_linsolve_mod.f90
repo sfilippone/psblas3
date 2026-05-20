@@ -80,7 +80,8 @@ module psb_linsolve_mod
     end subroutine psb_ckrylov_vect
 
     subroutine psb_dkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
-        & itmax, iter, err, itrace, irst, istop, cond, steps, eigext, base_type)
+                          & itmax, iter, err, itrace, irst, istop, cond, &
+                          & steps, base_type, eigext, Gram_solver, FGS_sweeps)
 
       use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_dspmat_type, &
             & psb_dpk_, psb_d_vect_type
@@ -97,8 +98,10 @@ module psb_linsolve_mod
       integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, irst, istop, steps
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_dpk_), optional, intent(out)     :: err, cond
-      real(psb_dpk_), optional, intent(in)      :: eigext(2)
       character, optional, intent(in)           :: base_type
+      real(psb_dpk_), optional, intent(in)      :: eigext(2)
+      character(len=3), optional, intent(in)    :: Gram_solver
+      integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
     end subroutine psb_dkrylov_vect
 
     subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &

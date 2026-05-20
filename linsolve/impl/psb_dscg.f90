@@ -1,4 +1,6 @@
-subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, iter, err, itrace, istop, eigext)
+subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
+                      & itmax, iter, err, itrace, istop, &
+                      & base_type, eigext, Gram_solver, FGS_sweeps)
   use psb_base_mod
   use psb_prec_mod
   use psb_d_linsolve_conv_mod
@@ -11,17 +13,20 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   type(psb_d_vect_type), intent(inout)  :: b, x
   integer(psb_ipk_), intent(in)         :: s
   real(psb_dpk_), intent(in)            :: eps
-  character, intent(in)                 :: base_type
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
   integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
   integer(psb_ipk_), optional, intent(out)  :: iter
   real(psb_dpk_), optional, intent(out)     :: err
+  character, optional, intent(in)           :: base_type
   real(psb_dpk_), optional, intent(in)      :: eigext(2)
+  character(len=3), optional, intent(in)    :: Gram_solver
+  integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
 
   ! Local vars
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: istop_, itmax_, itrace_
+  integer(psb_ipk_)   :: istop_, itmax_, itrace_, FGS_sweeps_
+  character(len=3)    :: base_type_, Gram_solver_
   integer(psb_ipk_)   :: err_act, np, me, debug_level, debug_unit, &
                           & n_col, n_row
   integer(psb_lpk_)   :: mglob
@@ -37,10 +42,11 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   type(psb_itconv_type)         :: stopdat
   real(psb_dpk_)                :: derr 
 
-  integer(psb_ipk_), parameter  :: forwardGS = izero
-  integer(psb_ipk_), parameter  :: lapackLU = ione
-  integer(psb_ipk_), parameter  :: lapackCC = itwo
-  integer(psb_ipk_), parameter  :: Gram_solver_type = lapackLU
+  character(len=3), parameter   :: forwardGS = "FGS"
+  character(len=3), parameter   :: lapackLU = "LLU"
+  character(len=3), parameter   :: lapackCC = "LCC"
+
+  
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -65,11 +71,8 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     goto 9999
   endif
 
-  if (present(istop)) then 
-    istop_ = istop 
-  else
-    istop_ = 2
-  endif
+  istop_ = 2
+  if (present(istop)) istop_ = istop
   
   !  ISTOP_ = 1:  Normwise backward error, infinity norm 
   !  ISTOP_ = 2:  ||r||/||b||, 2-norm 
@@ -80,17 +83,21 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     goto 9999
   endif
 
-  if (present(itmax)) then 
-    itmax_ = itmax
-  else
-    itmax_ = 1000
-  endif
+  itmax_ = 1000
+  if (present(itmax)) itmax_ = itmax
 
-  if (present(itrace)) then
-    itrace_ = itrace
-  else
-    itrace_ = 0
-  end if
+  itrace_ = 0
+  if (present(itrace)) itrace_ = itrace
+
+  base_type_ = "C"
+  if (present(base_type)) base_type_ = base_type
+
+  Gram_solver_ = lapackCC
+  if (present(Gram_solver)) Gram_solver_ = Gram_solver
+  
+  FGS_sweeps_ = 30
+  if (present(FGS_sweeps)) FGS_sweeps_ = FGS_sweeps
+
 
   mglob = desc_a%get_global_rows()
   n_row = desc_a%get_local_rows()
@@ -151,7 +158,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   ! check convergence here?
 
   ! Chebyshev coefficient calculation
-  select case (base_type)
+  select case (base_type_)
     case("M")
       cheb_coeff = dzero
     case("C")
@@ -161,6 +168,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
       call psb_errpush(info, name)
       goto 9999
   end select
+
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
@@ -168,7 +176,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
   end if
   
   ! First matrix power kernel
-  call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type, &
+  call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3))
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
@@ -190,14 +198,18 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     alpha = temp_fa(:, s + 1)
 
     ! Factor matrix W (if soving with LU or Cholesky factorization)
-    if(Gram_solver_type == lapackLU) call dgetrf(s, s, W, s, pW, info)
-    if(Gram_solver_type == lapackCC) call dpotrf('L', s, W, s, info)
+    if(Gram_solver_ == lapackLU) call dgetrf(s, s, W, s, pW, info)
+    if(Gram_solver_ == lapackCC) call dpotrf('L', s, W, s, info)
 
     ! Solve for alpha
-    select case(Gram_solver_type)
-      case(forwardGS);  call inner_solver_fgs_1D(W, alpha)
+    select case(Gram_solver_)
+      case(forwardGS);  call inner_solver_fgs_1D(W, alpha, FGS_sweeps_)
       case(lapackLU);   call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
       case(lapackCC);   call dpotrs('L', s, 1, W, s, alpha, s, info)
+      case default
+        info = psb_err_invalid_input_ 
+        call psb_errpush(info, name)
+        goto 9999
     end select
 
     ! Update solution and residual
@@ -208,7 +220,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     if(psb_check_conv(methdname, itidx, x, r, desc_a, stopdat, info)) exit
     
     ! Matrix power kernel
-    call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type, &
+    call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3))
 
     ! Compute rhs for beta
@@ -216,10 +228,14 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, base_type, desc_a, info, itmax, 
     beta = -beta;
 
     ! Solve for beta
-    select case(Gram_solver_type)
-      case(forwardGS);  call inner_solver_fgs_2D(W, beta)
+    select case(Gram_solver_)
+      case(forwardGS);  call inner_solver_fgs_2D(W, beta, FGS_sweeps_)
       case(lapackLU);   call dgetrs('N', s, s, W, s, pW, beta, s, info)
       case(lapackCC);   call dpotrs('L', s, s, W, s, beta, s, info)
+      case default
+        info = psb_err_invalid_input_ 
+        call psb_errpush(info, name)
+        goto 9999
     end select
 
     ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
@@ -294,11 +310,11 @@ contains
     coeff(3) = done
   end function psb_d_chebyshev_coefficients
 
-  subroutine inner_solver_fgs_1D(M, rhs)
+  subroutine inner_solver_fgs_1D(M, rhs, num_iter)
     real(psb_dpk_), intent(in)    :: M(:, :)
     real(psb_dpk_), intent(inout) :: rhs(:)
+    integer(psb_ipk_), intent(in) :: num_iter
 
-    integer(psb_ipk_), parameter  :: num_iter = 50
     integer(psb_ipk_) :: iter_idx, i, j, n
     real(psb_dpk_)    :: sol(size(rhs))
 
@@ -316,11 +332,11 @@ contains
     rhs = sol
   end subroutine inner_solver_fgs_1D
 
-  subroutine inner_solver_fgs_2D(M, rhs)
+  subroutine inner_solver_fgs_2D(M, rhs, num_iter)
     real(psb_dpk_), intent(in)    :: M(:, :)
     real(psb_dpk_), intent(inout) :: rhs(:, :)
-    
-    integer(psb_ipk_), parameter  :: num_iter = 50
+    integer(psb_ipk_), intent(in) :: num_iter
+
     integer(psb_ipk_) :: iter_idx, i, j, n
     real(psb_dpk_)    :: sol(size(rhs, 1), size(rhs, 2))
 
