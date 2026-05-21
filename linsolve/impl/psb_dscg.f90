@@ -31,7 +31,8 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
                           & n_col, n_row
   integer(psb_lpk_)   :: mglob
   character(len=20)           :: name = 'psb_dscg'
-  character(len=*), parameter :: methdname = 'sStepCG'
+  character(len=*), parameter :: methdbasename = 'sStepCG'
+  character(len=20)           :: methdfullname
 
   real(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_fa(:, :)
   type(psb_d_vect_type)       :: r  
@@ -45,8 +46,6 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   character(len=3), parameter   :: forwardGS = "FGS"
   character(len=3), parameter   :: lapackLU = "LLU"
   character(len=3), parameter   :: lapackCC = "LCC"
-
-  
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -64,6 +63,8 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     call psb_errpush(info, name)
     goto 9999
   endif
+
+  write(methdfullname, '(A, "(", I0, ")")') methdbasename, s
 
   if ((.not. allocated(b%v)) .or. (.not.allocated(x%v))) then 
     info = psb_err_invalid_vect_state_
@@ -97,7 +98,6 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   
   FGS_sweeps_ = 30
   if (present(FGS_sweeps)) FGS_sweeps_ = FGS_sweeps
-
 
   mglob = desc_a%get_global_rows()
   n_row = desc_a%get_local_rows()
@@ -148,7 +148,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   end if
 
   ! Init converence
-  call psb_init_conv(methdname, istop_, itrace_, itmax_, a, x, b, eps, desc_a, stopdat, info)
+  call psb_init_conv(methdfullname, istop_, itrace_, itmax_, a, x, b, eps, desc_a, stopdat, info)
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
@@ -184,7 +184,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     goto 9999
   end if
 
-  ! Inizialization of P and V
+  ! Inizialization of P and V ---> axpy eliminabile facendo direttamente pMPK su P e V?
   call psb_geaxpby(done, Z, dzero, P, desc_a, info)
   call psb_geaxpby(done, Q, dzero, V, desc_a, info)
 
@@ -217,7 +217,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     call psb_geaxpby(V, -alpha, r, desc_a, info, upd_flag = .true.)
 
     ! Check convergence. 
-    if(psb_check_conv(methdname, itidx, x, r, desc_a, stopdat, info)) exit
+    if(psb_check_conv(methdfullname, itidx, x, r, desc_a, stopdat, info)) exit
     
     ! Matrix power kernel
     call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
@@ -245,7 +245,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     call psb_geaxpby(done, Q, done, temp_mv, V, desc_a, info)
   end do
 
-  call psb_end_conv(methdname, itidx, desc_a, stopdat, info, derr, iter)
+  call psb_end_conv(methdfullname, itidx, desc_a, stopdat, info, derr, iter)
   if (present(err)) err = derr
   if (present(iter)) iter = iter * s
 
