@@ -174,13 +174,14 @@ module psb_z_base_vect_mod
     !
     ! Vector-Vector operations
     !
-    procedure, pass(x) :: div_v         => z_base_div_v
-    procedure, pass(x) :: div_v_check   => z_base_div_v_check
+    procedure, pass(y) :: div_v         => z_base_div_v
+    procedure, pass(y) :: div_a         => z_base_div_a
+    procedure, pass(y) :: div_v_check   => z_base_div_v_check
     procedure, pass(z) :: div_v2         => z_base_div_v2
     procedure, pass(z) :: div_v2_check   => z_base_div_v2_check
     procedure, pass(z) :: div_a2        => z_base_div_a2
     procedure, pass(z) :: div_a2_check  => z_base_div_a2_check
-    generic, public    :: div           => div_v, div_v2, div_v_check, &
+    generic, public    :: div           => div_v, div_v2, div_v_check, div_a, &
                                             div_v2_check, div_a2, div_a2_check
     procedure, pass(y) :: inv_v    => z_base_inv_v
     procedure, pass(y) :: inv_v_check => z_base_inv_v_check
@@ -1443,9 +1444,28 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call x%div(x%v,y%v,info)
+    call y%div(x%v,info)
 
   end subroutine z_base_div_v
+
+  subroutine z_base_div_a(x, y, info)
+    use psi_serial_mod
+    implicit none
+    complex(psb_dpk_), intent(in)        :: x(:)
+    class(psb_z_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_) :: i, n
+
+    info = 0
+    if (y%is_dev()) call y%sync()
+    n = min(size(y%v), size(x))
+    !$omp parallel do private(i)    
+    do i=1, n
+      y%v(i) = y%v(i)/x(i)
+    end do
+    call y%set_host()
+
+  end subroutine z_base_div_a
   !
   !> Function  base_div_v2
   !! \memberof  psb_z_base_vect_type
