@@ -97,17 +97,20 @@
 !                                         iterations
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
-!                                         1: err =  |r|/(|a||x|+|b|);  here the iteration is
+!                                         1: err =  |r|/(|a||x|+|b|);  here
+!                                            the iteration is
 !                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         2: err =  |r|/|b|; here the iteration is
 !                                            stopped when  |r| <= eps * |b|
+!                                         3: Same as 2 but with X and B scaled
+!                                            by s1 and s2 
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !    irst   -  integer(optional)          Input: restart parameter 
 !
 
 subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,irst,istop)
+     & itmax,iter,err,itrace,irst,istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_z_linsolve_conv_mod
@@ -123,6 +126,7 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
+  type(psb_z_vect_type), intent(inout), optional   :: s1, s2
 ! =   local data
   complex(psb_dpk_), allocatable   :: aux(:)
   complex(psb_dpk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
@@ -172,19 +176,30 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 2
+    istop_ = psb_get_istop_default()
   endif
-!
-!  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!  ISTOP_ = 2:  ||r||/||b||, 2-norm 
-!
-
-  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+  
+  if (.not.psb_is_valid_istop(istop_)) then
     info=psb_err_invalid_istop_
     err=info
     call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
-  endif
+  end if
+  !
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2
+  !
+  select case(istop_)
+  case(psb_istop_ani_,psb_istop_bn2_,&
+       & psb_istop_rn2_abs_,psb_istop_rrn2_)
+    ! nothing needed
+  case default
+    ! should never get here
+    info=psb_err_internal_error_
+    err=info
+    call psb_errpush(info,name,a_err="invalid istop_")
+    goto 9999
+  end select
 
   if (present(itmax)) then 
     litmax = itmax
@@ -253,12 +268,15 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
        & w%get_nrows(),w1%get_nrows()
 
 
-  if (istop_ == 1) then 
+  select case(istop_)
+  case(psb_istop_ani_)
     ani = psb_spnrmi(a,desc_a,info)
     bni = psb_geamax(b,desc_a,info)
-  else if (istop_ == 2) then 
-    bn2 = psb_genrm2(b,desc_a,info)
-  else if (istop_ == 3) then
+  case(psb_istop_bn2_)
+    bn2 = psb_genrm2(b,desc_a,info)    
+  case(psb_istop_rn2_abs_)
+    ! do nothing
+  case(psb_istop_rrn2_)
     call psb_geaxpby(zone,b,zzero,v(1),desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
@@ -273,7 +291,8 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
     r0n2 = psb_genrm2(v(1),desc_a,info)
-  endif
+  end select
+  
   errnum = zzero
   errden = zone
   deps   = eps
@@ -307,7 +326,8 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_errpush(info,name)
       goto 9999
     end if
-
+    if (present(s1)) call psb_gemlt(s1,v(1),desc_a,info)
+    
     rs(1) = psb_genrm2(v(1),desc_a,info)
     rs(2:) = zzero
     if (info /= psb_success_) then 
@@ -324,20 +344,25 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
     !
     ! check convergence
     !
-    if (istop_ == 1) then 
+    select case(istop_)
+    case(psb_istop_ani_)
       rni = psb_geamax(v(1),desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       errnum = rni
       errden = (ani*xni+bni)
-    else if (istop_ == 2) then 
+    case(psb_istop_bn2_)
       rni = psb_genrm2(v(1),desc_a,info)
       errnum = rni
       errden = bn2
-    else if (istop_ == 3) then 
+    case(psb_istop_rn2_abs_)
+      rni = psb_genrm2(v(1),desc_a,info)
+      errnum = rni
+      errden = done
+    case(psb_istop_rrn2_) 
       rni = psb_genrm2(v(1),desc_a,info)
       errnum = rni
       errden = r0n2
-    endif
+    end select
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
@@ -381,7 +406,8 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
       h(i+1,i) = zzero
       call zrot(1,rs(i),1,rs(i+1),1,real(c(i),kind=psb_dpk_),s(i))
       
-      if (istop_ == 1) then 
+      select case(istop_)
+      case(psb_istop_ani_)
         !
         ! build x and then compute the residual and its infinity norm
         !
@@ -403,8 +429,7 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
         errnum = rni
         errden = (ani*xni+bni)
         !
-
-      else if (istop_ == 2) then 
+      case(psb_istop_bn2_)
         !
         ! compute the residual 2-norm as byproduct of the solution
         ! procedure of the least-squares problem
@@ -412,7 +437,14 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
         rni = abs(rs(i+1))
         errnum = rni
         errden = bn2
-      else if (istop_ == 3) then 
+        
+      case(psb_istop_rn2_abs_)
+        rni = abs(rs(i+1))
+        errnum = rni
+        errden = done
+
+      case(psb_istop_rrn2_)
+        
         !
         ! compute the residual 2-norm as byproduct of the solution
         ! procedure of the least-squares problem
@@ -420,14 +452,15 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
         rni = abs(rs(i+1))
         errnum = rni
         errden = r0n2
-      endif
+      end select
 
       if (errnum <= eps*errden) then 
 
-        if (istop_ == 1) then 
+        select case(istop_)
+        case(psb_istop_ani_)
           call psb_geaxpby(zone,xt,zzero,x,desc_a,info)
 ! =          x = xt 
-        else if (istop_ == 2) then
+        case(psb_istop_bn2_, psb_istop_rn2_abs_)
           !
           ! build x
           !
@@ -441,7 +474,22 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
           end do
           call prec%apply(w1,w,desc_a,info)
           call psb_geaxpby(zone,w,zone,x,desc_a,info)
-        end if
+
+        case(psb_istop_rrn2_)
+          !
+          ! build x
+          !
+          call ztrsm('l','u','n','n',i,1,zone,h,size(h,1),rs,size(rs,1))
+          if (debug_level >= psb_debug_ext_) &
+               & write(debug_unit,*) me,' ',trim(name),&
+               & ' Rebuild x-> RS:',rs(1:i)
+          call w1%set(zzero)
+          do k=1, i
+            call psb_geaxpby(rs(k),v(k),zone,w1,desc_a,info)
+          end do
+          call prec%apply(w1,w,desc_a,info)
+          call psb_geaxpby(zone,w,zone,x,desc_a,info)          
+        end select
 
         if (itrace_ > 0) &
              & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
@@ -454,9 +502,11 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
     end do inner
 
-    if (istop_ == 1) then 
+    select case(istop_)
+    case(psb_istop_ani_)
       call psb_geaxpby(zone,xt,zzero,x,desc_a,info)!      x = xt 
-    else if (istop_ == 2) then
+
+    case(psb_istop_bn2_, psb_istop_rn2_abs_)
       !
       ! build x
       !
@@ -470,7 +520,22 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
       end do
       call prec%apply(w1,w,desc_a,info)
       call psb_geaxpby(zone,w,zone,x,desc_a,info)
-    end if
+      
+    case(psb_istop_rrn2_)
+      !
+      ! build x
+      !
+      call ztrsm('l','u','n','n',nl,1,zone,h,size(h,1),rs,size(rs,1))
+      if (debug_level >= psb_debug_ext_) &
+           & write(debug_unit,*) me,' ',trim(name),&
+           & ' Rebuild x-> RS:',rs(1:nl)
+      call w1%set(zzero)
+      do k=1, nl
+        call psb_geaxpby(rs(k),v(k),zone,w1,desc_a,info)
+      end do
+      call prec%apply(w1,w,desc_a,info)
+      call psb_geaxpby(zone,w,zone,x,desc_a,info)
+    end select
     
     if (itx >= litmax) then 
       if (itrace_ > 0) then 

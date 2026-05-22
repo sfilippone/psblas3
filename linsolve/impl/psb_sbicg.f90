@@ -95,7 +95,7 @@
 !
 
 subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop)
+     & itmax,iter,err,itrace,istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_s_linsolve_conv_mod
@@ -111,6 +111,7 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), optional, intent(in)        :: itmax, itrace, istop
   integer(psb_ipk_), optional, intent(out)       :: iter
   real(psb_spk_), optional, intent(out) :: err
+  type(psb_s_vect_type), intent(inout), optional   :: s1, s2
 ! !$   local data
   real(psb_spk_), allocatable, target   :: aux(:)
   type(psb_s_vect_type), allocatable, target :: wwrk(:)
@@ -160,19 +161,29 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 2
+    istop_ = psb_get_istop_default()
   endif
-  !
-  !  istop_ = 1:  normwise backward error, infinity norm 
-  !  istop_ = 2:  ||r||/||b||   norm 2 
-  !
-
-  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+  if (.not.psb_is_valid_istop(istop_)) then
     info=psb_err_invalid_istop_
     err=info
     call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
-  endif
+  end if
+  !
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2
+  !
+  select case(istop_)
+  case(psb_istop_ani_,psb_istop_bn2_,&
+       & psb_istop_rn2_abs_, psb_istop_rrn2_)
+    ! nothing needed
+  case default
+    ! should never get here
+    info=psb_err_internal_error_
+    err=info
+    call psb_errpush(info,name,a_err="invalid istop_")
+    goto 9999
+  end select
 
   call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then
@@ -226,7 +237,8 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   itx   = 0
 
 
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,&
+       & desc_a,stopdat,info,s1=s1,s2=s2)
   if (info /= psb_success_) Then 
      call psb_errpush(psb_err_from_subroutine_non_,name)
      goto 9999
@@ -252,7 +264,7 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
     rho = szero
     
     ! Perhaps we already satisfy the convergence criterion...
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
     if (info /= psb_success_) Then 
       call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
@@ -306,7 +318,7 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(-alpha,q,sone,r,desc_a,info)
       call psb_geaxpby(-alpha,qt,sone,rt,desc_a,info)
 
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
       if (info /= psb_success_) Then 
         call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
