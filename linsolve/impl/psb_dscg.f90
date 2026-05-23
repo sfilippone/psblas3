@@ -176,17 +176,13 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   end if
   
   ! First matrix power kernel
-  call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
+  call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3))
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
   end if
-
-  ! Inizialization of P and V ---> axpy eliminabile facendo direttamente pMPK su P e V?
-  call psb_geaxpby(done, Z, dzero, P, desc_a, info)
-  call psb_geaxpby(done, Q, dzero, V, desc_a, info)
 
   ! Loop until convergence (or maxiter)
   do itidx = 1, itmax_
