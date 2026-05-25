@@ -1,9 +1,9 @@
-!   
+!
 !                Parallel Sparse BLAS  version 3.5
 !      (C) Copyright 2006-2018
-!        Salvatore Filippone    
-!        Alfredo Buttari      
-!   
+!        Salvatore Filippone
+!        Alfredo Buttari
+!
 !    Redistribution and use in source and binary forms, with or without
 !    modification, are permitted provided that the following conditions
 !    are met:
@@ -14,8 +14,8 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific prior written permission.
-!   
+!         software without specific written permission.
+!
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 !    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -27,23 +27,20 @@
 !    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
-!   
-!    
-module psb_tools_mod
-  use psb_cd_tools_mod
-  use psb_i2_tools_a_mod
-  use psb_e_tools_a_mod
-  use psb_m_tools_a_mod
-  use psb_s_tools_a_mod
-  use psb_d_tools_a_mod
-  use psb_c_tools_a_mod
-  use psb_z_tools_a_mod
-  use psb_i_tools_mod
-  use psb_l_tools_mod
-  use psb_s_tools_mod
-  use psb_d_tools_mod
-  use psb_c_tools_mod
-  use psb_z_tools_mod
-  use psb_cd_nest_tools_mod
-  use psb_d_nest_tools_mod
-end module psb_tools_mod
+!
+!
+! module: psb_d_nest_mod
+!
+! Umbrella module for the nested (block-structured) double precision
+! real types.  Users need only:
+!
+!   use psb_d_nest_mod
+!
+! to access all three container types and their parallel operations.
+!
+module psb_d_nest_mod
+  use psb_desc_nest_mod
+  use psb_d_nest_vect_mod
+  use psb_d_nest_mat_mod
+  use psb_d_nest_psblas_mod
+end module psb_d_nest_mod
