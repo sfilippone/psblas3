@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -33,7 +33,7 @@
 ! package: psb_i_base_vect_mod
 !
 ! This module contains the definition of the psb_i_base_vect type which
-! is a container for dense vectors.
+! is a container for dense vectors.\
 !  This is encapsulated instead of being just a simple array to allow for
 !  more complicated situations, such as GPU programming, where the memory
 !  area we are interested in is not easily accessible from the host/Fortran
@@ -47,7 +47,8 @@ module psb_i_base_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
-  use psb_neighbor_topology_mod
+  use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, psb_comm_unknown_
+  use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
 
   !> \namespace  psb_base_mod  \class psb_i_base_vect_type
   !! The psb_i_base_vect_type
@@ -61,10 +62,9 @@ module psb_i_base_vect_mod
   !!
   type psb_i_base_vect_type
     !> Values.
-    integer(psb_ipk_), allocatable :: v(:)
-    integer(psb_ipk_), allocatable :: combuf(:)
-    integer(psb_mpk_), allocatable :: comid(:,:) ! This is used only for Isend/Irecv scheme, to store the communication handles for each neighbor
-    integer(psb_mpk_)              :: communication_handle ! This is used only for Isend/Irecv scheme, to store the communication handle for the whole halo exchange
+    integer(psb_ipk_), allocatable              :: v(:)
+    integer(psb_ipk_), allocatable              :: combuf(:)
+    class(psb_comm_handle_type), allocatable  :: comm_handle 
 
     !> vector bldstate:
     !!    null:   pristine;
@@ -74,13 +74,10 @@ module psb_i_base_vect_mod
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
     !!            psb_T_vect_mod.
-    integer(psb_ipk_), private :: bldstate = psb_vect_null_
-    integer(psb_ipk_), private :: dupl     = psb_dupl_null_
-    integer(psb_ipk_), private :: ncfs     = 0
-    integer(psb_ipk_), allocatable :: iv(:)
-
-    type(psb_neighbor_topology_type)  :: neighbor_topology
-
+    integer(psb_ipk_), private      :: bldstate = psb_vect_null_
+    integer(psb_ipk_), private      :: dupl     = psb_dupl_null_
+    integer(psb_ipk_), private      :: ncfs     = 0
+    integer(psb_ipk_), allocatable  :: iv(:)
   contains
     !
     !  Constructors/allocators
@@ -144,9 +141,7 @@ module psb_i_base_vect_mod
     procedure, nopass  :: device_wait  => i_base_device_wait
     procedure, pass(x) :: maybe_free_buffer  => i_base_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => i_base_free_buffer
-    procedure, pass(x) :: new_comid    => i_base_new_comid
-    procedure, pass(x) :: free_comid   => i_base_free_comid
-
+    
     !
     ! Basic info
     procedure, pass(x) :: get_nrows => i_base_get_nrows
@@ -176,9 +171,9 @@ module psb_i_base_vect_mod
 
     procedure, pass(x) :: check_addr  => i_base_check_addr
 
-    ! Methods used to handle topology in neighbor_alltoallv communication scheme
-    procedure, pass(x) :: init_topology => i_base_init_topology
-    procedure, pass(x) :: free_topology => i_base_free_topology
+
+
+
 
 
   end type psb_i_base_vect_type
@@ -361,11 +356,12 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_i_base_vect_type), intent(out)    :: x
+    class(psb_i_base_vect_type), intent(inout)    :: x
     integer(psb_ipk_), intent(out)              :: info
     logical, intent(in), optional               :: clear
     logical :: clear_
 
+    info =  0
     if (present(clear)) then
       clear_ = clear
     else
@@ -755,13 +751,17 @@ contains
     use psb_realloc_mod
     implicit none
     class(psb_i_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_)                             :: info_comm
+    integer(psb_ipk_), intent(out)                :: info
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
     if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
-    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
-    if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)    
+    if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)  
+    if ((info == 0).and.allocated(x%comm_handle)) then
+      call psb_comm_free(x%comm_handle, info_comm)
+      if (info_comm /= psb_success_) info = info_comm
+    end if  
     if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
     call x%set_null()
@@ -807,24 +807,6 @@ contains
          &  call x%free_buffer(info)
 
   end subroutine i_base_maybe_free_buffer
-
-  !
-  !> Function  base_free_comid:
-  !! \memberof  psb_i_base_vect_type
-  !! \brief Free aux MPI communication id buffer
-  !!
-  !!  \param info  return code
-  !!
-  !
-  subroutine i_base_free_comid(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
-  end subroutine i_base_free_comid
   
   function i_base_get_ncfs(x) result(res)
     implicit none
@@ -1297,17 +1279,6 @@ contains
     call psb_realloc(n,x%combuf,info)
   end subroutine i_base_new_buffer
 
-  subroutine i_base_new_comid(n,x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
-
-    call psb_realloc(n,2_psb_ipk_,x%comid,info)
-  end subroutine i_base_new_comid
-
-
   !
   ! shortcut alpha=1 beta=0
   !
@@ -1393,33 +1364,6 @@ contains
 
   end subroutine i_base_sctb_buf
 
-  ! --------------------------------------------------------------------
-  ! Implementation of methods used for neighbor alltoallv communication
-  ! --------------------------------------------------------------------
-  subroutine i_base_init_topology(x, halo_index, num_exchanges, &
-       & total_send_elems, total_recv_elems, ctxt, icomm, info)
-    implicit none
-    class(psb_i_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: halo_index(:)
-    integer(psb_ipk_), intent(in)               :: num_exchanges, total_send_elems, total_recv_elems
-    type(psb_ctxt_type), intent(in)             :: ctxt
-    integer(psb_mpk_), intent(in)               :: icomm
-    integer(psb_ipk_), intent(out)              :: info
-
-    call x%neighbor_topology%init(halo_index, num_exchanges, &
-         & total_send_elems, total_recv_elems, ctxt, icomm, info)
-
-  end subroutine i_base_init_topology
-
-  subroutine i_base_free_topology(x, info)
-    implicit none
-    class(psb_i_base_vect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out) :: info
-
-    call x%neighbor_topology%free(info)
-
-  end subroutine i_base_free_topology
-  ! --------------------------------------------------------------------
 
 end module psb_i_base_vect_mod
 
@@ -1430,7 +1374,6 @@ module psb_i_base_multivect_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_i_base_vect_mod
-  use psb_neighbor_topology_mod
 
   !> \namespace  psb_base_mod  \class psb_i_base_vect_type
   !! The psb_i_base_vect_type
@@ -1447,10 +1390,9 @@ module psb_i_base_multivect_mod
 
   type psb_i_base_multivect_type
     !> Values.
-    integer(psb_ipk_), allocatable :: v(:,:)
-    integer(psb_ipk_), allocatable :: combuf(:)
-    integer(psb_mpk_), allocatable :: comid(:,:) ! This is used only for Isend/Irecv scheme, to store the communication handles for each neighbor
-    integer(psb_mpk_)              :: communication_handle ! This is used only for Isend/Irecv scheme, to store the communication handle for the whole halo exchange
+    integer(psb_ipk_), allocatable              :: v(:,:)
+    integer(psb_ipk_), allocatable              :: combuf(:)
+    class(psb_comm_handle_type), allocatable  :: comm_handle 
 
     !> vector bldstate:
     !!    null:   pristine;
@@ -1464,9 +1406,6 @@ module psb_i_base_multivect_mod
     integer(psb_ipk_), private :: dupl     = psb_dupl_null_
     integer(psb_ipk_), private :: ncfs     = 0
     integer(psb_ipk_), allocatable :: iv(:)
-
-    type(psb_neighbor_topology_type)  :: neighbor_topology
-
   contains
     !
     !  Constructors/allocators
@@ -1541,8 +1480,6 @@ module psb_i_base_multivect_mod
     procedure, nopass  :: device_wait  => i_base_mlv_device_wait
     procedure, pass(x) :: maybe_free_buffer  => i_base_mlv_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => i_base_mlv_free_buffer
-    procedure, pass(x) :: new_comid    => i_base_mlv_new_comid
-    procedure, pass(x) :: free_comid   => i_base_mlv_free_comid
 
     !
     ! Gather/scatter. These are needed for MPI interfacing.
@@ -1559,11 +1496,6 @@ module psb_i_base_multivect_mod
     procedure, pass(y) :: sctb_x   => i_base_mlv_sctb_x
     procedure, pass(y) :: sctb_buf => i_base_mlv_sctb_buf
     generic, public    :: sct      => sctb, sctbr2, sctb_x, sctb_buf
-
-    ! Neighbor alltoallv communication topology handling
-    procedure, pass(x) :: init_topology => i_base_mlv_init_topology
-    procedure, pass(x) :: free_topology => i_base_mlv_free_topology
-
   end type psb_i_base_multivect_type
 
   interface psb_i_base_multivect
@@ -1645,7 +1577,7 @@ contains
     logical, intent(in), optional        :: scratch
 
     call psb_realloc(m,n,x%v,info)
-    call x%asb(m,n,info,scratch)
+    call x%asb(m,n,info,scratch=scratch)
 
   end subroutine i_base_mlv_bld_n
 
@@ -1697,6 +1629,7 @@ contains
     class(psb_i_base_multivect_type), intent(out)    :: x
     integer(psb_ipk_), intent(out)              :: info
 
+    info = 0
     if (allocated(x%v)) then 
       call x%sync()
       x%v(:,:) = izero
@@ -1925,23 +1858,26 @@ contains
         case(psb_dupl_err_)
           do i=1,ncfs
             if (any(vv(x%iv(i),:).ne.izero)) then
-              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
+              info = psb_err_duplicate_coo
+              call psb_errpush(info,'mvect-asb')
               return
             else
               vv(x%iv(i),:) = x%v(i,:)
             end if
           end do
         case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          write(psb_err_unit,*) 'Error in mvect_asb: unsafe dupl',x%get_dupl()
           info =-7
         end select
         call psb_move_alloc(vv,x%v,info)
         if (allocated(x%iv)) deallocate(x%iv,stat=info)
       else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < m) &
+        if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
              & call psb_realloc(m,n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+        if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+        end if
       else
         info = psb_err_invalid_vect_state_        
         call psb_errpush(info,'vect_asb')
@@ -1949,8 +1885,10 @@ contains
     else
       if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
            & call psb_realloc(m,n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+        end if
     end if
     call x%set_host()
     call x%set_asb()
@@ -2339,16 +2277,6 @@ contains
     call psb_realloc(n*nc,x%combuf,info)
   end subroutine i_base_mlv_new_buffer
 
-  subroutine i_base_mlv_new_comid(n,x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_i_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
-
-    call psb_realloc(n,2_psb_ipk_,x%comid,info)
-  end subroutine i_base_mlv_new_comid
-
 
   subroutine i_base_mlv_maybe_free_buffer(x,info)
     use psb_realloc_mod
@@ -2372,17 +2300,6 @@ contains
     if (allocated(x%combuf)) &
          &  deallocate(x%combuf,stat=info)
   end subroutine i_base_mlv_free_buffer
-
-  subroutine i_base_mlv_free_comid(x,info)
-    use psb_realloc_mod
-    implicit none
-    class(psb_i_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
-  end subroutine i_base_mlv_free_comid
-
 
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
@@ -2604,34 +2521,5 @@ contains
     implicit none
 
   end subroutine i_base_mlv_device_wait
-
-
-  ! --------------------------------------------------------------------
-  ! Implementation of methods used for neighbor alltoallv communication
-  ! --------------------------------------------------------------------
-  subroutine i_base_mlv_init_topology(x, halo_index, num_exchanges, &
-       & total_send_elems, total_recv_elems, ctxt, icomm, info)
-    implicit none
-    class(psb_i_base_multivect_type), intent(inout)   :: x
-    integer(psb_ipk_), intent(in)                     :: halo_index(:)
-    integer(psb_ipk_), intent(in)                     :: num_exchanges, total_send_elems, total_recv_elems
-    type(psb_ctxt_type), intent(in)                   :: ctxt
-    integer(psb_mpk_), intent(in)                     :: icomm
-    integer(psb_ipk_), intent(out)                    :: info
-
-    call x%neighbor_topology%init(halo_index, num_exchanges, &
-         & total_send_elems, total_recv_elems, ctxt, icomm, info)
-
-  end subroutine i_base_mlv_init_topology
-
-  subroutine i_base_mlv_free_topology(x, info)
-    implicit none
-    class(psb_i_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)                  :: info
-
-    call x%neighbor_topology%free(info)
-
-  end subroutine i_base_mlv_free_topology
-  ! --------------------------------------------------------------------
 
 end module psb_i_base_multivect_mod

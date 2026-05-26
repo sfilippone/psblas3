@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -51,35 +51,35 @@
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine psb_chalo_vect(x,desc_a,info,tran,mode,data)
+subroutine  psb_chalo_vect(x,desc_a,info,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_chalo_vect
   use psi_mod
   implicit none
 
-  type(psb_c_vect_type), intent(inout)                :: x
-  type(psb_desc_type), intent(in)                     :: desc_a
-  integer(psb_ipk_), intent(out)                      :: info
-  integer(psb_ipk_), intent(in), optional             :: mode,data
-  character, intent(in), optional                     :: tran
+  type(psb_c_vect_type), intent(inout)            :: x
+  type(psb_desc_type), intent(in)                   :: desc_a
+  integer(psb_ipk_), intent(out)                    :: info
+  integer(psb_ipk_), intent(in), optional           :: mode,data
+  character, intent(in), optional                   :: tran
 
   ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, iix, jjx, &
-       & nrow, ncol, lldx, imode, data_
-  integer(psb_lpk_) :: m, n, ix, ijx
-  character                 :: tran_
-  character(len=20)         :: name, ch_err
-  logical                   :: aliw
+  type(psb_ctxt_type)     :: ctxt
+  integer(psb_ipk_)       :: np, me, err_act, iix, jjx, &
+       & nrow, ncol, lldx, imode,data_
+  integer(psb_lpk_)       :: m, n, ix, ijx
+  character               :: tran_
+  character(len=20)       :: name, ch_err
+  logical                 :: aliw
 
-  name = 'psb_chalo_vect'
+  name = 'psb_chalov'
   info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_    
+    info = psb_err_internal_error_     
     goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ctxt, me, np)
@@ -116,7 +116,7 @@ subroutine psb_chalo_vect(x,desc_a,info,tran,mode,data)
   if (present(mode)) then 
     imode = mode
   else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
+    imode = psb_comm_status_sync_
   endif
 
   if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
@@ -173,31 +173,32 @@ end subroutine psb_chalo_vect
 !                                       psb_comm_mov_     use ovr_mst_idx
 !
 !
-subroutine  psb_chalo_multivect(x,desc_a,info,tran,mode,data)
+subroutine psb_chalo_multivect(x,desc_a,info,tran,mode,data)
   use psb_base_mod, psb_protect_name => psb_chalo_multivect
   use psi_mod
   implicit none
 
-  type(psb_c_multivect_type), intent(inout)         :: x
-  type(psb_desc_type), intent(in)                   :: desc_a
-  integer(psb_ipk_), intent(out)                    :: info
-  integer(psb_ipk_), intent(in), optional           :: mode,data
-  character, intent(in), optional                   :: tran
+  type(psb_c_multivect_type), intent(inout) :: x
+  type(psb_desc_type), intent(in)             :: desc_a
+  integer(psb_ipk_), intent(out)              :: info
+  integer(psb_ipk_), intent(in), optional     :: mode,data
+  character, intent(in), optional             :: tran
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, iix, jjx, &
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
        & nrow, ncol, lldx, imode, data_
-  integer(psb_lpk_) :: m, n, ix, ijx
-  character                 :: tran_
-  character(len=20)         :: name, ch_err
-  logical                   :: aliw
+  integer(psb_lpk_)   :: m, n, ix, ijx
+  character           :: tran_
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
 
-  name = 'psb_chalo_multivect'
+  name = 'psb_chalov'
   info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+    info = psb_err_internal_error_ 
+    goto 9999
   end if
 
   ctxt = desc_a%get_context()
@@ -238,7 +239,7 @@ subroutine  psb_chalo_multivect(x,desc_a,info,tran,mode,data)
   if (present(mode)) then 
     imode = mode
   else
-    imode = IOR(psb_swap_send_,psb_swap_recv_)
+    imode = psb_comm_status_sync_
   endif
 
   if (lldx < ncol) call x%reall(ncol,x%get_ncols(),info)
@@ -261,7 +262,7 @@ subroutine  psb_chalo_multivect(x,desc_a,info,tran,mode,data)
   end if
 
   if (info /= psb_success_) then
-    ch_err = 'PSI_swapdata'
+    ch_err='PSI_swapdata'
     call psb_errpush(psb_err_from_subroutine_,name,a_err=ch_err)
     goto 9999
   end if

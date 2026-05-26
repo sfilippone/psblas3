@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -31,92 +31,132 @@
 !    
 module psi_i_comm_v_mod
   use psi_penv_mod, only : psb_ctxt_type
-  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, &
-       & psb_lpk_, psb_epk_, psb_i2pk_
+  use psb_i_base_vect_mod, only : psb_i_base_vect_type 
+  use psb_desc_mod, only : psb_desc_type, psb_ipk_, psb_mpk_, psb_ipk_
   use psb_i_base_vect_mod, only : psb_i_base_vect_type 
   use psb_i_base_multivect_mod, only : psb_i_base_multivect_type 
 
   interface psi_swapdata
-    module subroutine psi_iswapdata_vect(flag,beta,y,desc_a,info,data)
-      integer(psb_ipk_), intent(in)               :: flag
-      integer(psb_ipk_), intent(in)               :: beta 
+    module subroutine psi_iswapdata_vect(swap_status,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                 :: swap_status
+      integer(psb_ipk_), intent(in)                   :: beta
       class(psb_i_base_vect_type), intent(inout)  :: y
-      type(psb_desc_type), target                 :: desc_a
-      integer(psb_ipk_), intent(out)              :: info
-      integer(psb_ipk_), optional                 :: data
+      type(psb_desc_type), target                   :: desc_a
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), optional                   :: data
     end subroutine psi_iswapdata_vect
-    module subroutine psi_iswapdata_multivect(flag,beta,y,desc_a,info,data)
-      integer(psb_ipk_), intent(in)                   :: flag
-      integer(psb_ipk_), intent(in)                   :: beta 
+    module subroutine psi_iswapdata_multivect(swap_status,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                     :: swap_status
+      integer(psb_ipk_), intent(in)                       :: beta
       class(psb_i_base_multivect_type), intent(inout) :: y
-      type(psb_desc_type), target                     :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
-      integer(psb_ipk_), optional                     :: data
+      type(psb_desc_type), target                       :: desc_a
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_ipk_), optional                       :: data
     end subroutine psi_iswapdata_multivect
+    module subroutine psi_iswap_vidx_vect(ctxt,swap_status,beta,y,idx,&
+         & totxch,totsnd,totrcv,info)
+      type(psb_ctxt_type), intent(in)               :: ctxt
+      integer(psb_ipk_), intent(in)                 :: swap_status
+      integer(psb_ipk_), intent(out)                :: info
+      class(psb_i_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(in)                   :: beta
+      class(psb_i_base_vect_type), intent(inout)    :: idx
+      integer(psb_ipk_), intent(in)                 :: totxch, totsnd, totrcv
+    end subroutine psi_iswap_vidx_vect
+    module subroutine psi_iswap_vidx_multivect(ctxt,swap_status,beta,y,idx,&
+         & totxch,totsnd,totrcv,info)
+      type(psb_ctxt_type), intent(in)                   :: ctxt
+      integer(psb_ipk_), intent(in)                     :: swap_status
+      integer(psb_ipk_), intent(out)                    :: info
+      class(psb_i_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                       :: beta
+      class(psb_i_base_vect_type), intent(inout)        :: idx
+      integer(psb_ipk_), intent(in)                     :: totxch, totsnd, totrcv
+    end subroutine psi_iswap_vidx_multivect
   end interface psi_swapdata
 
 
   interface psi_swaptran
-    module subroutine psi_iswaptran_vect(flag,beta,y,desc_a,info,data)
-      integer(psb_ipk_), intent(in)               :: flag
-      integer(psb_ipk_), intent(in)               :: beta
-      class(psb_i_base_vect_type), intent(inout)  :: y
-      type(psb_desc_type), target                 :: desc_a
-      integer(psb_ipk_), intent(out)              :: info
-      integer(psb_ipk_), optional                 :: data
-    end subroutine psi_iswaptran_vect
-    module subroutine psi_iswaptran_multivect(flag,beta,y,desc_a,info,data)
-      integer(psb_ipk_), intent(in)                   :: flag
+    module subroutine psi_iswaptran_vect(swap_status,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                 :: swap_status
       integer(psb_ipk_), intent(in)                   :: beta
+      class(psb_i_base_vect_type), intent(inout)  :: y
+      type(psb_desc_type), target                   :: desc_a
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), optional                   :: data
+    end subroutine psi_iswaptran_vect
+    module subroutine psi_iswaptran_multivect(swap_status,beta,y,desc_a,info,data)
+      integer(psb_ipk_), intent(in)                     :: swap_status
+      integer(psb_ipk_), intent(in)                       :: beta
       class(psb_i_base_multivect_type), intent(inout) :: y
-      type(psb_desc_type), target                     :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
-      integer(psb_ipk_), optional                     :: data
+      type(psb_desc_type), target                       :: desc_a
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_ipk_), optional                       :: data
     end subroutine psi_iswaptran_multivect
+    module subroutine psi_itran_vidx_vect(ctxt,swap_status,beta,y,idx,&
+         & totxch,totsnd,totrcv,info)
+      type(psb_ctxt_type), intent(in)               :: ctxt
+      integer(psb_ipk_), intent(in)                 :: swap_status
+      integer(psb_ipk_), intent(out)                :: info
+      class(psb_i_base_vect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(in)                   :: beta
+      class(psb_i_base_vect_type), intent(inout)    :: idx
+      integer(psb_ipk_), intent(in)                 :: totxch, totsnd, totrcv
+    end subroutine psi_itran_vidx_vect
+    module subroutine psi_itran_vidx_multivect(ctxt,swap_status,beta,y,idx,&
+         & totxch,totsnd,totrcv,info)
+      type(psb_ctxt_type), intent(in)                   :: ctxt
+      integer(psb_ipk_), intent(in)                     :: swap_status
+      integer(psb_ipk_), intent(out)                    :: info
+      class(psb_i_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                       :: beta
+      class(psb_i_base_vect_type), intent(inout)        :: idx
+      integer(psb_ipk_), intent(in)                     :: totxch, totsnd, totrcv
+    end subroutine psi_itran_vidx_multivect
   end interface psi_swaptran
 
   interface psi_ovrl_upd
     module subroutine  psi_iovrl_upd_vect(x,desc_a,update,info)
-      class(psb_i_base_vect_type)       :: x
-      type(psb_desc_type), intent(in)   :: desc_a
-      integer(psb_ipk_), intent(in)               :: update
-      integer(psb_ipk_), intent(out)              :: info
+      class(psb_i_base_vect_type)   :: x
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(in)   :: update
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_iovrl_upd_vect
     module subroutine  psi_iovrl_upd_multivect(x,desc_a,update,info)
-      class(psb_i_base_multivect_type)   :: x
-      type(psb_desc_type), intent(in)      :: desc_a
-      integer(psb_ipk_), intent(in)        :: update
-      integer(psb_ipk_), intent(out)       :: info
+      class(psb_i_base_multivect_type)  :: x
+      type(psb_desc_type), intent(in)     :: desc_a
+      integer(psb_ipk_), intent(in)       :: update
+      integer(psb_ipk_), intent(out)      :: info
     end subroutine psi_iovrl_upd_multivect
   end interface psi_ovrl_upd
 
   interface psi_ovrl_save
     module subroutine  psi_iovrl_save_vect(x,xs,desc_a,info)
-      class(psb_i_base_vect_type)     :: x
-      integer(psb_ipk_), allocatable  :: xs(:)
+      class(psb_i_base_vect_type)   :: x
+      integer(psb_ipk_), allocatable    :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_iovrl_save_vect
     module subroutine  psi_iovrl_save_multivect(x,xs,desc_a,info)
-      class(psb_i_base_multivect_type)     :: x
-      integer(psb_ipk_), allocatable  :: xs(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_i_base_multivect_type)  :: x
+      integer(psb_ipk_), allocatable        :: xs(:,:)
+      type(psb_desc_type), intent(in)     :: desc_a
+      integer(psb_ipk_), intent(out)      :: info
     end subroutine psi_iovrl_save_multivect
   end interface psi_ovrl_save
 
   interface psi_ovrl_restore
     module subroutine  psi_iovrl_restr_vect(x,xs,desc_a,info)
       class(psb_i_base_vect_type)     :: x
-      integer(psb_ipk_)               :: xs(:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_)                   :: xs(:)
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_iovrl_restr_vect
     module subroutine  psi_iovrl_restr_multivect(x,xs,desc_a,info)
-      class(psb_i_base_multivect_type)     :: x
-      integer(psb_ipk_)               :: xs(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_i_base_multivect_type)  :: x
+      integer(psb_ipk_)                     :: xs(:,:)
+      type(psb_desc_type), intent(in)     :: desc_a
+      integer(psb_ipk_), intent(out)      :: info
     end subroutine psi_iovrl_restr_multivect
   end interface psi_ovrl_restore
 

@@ -30,7 +30,7 @@
 !   
 !    
 !
-! File: psi_mswaptran.F90
+! File: psi_mswaptran_a.F90
 !
 ! Subroutine: psi_mswaptranm
 !   Implements the data exchange among processes. This is similar to Xswapdata, but
@@ -43,7 +43,7 @@
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
-!                                         D    real(psb_dpk_)
+!                                         D    integer(psb_mpk_)
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
@@ -74,10 +74,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - integer                  Choose overwrite or sum. 
-!    y(:,:)   - integer                  The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y(:,:)   - real                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - integer                  Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -101,13 +101,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_mpk_), intent(in)      :: n
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    integer(psb_mpk_)         :: y(:,:), beta
-    integer(psb_mpk_), target :: work(:)
-    type(psb_desc_type),target       :: desc_a
-    integer(psb_ipk_), optional         :: data
+    integer(psb_ipk_), intent(in)                   :: flag
+    integer(psb_mpk_), intent(in)                   :: n
+    integer(psb_mpk_), intent(in)                      :: beta
+    integer(psb_mpk_), intent(inout)                   :: y(:,:)
+    type(psb_desc_type),target                      :: desc_a
+    integer(psb_mpk_), target                          :: work(:)
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_), optional                     :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -149,7 +150,7 @@ contains
       goto 9999
     end if
 
-    call  psi_swaptran(ctxt,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
+    call psi_swaptran(ctxt,flag,n,beta,y,d_idx,totxch,idxs,idxr,work,info)
     if (info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
@@ -174,7 +175,8 @@ contains
     integer(psb_mpk_), intent(in)     :: n
     integer(psb_ipk_), intent(in)     :: flag
     integer(psb_ipk_), intent(out)    :: info
-    integer(psb_mpk_)         :: y(:,:), beta
+    integer(psb_mpk_), intent(inout)     :: y(:,:)
+    integer(psb_mpk_), intent(in)        :: beta
     integer(psb_mpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
@@ -360,7 +362,7 @@ contains
         nesd = idx(pnti+nerv+psb_n_elem_send_)
         prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
         if ((nesd>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_int4_swap_tag
+          p2ptag = psb_double_swap_tag
           call mpi_irecv(sndbuf(snd_pt),n*nesd,&
                & psb_mpi_mpk_,prcid(i),&
                & p2ptag,icomm,rvhd(i),iret)
@@ -383,7 +385,7 @@ contains
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
         if ((nerv>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_int4_swap_tag
+          p2ptag = psb_double_swap_tag
           if (usersend) then 
             call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
                  & psb_mpi_mpk_,prcid(i),&
@@ -413,7 +415,7 @@ contains
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-        p2ptag = psb_int4_swap_tag
+        p2ptag = psb_double_swap_tag
 
         if ((proc_to_comm /= me).and.(nesd>0)) then
           call mpi_wait(rvhd(i),p2pstat,iret)
@@ -525,7 +527,7 @@ contains
   !   application environment. All the variants have the same structure 
   !   In all these subroutines X may be:    I    Integer
   !                                         S    real(psb_spk_)
-  !                                         D    real(psb_dpk_)
+  !                                         D    integer(psb_mpk_)
   !                                         C    complex(psb_spk_)
   !                                         Z    complex(psb_dpk_)
   !   Basically the operation is as follows: on each process, we identify 
@@ -556,10 +558,10 @@ contains
   !
   !
   !    n        - integer                 Number of columns in Y               
-  !    beta     - integer                  Choose overwrite or sum. 
-  !    y(:)     - integer                  The data area                        
+  !    beta     - real                  Choose overwrite or sum. 
+  !    y(:)     - real                  The data area                        
   !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-  !    work(:)  - integer                  Buffer space. If not sufficient, will do 
+  !    work(:)  - real                  Buffer space. If not sufficient, will do 
   !                                       our own internal allocation.
   !    info     - integer.                return code.
   !    data     - integer                 which list is to be used to exchange data
@@ -579,12 +581,13 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    integer(psb_mpk_)         :: y(:), beta
-    integer(psb_mpk_), target :: work(:)
-    type(psb_desc_type),target  :: desc_a
-    integer(psb_ipk_), optional    :: data
+    integer(psb_ipk_), intent(in)   :: flag
+    integer(psb_mpk_), intent(in)      :: beta
+    integer(psb_mpk_), intent(inout)   :: y(:)
+    type(psb_desc_type),target      :: desc_a
+    integer(psb_mpk_), target          :: work(:)
+    integer(psb_ipk_), intent(out)  :: info
+    integer(psb_ipk_), optional     :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -659,7 +662,8 @@ contains
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)   :: flag
     integer(psb_ipk_), intent(out)  :: info
-    integer(psb_mpk_)         :: y(:), beta
+    integer(psb_mpk_), intent(inout)   :: y(:)
+    integer(psb_mpk_), intent(in)      :: beta
     integer(psb_mpk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
@@ -845,7 +849,7 @@ contains
         nesd = idx(pnti+nerv+psb_n_elem_send_)
         prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
         if ((nesd>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_int4_swap_tag
+          p2ptag = psb_double_swap_tag
           call mpi_irecv(sndbuf(snd_pt),nesd,&
                & psb_mpi_mpk_,prcid(i),&
                & p2ptag,icomm,rvhd(i),iret)
@@ -868,7 +872,7 @@ contains
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
         if ((nerv>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_int4_swap_tag
+          p2ptag = psb_double_swap_tag
           if (usersend) then 
             call mpi_rsend(rcvbuf(rcv_pt),nerv,&
                  & psb_mpi_mpk_,prcid(i),&
@@ -896,7 +900,7 @@ contains
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        p2ptag = psb_int4_swap_tag
+        p2ptag = psb_double_swap_tag
 
         if ((proc_to_comm /= me).and.(nesd>0)) then
           call mpi_wait(rvhd(i),p2pstat,iret)

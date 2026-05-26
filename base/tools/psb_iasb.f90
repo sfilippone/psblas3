@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -309,7 +309,7 @@ subroutine psb_iasb_multivect(x, desc_a, info, mold, scratch,n)
   dupl_ = x%get_dupl()
   if (scratch_) then 
     call x%free(info)
-    call x%bld(ncol,n_,mold=mold)
+    call x%bld(ncol,n_,mold=mold,scratch=.true.)
   else
     call x%asb(ncol,n_,info)
     ! ..update halo elements..

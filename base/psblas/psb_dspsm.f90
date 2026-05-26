@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -71,35 +71,36 @@ subroutine psb_dspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   use psi_mod
   implicit none 
 
-  real(psb_dpk_), intent(in)           :: alpha, beta
-  type(psb_d_vect_type), intent(inout)    :: x
-  type(psb_d_vect_type), intent(inout)    :: y
-  type(psb_dspmat_type), intent(inout)    :: a
-  type(psb_desc_type), intent(in)         :: desc_a
+  real(psb_dpk_), intent(in)                       :: alpha, beta
+  type(psb_d_vect_type), intent(inout)            :: x
+  type(psb_d_vect_type), intent(inout)            :: y
+  type(psb_dspmat_type), intent(inout)            :: a
+  type(psb_desc_type), intent(in)                   :: desc_a
   integer(psb_ipk_), intent(out)                    :: info
   type(psb_d_vect_type), intent(inout), optional  :: diag
-  character, intent(in), optional         :: trans, scale
+  character, intent(in), optional                   :: trans, scale
   integer(psb_ipk_), intent(in), optional           :: choice
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, &
+  integer(psb_ipk_)   :: np, me, &
        & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
        & ix, iy, ik, jx, jy, i, lld,&
-       & m, nrow, ncol, iiy, jjy, idx, ndm
+       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
 
-  character                :: lscale
-  integer(psb_ipk_), parameter       :: nb=4
-  real(psb_dpk_),pointer :: xp(:), yp(:)
-  character                :: itrans
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  character                     :: lscale
+  integer(psb_ipk_), parameter  :: nb=4
+  real(psb_dpk_),pointer       :: xp(:), yp(:)
+  character                     :: itrans
+  character(len=20)             :: name, ch_err
+  logical                       :: aliw
 
   name = 'psb_dspsv_vect'
   info = psb_success_
   call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+    info = psb_err_internal_error_ 
+    goto 9999
   end if
 
   ctxt = desc_a%get_context()
@@ -157,8 +158,8 @@ subroutine psb_dspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
 
   if (psb_errstatus_fatal()) then 
-    info = psb_err_from_subroutine_
-    ch_err = 'reall'
+    info=psb_err_from_subroutine_
+    ch_err='reall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
@@ -171,16 +172,14 @@ subroutine psb_dspsv_vect(alpha,a,x,beta,y,desc_a,info,&
   end if
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    ch_err = 'dcssm'
+    ch_err='dcssm'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   ! update overlap elements
   if (choice_ > 0) then
-    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),done,y%v,desc_a,info,data=psb_comm_ovr_)
-
-
+    call psi_swapdata(psb_comm_status_sync_,done,y%v,desc_a,info,data=psb_comm_ovr_)
     if (info == psb_success_) call psi_ovrl_upd(y%v,desc_a,choice_,info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
@@ -238,7 +237,7 @@ end subroutine psb_dspsv_vect
 !    jy      -  integer(optional).     The column offset for ( Y ). Default: 1 
 !    work(:) -  real, optional      Working area.
 ! 
-subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
+subroutine psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, k, jx, jy, work)   
   use psb_base_mod, psb_protect_name => psb_dspsm
   use psi_mod
@@ -484,7 +483,7 @@ end subroutine psb_dspsm
 !    d(:)    -  real, optional      Matrix for diagonal scaling.
 !    work(:) -  real, optional      Working area.
 ! 
-subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
+subroutine psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
      & trans, scale, choice, diag, work)   
   use psb_base_mod, psb_protect_name => psb_dspsv
   use psi_mod

@@ -31,6 +31,7 @@
 !    
 module psb_realloc_mod
   use psb_const_mod
+  use psb_i2_realloc_mod
   use psb_m_realloc_mod
   use psb_e_realloc_mod
   use psb_s_realloc_mod

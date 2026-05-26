@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -33,7 +33,7 @@
 ! package: psb_d_base_vect_mod
 !
 ! This module contains the definition of the psb_d_base_vect type which
-! is a container for dense vectors.
+! is a container for dense vectors.\
 !  This is encapsulated instead of being just a simple array to allow for
 !  more complicated situations, such as GPU programming, where the memory
 !  area we are interested in is not easily accessible from the host/Fortran
@@ -47,11 +47,10 @@ module psb_d_base_vect_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
-  use psb_i_base_vect_mod
-  use psb_l_base_vect_mod
   use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, psb_comm_unknown_
   use psb_comm_factory_mod, only: psb_comm_set, psb_comm_free
-
+  use psb_i_base_vect_mod
+  use psb_l_base_vect_mod
 
   !> \namespace  psb_base_mod  \class psb_d_base_vect_type
   !! The psb_d_base_vect_type
@@ -65,9 +64,8 @@ module psb_d_base_vect_mod
   !!
   type psb_d_base_vect_type
     !> Values.
-    real(psb_dpk_), allocatable               :: v(:)
-    real(psb_dpk_), allocatable               :: combuf(:)
-    ! Polymorphic communication handle stored at vector level.
+    real(psb_dpk_), allocatable              :: v(:)
+    real(psb_dpk_), allocatable              :: combuf(:)
     class(psb_comm_handle_type), allocatable  :: comm_handle 
 
     !> vector bldstate:
@@ -78,10 +76,10 @@ module psb_d_base_vect_mod
     !!            in already existing entries.
     !!    The transitions among the states are detailed in
     !!            psb_T_vect_mod.
-    integer(psb_ipk_), private :: bldstate = psb_vect_null_
-    integer(psb_ipk_), private :: dupl     = psb_dupl_null_
-    integer(psb_ipk_), private :: ncfs     = 0
-    integer(psb_ipk_), allocatable :: iv(:)
+    integer(psb_ipk_), private      :: bldstate = psb_vect_null_
+    integer(psb_ipk_), private      :: dupl     = psb_dupl_null_
+    integer(psb_ipk_), private      :: ncfs     = 0
+    integer(psb_ipk_), allocatable  :: iv(:)
   contains
     !
     !  Constructors/allocators
@@ -145,7 +143,7 @@ module psb_d_base_vect_mod
     procedure, nopass  :: device_wait  => d_base_device_wait
     procedure, pass(x) :: maybe_free_buffer  => d_base_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => d_base_free_buffer
-
+    
     !
     ! Basic info
     procedure, pass(x) :: get_nrows => d_base_get_nrows
@@ -160,6 +158,7 @@ module psb_d_base_vect_mod
     procedure, pass(x) :: set_vect => d_base_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: get_entry=> d_base_get_entry
+    procedure, pass(x) :: set_entry=> d_base_set_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -175,7 +174,8 @@ module psb_d_base_vect_mod
     generic, public    :: sct      => sctb, sctb_x, sctb_buf
 
     procedure, pass(x) :: check_addr  => d_base_check_addr
-    
+
+
 
     !
     ! Dot product and AXPBY
@@ -250,6 +250,7 @@ module psb_d_base_vect_mod
     procedure, pass(x) :: minquotient_v  => d_base_minquotient_v
     procedure, pass(x) :: minquotient_a2 => d_base_minquotient_a2
     generic, public    :: minquotient    => minquotient_v, minquotient_a2
+
   end type psb_d_base_vect_type
 
   public  :: psb_d_base_vect
@@ -405,11 +406,6 @@ contains
       call psb_realloc(n,x%iv,info)
       call x%set_ncfs(0)
     end if
-    if (info == psb_success_) then
-      if (.not. allocated(x%comm_handle)) then
-        call psb_comm_set(psb_comm_isend_irecv_, x%comm_handle, info)
-      end if
-    end if
 
   end subroutine d_base_all
 
@@ -428,9 +424,6 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     allocate(psb_d_base_vect_type :: y, stat=info)
-    if (info == psb_success_) then
-      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
-    end if
 
   end subroutine d_base_mold
 
@@ -438,11 +431,12 @@ contains
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_d_base_vect_type), intent(inout)  :: x
+    class(psb_d_base_vect_type), intent(inout)    :: x
     integer(psb_ipk_), intent(out)              :: info
     logical, intent(in), optional               :: clear
     logical :: clear_
 
+    info =  0
     if (present(clear)) then
       clear_ = clear
     else
@@ -454,11 +448,6 @@ contains
       if (clear_) x%v(:) = dzero
       call x%set_host()
       call x%set_upd()
-    end if
-    if (info == psb_success_) then
-      if (.not. allocated(x%comm_handle)) then
-        call psb_comm_set(psb_comm_isend_irecv_, x%comm_handle, info)
-      end if
     end if
 
   end subroutine d_base_reinit
@@ -837,18 +826,17 @@ contains
     use psb_realloc_mod
     implicit none
     class(psb_d_base_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(out)              :: info
-
-    integer(psb_ipk_)                           :: info_comm
+    integer(psb_ipk_)                             :: info_comm
+    integer(psb_ipk_), intent(out)                :: info
 
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
     if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
-    if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)
+    if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)  
     if ((info == 0).and.allocated(x%comm_handle)) then
       call psb_comm_free(x%comm_handle, info_comm)
       if (info_comm /= psb_success_) info = info_comm
-    end if
+    end if  
     if (info /= 0) call &
          & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
     call x%set_null()
@@ -894,7 +882,7 @@ contains
          &  call x%free_buffer(info)
 
   end subroutine d_base_maybe_free_buffer
-
+  
   function d_base_get_ncfs(x) result(res)
     implicit none
     class(psb_d_base_vect_type), intent(in) :: x
@@ -1098,25 +1086,12 @@ contains
     implicit none
     class(psb_d_base_vect_type), intent(in)   :: x
     class(psb_d_base_vect_type), intent(out)  :: y
-    integer(psb_ipk_)                         :: info
-    integer(psb_ipk_)                         :: swap_status
 
     if (allocated(x%v)) call y%bld(x%v)
     call y%set_state(x%get_state())
     call y%set_dupl(x%get_dupl())
     call y%set_ncfs(x%get_ncfs())
     if (allocated(x%iv)) y%iv = x%iv
-    if (allocated(x%comm_handle)) then
-      call psb_comm_set(x%comm_handle%comm_type, y%comm_handle, info)
-      if (info /= psb_success_) return
-      y%comm_handle%id = x%comm_handle%id
-      call x%comm_handle%get_swap_status(swap_status, info)
-      if (info /= psb_success_) return
-      call y%comm_handle%set_swap_status(swap_status, info)
-      if (info /= psb_success_) return
-    else
-      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
-    end if
   end subroutine d_base_cpy
 
   !
@@ -1295,14 +1270,32 @@ contains
   !
   function d_base_get_entry(x, index) result(res)
     implicit none
-    class(psb_d_base_vect_type), intent(in) :: x
+    class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
     real(psb_dpk_)                           :: res
 
     res = 0
-    if (allocated(x%v)) res = x%v(index)
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      res = x%v(index)
+    end if
 
   end function d_base_get_entry
+
+  subroutine d_base_set_entry(x, index, val)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    real(psb_dpk_)                           :: val
+
+
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      x%v(index) =val
+      call x%set_host()
+    end if
+
+  end subroutine d_base_set_entry
 
   !
   ! Overwrite with absolute value
@@ -2202,6 +2195,10 @@ contains
       res = min(res,abs(x%v(i)))
     end do
 #else
+    !
+    ! From M&R&C: if the array is of size zero, MINVAL
+    !           returns the largest positive value
+    !
     res =  minval(x%v(1:n))
 #endif
   end function d_base_min
@@ -2366,56 +2363,6 @@ contains
 
   end subroutine d_base_device_wait
 
-
-  subroutine d_base_init_comm(x, comm_handle, info)
-    ! `init_comm` is intentionally a configuration step.
-    ! It does not define the communication API surface itself; instead it:
-    !   1) resets local communication buffers,
-    !   2) ensures a handle exists with the requested concrete scheme,
-    !      recreating it only when needed (missing handle or type change),
-    !   3) copies runtime state (`id`, swap status) from the input handle.
-    implicit none
-    class(psb_d_base_vect_type), intent(inout) :: x
-    class(psb_comm_handle_type), intent(in), pointer :: comm_handle
-    integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: comm_type, swap_status
-    logical           :: need_new_handle
-
-    info = psb_success_
-
-    ! Reset/initialize communication related storage. Actual
-    ! topology/building is done lazily by neighbor_topology_init
-    if (allocated(x%combuf)) then
-      deallocate(x%combuf)
-    end if
-
-    comm_type = psb_comm_isend_irecv_
-    if (associated(comm_handle)) then
-      comm_type = comm_handle%comm_type
-      if (comm_type == psb_comm_unknown_) comm_type = psb_comm_isend_irecv_
-    end if
-
-    ! Recreate only when needed (missing handle or scheme change).
-    need_new_handle = .not. allocated(x%comm_handle)
-    if (.not. need_new_handle) then
-      need_new_handle = (x%comm_handle%comm_type /= comm_type)
-    end if
-
-    if (need_new_handle) then
-      call psb_comm_set(comm_type, x%comm_handle, info)
-      if (info /= psb_success_) return
-    end if
-
-    if (associated(comm_handle)) then
-      x%comm_handle%id = comm_handle%id
-      call comm_handle%get_swap_status(swap_status, info)
-      if (info /= psb_success_) return
-      call x%comm_handle%set_swap_status(swap_status, info)
-      if (info /= psb_success_) return
-    end if
-
-  end subroutine d_base_init_comm
-
   function d_base_use_buffer() result(res)
     logical :: res
 
@@ -2431,7 +2378,6 @@ contains
 
     call psb_realloc(n,x%combuf,info)
   end subroutine d_base_new_buffer
-
 
   !
   ! shortcut alpha=1 beta=0
@@ -2663,7 +2609,6 @@ contains
     if (x%is_dev()) call x%sync()
     call z%addconst(x%v,b,info)
   end subroutine d_base_addconst_v2
-
 end module psb_d_base_vect_mod
 
 
@@ -2673,7 +2618,6 @@ module psb_d_base_multivect_mod
   use psb_error_mod
   use psb_realloc_mod
   use psb_d_base_vect_mod
-  use psb_comm_schemes_mod, only: psb_comm_handle_type
 
   !> \namespace  psb_base_mod  \class psb_d_base_vect_type
   !! The psb_d_base_vect_type
@@ -2690,9 +2634,9 @@ module psb_d_base_multivect_mod
 
   type psb_d_base_multivect_type
     !> Values.
-    real(psb_dpk_), allocatable       :: v(:,:)
-    real(psb_dpk_), allocatable       :: combuf(:)
-      ! neighbor-specific communication state removed; comm_handle owned below
+    real(psb_dpk_), allocatable              :: v(:,:)
+    real(psb_dpk_), allocatable              :: combuf(:)
+    class(psb_comm_handle_type), allocatable  :: comm_handle 
 
     !> vector bldstate:
     !!    null:   pristine;
@@ -2706,9 +2650,6 @@ module psb_d_base_multivect_mod
     integer(psb_ipk_), private :: dupl     = psb_dupl_null_
     integer(psb_ipk_), private :: ncfs     = 0
     integer(psb_ipk_), allocatable :: iv(:)
-
-    class(psb_comm_handle_type), allocatable :: comm_handle
-
   contains
     !
     !  Constructors/allocators
@@ -2832,7 +2773,6 @@ module psb_d_base_multivect_mod
     procedure, pass(y) :: sctb_x   => d_base_mlv_sctb_x
     procedure, pass(y) :: sctb_buf => d_base_mlv_sctb_buf
     generic, public    :: sct      => sctb, sctbr2, sctb_x, sctb_buf
-
   end type psb_d_base_multivect_type
 
   interface psb_d_base_multivect
@@ -2914,7 +2854,7 @@ contains
     logical, intent(in), optional        :: scratch
 
     call psb_realloc(m,n,x%v,info)
-    call x%asb(m,n,info,scratch)
+    call x%asb(m,n,info,scratch=scratch)
 
   end subroutine d_base_mlv_bld_n
 
@@ -2966,6 +2906,7 @@ contains
     class(psb_d_base_multivect_type), intent(out)    :: x
     integer(psb_ipk_), intent(out)              :: info
 
+    info = 0
     if (allocated(x%v)) then 
       call x%sync()
       x%v(:,:) = dzero
@@ -3194,23 +3135,26 @@ contains
         case(psb_dupl_err_)
           do i=1,ncfs
             if (any(vv(x%iv(i),:).ne.dzero)) then
-              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
+              info = psb_err_duplicate_coo
+              call psb_errpush(info,'mvect-asb')
               return
             else
               vv(x%iv(i),:) = x%v(i,:)
             end if
           end do
         case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          write(psb_err_unit,*) 'Error in mvect_asb: unsafe dupl',x%get_dupl()
           info =-7
         end select
         call psb_move_alloc(vv,x%v,info)
         if (allocated(x%iv)) deallocate(x%iv,stat=info)
       else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < m) &
+        if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
              & call psb_realloc(m,n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+        if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+        end if
       else
         info = psb_err_invalid_vect_state_        
         call psb_errpush(info,'vect_asb')
@@ -3218,8 +3162,10 @@ contains
     else
       if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
            & call psb_realloc(m,n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+        end if
     end if
     call x%set_host()
     call x%set_asb()
@@ -4090,6 +4036,7 @@ contains
     call psb_realloc(n*nc,x%combuf,info)
   end subroutine d_base_mlv_new_buffer
 
+
   subroutine d_base_mlv_maybe_free_buffer(x,info)
     use psb_realloc_mod
     implicit none
@@ -4333,9 +4280,5 @@ contains
     implicit none
 
   end subroutine d_base_mlv_device_wait
-
-  !
-  ! Communication routines for multivectors (delegates to base vector implementation)
-  !
 
 end module psb_d_base_multivect_mod

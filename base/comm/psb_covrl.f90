@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -67,28 +67,28 @@ subroutine psb_covrl_vect(x,desc_a,info,update,mode)
   use psi_mod
   implicit none
 
-  type(psb_c_vect_type), intent(inout)   :: x
-  type(psb_desc_type), intent(in)        :: desc_a
-  integer(psb_ipk_), intent(out)                   :: info
-  integer(psb_ipk_), intent(in), optional          :: update,mode
+  type(psb_c_vect_type), intent(inout)  :: x
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+  integer(psb_ipk_), intent(in), optional :: update,mode
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, k, iix, jjx, &
+  integer(psb_ipk_)   :: np, me, err_act, k, iix, jjx, &
        & nrow, ncol, ldx, data_, update_, mode_
-  integer(psb_lpk_) :: m, n, ix, ijx
-  logical                  :: do_swap
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  integer(psb_lpk_)   :: m, n, ix, ijx
+  logical             :: do_swap
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
 
-  name = 'psb_covrl_vect'
+  name = 'psb_covrlv'
   info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ctxt = desc_a%get_context()
+  ctxt=desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ctxt, me, np)
@@ -136,7 +136,8 @@ subroutine psb_covrl_vect(x,desc_a,info,update,mode)
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,cone,x%v,desc_a,info,data=psb_comm_ovr_)
+    call psi_swapdata(mode_,cone,x%v,&
+         & desc_a,info,data=psb_comm_ovr_)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,update_,info)
   if (info /= psb_success_) then
@@ -183,33 +184,33 @@ end subroutine psb_covrl_vect
 !                                       - if (swap_recv): use psb_rcv (completing a 
 !                                                       previous call with swap_send)
 !
-subroutine psb_covrl_multivect(x,desc_a,info,update,mode)
+subroutine  psb_covrl_multivect(x,desc_a,info,update,mode)
   use psb_base_mod, psb_protect_name => psb_covrl_multivect
   use psi_mod
   implicit none
 
-  type(psb_c_multivect_type), intent(inout)   :: x
+  type(psb_c_multivect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)             :: desc_a
   integer(psb_ipk_), intent(out)              :: info
   integer(psb_ipk_), intent(in), optional     :: update,mode
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, k, iix, jjx, &
+  integer(psb_ipk_)   :: np, me, err_act, k, iix, jjx, &
        & nrow, ncol, ldx, data_, update_, mode_
-  integer(psb_lpk_) :: m, n, ix, ijx
-  logical                  :: do_swap
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
+  integer(psb_lpk_)   :: m, n, ix, ijx
+  logical             :: do_swap
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
 
-  name = 'psb_covrl_multivect'
+  name = 'psb_covrlv'
   info = psb_success_
   call psb_erractionsave(err_act)
   if (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   ! check on blacs grid 
   call psb_info(ctxt, me, np)
@@ -244,7 +245,7 @@ subroutine psb_covrl_multivect(x,desc_a,info,update,mode)
   if (present(mode)) then 
     mode_ = mode
   else
-    mode_ = IOR(psb_swap_send_,psb_swap_recv_)
+    mode_ = psb_comm_status_sync_
   endif
   do_swap = (mode_ /= 0)
 
@@ -252,14 +253,16 @@ subroutine psb_covrl_multivect(x,desc_a,info,update,mode)
   if (ldx < ncol) call x%reall(ncol,x%get_ncols(),info)
   
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_ ;    ch_err='psb_reall'
+    info=psb_err_from_subroutine_ 
+    ch_err='psb_reall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
   ! exchange overlap elements
   if (do_swap) then
-    call psi_swapdata(mode_,cone,x%v, desc_a,info,data=psb_comm_ovr_)
+    call psi_swapdata(mode_,cone,x%v,&
+         & desc_a,info,data=psb_comm_ovr_)
   end if
   if (info == psb_success_) call psi_ovrl_upd(x%v,desc_a,update_,info)
   if (info /= psb_success_) then

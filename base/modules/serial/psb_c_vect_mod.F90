@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -108,6 +108,7 @@ module psb_c_vect_mod
     procedure, pass(x) :: check_addr => c_vect_check_addr
 
     procedure, pass(x) :: get_entry => c_vect_get_entry
+    procedure, pass(x) :: set_entry => c_vect_set_entry
 
     procedure, pass(x) :: dot_v    => c_vect_dot_v
     procedure, pass(x) :: dot_a    => c_vect_dot_a
@@ -855,12 +856,20 @@ contains
 
   function c_vect_get_entry(x,index) result(res)
     implicit none
-    class(psb_c_vect_type), intent(in) :: x
+    class(psb_c_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index
     complex(psb_spk_) :: res
-    res = 0
+    res = czero
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function c_vect_get_entry
+
+  subroutine c_vect_set_entry(x,index,val)
+    implicit none
+    class(psb_c_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: index
+    complex(psb_spk_) :: val
+    if (allocated(x%v)) call x%v%set_entry(index,val)
+  end subroutine c_vect_set_entry
 
   function c_vect_dot_v(n,x,y) result(res)
     implicit none
@@ -1660,19 +1669,20 @@ contains
   end subroutine c_mvect_bld_x
 
 
-  subroutine c_mvect_bld_n(x,m,n,mold)
+  subroutine c_mvect_bld_n(x,m,n,mold,scratch)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_c_multivect_type), intent(out) :: x
     class(psb_c_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-
+    logical, intent(in), optional        :: scratch
+    
     info = psb_success_
     if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_c_get_base_multivect_default())
     endif
-    if (info == psb_success_) call x%v%bld(m,n)
+    if (info == psb_success_) call x%v%bld(m,n,scratch=scratch)
 
   end subroutine c_mvect_bld_n
 
@@ -2153,3 +2163,4 @@ contains
 !!$  end function c_mvect_asum
 
 end module psb_c_multivect_mod
+

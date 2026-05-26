@@ -45,4 +45,16 @@ module psb_comm_mod
   use psb_c_comm_mod
   use psb_z_comm_mod
 
+  ! Import scheme symbols and re-export them as public symbols from this module.
+  use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, &
+    & psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_, &
+    & psb_comm_rma_pull_, psb_comm_rma_push_, psb_comm_unknown_, &
+    & psb_comm_status_unknown_, psb_comm_status_start_, psb_comm_status_wait_, &
+    & psb_comm_status_sync_
+
+  public :: psb_comm_handle_type, psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
+    & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_, &
+    & psb_comm_unknown_, psb_comm_status_unknown_, psb_comm_status_start_, &
+    & psb_comm_status_wait_, psb_comm_status_sync_
+
 end module psb_comm_mod

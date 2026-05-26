@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -148,7 +148,7 @@ end function psb_damax
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -371,7 +371,7 @@ end function psb_damax_vect
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -496,7 +496,7 @@ end subroutine psb_damaxvs
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -689,11 +689,11 @@ function psb_dmin_vect(x, desc_a, info,global) result(res)
     goto 9999
   end if
 
-  ! compute local max
+  ! compute local min
   if ((desc_a%get_local_rows() > 0).and.(m /= 0)) then
     res = x%minreal(desc_a%get_local_rows())
   else
-    res = dzero
+    res = HUGE(done)
   end if
 
   ! compute global min

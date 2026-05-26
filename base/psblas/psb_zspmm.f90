@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -72,7 +72,7 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, ib, ip, idx
+       & iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter       :: nb=4
   complex(psb_dpk_), pointer :: xp(:), yp(:)
@@ -85,8 +85,8 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   integer(psb_ipk_), save  :: mv_phase1=-1, mv_phase2=-1, mv_phase3=-1, mv_phase4=-1
   integer(psb_ipk_), save  :: mv_phase11=-1, mv_phase12=-1
 
-  name = 'psb_zspmv_vect'
-  info = psb_success_
+  name='psb_zspmv'
+  info=psb_success_
   call psb_erractionsave(err_act)
   if  (psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
@@ -94,7 +94,7 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  ctxt = desc_a%get_context()
+  ctxt=desc_a%get_context()
   call psb_info(ctxt, me, np)
   if (np == -1) then
     info = psb_err_context_error_
@@ -155,14 +155,12 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
 
   if (psb_errstatus_fatal()) then 
-    info = psb_err_from_subroutine_
-    ch_err = 'reall'
+    info=psb_err_from_subroutine_
+    ch_err='reall'
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
 
-  if (debug_level >= psb_debug_comp_) &
-       & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
 
   if (trans_ == 'N') then
     !  Matrix is not transposed
@@ -174,12 +172,14 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         !if (me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if (do_timings) call psb_barrier(ctxt)
         if (do_timings) call psb_tic(mv_phase1)
-        if (doswap_) call psi_swapdata(psb_swap_send_,zzero,x%v,desc_a,info,data=psb_comm_halo_)
+        if (doswap_) call psi_swapdata(psb_swap_send_,&
+             & zzero,x%v,desc_a,info,data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase1)
         if (do_timings) call psb_tic(mv_phase2)          
         call a%ad%spmm(alpha,x%v,beta,y%v,info)
         if (do_timings) call psb_tic(mv_phase3)
-        if (doswap_) call psi_swapdata(psb_swap_recv_,zzero,x%v,desc_a,info,data=psb_comm_halo_)
+        if (doswap_) call psi_swapdata(psb_swap_recv_,&
+             & zzero,x%v,desc_a,info,data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase3)
         if (do_timings) call psb_tic(mv_phase4)          
         call a%and%spmm(alpha,x%v,zone,y%v,info)
@@ -194,7 +194,8 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         
         if (do_timings) call psb_tic(mv_phase11)          
         if (doswap_) then
-          call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),zzero,x%v,desc_a,info,data=psb_comm_halo_)
+          call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+               & zzero,x%v,desc_a,info,data=psb_comm_halo_)
         end if
         if (do_timings) call psb_toc(mv_phase11)
         if (do_timings) call psb_tic(mv_phase12)          
@@ -231,14 +232,16 @@ subroutine psb_zspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     if (info == psb_success_) call psi_ovrl_restore(x%v,xvsave,desc_a,info)
     if (info /= psb_success_) then
       info = psb_err_from_subroutine_
-      ch_err = 'psb_csmm'
+      ch_err='psb_csmm'
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
 
     if (doswap_) then
-      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),zone,y%v,desc_a,info)
-      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),zone,y%v,desc_a,info,data=psb_comm_ovr_)
+      call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
+           & zone,y%v,desc_a,info)
+      if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
+           & zone,y%v,desc_a,info,data=psb_comm_ovr_)
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
@@ -606,7 +609,7 @@ end subroutine psb_zspmm
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$ 
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED

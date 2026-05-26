@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -71,7 +71,7 @@ subroutine psb_z_map_U2V_a(alpha,x,beta,y,map,info,work)
     nr2   = map%p_desc_V%get_global_rows()
     nc2   = map%p_desc_V%get_local_cols() 
     allocate(yt(nc2),stat=info) 
-    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%mat_U2V,x,zzero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_V)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -91,7 +91,7 @@ subroutine psb_z_map_U2V_a(alpha,x,beta,y,map,info,work)
     nc2   = map%desc_V%get_local_cols() 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == psb_success_) call psb_halo(xt,map%desc_U,info,work)
+    if (info == psb_success_) call psb_halo(xt,map%desc_U,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%mat_U2V,xt,zzero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_V)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -115,19 +115,19 @@ end subroutine psb_z_map_U2V_a
 subroutine psb_z_map_U2V_v(alpha,x,beta,y,map,info,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_z_map_U2V_v
   implicit none 
-  class(psb_zlinmap_type), intent(in)   :: map
-  complex(psb_dpk_), intent(in)        :: alpha,beta
-  type(psb_z_vect_type), intent(inout) :: x,y
-  integer(psb_ipk_), intent(out)                 :: info 
+  class(psb_zlinmap_type), intent(in)                     :: map
+  complex(psb_dpk_), intent(in)                               :: alpha,beta
+  type(psb_z_vect_type), intent(inout)                    :: x,y
+  integer(psb_ipk_), intent(out)                            :: info 
   type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
-  type(psb_z_vect_type), target  :: xt, yt
-  type(psb_z_vect_type),pointer  :: ptx, pty
-  complex(psb_dpk_), allocatable :: xta(:), yta(:)
-  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
+  type(psb_z_vect_type), target   :: xt, yt
+  type(psb_z_vect_type),pointer   :: ptx, pty
+  complex(psb_dpk_), allocatable      :: xta(:), yta(:)
+  integer(psb_ipk_)                 :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, nr, iam, np
-  type(psb_ctxt_type) :: ctxt
-  character(len=20), parameter   :: name='psb_map_U2V_v'
+  type(psb_ctxt_type)               :: ctxt
+  character(len=20), parameter      :: name = 'psb_map_U2V_v'
 
   info = psb_success_
   if (.not.map%is_asb()) then 
@@ -253,7 +253,7 @@ subroutine psb_z_map_V2U_a(alpha,x,beta,y,map,info,work)
     nr2   = map%p_desc_U%get_global_rows()
     nc2   = map%p_desc_U%get_local_cols() 
     allocate(yt(nc2),stat=info) 
-    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%mat_V2U,x,zzero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%p_desc_U)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -273,7 +273,7 @@ subroutine psb_z_map_V2U_a(alpha,x,beta,y,map,info,work)
     nc2   = map%desc_U%get_local_cols() 
     allocate(xt(nc1),yt(nc2),stat=info) 
     xt(1:nr1) = x(1:nr1) 
-    if (info == psb_success_) call psb_halo(xt,map%desc_V,info,work)
+    if (info == psb_success_) call psb_halo(xt,map%desc_V,info,work=work)
     if (info == psb_success_) call psb_csmm(zone,map%mat_V2U,xt,zzero,yt,info)
     if ((info == psb_success_) .and. psb_is_repl_desc(map%desc_U)) then
       call psb_sum(ctxt,yt(1:nr2))
@@ -296,19 +296,19 @@ end subroutine psb_z_map_V2U_a
 subroutine psb_z_map_V2U_v(alpha,x,beta,y,map,info,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_z_map_V2U_v
   implicit none 
-  class(psb_zlinmap_type), intent(in)   :: map
-  complex(psb_dpk_), intent(in)        :: alpha,beta
-  type(psb_z_vect_type), intent(inout) :: x,y
-  integer(psb_ipk_), intent(out)                 :: info 
+  class(psb_zlinmap_type), intent(in)                     :: map
+  complex(psb_dpk_), intent(in)                               :: alpha,beta
+  type(psb_z_vect_type), intent(inout)                    :: x,y
+  integer(psb_ipk_), intent(out)                            :: info 
   type(psb_z_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
-  type(psb_z_vect_type), target  :: xt, yt
-  type(psb_z_vect_type),pointer  :: ptx, pty
-  complex(psb_dpk_), allocatable :: xta(:), yta(:)
-  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
+  type(psb_z_vect_type), target :: xt, yt
+  type(psb_z_vect_type),pointer :: ptx, pty
+  complex(psb_dpk_), allocatable    :: xta(:), yta(:)
+  integer(psb_ipk_)               :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, iam, np
-  type(psb_ctxt_type) :: ctxt
-  character(len=20), parameter   :: name='psb_map_V2U_v'
+  type(psb_ctxt_type)             :: ctxt
+  character(len=20), parameter    :: name = 'psb_map_V2U_v'
 
   info = psb_success_
   if (.not.map%is_asb()) then 

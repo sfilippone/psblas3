@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -31,48 +31,49 @@
 !    
 module psi_d_comm_a_mod
   use psi_penv_mod, only : psb_ctxt_type
-  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, psb_dpk_, psb_i_base_vect_type
+  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, &
+       & psb_dpk_, psb_i_base_vect_type
 
   interface psi_swapdata
     module subroutine psi_dswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
       integer(psb_mpk_), intent(in)         :: n
-      real(psb_dpk_),intent(in)             :: beta
-      real(psb_dpk_),intent(inout)          :: y(:,:)
-      type(psb_desc_type), target           :: desc_a
-      real(psb_dpk_),target                 :: work(:)
+      integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
+      real(psb_dpk_), intent(in)           :: beta
+      real(psb_dpk_), intent(inout)        :: y(:,:)
+      real(psb_dpk_),target    :: work(:)
+      type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswapdatam
     module subroutine psi_dswapdatav(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
-      real(psb_dpk_),intent(in)             :: beta
-      real(psb_dpk_),intent(inout)          :: y(:)
-      type(psb_desc_type), target           :: desc_a
-      real(psb_dpk_),target                 :: work(:)
       integer(psb_ipk_), intent(out)        :: info
+      real(psb_dpk_), intent(in)           :: beta
+      real(psb_dpk_), intent(inout)        :: y(:)
+      real(psb_dpk_),target    :: work(:)
+      type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_dswapdatav
     module subroutine psi_dswapidxm(ctxt,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_ipk_), intent(in)   :: flag
       integer(psb_mpk_), intent(in)   :: n
-      real(psb_dpk_),intent(in)       :: beta
-      real(psb_dpk_),intent(inout)    :: y(:,:)
-      integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
-      real(psb_dpk_),target           :: work(:)
+      integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
+      real(psb_dpk_), intent(in)     :: beta
+      real(psb_dpk_), intent(inout)  :: y(:,:)
+      real(psb_dpk_),target :: work(:)
+      integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxm
     module subroutine psi_dswapidxv(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(in)   :: flag
-      real(psb_dpk_),intent(in)       :: beta
-      real(psb_dpk_),intent(inout)    :: y(:)
-      integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
-      real(psb_dpk_),target           :: work(:)
       integer(psb_ipk_), intent(out)  :: info
+      real(psb_dpk_), intent(in)     :: beta
+      real(psb_dpk_), intent(inout)  :: y(:)
+      real(psb_dpk_),target :: work(:)
+      integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dswapidxv
   end interface psi_swapdata
 
@@ -81,42 +82,42 @@ module psi_d_comm_a_mod
     module subroutine psi_dswaptranm(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_Mpk_), intent(in)         :: n
-      real(psb_dpk_),intent(in)             :: beta
-      real(psb_dpk_),intent(inout)          :: y(:,:)
-      type(psb_desc_type), target           :: desc_a
-      real(psb_dpk_),target                 :: work(:)
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_), optional           :: data !! TODO: Is this used in the code? If not, remove it.
+      real(psb_dpk_), intent(in)           :: beta
+      real(psb_dpk_), intent(inout)        :: y(:,:)
+      real(psb_dpk_),target    :: work(:)
+      type(psb_desc_type), target :: desc_a
+      integer(psb_ipk_), optional           :: data
     end subroutine psi_dswaptranm
     module subroutine psi_dswaptranv(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
-      real(psb_dpk_),intent(in)             :: beta
-      real(psb_dpk_),intent(inout)          :: y(:)
-      type(psb_desc_type), target           :: desc_a
-      real(psb_dpk_),target                 :: work(:)
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_), optional           :: data !! TODO: Is this used in the code? If not, remove it.
+      real(psb_dpk_), intent(in)           :: beta
+      real(psb_dpk_), intent(inout)        :: y(:)
+      real(psb_dpk_),target    :: work(:)
+      type(psb_desc_type), target :: desc_a
+      integer(psb_ipk_), optional           :: data
     end subroutine psi_dswaptranv
     module subroutine psi_dtranidxm(ctxt,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_ipk_), intent(in)   :: flag
       integer(psb_mpk_), intent(in)   :: n
-      real(psb_dpk_),intent(in)       :: beta
-      real(psb_dpk_),intent(inout)    :: y(:,:)
-      integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
-      real(psb_dpk_),target           :: work(:)
+      integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
+      real(psb_dpk_), intent(in)     :: beta
+      real(psb_dpk_), intent(inout)  :: y(:,:)
+      real(psb_dpk_),target :: work(:)
+      integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxm
     module subroutine psi_dtranidxv(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(in)   :: flag
-      real(psb_dpk_),intent(in)       :: beta
-      real(psb_dpk_),intent(inout)    :: y(:)
-      integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd,totrcv
-      real(psb_dpk_),target           :: work(:)
       integer(psb_ipk_), intent(out)  :: info
+      real(psb_dpk_), intent(in)     :: beta
+      real(psb_dpk_), intent(inout)  :: y(:)
+      real(psb_dpk_),target :: work(:)
+      integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_dtranidxv
   end interface psi_swaptran
  

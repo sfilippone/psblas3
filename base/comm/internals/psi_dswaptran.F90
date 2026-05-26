@@ -104,22 +104,19 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)               :: swap_status
-    real(psb_dpk_), intent(in)                  :: beta
-    class(psb_d_base_vect_type), intent(inout)  :: y
-    type(psb_desc_type),target                  :: desc_a
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_), optional                 :: data
+    integer(psb_ipk_), intent(in)                 :: swap_status
+    real(psb_dpk_), intent(in)                    :: beta
+    class(psb_d_base_vect_type), intent(inout)    :: y
+    type(psb_desc_type),target                    :: desc_a
+    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_), optional                   :: data
 
     ! locals
-    type(psb_ctxt_type)                         :: ctxt
-    integer(psb_mpk_)                           :: icomm
-    integer(psb_ipk_)                           :: np, me, total_send, total_recv, num_neighbors, err_act, data_
-    class(psb_i_base_vect_type), pointer        :: comm_indexes
+    type(psb_ctxt_type)                           :: ctxt
+    integer(psb_mpk_)                             :: icomm
+    integer(psb_ipk_)                             :: np, me, total_send, total_recv, num_neighbors, err_act, data_
+    class(psb_i_base_vect_type), pointer          :: comm_indexes
     character(len=20)  :: name
-
-    ! local variables used to detect the communication scheme
-    logical                                     :: baseline, neighbor_a2av
 
     info = psb_success_
     name = 'psi_dswaptran_vect'
@@ -174,33 +171,42 @@ contains
       goto 9999
     end if
 
-    baseline = .false.
-    neighbor_a2av = .false.
     select case(y%comm_handle%comm_type)
-    case(psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_)
-      neighbor_a2av = .true.
-    case default
-      baseline = .true.
-    end select
-
-    if (baseline) then 
-      call psi_dtran_baseline_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
-      if (info /= psb_success_) then 
-        call psb_errpush(info,name,a_err='baseline swap')
-        goto 9999
-      end if
-    else if (neighbor_a2av) then 
+    case(psb_comm_ineighbor_alltoallv_)
       call psi_dtran_neighbor_topology_vect(ctxt,swap_status,beta,y,comm_indexes,&
         & num_neighbors,total_send,total_recv,y%comm_handle,info)
-      if (info /= psb_success_) then 
-        call psb_errpush(info,name,a_err='neighbor a2av swap')
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='neighbor a2av tran')
         goto 9999
       end if
-    else 
-      info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible swap_status settings: neither baseline nor neighbor_a2av is true')
-      goto 9999
-    end if
+    case(psb_comm_persistent_ineighbor_alltoallv_)
+      call psi_dtran_neighbor_persistent_topology_vect(ctxt,swap_status,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='persistent neighbor tran')
+        goto 9999
+      end if
+    case(psb_comm_rma_pull_)
+      call psi_dtran_rma_pull_vect(ctxt,swap_status,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='rma pull tran')
+        goto 9999
+      end if
+    case(psb_comm_rma_push_)
+      call psi_dtran_rma_push_vect(ctxt,swap_status,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='rma push tran')
+        goto 9999
+      end if
+    case default
+      call psi_dtran_baseline_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='baseline tran')
+        goto 9999
+      end if
+    end select
 
     call psb_erractionrestore(err_act)
     return
@@ -687,8 +693,6 @@ contains
     class(psb_i_base_vect_type), pointer            :: comm_indexes
     character(len=20)                               :: name
 
-    ! local variables used to detect the communication scheme
-    logical                                         :: baseline, neighbor_a2av
     integer(psb_ipk_)                               :: setflag
 
 
@@ -754,33 +758,42 @@ contains
       goto 9999
     end if
 
-    baseline = .false.
-    neighbor_a2av = .false.
     select case(y%comm_handle%comm_type)
-    case(psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_)
-      neighbor_a2av = .true.
+    case(psb_comm_ineighbor_alltoallv_)
+      call psi_dtran_neighbor_topology_multivect(ctxt,setflag,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='neighbor a2av tran')
+        goto 9999
+      end if
+    case(psb_comm_persistent_ineighbor_alltoallv_)
+      call psi_dtran_neighbor_persistent_topology_multivect(ctxt,setflag,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='persistent neighbor tran')
+        goto 9999
+      end if
+    case(psb_comm_rma_pull_)
+      call psi_dtran_rma_pull_multivect(ctxt,setflag,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='rma pull tran')
+        goto 9999
+      end if
+    case(psb_comm_rma_push_)
+      call psi_dtran_rma_push_multivect(ctxt,setflag,beta,y,comm_indexes,&
+        & num_neighbors,total_send,total_recv,y%comm_handle,info)
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='rma push tran')
+        goto 9999
+      end if
     case default
-      baseline = .true.
-    end select
-
-    if (baseline) then 
       call psi_dtran_baseline_multivect(ctxt,setflag,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
-      if (info /= psb_success_) then 
-        call psb_errpush(info,name,a_err='baseline swap')
+      if (info /= psb_success_) then
+        call psb_errpush(info,name,a_err='baseline tran')
         goto 9999
       end if
-    else if (neighbor_a2av) then 
-      call psi_dtran_neighbor_topology_multivect(ctxt,setflag,beta,y,comm_indexes,num_neighbors,&
-      & total_send,total_recv,y%comm_handle,info)
-      if (info /= psb_success_) then 
-        call psb_errpush(info,name,a_err='neighbor a2av swap')
-        goto 9999
-      end if
-    else 
-      info = psb_err_mpi_error_
-      call psb_errpush(info,name,a_err='Incompatible swap_status settings: neither baseline nor neighbor_a2av is true')
-      goto 9999
-    end if
+    end select
 
     call psb_erractionrestore(err_act)
     return
@@ -1219,6 +1232,1336 @@ contains
     return
   end subroutine psi_dtran_neighbor_topology_multivect
 
+
+
+  subroutine psi_dtran_neighbor_persistent_topology_vect(ctxt,swap_status,beta,y,comm_indexes,&
+    & num_neighbors,total_send,total_recv,comm_handle,info)
+#ifdef PSB_MPI_MOD
+  use mpi
+#endif
+  implicit none
+#ifdef PSB_MPI_H
+  include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: swap_status
+    real(psb_dpk_), intent(in)                  :: beta
+    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
+    integer(psb_ipk_), intent(in)               :: num_neighbors,total_send,total_recv
+    class(psb_comm_handle_type), intent(inout)  :: comm_handle
+    integer(psb_ipk_), intent(out)              :: info
+
+    integer(psb_mpk_)                           :: icomm, np, my_rank, iret
+    integer(psb_mpk_)                           :: p2pstat(mpi_status_size)
+    type(psb_comm_neighbor_handle), pointer     :: neighbor_comm_handle
+    integer(psb_ipk_)                           :: err_act, topology_total_send, topology_total_recv, buffer_size
+    logical                                     :: do_start, do_wait
+    logical, parameter                          :: debug = .false.
+    character(len=30)                           :: name
+
+    info = psb_success_
+    name = 'psi_dtran_neighbor_persistent_topology_vect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,my_rank,np)
+    if (np == -1) then
+      info=psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    icomm = ctxt%get_mpic()
+
+    neighbor_comm_handle => null()
+    select type(ch => comm_handle)
+    type is(psb_comm_neighbor_handle)
+      neighbor_comm_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected neighbor comm_handle in persistent neighbor swaptran')
+      goto 9999
+    end select
+
+    if (swap_status == psb_comm_status_unknown_) then
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='psb_comm_status_unknown_ not allowed in persistent neighbor swaptran')
+      goto 9999
+    end if
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      if (neighbor_comm_handle%persistent_in_flight) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,a_err='Invalid START: persistent neighbor request already in flight')
+        goto 9999
+      end if
+      if (.not. neighbor_comm_handle%is_initialized) then
+        call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_, name, a_err='neighbor_topology_init')
+          goto 9999
+        end if
+      end if
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
+      buffer_size = topology_total_send + topology_total_recv
+
+      if (buffer_size > 0) then
+        if (.not. allocated(y%combuf)) then
+          if (neighbor_comm_handle%persistent_request_ready) then
+            if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+              call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+            end if
+            neighbor_comm_handle%persistent_request = mpi_request_null
+            neighbor_comm_handle%persistent_request_ready = .false.
+            neighbor_comm_handle%persistent_in_flight = .false.
+            neighbor_comm_handle%persistent_buffer_size = 0
+          end if
+          call y%new_buffer(buffer_size, info)
+          if (info /= 0) then
+            call psb_errpush(psb_err_alloc_dealloc_, name)
+            goto 9999
+          end if
+        else if (size(y%combuf) < buffer_size) then
+          if (neighbor_comm_handle%persistent_request_ready) then
+            if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+              call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+            end if
+            neighbor_comm_handle%persistent_request = mpi_request_null
+            neighbor_comm_handle%persistent_request_ready = .false.
+            neighbor_comm_handle%persistent_in_flight = .false.
+            neighbor_comm_handle%persistent_buffer_size = 0
+          end if
+          call y%new_buffer(buffer_size, info)
+          if (info /= 0) then
+            call psb_errpush(psb_err_alloc_dealloc_, name)
+            goto 9999
+          end if
+        end if
+      end if
+      neighbor_comm_handle%comm_request = mpi_request_null
+
+      if (buffer_size > 0) then
+        ! Transpose: gather from recv_indexes (we "send" recv data)
+        if (debug) write(*,*) my_rank,' tran_persistent_vect: gathering recv data,',topology_total_recv,' elems'
+        call y%gth(int(topology_total_recv,psb_mpk_), &
+          & neighbor_comm_handle%recv_indexes, &
+          & y%combuf(1:topology_total_recv))
+      else
+        neighbor_comm_handle%persistent_in_flight = .false.
+      end if
+
+      call y%device_wait()
+
+      if (.not. neighbor_comm_handle%persistent_request_ready) then
+        if (buffer_size > 0) then
+          ! Transpose: swap send/recv counts in alltoallv_init
+          !   send = recv_indexes data with recv_counts/displs
+          !   recv = into send_indexes area with send_counts/displs
+          call mpi_neighbor_alltoallv_init( &
+              & y%combuf(1),                             &
+              & neighbor_comm_handle%recv_counts,        &
+              & neighbor_comm_handle%recv_displs,        &
+              & psb_mpi_r_dpk_,                              &
+              & y%combuf(topology_total_recv + 1),       &
+              & neighbor_comm_handle%send_counts,        &
+              & neighbor_comm_handle%send_displs,        &
+              & psb_mpi_r_dpk_,                              &
+              & neighbor_comm_handle%graph_comm,         &
+              & mpi_info_null,                           &
+              & neighbor_comm_handle%persistent_request, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, m_err=(/iret/))
+            goto 9999
+          end if
+          neighbor_comm_handle%persistent_request_ready = .true.
+          neighbor_comm_handle%persistent_buffer_size = buffer_size
+        else
+          neighbor_comm_handle%persistent_request_ready = .false.
+          neighbor_comm_handle%persistent_buffer_size = 0
+        end if
+      end if
+
+      if (buffer_size > 0) then
+        call mpi_start(neighbor_comm_handle%persistent_request, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
+          goto 9999
+        end if
+        neighbor_comm_handle%persistent_in_flight = .true.
+      else
+        neighbor_comm_handle%persistent_in_flight = .false.
+      end if
+    end if ! do_start
+
+    if (do_wait) then
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
+
+      if ((topology_total_send + topology_total_recv) == 0) then
+        neighbor_comm_handle%persistent_in_flight = .false.
+      else
+        if (.not. neighbor_comm_handle%persistent_in_flight) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, a_err='Invalid WAIT: no persistent neighbor request in flight')
+          goto 9999
+        end if
+      end if
+
+      if ((topology_total_send + topology_total_recv) > 0) then
+        call mpi_wait(neighbor_comm_handle%persistent_request, p2pstat, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
+          goto 9999
+        end if
+        neighbor_comm_handle%persistent_in_flight = .false.
+
+        ! Transpose: scatter to send_indexes
+        if (debug) write(*,*) my_rank,' tran_persistent_vect: scattering to send_indexes,',topology_total_send,' elems'
+        call y%sct(int(topology_total_send,psb_mpk_), &
+          & neighbor_comm_handle%send_indexes, &
+          & y%combuf(topology_total_recv+1:topology_total_recv+topology_total_send), &
+          & beta)
+      end if
+
+      call y%device_wait()
+    end if ! do_wait
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+    return
+  end subroutine psi_dtran_neighbor_persistent_topology_vect
+
+
+  subroutine psi_dtran_rma_pull_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,comm_handle,info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)               :: ctxt
+    integer(psb_ipk_), intent(in)                 :: swap_status
+    real(psb_dpk_), intent(in)                    :: beta
+    class(psb_d_base_vect_type), intent(inout)    :: y
+    class(psb_i_base_vect_type), intent(inout)    :: comm_indexes
+    integer(psb_ipk_), intent(in)                 :: num_neighbors, total_send, total_recv
+    class(psb_comm_handle_type), intent(inout)    :: comm_handle
+    integer(psb_ipk_), intent(out)                :: info
+
+    ! Effective sizes for transpose:
+    !   eff_send = total_recv (we expose recv_indexes data)
+    !   eff_recv = total_send (we GET into the send_indexes area)
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm
+    integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
+    integer(psb_mpk_) :: remote_base
+    integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
+    integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size, eff_send, eff_recv
+    integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
+    logical :: do_start, do_wait, layout_rebuild_needed
+    type(psb_comm_rma_handle), pointer :: rma_handle
+    character(len=30) :: name
+
+    info = psb_success_
+    name = 'psi_dtran_rma_pull_vect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,my_rank,np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    icomm = ctxt%get_mpic()
+    eff_send = total_recv
+    eff_recv = total_send
+
+    select type(ch => comm_handle)
+    type is(psb_comm_rma_handle)
+      rma_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected RMA comm_handle for tran pull')
+      goto 9999
+    end select
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      buffer_size = eff_send + eff_recv
+      layout_rebuild_needed = (.not. rma_handle%layout_ready) .or. &
+         & (rma_handle%layout_nnbr /= num_neighbors) .or. &
+         & (rma_handle%layout_send /= eff_send) .or. &
+         & (rma_handle%layout_recv /= eff_recv)
+
+      if (layout_rebuild_needed) then
+        if (allocated(peer_mpi_rank)) deallocate(peer_mpi_rank)
+        if (num_neighbors > 0) then
+          allocate(peer_mpi_rank(num_neighbors), stat=iret)
+          if (iret /= 0) then
+            info = psb_err_alloc_dealloc_
+            call psb_errpush(info,name,a_err='RMA tran pull rank cache allocation')
+            goto 9999
+          end if
+        end if
+        list_pos = 1
+        do neighbor_idx = 1, num_neighbors
+          proc_to_comm = comm_indexes%v(list_pos+psb_proc_id_)
+          peer_mpi_rank(neighbor_idx) = psb_get_mpi_rank(ctxt,proc_to_comm)
+          recv_count = comm_indexes%v(list_pos+psb_n_elem_recv_)
+          send_count = comm_indexes%v(list_pos+recv_count+psb_n_elem_send_)
+          list_pos = list_pos + recv_count + send_count + 3
+        end do
+        call rma_handle%init_memory_buffer_layout_tran(info, comm_indexes%v, peer_mpi_rank, &
+             & num_neighbors, total_send, total_recv, my_rank, icomm)
+        if (info /= psb_success_) then
+          call psb_errpush(info,name,a_err='RMA tran pull init_memory_buffer_layout_tran failure')
+          goto 9999
+        end if
+      end if
+
+      if (buffer_size > 0) then
+        if (.not. allocated(y%combuf)) then
+          call y%new_buffer(ione*size(comm_indexes%v), info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        else if (size(y%combuf) < size(comm_indexes%v)) then
+          if (rma_handle%window_open) then
+            call mpi_win_unlock_all(rma_handle%win, iret)
+            rma_handle%window_open = .false.
+          end if
+          if (rma_handle%window_ready) then
+            call mpi_win_free(rma_handle%win, iret)
+            rma_handle%window_ready = .false.
+            rma_handle%win = mpi_win_null
+          end if
+          call y%new_buffer(ione*size(comm_indexes%v), info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        end if
+      end if
+
+      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
+        element_bytes = storage_size(y%combuf(1))/8
+        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_ready = .true.
+      end if
+
+      if (buffer_size > 0) then
+        ! Transpose: gather recv_indexes data into combuf(1:eff_send)
+        if (eff_send > 0) then
+          call y%gth(int(eff_send,psb_mpk_), rma_handle%peer_send_indexes, y%combuf(1:eff_send))
+        end if
+        call y%device_wait()
+
+        ! Pull from each peer's recv_indexes area with per-neighbor passive lock (neighbor-only sync).
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          send_count = rma_handle%peer_send_counts(neighbor_idx)
+          recv_count = rma_handle%peer_recv_counts(neighbor_idx)
+          prc_rank   = rma_handle%peer_mpi_rank(neighbor_idx)
+          send_pos   = rma_handle%peer_send_displs(neighbor_idx) + 1
+          recv_pos   = eff_send + rma_handle%peer_recv_displs(neighbor_idx) + 1
+
+          if (proc_to_comm /= my_rank) then
+            remote_base = rma_handle%peer_remote_send_displs(neighbor_idx)
+            if (remote_base < 1) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='Invalid remote metadata in RMA tran pull')
+              goto 9999
+            end if
+            if (recv_count > 0) then
+              call mpi_win_lock(MPI_LOCK_SHARED, prc_rank, 0, rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+              remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
+              call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count, psb_mpi_r_dpk_, &
+                   & rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+              call mpi_win_unlock(prc_rank, rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+            end if
+          else
+            if (send_count /= recv_count) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='RMA tran pull self-copy mismatch')
+              goto 9999
+            end if
+            y%combuf(recv_pos:recv_pos+recv_count-1) = y%combuf(send_pos:send_pos+send_count-1)
+          end if
+        end do
+      end if
+    end if ! do_start
+
+    ! WAIT phase: GETs already complete (per-neighbor unlock in START); scatter into send_indexes.
+    if (do_wait) then
+      ! Transpose: scatter to send_indexes (peer_recv_indexes in tran init = actual send_indexes)
+      if (eff_recv > 0) then
+        call y%sct(int(eff_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(eff_send+1:eff_send+eff_recv), beta)
+      end if
+      call y%device_wait()
+    end if ! do_wait
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+    return
+  end subroutine psi_dtran_rma_pull_vect
+
+
+  subroutine psi_dtran_rma_push_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,comm_handle,info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)               :: ctxt
+    integer(psb_ipk_), intent(in)                 :: swap_status
+    real(psb_dpk_), intent(in)                    :: beta
+    class(psb_d_base_vect_type), intent(inout)    :: y
+    class(psb_i_base_vect_type), intent(inout)    :: comm_indexes
+    integer(psb_ipk_), intent(in)                 :: num_neighbors, total_send, total_recv
+    class(psb_comm_handle_type), intent(inout)    :: comm_handle
+    integer(psb_ipk_), intent(out)                :: info
+
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm
+    integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
+    integer(psb_mpk_) :: remote_base
+    integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
+    integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size, eff_send, eff_recv
+    integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
+    integer(psb_mpk_), parameter :: rma_push_notify_tag = 914_psb_mpk_
+    logical :: do_start, do_wait, layout_rebuild_needed
+    type(psb_comm_rma_handle), pointer :: rma_handle
+    character(len=30) :: name
+
+    info = psb_success_
+    name = 'psi_dtran_rma_push_vect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,my_rank,np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    icomm = ctxt%get_mpic()
+    eff_send = total_recv
+    eff_recv = total_send
+
+    select type(ch => comm_handle)
+    type is(psb_comm_rma_handle)
+      rma_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected RMA comm_handle for tran push')
+      goto 9999
+    end select
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      buffer_size = eff_send + eff_recv
+      layout_rebuild_needed = (.not. rma_handle%layout_ready) .or. &
+         & (rma_handle%layout_nnbr /= num_neighbors) .or. &
+         & (rma_handle%layout_send /= eff_send) .or. &
+         & (rma_handle%layout_recv /= eff_recv)
+
+      if (layout_rebuild_needed) then
+        if (allocated(peer_mpi_rank)) deallocate(peer_mpi_rank)
+        if (num_neighbors > 0) then
+          allocate(peer_mpi_rank(num_neighbors), stat=iret)
+          if (iret /= 0) then
+            info = psb_err_alloc_dealloc_
+            call psb_errpush(info,name,a_err='RMA tran push rank cache allocation')
+            goto 9999
+          end if
+        end if
+        list_pos = 1
+        do neighbor_idx = 1, num_neighbors
+          proc_to_comm = comm_indexes%v(list_pos+psb_proc_id_)
+          peer_mpi_rank(neighbor_idx) = psb_get_mpi_rank(ctxt,proc_to_comm)
+          recv_count = comm_indexes%v(list_pos+psb_n_elem_recv_)
+          send_count = comm_indexes%v(list_pos+recv_count+psb_n_elem_send_)
+          list_pos = list_pos + recv_count + send_count + 3
+        end do
+        call rma_handle%init_memory_buffer_layout_tran(info, comm_indexes%v, peer_mpi_rank, &
+             & num_neighbors, total_send, total_recv, my_rank, icomm)
+        if (info /= psb_success_) then
+          call psb_errpush(info,name,a_err='RMA tran push init_memory_buffer_layout_tran failure')
+          goto 9999
+        end if
+      end if
+
+      if (buffer_size > 0) then
+        if (.not. allocated(y%combuf)) then
+          call y%new_buffer(ione*size(comm_indexes%v), info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        else if (size(y%combuf) < size(comm_indexes%v)) then
+          if (rma_handle%window_open) then
+            call mpi_win_unlock_all(rma_handle%win, iret)
+            rma_handle%window_open = .false.
+          end if
+          if (rma_handle%window_ready) then
+            call mpi_win_free(rma_handle%win, iret)
+            rma_handle%window_ready = .false.
+            rma_handle%win = mpi_win_null
+          end if
+          call y%new_buffer(ione*size(comm_indexes%v), info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        end if
+      end if
+
+      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
+        element_bytes = storage_size(y%combuf(1))/8
+        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_ready = .true.
+      end if
+
+      if (buffer_size > 0) then
+        ! Transpose: gather recv_indexes data into combuf(1:eff_send)
+        if (eff_send > 0) then
+          call y%gth(int(eff_send,psb_mpk_), rma_handle%peer_send_indexes, y%combuf(1:eff_send))
+        end if
+        call y%device_wait()
+
+        ! Pre-post notification receives before opening the window.
+        if (num_neighbors > 0) then
+          rma_handle%notify_recv_reqs(1:num_neighbors) = MPI_REQUEST_NULL
+          rma_handle%notify_send_reqs(1:num_neighbors) = MPI_REQUEST_NULL
+        end if
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          if (proc_to_comm /= my_rank) then
+            prc_rank = rma_handle%peer_mpi_rank(neighbor_idx)
+            call mpi_irecv(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
+                 & rma_push_notify_tag, icomm, rma_handle%notify_recv_reqs(neighbor_idx), iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+          end if
+        end do
+
+        call mpi_win_lock_all(0, rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .true.
+
+        ! Push our recv_indexes data to each peer's send_indexes area; notify after flush.
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          send_count = rma_handle%peer_send_counts(neighbor_idx)
+          recv_count = rma_handle%peer_recv_counts(neighbor_idx)
+          prc_rank   = rma_handle%peer_mpi_rank(neighbor_idx)
+          send_pos   = rma_handle%peer_send_displs(neighbor_idx) + 1
+          recv_pos   = eff_send + rma_handle%peer_recv_displs(neighbor_idx) + 1
+
+          if (proc_to_comm /= my_rank) then
+            remote_base = rma_handle%peer_remote_recv_displs(neighbor_idx)
+            if (remote_base < 1) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='Invalid remote metadata in RMA tran push')
+              goto 9999
+            end if
+            if (send_count > 0) then
+              remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
+              call mpi_put(y%combuf(send_pos), send_count, psb_mpi_r_dpk_, prc_rank, remote_disp, send_count, psb_mpi_r_dpk_, &
+                   & rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+            end if
+            call mpi_win_flush(prc_rank, rma_handle%win, iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
+                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+          else
+            if (send_count /= recv_count) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='RMA tran push self-copy mismatch')
+              goto 9999
+            end if
+            y%combuf(recv_pos:recv_pos+recv_count-1) = y%combuf(send_pos:send_pos+send_count-1)
+          end if
+        end do
+      end if
+    end if ! do_start
+
+    ! WAIT phase: close epoch, wait for P2P notifications, then scatter into send_indexes.
+    if (do_wait) then
+      if (rma_handle%window_open) then
+        call mpi_win_unlock_all(rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .false.
+      end if
+      if (num_neighbors > 0) then
+        call mpi_waitall(num_neighbors, rma_handle%notify_recv_reqs, MPI_STATUSES_IGNORE, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        call mpi_waitall(num_neighbors, rma_handle%notify_send_reqs, MPI_STATUSES_IGNORE, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+      end if
+      ! Transpose: scatter to send_indexes (peer_recv_indexes in tran init = actual send_indexes)
+      if (eff_recv > 0) then
+        call y%sct(int(eff_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(eff_send+1:eff_send+eff_recv), beta)
+      end if
+      call y%device_wait()
+    end if ! do_wait
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+    return
+  end subroutine psi_dtran_rma_push_vect
+
+
+  subroutine psi_dtran_neighbor_persistent_topology_multivect(ctxt,swap_status,beta,y,comm_indexes,&
+    & num_neighbors,total_send,total_recv,comm_handle,info)
+#ifdef PSB_MPI_MOD
+  use mpi
+#endif
+  implicit none
+#ifdef PSB_MPI_H
+  include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)                 :: ctxt
+    integer(psb_ipk_), intent(in)                   :: swap_status
+    real(psb_dpk_), intent(in)                      :: beta
+    class(psb_d_base_multivect_type), intent(inout) :: y
+    class(psb_i_base_vect_type), intent(inout)      :: comm_indexes
+    integer(psb_ipk_), intent(in)                   :: num_neighbors,total_send,total_recv
+    class(psb_comm_handle_type), intent(inout)      :: comm_handle
+    integer(psb_ipk_), intent(out)                  :: info
+
+    integer(psb_mpk_)                               :: icomm, np, my_rank, iret, n
+    integer(psb_mpk_)                               :: p2pstat(mpi_status_size)
+    type(psb_comm_neighbor_handle), pointer         :: neighbor_comm_handle
+    integer(psb_ipk_)                               :: err_act, topology_total_send, topology_total_recv, buffer_size
+    integer(psb_mpk_)                               :: total_send_, total_recv_
+    logical                                         :: do_start, do_wait
+    logical, parameter                              :: debug = .false.
+    character(len=30)                               :: name
+
+    info = psb_success_
+    name = 'psi_dtran_neighbor_persistent_topology_multivect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,my_rank,np)
+    if (np == -1) then
+      info=psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    icomm = ctxt%get_mpic()
+    n = y%get_ncols()
+
+    neighbor_comm_handle => null()
+    select type(ch => comm_handle)
+    type is(psb_comm_neighbor_handle)
+      neighbor_comm_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected neighbor comm_handle in persistent neighbor multivect swaptran')
+      goto 9999
+    end select
+
+    if (swap_status == psb_comm_status_unknown_) then
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='psb_comm_status_unknown_ not allowed in persistent neighbor multivect swaptran')
+      goto 9999
+    end if
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      if (neighbor_comm_handle%persistent_in_flight) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,a_err='Invalid START: persistent neighbor request already in flight')
+        goto 9999
+      end if
+      if (.not. neighbor_comm_handle%is_initialized) then
+        call neighbor_comm_handle%topology_init(comm_indexes%v, num_neighbors, total_send, total_recv, ctxt, icomm, info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_internal_error_, name, a_err='neighbor_topology_init')
+          goto 9999
+        end if
+      end if
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
+      total_send_ = topology_total_send * n
+      total_recv_ = topology_total_recv * n
+      buffer_size = total_send_ + total_recv_
+
+      if (buffer_size > 0) then
+        if (.not. allocated(y%combuf)) then
+          if (neighbor_comm_handle%persistent_request_ready) then
+            if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+              call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+            end if
+            neighbor_comm_handle%persistent_request = mpi_request_null
+            neighbor_comm_handle%persistent_request_ready = .false.
+            neighbor_comm_handle%persistent_in_flight = .false.
+            neighbor_comm_handle%persistent_buffer_size = 0
+          end if
+          call y%new_buffer(buffer_size, info)
+          if (info /= 0) then
+            call psb_errpush(psb_err_alloc_dealloc_, name)
+            goto 9999
+          end if
+        else if (size(y%combuf) < buffer_size) then
+          if (neighbor_comm_handle%persistent_request_ready) then
+            if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
+              call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
+            end if
+            neighbor_comm_handle%persistent_request = mpi_request_null
+            neighbor_comm_handle%persistent_request_ready = .false.
+            neighbor_comm_handle%persistent_in_flight = .false.
+            neighbor_comm_handle%persistent_buffer_size = 0
+          end if
+          call y%new_buffer(buffer_size, info)
+          if (info /= 0) then
+            call psb_errpush(psb_err_alloc_dealloc_, name)
+            goto 9999
+          end if
+        end if
+      end if
+      neighbor_comm_handle%comm_request = mpi_request_null
+
+      if (buffer_size > 0) then
+        ! Transpose: gather from recv_indexes
+        if (debug) write(*,*) my_rank,' tran_persistent_mv: gathering recv data,',topology_total_recv,' elems'
+        call y%gth(int(topology_total_recv,psb_mpk_), &
+          & neighbor_comm_handle%recv_indexes, &
+          & y%combuf(1:total_recv_))
+      else
+        neighbor_comm_handle%persistent_in_flight = .false.
+      end if
+
+      call y%device_wait()
+
+      if (.not. neighbor_comm_handle%persistent_request_ready) then
+        if (buffer_size > 0) then
+          ! Transpose: swap send/recv in alltoallv_init
+          call mpi_neighbor_alltoallv_init( &
+              & y%combuf(1),                              &
+              & n*neighbor_comm_handle%recv_counts,       &
+              & n*neighbor_comm_handle%recv_displs,       &
+              & psb_mpi_r_dpk_,                               &
+              & y%combuf(total_recv_ + 1),                &
+              & n*neighbor_comm_handle%send_counts,       &
+              & n*neighbor_comm_handle%send_displs,       &
+              & psb_mpi_r_dpk_,                               &
+              & neighbor_comm_handle%graph_comm,          &
+              & mpi_info_null,                            &
+              & neighbor_comm_handle%persistent_request, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info, name, m_err=(/iret/))
+            goto 9999
+          end if
+          neighbor_comm_handle%persistent_request_ready = .true.
+          neighbor_comm_handle%persistent_buffer_size = buffer_size
+        else
+          neighbor_comm_handle%persistent_request_ready = .false.
+          neighbor_comm_handle%persistent_buffer_size = 0
+        end if
+      end if
+
+      if (buffer_size > 0) then
+        call mpi_start(neighbor_comm_handle%persistent_request, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
+          goto 9999
+        end if
+        neighbor_comm_handle%persistent_in_flight = .true.
+      else
+        neighbor_comm_handle%persistent_in_flight = .false.
+      end if
+    end if ! do_start
+
+    if (do_wait) then
+      topology_total_send = neighbor_comm_handle%total_send
+      topology_total_recv = neighbor_comm_handle%total_recv
+      total_send_ = topology_total_send * n
+      total_recv_ = topology_total_recv * n
+
+      if ((topology_total_send + topology_total_recv) == 0) then
+        neighbor_comm_handle%persistent_in_flight = .false.
+      else
+        if (.not. neighbor_comm_handle%persistent_in_flight) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, a_err='Invalid WAIT: no persistent neighbor request in flight')
+          goto 9999
+        end if
+      end if
+
+      if ((topology_total_send + topology_total_recv) > 0) then
+        call mpi_wait(neighbor_comm_handle%persistent_request, p2pstat, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
+          goto 9999
+        end if
+        neighbor_comm_handle%persistent_in_flight = .false.
+
+        ! Transpose: scatter to send_indexes
+        if (debug) write(*,*) my_rank,' tran_persistent_mv: scattering to send_indexes,',topology_total_send,' elems'
+        call y%sct(int(topology_total_send,psb_mpk_), &
+          & neighbor_comm_handle%send_indexes, &
+          & y%combuf(total_recv_+1:total_recv_+total_send_), &
+          & beta)
+      end if
+
+      call y%device_wait()
+    end if ! do_wait
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+    return
+  end subroutine psi_dtran_neighbor_persistent_topology_multivect
+
+
+  subroutine psi_dtran_rma_pull_multivect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,comm_handle,info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)                   :: ctxt
+    integer(psb_ipk_), intent(in)                     :: swap_status
+    real(psb_dpk_), intent(in)                        :: beta
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)        :: comm_indexes
+    integer(psb_ipk_), intent(in)                     :: num_neighbors, total_send, total_recv
+    class(psb_comm_handle_type), intent(inout)        :: comm_handle
+    integer(psb_ipk_), intent(out)                    :: info
+
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, n
+    integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
+    integer(psb_mpk_) :: remote_base
+    integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
+    integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size, eff_send, eff_recv, total_eff_send_, total_eff_recv_
+    integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
+    logical :: do_start, do_wait, layout_rebuild_needed
+    type(psb_comm_rma_handle), pointer :: rma_handle
+    character(len=30) :: name
+
+    info = psb_success_
+    name = 'psi_dtran_rma_pull_multivect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,my_rank,np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    icomm = ctxt%get_mpic()
+    n = y%get_ncols()
+    eff_send = total_recv
+    eff_recv = total_send
+    total_eff_send_ = eff_send * n
+    total_eff_recv_ = eff_recv * n
+
+    select type(ch => comm_handle)
+    type is(psb_comm_rma_handle)
+      rma_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected RMA comm_handle for tran pull multivect')
+      goto 9999
+    end select
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      buffer_size = total_eff_send_ + total_eff_recv_
+      layout_rebuild_needed = (.not. rma_handle%layout_ready) .or. &
+         & (rma_handle%layout_nnbr /= num_neighbors) .or. &
+         & (rma_handle%layout_send /= eff_send) .or. &
+         & (rma_handle%layout_recv /= eff_recv)
+
+      if (layout_rebuild_needed) then
+        if (allocated(peer_mpi_rank)) deallocate(peer_mpi_rank)
+        if (num_neighbors > 0) then
+          allocate(peer_mpi_rank(num_neighbors), stat=iret)
+          if (iret /= 0) then
+            info = psb_err_alloc_dealloc_
+            call psb_errpush(info,name,a_err='RMA tran pull multivect rank allocation')
+            goto 9999
+          end if
+        end if
+        list_pos = 1
+        do neighbor_idx = 1, num_neighbors
+          proc_to_comm = comm_indexes%v(list_pos+psb_proc_id_)
+          peer_mpi_rank(neighbor_idx) = psb_get_mpi_rank(ctxt,proc_to_comm)
+          recv_count = comm_indexes%v(list_pos+psb_n_elem_recv_)
+          send_count = comm_indexes%v(list_pos+recv_count+psb_n_elem_send_)
+          list_pos = list_pos + recv_count + send_count + 3
+        end do
+        call rma_handle%init_memory_buffer_layout_tran(info, comm_indexes%v, peer_mpi_rank, &
+             & num_neighbors, total_send, total_recv, my_rank, icomm)
+        if (info /= psb_success_) then
+          call psb_errpush(info,name,a_err='RMA tran pull multivect init_memory_buffer_layout_tran')
+          goto 9999
+        end if
+      end if
+
+      if (buffer_size > 0) then
+        if (.not. allocated(y%combuf)) then
+          call y%new_buffer(buffer_size, info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        else if (size(y%combuf) < buffer_size) then
+          if (rma_handle%window_open) then
+            call mpi_win_unlock_all(rma_handle%win, iret)
+            rma_handle%window_open = .false.
+          end if
+          if (rma_handle%window_ready) then
+            call mpi_win_free(rma_handle%win, iret)
+            rma_handle%window_ready = .false.
+            rma_handle%win = mpi_win_null
+          end if
+          call y%new_buffer(buffer_size, info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        end if
+      end if
+
+      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
+        element_bytes = storage_size(y%combuf(1))/8
+        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_ready = .true.
+      end if
+
+      if (buffer_size > 0) then
+        if (eff_send > 0) then
+          call y%gth(int(eff_send,psb_mpk_), rma_handle%peer_send_indexes, y%combuf(1:total_eff_send_))
+        end if
+        call y%device_wait()
+
+        ! Pull from each peer's recv_indexes area with per-neighbor passive lock (neighbor-only sync).
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          send_count = rma_handle%peer_send_counts(neighbor_idx)
+          recv_count = rma_handle%peer_recv_counts(neighbor_idx)
+          prc_rank   = rma_handle%peer_mpi_rank(neighbor_idx)
+          send_pos   = rma_handle%peer_send_displs(neighbor_idx)*n + 1
+          recv_pos   = total_eff_send_ + rma_handle%peer_recv_displs(neighbor_idx)*n + 1
+
+          if (proc_to_comm /= my_rank) then
+            remote_base = rma_handle%peer_remote_send_displs(neighbor_idx)
+            if (remote_base < 1) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='Invalid remote metadata in RMA tran pull multivect')
+              goto 9999
+            end if
+            if (recv_count > 0) then
+              call mpi_win_lock(MPI_LOCK_SHARED, prc_rank, 0, rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+              remote_disp = int((remote_base - 1)*n, kind=MPI_ADDRESS_KIND)
+              call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count*n, psb_mpi_r_dpk_, &
+                   & rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+              call mpi_win_unlock(prc_rank, rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+            end if
+          else
+            if (send_count /= recv_count) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='RMA tran pull multivect self-copy mismatch')
+              goto 9999
+            end if
+            y%combuf(recv_pos:recv_pos+recv_count*n-1) = y%combuf(send_pos:send_pos+send_count*n-1)
+          end if
+        end do
+      end if
+    end if ! do_start
+
+    ! WAIT phase: GETs already complete (per-neighbor unlock in START); scatter into send_indexes.
+    if (do_wait) then
+      if (eff_recv > 0) then
+        call y%sct(int(eff_recv,psb_mpk_), rma_handle%peer_recv_indexes, &
+          & y%combuf(total_eff_send_+1:total_eff_send_+total_eff_recv_), beta)
+      end if
+      call y%device_wait()
+    end if ! do_wait
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+    return
+  end subroutine psi_dtran_rma_pull_multivect
+
+
+  subroutine psi_dtran_rma_push_multivect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,comm_handle,info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+
+    type(psb_ctxt_type), intent(in)                   :: ctxt
+    integer(psb_ipk_), intent(in)                     :: swap_status
+    real(psb_dpk_), intent(in)                        :: beta
+    class(psb_d_base_multivect_type), intent(inout)  :: y
+    class(psb_i_base_vect_type), intent(inout)        :: comm_indexes
+    integer(psb_ipk_), intent(in)                     :: num_neighbors, total_send, total_recv
+    class(psb_comm_handle_type), intent(inout)        :: comm_handle
+    integer(psb_ipk_), intent(out)                    :: info
+
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, n
+    integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
+    integer(psb_mpk_) :: remote_base
+    integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
+    integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size, eff_send, eff_recv, total_eff_send_, total_eff_recv_
+    integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
+    integer(psb_mpk_), parameter :: rma_push_notify_tag = 914_psb_mpk_
+    logical :: do_start, do_wait, layout_rebuild_needed
+    type(psb_comm_rma_handle), pointer :: rma_handle
+    character(len=30) :: name
+
+    info = psb_success_
+    name = 'psi_dtran_rma_push_multivect'
+    call psb_erractionsave(err_act)
+    call psb_info(ctxt,my_rank,np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    end if
+    icomm = ctxt%get_mpic()
+    n = y%get_ncols()
+    eff_send = total_recv
+    eff_recv = total_send
+    total_eff_send_ = eff_send * n
+    total_eff_recv_ = eff_recv * n
+
+    select type(ch => comm_handle)
+    type is(psb_comm_rma_handle)
+      rma_handle => ch
+    class default
+      info = psb_err_mpi_error_
+      call psb_errpush(info,name,a_err='Expected RMA comm_handle for tran push multivect')
+      goto 9999
+    end select
+
+    do_start = (swap_status == psb_comm_status_start_) .or. (swap_status == psb_comm_status_sync_)
+    do_wait  = (swap_status == psb_comm_status_wait_)  .or. (swap_status == psb_comm_status_sync_)
+
+    call comm_indexes%sync()
+
+    if (do_start) then
+      buffer_size = total_eff_send_ + total_eff_recv_
+      layout_rebuild_needed = (.not. rma_handle%layout_ready) .or. &
+         & (rma_handle%layout_nnbr /= num_neighbors) .or. &
+         & (rma_handle%layout_send /= eff_send) .or. &
+         & (rma_handle%layout_recv /= eff_recv)
+
+      if (layout_rebuild_needed) then
+        if (allocated(peer_mpi_rank)) deallocate(peer_mpi_rank)
+        if (num_neighbors > 0) then
+          allocate(peer_mpi_rank(num_neighbors), stat=iret)
+          if (iret /= 0) then
+            info = psb_err_alloc_dealloc_
+            call psb_errpush(info,name,a_err='RMA tran push multivect rank allocation')
+            goto 9999
+          end if
+        end if
+        list_pos = 1
+        do neighbor_idx = 1, num_neighbors
+          proc_to_comm = comm_indexes%v(list_pos+psb_proc_id_)
+          peer_mpi_rank(neighbor_idx) = psb_get_mpi_rank(ctxt,proc_to_comm)
+          recv_count = comm_indexes%v(list_pos+psb_n_elem_recv_)
+          send_count = comm_indexes%v(list_pos+recv_count+psb_n_elem_send_)
+          list_pos = list_pos + recv_count + send_count + 3
+        end do
+        call rma_handle%init_memory_buffer_layout_tran(info, comm_indexes%v, peer_mpi_rank, &
+             & num_neighbors, total_send, total_recv, my_rank, icomm)
+        if (info /= psb_success_) then
+          call psb_errpush(info,name,a_err='RMA tran push multivect init_memory_buffer_layout_tran')
+          goto 9999
+        end if
+      end if
+
+      if (buffer_size > 0) then
+        if (.not. allocated(y%combuf)) then
+          call y%new_buffer(buffer_size, info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        else if (size(y%combuf) < buffer_size) then
+          if (rma_handle%window_open) then
+            call mpi_win_unlock_all(rma_handle%win, iret)
+            rma_handle%window_open = .false.
+          end if
+          if (rma_handle%window_ready) then
+            call mpi_win_free(rma_handle%win, iret)
+            rma_handle%window_ready = .false.
+            rma_handle%win = mpi_win_null
+          end if
+          call y%new_buffer(buffer_size, info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_alloc_dealloc_,name)
+            goto 9999
+          end if
+        end if
+      end if
+
+      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
+        element_bytes = storage_size(y%combuf(1))/8
+        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_ready = .true.
+      end if
+
+      if (buffer_size > 0) then
+        if (eff_send > 0) then
+          call y%gth(int(eff_send,psb_mpk_), rma_handle%peer_send_indexes, y%combuf(1:total_eff_send_))
+        end if
+        call y%device_wait()
+
+        ! Pre-post notification receives before opening the window.
+        if (num_neighbors > 0) then
+          rma_handle%notify_recv_reqs(1:num_neighbors) = MPI_REQUEST_NULL
+          rma_handle%notify_send_reqs(1:num_neighbors) = MPI_REQUEST_NULL
+        end if
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          if (proc_to_comm /= my_rank) then
+            prc_rank = rma_handle%peer_mpi_rank(neighbor_idx)
+            call mpi_irecv(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
+                 & rma_push_notify_tag, icomm, rma_handle%notify_recv_reqs(neighbor_idx), iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+          end if
+        end do
+
+        call mpi_win_lock_all(0, rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .true.
+
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          send_count = rma_handle%peer_send_counts(neighbor_idx)
+          recv_count = rma_handle%peer_recv_counts(neighbor_idx)
+          prc_rank   = rma_handle%peer_mpi_rank(neighbor_idx)
+          send_pos   = rma_handle%peer_send_displs(neighbor_idx)*n + 1
+          recv_pos   = total_eff_send_ + rma_handle%peer_recv_displs(neighbor_idx)*n + 1
+
+          if (proc_to_comm /= my_rank) then
+            remote_base = rma_handle%peer_remote_recv_displs(neighbor_idx)
+            if (remote_base < 1) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='Invalid remote metadata in RMA tran push multivect')
+              goto 9999
+            end if
+            if (send_count > 0) then
+              remote_disp = int((remote_base - 1)*n, kind=MPI_ADDRESS_KIND)
+              call mpi_put(y%combuf(send_pos), send_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, send_count*n, psb_mpi_r_dpk_, &
+                   & rma_handle%win, iret)
+              if (iret /= mpi_success) then
+                info = psb_err_mpi_error_
+                call psb_errpush(info,name,m_err=(/iret/))
+                goto 9999
+              end if
+            end if
+            call mpi_win_flush(prc_rank, rma_handle%win, iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
+                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+          else
+            if (send_count /= recv_count) then
+              info = psb_err_internal_error_
+              call psb_errpush(info,name,a_err='RMA tran push multivect self-copy mismatch')
+              goto 9999
+            end if
+            y%combuf(recv_pos:recv_pos+recv_count*n-1) = y%combuf(send_pos:send_pos+send_count*n-1)
+          end if
+        end do
+      end if
+    end if ! do_start
+
+    ! WAIT phase: close epoch, wait for P2P notifications, then scatter into send_indexes.
+    if (do_wait) then
+      if (rma_handle%window_open) then
+        call mpi_win_unlock_all(rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .false.
+      end if
+      if (num_neighbors > 0) then
+        call mpi_waitall(num_neighbors, rma_handle%notify_recv_reqs, MPI_STATUSES_IGNORE, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        call mpi_waitall(num_neighbors, rma_handle%notify_send_reqs, MPI_STATUSES_IGNORE, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+      end if
+      if (eff_recv > 0) then
+        call y%sct(int(eff_recv,psb_mpk_), rma_handle%peer_recv_indexes, &
+          & y%combuf(total_eff_send_+1:total_eff_send_+total_eff_recv_), beta)
+      end if
+      call y%device_wait()
+    end if ! do_wait
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+    return
+  end subroutine psi_dtran_rma_push_multivect
 
 
 end submodule psi_d_swaptran_impl

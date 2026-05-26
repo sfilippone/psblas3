@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -31,14 +31,16 @@
 !    
 module psi_s_comm_a_mod
   use psi_penv_mod, only : psb_ctxt_type
-  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, psb_spk_, psb_i_base_vect_type
+  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, &
+       & psb_spk_, psb_i_base_vect_type
 
   interface psi_swapdata
     module subroutine psi_sswapdatam(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      real(psb_spk_)           :: y(:,:), beta
+      real(psb_spk_), intent(in)           :: beta
+      real(psb_spk_), intent(inout)        :: y(:,:)
       real(psb_spk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
@@ -46,7 +48,8 @@ module psi_s_comm_a_mod
     module subroutine psi_sswapdatav(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      real(psb_spk_)           :: y(:), beta 
+      real(psb_spk_), intent(in)           :: beta
+      real(psb_spk_), intent(inout)        :: y(:)
       real(psb_spk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
@@ -57,7 +60,8 @@ module psi_s_comm_a_mod
       integer(psb_mpk_), intent(in)   :: n
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      real(psb_spk_)        :: y(:,:), beta
+      real(psb_spk_), intent(in)     :: beta
+      real(psb_spk_), intent(inout)  :: y(:,:)
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_sswapidxm
@@ -66,7 +70,8 @@ module psi_s_comm_a_mod
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      real(psb_spk_)        :: y(:), beta
+      real(psb_spk_), intent(in)     :: beta
+      real(psb_spk_), intent(inout)  :: y(:)
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_sswapidxv
@@ -78,7 +83,8 @@ module psi_s_comm_a_mod
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_Mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(out)        :: info
-      real(psb_spk_)           :: y(:,:), beta
+      real(psb_spk_), intent(in)           :: beta
+      real(psb_spk_), intent(inout)        :: y(:,:)
       real(psb_spk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
@@ -86,7 +92,8 @@ module psi_s_comm_a_mod
     module subroutine psi_sswaptranv(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      real(psb_spk_)           :: y(:), beta
+      real(psb_spk_), intent(in)           :: beta
+      real(psb_spk_), intent(inout)        :: y(:)
       real(psb_spk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
@@ -97,7 +104,8 @@ module psi_s_comm_a_mod
       integer(psb_mpk_), intent(in)   :: n
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      real(psb_spk_)        :: y(:,:), beta
+      real(psb_spk_), intent(in)     :: beta
+      real(psb_spk_), intent(inout)  :: y(:,:)
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_stranidxm
@@ -106,7 +114,8 @@ module psi_s_comm_a_mod
       type(psb_ctxt_type), intent(in) :: ctxt
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      real(psb_spk_)        :: y(:), beta
+      real(psb_spk_), intent(in)     :: beta
+      real(psb_spk_), intent(inout)  :: y(:)
       real(psb_spk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_stranidxv

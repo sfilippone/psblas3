@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -36,11 +36,11 @@ module psb_d_comm_a_mod
     subroutine psb_dovrlm(x,desc_a,info,jx,ik,work,update,mode)
       import
       implicit none
-      real(psb_dpk_), intent(inout), target           :: x(:,:)
-      type(psb_desc_type), intent(in)                 :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
+      real(psb_dpk_), intent(inout), target   :: x(:,:)
+      type(psb_desc_type), intent(in)            :: desc_a
+      integer(psb_ipk_), intent(out)             :: info
       real(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional         :: update,jx,ik,mode
+      integer(psb_ipk_), intent(in), optional              :: update,jx,ik,mode
     end subroutine psb_dovrlm
     subroutine psb_dovrlv(x,desc_a,info,work,update,mode)
       import
@@ -57,22 +57,22 @@ module psb_d_comm_a_mod
     subroutine psb_dhalom(x,desc_a,info,jx,ik,work,tran,mode,data)
       import
       implicit none
-      real(psb_dpk_), intent(inout), target           :: x(:,:)
-      type(psb_desc_type), intent(in)                 :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
+      real(psb_dpk_), intent(inout), target :: x(:,:)
+      type(psb_desc_type), intent(in)          :: desc_a
+      integer(psb_ipk_), intent(out)                     :: info
       real(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional         :: mode,jx,ik,data
-      character, intent(in), optional                 :: tran
+      integer(psb_ipk_), intent(in), optional           :: mode,jx,ik,data
+      character, intent(in), optional         :: tran
     end subroutine psb_dhalom
     subroutine psb_dhalov(x,desc_a,info,work,tran,mode,data)
       import
       implicit none
-      real(psb_dpk_), intent(inout)                   :: x(:)
-      type(psb_desc_type), intent(in)                 :: desc_a
-      integer(psb_ipk_), intent(out)                  :: info
+      real(psb_dpk_), intent(inout)        :: x(:)
+      type(psb_desc_type), intent(in)       :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
       real(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional         :: mode,data
-      character, intent(in), optional                 :: tran
+      integer(psb_ipk_), intent(in), optional           :: mode,data
+      character, intent(in), optional         :: tran
     end subroutine psb_dhalov
   end interface psb_halo
 

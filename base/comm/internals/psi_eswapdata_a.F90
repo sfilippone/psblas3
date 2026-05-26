@@ -39,7 +39,7 @@
 !   application environment. All the variants have the same structure 
 !   In all these subroutines X may be:    I    Integer
 !                                         S    real(psb_spk_)
-!                                         D    real(psb_dpk_)
+!                                         D    integer(psb_epk_)
 !                                         C    complex(psb_spk_)
 !                                         Z    complex(psb_dpk_)
 !   Basically the operation is as follows: on each process, we identify 
@@ -70,10 +70,10 @@
 !
 !
 !    n        - integer                 Number of columns in Y               
-!    beta     - integer                  Choose overwrite or sum. 
-!    y(:,:)   - integer                  The data area                        
+!    beta     - real                  Choose overwrite or sum. 
+!    y(:,:)   - real                  The data area                        
 !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-!    work(:)  - integer                  Buffer space. If not sufficient, will do 
+!    work(:)  - real                  Buffer space. If not sufficient, will do 
 !                                       our own internal allocation.
 !    info     - integer.                return code.
 !    data     - integer                 which list is to be used to exchange data
@@ -97,13 +97,14 @@ contains
     include 'mpif.h'
 #endif
 
-    integer(psb_mpk_), intent(in)      :: n
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-integer(psb_epk_)         :: y(:,:), beta
-integer(psb_epk_), target :: work(:)
-    type(psb_desc_type),target      :: desc_a
-    integer(psb_ipk_), optional        :: data
+    integer(psb_ipk_), intent(in)     :: flag
+    integer(psb_mpk_), intent(in)     :: n
+    integer(psb_epk_), intent(in)        :: beta
+    integer(psb_epk_), intent(inout)     :: y(:,:)
+    type(psb_desc_type),target        :: desc_a
+    integer(psb_epk_), target            :: work(:)
+    integer(psb_ipk_), intent(out)    :: info
+    integer(psb_ipk_), optional       :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -165,12 +166,13 @@ integer(psb_epk_), target :: work(:)
 #endif
 
     type(psb_ctxt_type), intent(in) :: ctxt
-    integer(psb_mpk_), intent(in)   :: n
     integer(psb_ipk_), intent(in)   :: flag
+    integer(psb_mpk_), intent(in)   :: n
     integer(psb_ipk_), intent(out)  :: info
-integer(psb_epk_)         :: y(:,:), beta
-integer(psb_epk_), target :: work(:)
-    integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
+    integer(psb_epk_), intent(in)      :: beta
+    integer(psb_epk_), intent(inout)   :: y(:,:)
+    integer(psb_epk_), target          :: work(:)
+    integer(psb_ipk_), intent(in)   :: idx(:),totxch,totsnd, totrcv
 
     ! locals
 
@@ -348,7 +350,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
         nesd = idx(pnti+nerv+psb_n_elem_send_)
         prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
         if ((nerv>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_int8_swap_tag
+          p2ptag = psb_double_swap_tag
           call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
                & psb_mpi_epk_,prcid(i),&
                & p2ptag, icomm,rvhd(i),iret)
@@ -370,7 +372,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-        p2ptag = psb_int8_swap_tag
+        p2ptag = psb_double_swap_tag
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           if (usersend) then 
             call mpi_rsend(sndbuf(snd_pt),n*nesd,&
@@ -401,7 +403,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-        p2ptag = psb_int8_swap_tag
+        p2ptag = psb_double_swap_tag
 
         if ((proc_to_comm /= me).and.(nerv>0)) then
           call mpi_wait(rvhd(i),p2pstat,iret)
@@ -510,7 +512,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
   !   application environment. All the variants have the same structure 
   !   In all these subroutines X may be:    I    Integer
   !                                         S    real(psb_spk_)
-  !                                         D    real(psb_dpk_)
+  !                                         D    integer(psb_epk_)
   !                                         C    complex(psb_spk_)
   !                                         Z    complex(psb_dpk_)
   !   Basically the operation is as follows: on each process, we identify 
@@ -541,10 +543,10 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
   !
   !
   !    n        - integer                 Number of columns in Y               
-  !    beta     - integer                  Choose overwrite or sum. 
-  !    y(:)     - integer                  The data area                        
+  !    beta     - real                  Choose overwrite or sum. 
+  !    y(:)     - real                  The data area                        
   !    desc_a   - type(psb_desc_type).  The communication descriptor.        
-  !    work(:)  - integer                  Buffer space. If not sufficient, will do 
+  !    work(:)  - real                  Buffer space. If not sufficient, will do 
   !                                       our own internal allocation.
   !    info     - integer.                return code.
   !    data     - integer                 which list is to be used to exchange data
@@ -565,12 +567,13 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
     include 'mpif.h'
 #endif
 
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    integer(psb_epk_)         :: y(:), beta
-    integer(psb_epk_), target :: work(:)
-    type(psb_desc_type),target      :: desc_a
-    integer(psb_ipk_), optional        :: data
+    integer(psb_ipk_), intent(in)       :: flag
+    integer(psb_epk_), intent(in)          :: beta
+    integer(psb_epk_), intent(inout)       :: y(:)
+    type(psb_desc_type),target          :: desc_a
+    integer(psb_epk_), target              :: work(:)
+    integer(psb_ipk_), intent(out)      :: info
+    integer(psb_ipk_), optional         :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -648,7 +651,8 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)   :: flag
     integer(psb_ipk_), intent(out)  :: info
-    integer(psb_epk_)         :: y(:), beta
+    integer(psb_epk_), intent(in)      :: beta
+    integer(psb_epk_), intent(inout)   :: y(:) 
     integer(psb_epk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
@@ -830,7 +834,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
 
         prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
         if ((nerv>0).and.(proc_to_comm /= me)) then 
-          p2ptag = psb_int8_swap_tag
+          p2ptag = psb_double_swap_tag
           call mpi_irecv(rcvbuf(rcv_pt),nerv,&
                & psb_mpi_epk_,prcid(i),&
                & p2ptag, icomm,rvhd(i),iret)
@@ -852,7 +856,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
 
-        p2ptag = psb_int8_swap_tag
+        p2ptag = psb_double_swap_tag
 
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           if (usersend) then 
@@ -882,7 +886,7 @@ integer(psb_epk_), pointer, dimension(:) :: sndbuf, rcvbuf
         proc_to_comm = idx(pnti+psb_proc_id_)
         nerv = idx(pnti+psb_n_elem_recv_)
         nesd = idx(pnti+nerv+psb_n_elem_send_)
-        p2ptag = psb_int8_swap_tag
+        p2ptag = psb_double_swap_tag
 
         if ((proc_to_comm /= me).and.(nerv>0)) then
           call mpi_wait(rvhd(i),p2pstat,iret)
