@@ -178,7 +178,7 @@ subroutine psb_dkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
   procedure(psb_dkryl_vect)       :: psb_dbicg_vect, psb_dcgstab_vect, psb_dcgs_vect
   procedure(psb_dkryl_rest_vect)  :: psb_drgmres_vect, psb_dcgstabl_vect, psb_dgcr_vect
   procedure(psb_dkryl_cond_vect)  :: psb_dcg_vect, psb_dfcg_vect
-  procedure(psb_dkryl_step_vect)  :: psb_dscg_vect
+  procedure(psb_dkryl_step_vect)  :: psb_dscg_vect, psb_dscg2_vect
 
   logical             :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
@@ -237,7 +237,17 @@ subroutine psb_dkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
       
       call psb_dscg_vect(a, prec, b, x, steps_, eps, desc_a, info, &
           & itmax = itmax, iter = iter, err = err, itrace = itrace_, istop = istop, &
-          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)              
+          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)
+      
+    case('SSTEPCG1')
+      ! steps (default = 5)
+      steps_ = 5
+      if(present(steps)) steps_ = steps
+
+      call psb_dscg2_vect(a, prec, b, x, steps_, eps, desc_a, info, &
+          & itmax = itmax, iter = iter, err = err, itrace = itrace_, istop = istop, &
+          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)  
+                     
     case default
       if (me == psb_root_) write(psb_err_unit, *) trim(name) , &
           & ': Warning: Unknown method  ', method, ', defaulting to BiCGSTAB'
