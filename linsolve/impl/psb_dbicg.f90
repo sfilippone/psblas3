@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -187,8 +187,7 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
   end if
 
 
-
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=9_psb_ipk_)
+  call psb_geall(wwrk,desc_a,info,n=9_psb_ipk_)
   if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v)  
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_non_
@@ -283,8 +282,8 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
         call psb_geaxpby(done,zt,beta,pt,desc_a,info)
       end if
 
-       call psb_spmm(done,a,p,dzero,q,desc_a,info)
-       call psb_spmm(done,a,pt,dzero,qt,desc_a,info,trans='c')
+      call psb_spmm(done,a,p,dzero,q,desc_a,info)
+      call psb_spmm(done,a,pt,dzero,qt,desc_a,info,trans='c')
 
       sigma = psb_gedot(pt,q,desc_a,info)
       if (sigma == dzero) then
@@ -314,10 +313,6 @@ subroutine psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(err)) err = derr
 
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
-  if (info /= psb_success_) then
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
   call psb_erractionrestore(err_act)
   return

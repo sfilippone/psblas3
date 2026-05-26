@@ -281,13 +281,19 @@ contains
     end if
 
     ixb = psb_c_get_index_base()
-    if (ixb == 1) then
-      call psb_geins(nz,irw(1:nz),val(1:nz),&
-           & xp,descp,info)
-    else
+    select case(ixb)
+    case (0)  
+      !write(0,*) 'C_GEINS:  IDX_BASE',ixb,' :',irw(1:nz)+(1-ixb),val(1:nz)
       call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
            & xp,descp,info)
-    end if
+    case(1)
+      !write(0,*) 'C_GEINS:  IDX_BASE',ixb,' :',irw(1:nz),val(1:nz)
+      call psb_geins(nz,irw(1:nz),val(1:nz),&
+           & xp,descp,info)
+    case default
+      write(0,*) 'C_GEINS: Unkonwn inndex base ',ixb
+      info =-2
+    end select
 
     res = min(0,info)
 
@@ -440,6 +446,7 @@ contains
 #endif
     type(psb_z_ell_sparse_mat), target    :: aell
     type(psb_z_csr_sparse_mat), target   :: acsr
+    type(psb_z_csc_sparse_mat), target   :: acsc
     type(psb_z_coo_sparse_mat), target   :: acoo
     type(psb_z_hll_sparse_mat), target    :: ahll
     type(psb_z_hdia_sparse_mat), target  :: ahdia
@@ -484,6 +491,8 @@ contains
       amold => ahll
     case('CSR')
       amold => acsr
+    case('CSC')
+      amold => acsc
     case('DNS')
       amold => adns
     case default
@@ -498,6 +507,8 @@ contains
       amold => ahdia
     case('CSR')
       amold => acsr
+    case('CSC')
+      amold => acsc
     case('DNS')
       amold => adns
     case default
@@ -514,7 +525,7 @@ contains
            & upd=upd,mold=arsb)
 #endif
 #endif
-    case('ELL','HLL','CSR','DNS')
+    case('ELL','HLL','CSR','DNS','CSC')
       call psb_spasb(ap,descp,info,upd=upd,mold=amold)
 #if defined(PSB_HAVE_CUDA)
     case('ELG','HLG','CSRG')
@@ -653,5 +664,40 @@ contains
     return
 
   end function psb_c_zgetelem
+
+  function psb_c_zmatgetelem(ah,rowindex,colindex,cdh) bind(c) result(res)
+    implicit none
+
+    type(psb_c_zspmat)      :: ah
+    integer(psb_c_lpk_), value :: rowindex, colindex
+    type(psb_c_descriptor)     :: cdh
+    complex(c_double_complex)           :: res
+
+    type(psb_zspmat_type), pointer :: ap
+    type(psb_desc_type), pointer     :: descp
+    integer(psb_c_ipk_)              :: info, ixb
+
+    res = -1
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    ixb = psb_c_get_index_base()
+    if (ixb == 1) then
+      res = psb_getelem(ap,rowindex,colindex,descp,info)
+    else
+      res = psb_getelem(ap,rowindex+(1-ixb),colindex+(1-ixb),descp,info)
+    end if
+
+    return
+
+  end function psb_c_zmatgetelem
 
 end module psb_z_tools_cbind_mod

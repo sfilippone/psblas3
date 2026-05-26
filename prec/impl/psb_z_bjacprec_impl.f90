@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -75,26 +75,25 @@ subroutine psb_z_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
   use psb_base_mod
   use psb_z_bjacprec, psb_protect_name => psb_z_bjac_apply_vect
   implicit none
-  type(psb_desc_type),intent(in)    :: desc_data
+  type(psb_desc_type),intent(in)                :: desc_data
   class(psb_z_bjac_prec_type), intent(inout)  :: prec
-  complex(psb_dpk_),intent(in)         :: alpha,beta
-  type(psb_z_vect_type),intent(inout)   :: x
-  type(psb_z_vect_type),intent(inout)   :: y
-  integer(psb_ipk_), intent(out)              :: info
-  character(len=1), optional        :: trans
+  complex(psb_dpk_),intent(in)                    :: alpha,beta
+  type(psb_z_vect_type),intent(inout)         :: x
+  type(psb_z_vect_type),intent(inout)         :: y
+  integer(psb_ipk_), intent(out)                :: info
+  character(len=1), optional                    :: trans
 
   ! Local variables
-  integer(psb_ipk_) :: n_row,n_col
-  complex(psb_dpk_), pointer :: ww(:)
+  integer(psb_ipk_)       :: n_row,n_col
   type(psb_z_vect_type) :: wv, wv1
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: err_act, ierr(5)
-  integer(psb_ipk_) :: debug_level, debug_unit
-  logical            :: do_alloc_wrk
-  character          :: trans_
-  character(len=20)  :: name='z_bjac_prec_apply'
-  character(len=20)  :: ch_err
+  type(psb_ctxt_type)     :: ctxt
+  integer(psb_ipk_)       :: np,me
+  integer(psb_ipk_)       :: err_act, ierr(5)
+  integer(psb_ipk_)       :: debug_level, debug_unit
+  logical                 :: do_alloc_wrk
+  character               :: trans_
+  character(len=20)       :: name='z_bjac_prec_apply'
+  character(len=20)       :: ch_err
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -138,8 +137,6 @@ subroutine psb_z_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
     goto 9999
   end if
 
-
-  allocate(ww(n_col),stat=info)
 
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
@@ -197,7 +194,7 @@ subroutine psb_z_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
         if (info == psb_success_) call wv1%mlt(zone,prec%dv,wv,zzero,info)
         if(info == psb_success_) &
              & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1,&
-             & beta,y,desc_data,info, trans=trans_, doswap=.false.)
+             & beta,y,desc_data,info, trans=trans_,doswap=.false.)
 
        case('T','C')
          call psb_spmm(zone,prec%av(psb_l_pr_),x,zzero,wv,desc_data,info,&
@@ -224,9 +221,6 @@ subroutine psb_z_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
   call psb_halo(y,desc_data,info,data=psb_comm_mov_)
 
   if (do_alloc_wrk) call prec%free_wrk(info)
-
-  deallocate(ww)
-
 
   call psb_erractionrestore(err_act)
   return
@@ -380,6 +374,7 @@ subroutine psb_z_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
         if (info == psb_success_) &
             & call psb_spmm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
             & trans=trans_,work=aux,doswap=.false.)
+
       case('C')
         call psb_spmm(zone,prec%av(psb_u_pr_),x,zzero,ww,desc_data,info,&
              & trans=trans_,work=aux,doswap=.false.)
@@ -387,6 +382,7 @@ subroutine psb_z_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
         if (info == psb_success_) &
              & call psb_spmm(alpha,prec%av(psb_l_pr_),ww,beta,y,desc_data,info,&
              & trans=trans_,work=aux,doswap=.false.)
+
     end select
 
 

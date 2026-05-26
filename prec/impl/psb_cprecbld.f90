@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -35,10 +35,10 @@ subroutine psb_cprecbld(a,desc_a,p,info,amold,vmold,imold)
   use psb_c_prec_type, psb_protect_name => psb_cprecbld
   Implicit None
 
-  type(psb_cspmat_type), intent(in), target   :: a
-  type(psb_desc_type), intent(inout), target    :: desc_a
-  class(psb_cprec_type),intent(inout), target :: p
-  integer(psb_ipk_), intent(out)                :: info
+  type(psb_cspmat_type), intent(inout), target :: a
+  type(psb_desc_type), intent(inout), target     :: desc_a
+  class(psb_cprec_type),intent(inout), target  :: p
+  integer(psb_ipk_), intent(out)                 :: info
   class(psb_c_base_sparse_mat), intent(in), optional :: amold
   class(psb_c_base_vect_type), intent(in), optional  :: vmold
   class(psb_i_base_vect_type), intent(in), optional  :: imold

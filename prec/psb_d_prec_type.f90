@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -85,7 +85,7 @@ module psb_d_prec_type
            & psb_d_base_sparse_mat, psb_dpk_, psb_d_base_vect_type, &
            & psb_dprec_type, psb_i_base_vect_type
       implicit none
-      type(psb_dspmat_type), intent(in), target    :: a
+      type(psb_dspmat_type), intent(inout), target :: a
       type(psb_desc_type), intent(inout), target     :: desc_a
       class(psb_dprec_type), intent(inout), target :: prec
       integer(psb_ipk_), intent(out)               :: info
@@ -110,47 +110,46 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply2_vect(prec,x,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type),intent(inout)  :: x
-      type(psb_d_vect_type),intent(inout)  :: y
-      integer(psb_ipk_), intent(out)                 :: info
-      character(len=1), optional           :: trans
+      type(psb_desc_type),intent(in)          :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      type(psb_d_vect_type),intent(inout)   :: x
+      type(psb_d_vect_type),intent(inout)   :: y
+      integer(psb_ipk_), intent(out)          :: info
+      character(len=1), optional              :: trans
     end subroutine psb_d_apply2_vect
   end interface
 
   interface
     subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-        type(psb_desc_type),intent(in)       :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      type(psb_d_vect_type),intent(inout)  :: x
-      integer(psb_ipk_), intent(out)                 :: info
-      character(len=1), optional           :: trans
+        type(psb_desc_type),intent(in)        :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      type(psb_d_vect_type),intent(inout)   :: x
+      integer(psb_ipk_), intent(out)          :: info
+      character(len=1), optional              :: trans
     end subroutine psb_d_apply1_vect
   end interface
 
   interface
-    subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
+    subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      real(psb_dpk_),intent(inout)   :: x(:)
-      real(psb_dpk_),intent(inout)   :: y(:)
-      integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+      type(psb_desc_type),intent(in)          :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      real(psb_dpk_),intent(inout)           :: x(:)
+      real(psb_dpk_),intent(inout)           :: y(:)
+      integer(psb_ipk_), intent(out)          :: info
+      character(len=1), optional              :: trans
     end subroutine psb_d_apply2v
   end interface
 
   interface
     subroutine psb_d_apply1v(prec,x,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type),intent(in)    :: desc_data
-      class(psb_dprec_type), intent(inout) :: prec
-      real(psb_dpk_),intent(inout)   :: x(:)
-      integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
+      type(psb_desc_type),intent(in)          :: desc_data
+      class(psb_dprec_type), intent(inout)  :: prec
+      real(psb_dpk_),intent(inout)           :: x(:)
+      integer(psb_ipk_), intent(out)          :: info
+      character(len=1), optional              :: trans
     end subroutine psb_d_apply1v
   end interface
 

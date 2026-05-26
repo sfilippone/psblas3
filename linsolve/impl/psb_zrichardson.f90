@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -154,13 +154,6 @@ Subroutine psb_zrichardson_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
-  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)  
-  if (info /= psb_success_) then 
-    info=psb_err_from_subroutine_non_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
   p  => wwrk(1)
   q  => wwrk(2)
   r  => wwrk(3)

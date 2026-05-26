@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -113,7 +113,8 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   real(psb_dpk_), allocatable, target   :: wwrk(:,:)
   type(psb_d_vect_type) :: q, r, p, v, s, t, z, f
 
-  integer(psb_ipk_) :: itmax_, it, itrace_, n_row, n_col
+  integer(psb_ipk_) :: itmax_, it, itrace_,&
+       & n_row, n_col
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   Logical, Parameter :: exchange=.True., noexchange=.False., debug1 = .False.
@@ -178,13 +179,6 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
     call psb_errpush(info,name,a_err='psb_chkvect on B')
     goto 9999
   end if
-
-  if (info /= psb_success_) then  
-    info=psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  End If
-
 
   call psb_geasb(q,desc_a,info,mold=x%v,scratch=.true.) 
   call psb_geasb(r,desc_a,info,mold=x%v,scratch=.true.)
@@ -363,7 +357,6 @@ Subroutine psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
 
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
   if (present(err)) err = derr
-
 
   call x%sync()
   call psb_gefree(q,desc_a,info) 

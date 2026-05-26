@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -113,14 +113,13 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err,cond
 ! =   Local data
-  real(psb_dpk_), allocatable, target   :: td(:),tu(:),eig(:),ewrk(:)
+  real(psb_dpk_), allocatable, target   ::td(:),tu(:),eig(:),ewrk(:)
   integer(psb_mpk_), allocatable :: ibl(:), ispl(:), iwrk(:)
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: q, p, r, z, w
   real(psb_dpk_)   :: alpha, beta, rho, rho_old, sigma,alpha_old,beta_old
   integer(psb_ipk_) :: itmax_, istop_, it, itx, itrace_,&
        &  n_col, n_row,err_act, ieg,nspl, istebz
-    integer(psb_ipk_) :: i, swap_status
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
   type(psb_ctxt_type) :: ctxt
@@ -140,11 +139,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name,a_err='invalid desc_a context in psb_dcg_vect')
-    goto 9999
-  end if
   if (.not.allocated(b%v)) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info,name)
@@ -177,21 +171,9 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
+
+  call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
   if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)  
-  if ((info == psb_success_).and.allocated(x%v%comm_handle)) then
-    do i=1,size(wwrk)
-      if (allocated(wwrk(i)%v)) then
-        call psb_comm_set(x%v%comm_handle%comm_type,wwrk(i)%v%comm_handle,info)
-        if (info /= psb_success_) exit
-        wwrk(i)%v%comm_handle%id = x%v%comm_handle%id
-        call x%v%comm_handle%get_swap_status(swap_status,info)
-        if (info /= psb_success_) exit
-        call wwrk(i)%v%comm_handle%set_swap_status(swap_status,info)
-        if (info /= psb_success_) exit
-      end if
-    end do
-  end if
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
@@ -335,10 +317,6 @@ subroutine psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(err)) err = derr
 
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
-  if (info /= psb_success_) then
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
   call psb_erractionrestore(err_act)
   return

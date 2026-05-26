@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -113,7 +113,7 @@ Subroutine psb_zcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   complex(psb_dpk_), allocatable, target   :: wwrk(:,:)
   type(psb_z_vect_type) :: q, r, p, v, s, t, z, f
 
-  integer(psb_ipk_) :: itmax_, it,itrace_,&
+  integer(psb_ipk_) :: itmax_, it, itrace_,&
        & n_row, n_col
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -179,7 +179,6 @@ Subroutine psb_zcgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
     call psb_errpush(info,name,a_err='psb_chkvect on B')
     goto 9999
   end if
-
 
   call psb_geasb(q,desc_a,info,mold=x%v,scratch=.true.) 
   call psb_geasb(r,desc_a,info,mold=x%v,scratch=.true.)

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -223,6 +223,11 @@ subroutine psb_zgcr_vect(a,prec,b,x,eps,desc_a,info,&
   endif
   
   h = zzero
+  if (info /= psb_success_) then 
+    info=psb_err_from_subroutine_non_ 
+    call psb_errpush(info,name)
+    goto 9999
+  end if
   
   call psb_geasb(r, desc_a,info, scratch=.true.,mold=x%v)
   

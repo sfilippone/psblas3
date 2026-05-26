@@ -18,7 +18,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -227,7 +227,6 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
     call psb_errpush(info,name,a_err='psb_chkvect on B')
     goto 9999
   end if
-
 
   if (info == psb_success_) call psb_geall(v,desc_a,info,n=nl+1)
   if (info == psb_success_) call psb_geall(w,desc_a,info)
@@ -485,6 +484,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   if (info == psb_success_) call psb_gefree(w,desc_a,info)
   if (info == psb_success_) call psb_gefree(w1,desc_a,info)
   if (info == psb_success_) call psb_gefree(xt,desc_a,info)
+  if (info == psb_success_) deallocate(h,c,s,rs,rst, stat=info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)

@@ -5,12 +5,6 @@ module psb_spmv_overlap_test
 
   use psb_base_mod
   use psb_util_mod
-  use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
-    & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_, &
-    & psb_comm_handle_type
-  use psb_comm_baseline_mod, only: psb_comm_baseline_handle
-  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
-  use psb_comm_rma_mod, only: psb_comm_rma_handle
 #ifdef PSB_HAVE_CUDA
   use psb_cuda_mod
 #endif

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -342,6 +342,7 @@ subroutine psb_cgcr_vect(a,prec,b,x,eps,desc_a,info,&
     if (info == psb_success_) call psb_gefree(c(i),desc_a,info)   
   end do
   
+  if (info == psb_success_) deallocate(h,c_scale,z,c,alpha,stat=info)
   if (info /= psb_success_) then
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
