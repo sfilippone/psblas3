@@ -7,7 +7,8 @@ program psb_comm_cg_test
   use psb_prec_mod
   use psb_linsolve_mod
   use psb_comm_factory_mod
-  use psb_comm_neighbor_impl_mod, only: psb_comm_neighbor_handle
+  use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
+       & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_
   use, intrinsic :: ieee_arithmetic
 
   implicit none
@@ -205,7 +206,14 @@ program psb_comm_cg_test
     do scheme_idx = 1, n_schemes
       do rep = 1, nrep
         t_start = psb_wtime()
-        call psb_comm_set(scheme_type(scheme_idx),x%v%comm_handle,info)
+        ! Set default scheme on the descriptor: all vectors that lazy-init during
+        ! this solve (including internal CG vectors r, p, q, z) will use this scheme.
+        call desc_a%set_comm_scheme(scheme_type(scheme_idx), info)
+        if (info /= psb_success_) goto 9999
+        ! Free x comm_handle so it also re-initializes from desc_a%comm_type
+        ! (it may already be allocated from a previous rep).
+        if (allocated(x%v%comm_handle)) call psb_comm_free(x%v%comm_handle, info)
+        if (info /= psb_success_) goto 9999
         comm_set_time(prec_idx,scheme_idx,rep) = psb_wtime() - t_start
         
         call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
@@ -256,6 +264,21 @@ program psb_comm_cg_test
         call psb_amx(ctxt,krylov_time(prec_idx,scheme_idx,rep))
 
         if (info /= psb_success_) goto 9999
+
+        ! Verify x used the descriptor scheme (lazy init should have fired during CG).
+        if (allocated(x%v%comm_handle)) then
+          if (x%v%comm_handle%comm_type /= scheme_type(scheme_idx)) then
+            if (my_rank == psb_root_) &
+              write(psb_err_unit,'("SCHEME MISMATCH rank=",i0," expected=",i0," got=",i0)') &
+                   my_rank, scheme_type(scheme_idx), x%v%comm_handle%comm_type
+            info = psb_err_internal_error_
+            goto 9999
+          else
+            if (my_rank == psb_root_ .and. rep == 1) &
+              write(psb_out_unit,'("  [OK] x comm_handle matches scheme: ",a)') &
+                   trim(scheme_name(scheme_idx))
+          end if
+        end if
 
         call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
         if (info /= psb_success_) goto 9999

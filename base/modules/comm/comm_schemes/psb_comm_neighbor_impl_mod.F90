@@ -19,6 +19,7 @@ module psb_comm_neighbor_impl_mod
     integer(psb_ipk_)  :: num_neighbors = 0
     integer(psb_mpk_), allocatable :: send_counts(:),  recv_counts(:)
     integer(psb_mpk_), allocatable :: send_displs(:),  recv_displs(:)
+    integer(psb_mpk_), allocatable :: send_displs_v(:), recv_displs_v(:)
     integer(psb_ipk_), allocatable :: send_indexes(:)
     integer(psb_ipk_), allocatable :: recv_indexes(:)
     integer(psb_ipk_)  :: total_send = 0
@@ -169,6 +170,20 @@ contains
       goto 9999
     end if
 
+    allocate(topology%send_displs_v(num_neighbors), stat=info)
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, name, a_err='Send vect displacements allocation failed')
+      goto 9999
+    end if
+
+    allocate(topology%recv_displs_v(num_neighbors), stat=info)
+    if (info /= psb_success_) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, name, a_err='Receive vect displacements allocation failed')
+      goto 9999
+    end if
+
 
     ! -----------------------------------------------------------
     ! Allocate the gather/scatter index arrays
@@ -219,6 +234,11 @@ contains
       topology%recv_counts(i) = int(num_elem_recv, psb_mpk_)
       topology%send_displs(i) = int(send_offset, psb_mpk_)
       topology%recv_displs(i) = int(recv_offset, psb_mpk_)
+      ! Positional displacements: match the combuf layout used by gthzbuf/sctb_buf
+      ! snd_pt = 1 + position + num_elem_recv + psb_n_elem_send_  → displs = snd_pt - 1
+      ! rcv_pt = 1 + position + psb_n_elem_recv_                  → displs = rcv_pt - 1
+      topology%send_displs_v(i) = int(position + num_elem_recv + psb_n_elem_send_, psb_mpk_)
+      topology%recv_displs_v(i) = int(position + psb_n_elem_recv_, psb_mpk_)
 
       ! Fill recv_indexes from halo_index(position+2 .. position+1+nerv)
       do k = 1, num_elem_recv
@@ -330,6 +350,8 @@ contains
     if (allocated(this%recv_counts))      deallocate(this%recv_counts)
     if (allocated(this%send_displs))      deallocate(this%send_displs)
     if (allocated(this%recv_displs))      deallocate(this%recv_displs)
+    if (allocated(this%send_displs_v))    deallocate(this%send_displs_v)
+    if (allocated(this%recv_displs_v))    deallocate(this%recv_displs_v)
     if (allocated(this%send_indexes))     deallocate(this%send_indexes)
     if (allocated(this%recv_indexes))     deallocate(this%recv_indexes)
 
@@ -357,6 +379,8 @@ contains
     if (allocated(this%recv_counts))      val = val + psb_sizeof_ip * size(this%recv_counts)
     if (allocated(this%send_displs))      val = val + psb_sizeof_ip * size(this%send_displs)
     if (allocated(this%recv_displs))      val = val + psb_sizeof_ip * size(this%recv_displs)
+    if (allocated(this%send_displs_v))    val = val + psb_sizeof_ip * size(this%send_displs_v)
+    if (allocated(this%recv_displs_v))    val = val + psb_sizeof_ip * size(this%recv_displs_v)
     if (allocated(this%send_indexes))     val = val + psb_sizeof_ip * size(this%send_indexes)
     if (allocated(this%recv_indexes))     val = val + psb_sizeof_ip * size(this%recv_indexes)
 

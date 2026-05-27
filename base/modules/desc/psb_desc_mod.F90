@@ -40,6 +40,7 @@ module psb_desc_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_i_vect_mod
+  use psb_comm_schemes_mod, only: psb_comm_isend_irecv_
 
   implicit none
 
@@ -216,6 +217,7 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
     integer(psb_ipk_), allocatable   :: idx_space(:)
+    integer(psb_ipk_)                :: comm_type = psb_comm_isend_irecv_
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
@@ -268,7 +270,7 @@ module psb_desc_mod
     procedure, pass(desc) :: g2lv2_ins       => cd_g2lv2_ins
     generic, public       :: g2l_ins         => g2ls2_ins, g2lv2_ins
     generic, public       :: g2lip_ins       => g2ls1_ins, g2lv1_ins
-    
+    procedure, pass(desc) :: set_comm_scheme => psb_desc_set_comm_scheme
 
   end type psb_desc_type
 
@@ -312,7 +314,16 @@ module psb_desc_mod
   integer(psb_lpk_), private, save :: cd_hash_threshold = psb_default_hash_threshold
   integer(psb_ipk_), private, save :: sp_a2av_alg        = psb_sp_a2av_smpl_triad_ 
 
-contains 
+contains
+
+  subroutine psb_desc_set_comm_scheme(desc, comm_type, info)
+    implicit none
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)       :: comm_type
+    integer(psb_ipk_), intent(out)      :: info
+    info = psb_success_
+    desc%comm_type = comm_type
+  end subroutine psb_desc_set_comm_scheme
 
   function psb_m_get_sp_a2av_alg() result(val)
     implicit none

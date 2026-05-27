@@ -118,10 +118,13 @@ contains
     ! error handling variables
     integer(psb_ipk_)                             :: err_act
     character(len=30)                             :: name
+    logical                                       :: debug
 
     info = psb_success_
     name = 'psi_lswapdata_vect'
     call psb_erractionsave(err_act)
+
+    debug = .false.
 
     ctxt = desc_a%get_context()
 
@@ -159,7 +162,7 @@ contains
     end if
 
     if (.not. allocated(y%comm_handle)) then
-      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(desc_a%comm_type, y%comm_handle, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
         goto 9999
@@ -173,7 +176,9 @@ contains
       goto 9999
     end if
 
-
+    if(debug .eqv. .true.) then 
+      write(0,'(a,i0,a,i0)') 'DBG_DISPATCH comm_type=',y%comm_handle%comm_type,' desc_a%comm_type=',desc_a%comm_type
+    endif
     select case(y%comm_handle%comm_type)
     case(psb_comm_isend_irecv_)
       call psi_lswap_baseline_vect(ctxt,swap_status,beta,y,comm_indexes,num_neighbors,total_send,total_recv,y%comm_handle,info)
@@ -620,15 +625,15 @@ contains
       if (debug) write(*,*) my_rank,' nbr_vect: posting MPI_Ineighbor_alltoallv'
       if (buffer_size > 0) then
         call mpi_ineighbor_alltoallv( &
-          & y%combuf(1),                        &  ! send buffer
-          & n*neighbor_comm_handle%send_counts,   &
-          & n*neighbor_comm_handle%send_displs,    &
-          & psb_mpi_r_dpk_,                     &
-          & y%combuf(1),                        &  ! recv buffer (baseline layout)
-          & neighbor_comm_handle%recv_counts,     &
-          & neighbor_comm_handle%recv_displs,     &
-          & psb_mpi_r_dpk_,                     &
-          & neighbor_comm_handle%graph_comm,      &
+          & y%combuf(1),                             &  ! send buffer (baseline/positional layout)
+          & neighbor_comm_handle%send_counts,        &
+          & neighbor_comm_handle%send_displs_v,      &  ! positional displacements (match gth layout)
+          & psb_mpi_lpk_,                             &
+          & y%combuf(1),                             &  ! recv buffer (baseline/positional layout)
+          & neighbor_comm_handle%recv_counts,        &
+          & neighbor_comm_handle%recv_displs_v,      &  ! positional displacements (match sct layout)
+          & psb_mpi_lpk_,                             &
+          & neighbor_comm_handle%graph_comm,         &
           & neighbor_comm_handle%comm_request, iret)
         if (iret /= mpi_success) then
           info = psb_err_mpi_error_
@@ -756,6 +761,7 @@ contains
     integer(psb_ipk_)                           :: i, nesd, nerv, snd_pt, rcv_pt, pnti, n
 
     info = psb_success_
+    debug = .false.
     name = 'psi_lswap_neighbor_persistent_topology_vect'
     call psb_erractionsave(err_act)
     call psb_info(ctxt,my_rank,np)
@@ -825,12 +831,12 @@ contains
             neighbor_comm_handle%persistent_in_flight = .false.
             neighbor_comm_handle%persistent_buffer_size = 0
           end if
-          call y%new_buffer(buffer_size, info)
+          call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= 0) then
             call psb_errpush(psb_err_alloc_dealloc_, name)
             goto 9999
           end if
-        else if (size(y%combuf) < buffer_size) then
+        else if (size(y%combuf) < ione*size(comm_indexes%v)) then
           if (neighbor_comm_handle%persistent_request_ready) then
             if (neighbor_comm_handle%persistent_request /= mpi_request_null) then
               call mpi_request_free(neighbor_comm_handle%persistent_request, iret)
@@ -840,7 +846,7 @@ contains
             neighbor_comm_handle%persistent_in_flight = .false.
             neighbor_comm_handle%persistent_buffer_size = 0
           end if
-          call y%new_buffer(buffer_size, info)
+          call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= 0) then
             call psb_errpush(psb_err_alloc_dealloc_, name)
             goto 9999
@@ -882,16 +888,16 @@ contains
         if (buffer_size > 0) then
           if (debug) write(*,*) my_rank,' nbr_vect: posting MPI_Neighbor_alltoallv_init'
           call mpi_neighbor_alltoallv_init( &
-              & y%combuf(1),                          &  ! send buffer
-              & neighbor_comm_handle%send_counts,     &
-              & neighbor_comm_handle%send_displs,     &
-              & psb_mpi_r_dpk_,                       &
-              & y%combuf(1),    &  ! recv buffer (baseline layout)
-              & neighbor_comm_handle%recv_counts,     &
-              & neighbor_comm_handle%recv_displs,     &
-              & psb_mpi_r_dpk_,                       &
-              & neighbor_comm_handle%graph_comm,      &
-              & mpi_info_null,                        &
+              & y%combuf(1),                            &  ! send buffer
+              & neighbor_comm_handle%send_counts,       &
+              & neighbor_comm_handle%send_displs_v,     &  ! positional (baseline layout)
+              & psb_mpi_r_dpk_,                         &
+              & y%combuf(1),                            &  ! recv buffer (baseline layout)
+              & neighbor_comm_handle%recv_counts,       &
+              & neighbor_comm_handle%recv_displs_v,     &  ! positional (baseline layout)
+              & psb_mpi_r_dpk_,                         &
+              & neighbor_comm_handle%graph_comm,        &
+              & mpi_info_null,                          &
               & neighbor_comm_handle%persistent_request, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
@@ -1559,7 +1565,7 @@ contains
     end if
 
     if (.not. allocated(y%comm_handle)) then
-      call psb_comm_set(psb_comm_isend_irecv_, y%comm_handle, info)
+      call psb_comm_set(desc_a%comm_type, y%comm_handle, info)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_internal_error_, name, a_err='init comm default baseline')
         goto 9999
