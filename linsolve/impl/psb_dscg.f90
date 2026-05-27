@@ -384,7 +384,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
                           & n_col, n_row
   integer(psb_lpk_)   :: mglob
   character(len=20)           :: name = 'psb_dscg'
-  character(len=*), parameter :: methdbasename = 'sStepCG'
+  character(len=*), parameter :: methdbasename = 'sStepCGv2'
   character(len=20)           :: methdfullname
 
   real(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_fa(:, :), B2(:, :), c0(:)
@@ -471,7 +471,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   end if
 
   !Allocate and assembly data structure
-  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, 2*s + 2), B2(s, s), c0(s), stat = info)
+  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, 2*s + 1), B2(s, s), c0(s), stat = info)
   if (info == psb_success_) call psb_geall(r, desc_a, info)
   if (info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
   if (info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
@@ -577,7 +577,6 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
     call psb_gedots(P, Q, temp_fa(:, 1 : s), desc_a, info, global = .false.)
     call psb_gedots(Z, Q, temp_fa(:, s+1 : 2*s), desc_a, info, global = .false.)
     call psb_gedots(Z, r, temp_fa(:, 2*s + 1), desc_a, info, global = .false.)
-    call psb_gedots(P, r, temp_fa(:, 2*s + 2), desc_a, info, global = .false.)
     call psb_sum(desc_a%get_context(), temp_fa)
 
     !Compute new rhs for beta
@@ -606,9 +605,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
     call dgemm('T', 'N', s, s, s, -done, beta, s, B2, s, done, W, s)
     
     !Compute new rhs for alpha
-    c0 = temp_fa(:, 2*s + 2)
     alpha = temp_fa(:, 2*s + 1)
-    call dgemv('T', s, s, done, beta, s, c0, ione, done, alpha, ione)
   end do
 
   call psb_end_conv(methdfullname, itidx, desc_a, stopdat, info, derr, iter)
