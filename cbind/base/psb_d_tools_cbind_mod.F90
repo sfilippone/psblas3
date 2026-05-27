@@ -21,19 +21,32 @@ contains
     integer(psb_c_ipk_)               :: info
 
     res = -1
-
+    nullify(xp)
     if (c_associated(cdh%item)) then
       call c_f_pointer(cdh%item,descp)
     else
       return
     end if
+!!$    write(0,*) 'On entry  to C_DGEALL xh->item'
+    call psb_c_print_pointer(xh%item)
     if (c_associated(xh%item)) then
+      write(0,*) 'C associated on c_dgeall'
+      call psb_c_print_pointer(xh%item)
       return
     end if
-    allocate(xp)
+    allocate(xp,stat=info)
+    write(0,*) 'From DGEALL/ALLOCATE:',info
+    call psb_c_print_pointer(c_loc(xp))
     call psb_geall(xp,descp,info)
+    xp%v%v(1) = 1.d0
+    write(0,*) 'c_dgeall out from geall xp ',xp%get_nrows()
     xh%item = c_loc(xp)
     res = min(0,info)
+!!$    write(0,*) 'Check from C_DGEALL 1:',info
+    write(0,*) 'On end of  C_DGEALL xh->item'
+    call psb_c_print_pointer(xh%item)
+!!$    if (info==0)  write(0,*) 'Check from C_DGEALL 2:',xp%get_nrows(),descp%get_local_cols()
+    
 
     return
   end function psb_c_dgeall
@@ -57,6 +70,8 @@ contains
       return
     end if
     if (c_associated(xh%item)) then
+      write(0,*) 'C associated on c_dgeall_remote'
+      call psb_c_print_pointer(xh%item)
       return
     end if
     allocate(xp)

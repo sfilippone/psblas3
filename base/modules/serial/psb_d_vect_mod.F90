@@ -418,6 +418,8 @@ contains
     class(psb_d_vect_type), intent(in) :: x
     integer(psb_ipk_) :: res
     res = 0
+    write(0,*) allocated(x%v)
+    if (allocated(x%v)) write(0,*) allocated(x%v%v)
     if (allocated(x%v)) res = x%v%get_nrows()
   end function d_vect_get_nrows
 

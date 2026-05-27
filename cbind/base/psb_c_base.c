@@ -58,4 +58,7 @@ char *psb_c_pop_errmsg()
   return(tmp);
 }
 
+void    psb_c_print_pointer(void *p){
+  fprintf(stderr,"psb_c_print_pointer  %p\n",p);
+}
 // Convertire il comunicatore fortran in comunicatore c

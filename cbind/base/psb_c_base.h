@@ -30,6 +30,10 @@ extern "C" {
     psb_i_t *ctxt;
   } psb_c_ctxt;
 
+  typedef struct PSB_C_OBJTYPE   {
+    void *item;
+  } psb_c_objtype;
+
 
 
   void  psb_c_check_error(psb_c_ctxt cctxt);
@@ -42,6 +46,7 @@ extern "C" {
   void psb_c_seterraction_print();
   void psb_c_seterraction_abort();
 
+  void    psb_c_print_pointer(void *p);
   /* Environment routines */
   void    psb_c_init(psb_c_ctxt *cctxt);
   void    psb_c_init_from_fint(psb_c_ctxt *cctxt, psb_i_t f_comm);
