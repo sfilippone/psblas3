@@ -382,8 +382,14 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
     inner:  Do i=1,nl
       itx  = itx + 1
 
-      call prec%apply(v(i),w1,desc_a,info)
+      if (present(s2)) then
+        call psb_gediv(v(i),s2,w,desc_a,info)
+        call prec%apply(w,w1,desc_a,info)
+      else
+        call prec%apply(v(i),w1,desc_a,info)
+      end if
       call psb_spmm(done,a,w1,dzero,w,desc_a,info,work=aux)
+      if (present(s1)) call psb_gemlt(s1,w,desc_a,info)
       !
 
       do k = 1, i

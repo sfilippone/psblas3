@@ -22,6 +22,8 @@ typedef struct psb_c_solveroptions {
   int istop;      /* Stopping criterion: 1:backward error 2: ||r||_2/||b||_2 */
   double eps;     /* Stopping tolerance */ 
   double err;     /* Convergence indicator on exit */
+  void *s1;
+  void *s2;
 } psb_c_SolverOptions; 
 
 int psb_c_DefaultSolverOptions(psb_c_SolverOptions *opt);

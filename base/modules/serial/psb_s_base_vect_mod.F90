@@ -1490,10 +1490,10 @@ contains
     integer(psb_ipk_) :: i, n
 
     info = 0
-    if (z%is_dev()) call z%sync()
+    if (x%is_dev()) call x%sync()
+    if (y%is_dev()) call y%sync()
     call z%div(x%v,y%v,info)
-
-
+    call x%set_host()
   end subroutine s_base_div_v2
   !
   !> Function  base_div_v_check
@@ -1513,6 +1513,7 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
+    if (y%is_dev()) call y%sync()
     call x%div(x%v,y%v,info,flag)
 
   end subroutine s_base_div_v_check

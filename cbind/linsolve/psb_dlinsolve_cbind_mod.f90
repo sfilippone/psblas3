@@ -24,13 +24,14 @@ contains
     res= psb_c_dkrylov_opt(methd, ah, ph, bh, xh, options%eps,cdh,  &
          & itmax=options%itmax, iter=options%iter,&
          & itrace=options%itrace, istop=options%istop,&
-         & irst=options%irst, err=options%err)
+         & irst=options%irst, err=options%err, s1=options%s1,s2=options%s2)
     
   end function psb_c_dkrylov
 
 
   function  psb_c_dkrylov_opt(methd,&
-       & ah,ph,bh,xh,eps,cdh,itmax,iter,err,itrace,irst,istop) bind(c) result(res)
+       & ah,ph,bh,xh,eps,cdh,itmax,iter,&
+       & err,itrace,irst,istops1,s2) bind(c) result(res)
     use psb_base_mod
     use psb_error_mod
     use psb_prec_mod
@@ -49,10 +50,12 @@ contains
     integer(psb_c_ipk_)    :: iter
     real(c_double)        :: err
     character(c_char)       :: methd(*)
+    type(psb_c_object_type) ::  s1,s2
+
     type(psb_desc_type), pointer   :: descp
     type(psb_dspmat_type), pointer :: ap
     type(psb_dprec_type), pointer  :: precp
-    type(psb_d_vect_type), pointer :: xp, bp
+    type(psb_d_vect_type), pointer :: xp, bp, s1p, s2p
 
     integer(psb_c_ipk_)  :: info,fitmax,fitrace,first,fistop,fiter,err_act
     character(len=20)   :: fmethd
@@ -84,6 +87,16 @@ contains
     else
       return 
     end if
+    if (c_associated(s1%item)) then 
+      call c_f_pointer(s1%item,s1p)
+    else
+      nullify(s1p)
+    end if
+    if (c_associated(s2%item)) then 
+      call c_f_pointer(s2%item,s2p)
+    else
+      nullify(s2p)
+    end if
 
     
     call stringc2f(methd,fmethd)
@@ -94,10 +107,27 @@ contains
     fistop  = istop
     err_act = psb_act_abort_
     if (psb_errstatus_fatal()) call psb_error_handler(err_act)
-    call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
-         & descp, info,&
-         & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
-         & irst=first, err=ferr)
+    if (associated(s1p).and.associated(s2p)) then 
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, info,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p,s2=s2p)
+    else if  (associated(s1p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, info,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s1=s1p)
+    else  if (associated(s2p)) then
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, info,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr,s2=s2p)
+    else
+      call psb_krylov(fmethd, ap, precp, bp, xp, feps, &
+           & descp, info,&
+           & itmax=fitmax,iter=fiter,itrace=fitrace,istop=fistop,&
+           & irst=first, err=ferr)
+    end if
     iter = fiter
     err  = ferr
     res = info
