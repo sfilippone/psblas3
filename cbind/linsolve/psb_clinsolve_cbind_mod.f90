@@ -31,7 +31,7 @@ contains
 
   function  psb_c_ckrylov_opt(methd,&
        & ah,ph,bh,xh,eps,cdh,itmax,iter,&
-       & err,itrace,irst,istops1,s2) bind(c) result(res)
+       & err,itrace,irst,istop,s1,s2) bind(c) result(res)
     use psb_base_mod
     use psb_error_mod
     use psb_prec_mod
