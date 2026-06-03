@@ -18,8 +18,8 @@ In order to have the exact same environment used for testing compile PSBALS libr
 Steps to reproduce the tests:
 - Compile the code using ``` make ```
 - Insert the matrix files inside the matrix/ directory (or create one if it doesn't exists; psblas3/test/spmm/matrix/)
-- Launch the script autotest.sh (Still not implemented)
-- Check the output log file test_log.txt to collect results
+- Launch the script autotest.sh
+- Check the output log file logs/psblas_spmm_test.log to collect results
 
 ## Test goal
 Check the correctness of the matrix-vector multiplication $y = Ax$ using the **psb_spmm** routine, checking for all the test suite cases.

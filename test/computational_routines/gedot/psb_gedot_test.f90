@@ -235,6 +235,7 @@ module psb_gedot_test
             deallocate(y_global)
         end if
 
+        ret = 0
         return
 
 
@@ -298,7 +299,7 @@ module psb_gedot_test
         end if
 
         ! Allocate descriptor as if it was a block rows distribution
-        call psb_cdall(ctxt, desc_a, info,nl=10000/np)
+        call psb_cdall(ctxt, desc_a, info,nl=arr_size/np)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error allocating desc_a data structure"
             goto 9999
@@ -430,6 +431,7 @@ module psb_gedot_test
 
         ret = 0
 
+        ret = 0
         return
 
 

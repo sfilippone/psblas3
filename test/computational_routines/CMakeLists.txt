@@ -30,6 +30,7 @@ set(PSBLAS_LIBS  psblas::util psblas::prec psblas::base)
 
 include(${CMAKE_CURRENT_LIST_DIR}/geaxpby/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/gedot/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/spmm/CMakeLists.txt)
 
 
 # Create executables

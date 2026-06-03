@@ -6,7 +6,7 @@ This is a directory developed by Luca Pepè Sciarria and Simone Staccone froma T
 Steps to reproduce the tests:
 - Compile the code using ``` make ``` (Optional)
 - Launch the script ./autotest.sh or with source ./autotest.sh if you want to add modules to the .bashrc file permenently.
-- Check the output log file psblas_geaxpby_test.log to collect results
+- Check the output log file logs/psblas_geaxpby_test.log to collect results
 
 NOTE: If the code is changed and a new compilation is needed to show the changes, the autotest.sh script isn't aware of this scenario, therefore it is necessary to manually recompile the code.
 

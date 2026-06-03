@@ -1,416 +1,74 @@
-Welcome to PSBLAS version: 3.9.0
+Welcome to PSBLAS version: 3.9.1
 This is the psb_gedot_test sample program
 Number of processes used in this computation: 1
 
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x1_y1.mtx 1/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x1_y2.mtx 2/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x1_y3.mtx 3/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x1_y4.mtx 4/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x2_y1.mtx 5/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x2_y2.mtx 6/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x2_y3.mtx 7/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x2_y4.mtx 8/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x3_y1.mtx 9/144               [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x3_y2.mtx 10/144              [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x3_y3.mtx 11/144              [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x3_y4.mtx 12/144              [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x4_y1.mtx 13/144              [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x4_y2.mtx 14/144              [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x4_y3.mtx 15/144              [OK]
-[2025-06-12 13:27:44] Generation gedot single precision result file serial/sol_x4_y4.mtx 16/144              [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x1_y1.mtx 1/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x1_y2.mtx 2/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x1_y3.mtx 3/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x1_y4.mtx 4/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x2_y1.mtx 5/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x2_y2.mtx 6/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x2_y3.mtx 7/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x2_y4.mtx 8/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x3_y1.mtx 9/16                [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x3_y2.mtx 10/16               [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x3_y3.mtx 11/16               [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x3_y4.mtx 12/16               [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x4_y1.mtx 13/16               [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x4_y2.mtx 14/16               [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x4_y3.mtx 15/16               [OK]
+[2026-05-30 13:02:07] Generation gedot single precision result file serial/sol_x4_y4.mtx 16/16               [OK]
  
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x1_y1.mtx 1/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x1_y2.mtx 2/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x1_y3.mtx 3/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x1_y4.mtx 4/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x2_y1.mtx 5/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x2_y2.mtx 6/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x2_y3.mtx 7/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x2_y4.mtx 8/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x3_y1.mtx 9/144                              [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x3_y2.mtx 10/144                             [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x3_y3.mtx 11/144                             [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x3_y4.mtx 12/144                             [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x4_y1.mtx 13/144                             [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x4_y2.mtx 14/144                             [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x4_y3.mtx 15/144                             [OK]
-[2025-06-12 13:27:44] Double precision check on file serial/sol_x4_y4.mtx 16/144                             [OK]
-Welcome to PSBLAS version: 3.9.0
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x1_y1.mtx 1/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x1_y2.mtx 2/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x1_y3.mtx 3/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x1_y4.mtx 4/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x2_y1.mtx 5/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x2_y2.mtx 6/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x2_y3.mtx 7/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x2_y4.mtx 8/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x3_y1.mtx 9/16                               [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x3_y2.mtx 10/16                              [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x3_y3.mtx 11/16                              [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x3_y4.mtx 12/16                              [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x4_y1.mtx 13/16                              [OK]
+[2026-05-30 13:02:07] Double precision check on file serial/sol_x4_y2.mtx 14/16                              [OK]
+[2026-05-30 13:02:08] Double precision check on file serial/sol_x4_y3.mtx 15/16                              [OK]
+[2026-05-30 13:02:08] Double precision check on file serial/sol_x4_y4.mtx 16/16                              [OK]
+Welcome to PSBLAS version: 3.9.1
 This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
+Number of processes used in this computation: 4
 
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:28:19] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:28:20] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:28:20] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/16              [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/16             [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/16             [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/16             [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/16             [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/16             [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/16             [OK]
+[2026-05-30 13:02:08] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/16             [OK]
  
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:28:20] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
-
-[2025-06-12 13:32:44] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:32:44] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:32:45] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
- 
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:32:45] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
-
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:33:40] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
- 
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:33:41] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
-
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:34:42] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
- 
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:34:42] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:34:43] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:34:43] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:34:43] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:34:43] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
-
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:35:32] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
- 
-[2025-06-12 13:35:32] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:35:32] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:35:33] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
-
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:37:17] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
- 
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:37:17] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:37:18] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-Welcome to PSBLAS version: 3.9.0
-This is the psb_gedot_test sample program
-Number of processes used in this computation: 40
-
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x1_y1.mtx 1/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x1_y2.mtx 2/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x1_y3.mtx 3/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x1_y4.mtx 4/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x2_y1.mtx 5/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x2_y2.mtx 6/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x2_y3.mtx 7/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x2_y4.mtx 8/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x3_y1.mtx 9/144             [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x3_y2.mtx 10/144            [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x3_y3.mtx 11/144            [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x3_y4.mtx 12/144            [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x4_y1.mtx 13/144            [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x4_y2.mtx 14/144            [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x4_y3.mtx 15/144            [OK]
-[2025-06-12 13:37:56] Generation gedot single precision result file parallel/sol_x4_y4.mtx 16/144            [OK]
- 
-[2025-06-12 13:37:56] Double precision check on file parallel/sol_x1_y1.mtx 1/144                            [OK]
-[2025-06-12 13:37:56] Double precision check on file parallel/sol_x1_y2.mtx 2/144                            [OK]
-[2025-06-12 13:37:56] Double precision check on file parallel/sol_x1_y3.mtx 3/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x1_y4.mtx 4/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x2_y1.mtx 5/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x2_y2.mtx 6/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x2_y3.mtx 7/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x2_y4.mtx 8/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x3_y1.mtx 9/144                            [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x3_y2.mtx 10/144                           [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x3_y3.mtx 11/144                           [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x3_y4.mtx 12/144                           [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x4_y1.mtx 13/144                           [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x4_y2.mtx 14/144                           [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x4_y3.mtx 15/144                           [OK]
-[2025-06-12 13:37:57] Double precision check on file parallel/sol_x4_y4.mtx 16/144                           [OK]
-
-Comparison between serial/sol_x1_y1.mtx and parallel/sol_x1_y1.mtx: 4 differences
-Comparison between serial/sol_x1_y2.mtx and parallel/sol_x1_y2.mtx: 4 differences
-Comparison between serial/sol_x1_y3.mtx and parallel/sol_x1_y3.mtx: 4 differences
-Comparison between serial/sol_x1_y4.mtx and parallel/sol_x1_y4.mtx: 0 differences
-Comparison between serial/sol_x2_y1.mtx and parallel/sol_x2_y1.mtx: 4 differences
-Comparison between serial/sol_x2_y2.mtx and parallel/sol_x2_y2.mtx: 4 differences
-Comparison between serial/sol_x2_y3.mtx and parallel/sol_x2_y3.mtx: 4 differences
-Comparison between serial/sol_x2_y4.mtx and parallel/sol_x2_y4.mtx: 0 differences
-Comparison between serial/sol_x3_y1.mtx and parallel/sol_x3_y1.mtx: 4 differences
-Comparison between serial/sol_x3_y2.mtx and parallel/sol_x3_y2.mtx: 4 differences
-Comparison between serial/sol_x3_y3.mtx and parallel/sol_x3_y3.mtx: 4 differences
-Comparison between serial/sol_x3_y4.mtx and parallel/sol_x3_y4.mtx: 0 differences
-Comparison between serial/sol_x4_y1.mtx and parallel/sol_x4_y1.mtx: 0 differences
-Comparison between serial/sol_x4_y2.mtx and parallel/sol_x4_y2.mtx: 0 differences
-Comparison between serial/sol_x4_y3.mtx and parallel/sol_x4_y3.mtx: 0 differences
-Comparison between serial/sol_x4_y4.mtx and parallel/sol_x4_y4.mtx: 0 differences
-
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x1_y1.mtx 1/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x1_y2.mtx 2/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x1_y3.mtx 3/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x1_y4.mtx 4/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x2_y1.mtx 5/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x2_y2.mtx 6/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x2_y3.mtx 7/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x2_y4.mtx 8/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x3_y1.mtx 9/16                             [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x3_y2.mtx 10/16                            [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x3_y3.mtx 11/16                            [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x3_y4.mtx 12/16                            [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x4_y1.mtx 13/16                            [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x4_y2.mtx 14/16                            [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x4_y3.mtx 15/16                            [OK]
+[2026-05-30 13:02:08] Double precision check on file parallel/sol_x4_y4.mtx 16/16                            [OK]

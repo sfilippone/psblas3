@@ -14,6 +14,7 @@ BLUE="\033[0;34m"
 YELLOW="\033[33m" 
 RESET="\033[0m"
 
+
 # Function to center text
 center_text() {
     local text="$1"
@@ -73,6 +74,7 @@ echo -e "${BLUE}[INFO]\t  Environment check for required modules completed.${RES
 echo ""
 
 
+
 # Iterate through first-layer subdirectories
 for dir in "$base_dir"/*/; do    
     # Skip the current directory itself
@@ -81,7 +83,12 @@ for dir in "$base_dir"/*/; do
     fi
     
     echo -e "${BLUE}${separator}${RESET}"
-    echo -e "${BLUE}[INFO]\t  Entering directory: $(pwd)/$(basename "$dir")${RESET}"
+    base_name=$(basename "$dir")
+    if [ "$base_name" = "common" ]; then
+        continue
+    fi
+
+    echo -e "${BLUE}[INFO]\t  Entering directory: $(pwd)/${base_name}${RESET}"
     ( # excecute script in a subshell, otherwise the dir search will stop
         cd "$dir"
 
@@ -93,8 +100,11 @@ for dir in "$base_dir"/*/; do
             echo -e "${YELLOW}[WARNING] autotest.sh not found in $(pwd). Skipping $(basename "$dir") kernel${RESET}"
         fi
 
-        # Append contents of any .log file in the subdirectory to the main log file
-        log_files=$(find . -maxdepth 1 -type f -name "*.log")
+        # Append contents of any .log file in the standardized logs/ directory (fallback to local *.log)
+        log_files=$(find ./logs -maxdepth 1 -type f -name "*.log" 2>/dev/null)
+        if [ -z "$log_files" ]; then
+            log_files=$(find . -maxdepth 1 -type f -name "*.log")
+        fi
         if [ -n "$log_files" ]; then
             for log_file in $log_files; do
                 cat "$log_file" >> "../${log_file_name}"

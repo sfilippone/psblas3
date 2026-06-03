@@ -17,7 +17,7 @@ program main
     integer(psb_ipk_)               :: tests_number, count
 
     ! cycle indexes variables
-    integer(psb_ipk_)               :: i,j,k,h,l
+    integer(psb_ipk_)               :: i,j,k,h
     integer(psb_ipk_)               :: info, ret, unit
 
     ! time stats variables
@@ -28,6 +28,7 @@ program main
 
     ! others
     character(len=:), allocatable   :: output_file_name
+    integer(psb_ipk_)               :: last_percent_sp, last_percent_dp
 
     ! Initialize parameters
     x(1) = "vectors/x1.mtx"
@@ -51,6 +52,8 @@ program main
     arr_size = 10000
     tests_number = size(x) * size(y) * size(alpha) * size(beta)
     count = 0
+    last_percent_sp = -1
+    last_percent_dp = -1
 
     call psb_init(ctxt)
     call psb_info(ctxt,my_rank,np)
@@ -95,6 +98,7 @@ program main
 
                     if(my_rank == psb_root_) then
                         count = count + 1
+                        call print_progress(count, tests_number, last_percent_sp, "single precision")
                         call date_and_time(date, time, zones, values)
 
                         if(ret /= -1) then 
@@ -145,6 +149,7 @@ program main
                     
                     if(my_rank == psb_root_) then
                         count = count + 1
+                        call print_progress(count, tests_number, last_percent_dp, "double precision")
                         call date_and_time(date, time, zones, values)
 
                         if(ret == 0) then 
@@ -198,4 +203,31 @@ program main
     
     call psb_exit(ctxt)
     return
+contains
+
+    subroutine print_progress(current, total, last_percent, label)
+        implicit none
+        integer(psb_ipk_), intent(in)    :: current, total
+        integer(psb_ipk_), intent(inout) :: last_percent
+        character(len=*), intent(in)     :: label
+        integer(psb_ipk_)                :: percent, filled, width, i
+
+        if (total <= 0) return
+        percent = int(real(current) / real(total) * 100.0)
+        if (percent == last_percent) return
+        last_percent = percent
+
+        width = 30
+        filled = int(real(percent) / 100.0 * width)
+
+        write(*,'(A)',advance='no') "[INFO]    Progress " // trim(label) // ": ["
+        do i = 1, filled
+            write(*,'(A)',advance='no') "#"
+        end do
+        do i = filled + 1, width
+            write(*,'(A)',advance='no') "-"
+        end do
+        write(*,'(A,I3,A,I0,A,I0,A)') "] ", percent, "% (", current, "/", total, ")"
+    end subroutine print_progress
+
 end program main

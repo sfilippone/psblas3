@@ -19,17 +19,36 @@ The innovative approach introduced in this test suite is to have a theoretical r
 
 ## Directory description
 Each directory has the name of the computational kernel routines described in the documentation of the version 3.9 of the PSBLAS library. In each directory there are different files and directories:
-- parallel/ 
-- serial/ 
+
+- parallel/
+- serial/
 - vectors/
+- runs/
+- logs/
 - autotest.sh
 - Makefile
 - &lt;routine_name&gt;.f90
 - psb_&lt;routine_name&gt;_test.f90
 - README.md
 
+## Standard test runner and log schema
+
+All `autotest.sh` scripts use a shared helper in `test/computational_routines/common/testlib.sh` to standardize execution and logging. Each test writes logs in `logs/` with the format:
+
+- `[RUN] <routine>` and `[DATE] <timestamp>` header
+- `[DIFF] <file1> vs <file2>: <count> differences` for each comparison
+
+The main driver [test/computational_routines/test.sh](test/computational_routines/test.sh) aggregates logs from each `logs/` directory.
+
+Process count for multi-process runs is capped to 4 by default. Override with:
+
+- `PSBLAS_TEST_NP=<n>` to set a specific process count
+- `PSBLAS_TEST_MAX_NP=<n>` to change the default cap
+
 ## Routines
+
 In this test suite were considered only computational routines implemented by PSBLAS, according to the version 3.9 of the documentation. In the following table are reported all the kernels, their implementation and wheter or not they were tested yet.
+
 |**Kernel**| **PSBLAS Subroutine**|**Description**|**Test**|
 | ------------------------------- | :--------------------------: | ---------------------------------------------------------------------- | :---------------: |
 |**General Dense Matrix Sum**| `psb_geaxpby`| This subroutine is an interface to the computational kernel for dense matrix sum:$$Y \leftarrow \alpha  X + \beta  Y$$|Yes ✅|

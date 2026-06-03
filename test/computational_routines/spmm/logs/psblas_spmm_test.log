@@ -1,0 +1,170 @@
+[RUN] psb_spmm
+[DATE] 2026-05-28 10:23:38
+
+[RUN] psb_spmm
+[DATE] 2026-05-28 10:27:00
+
+[RUN] psb_spmm
+[DATE] 2026-05-28 10:50:33
+
+[RUN] psb_spmm
+[DATE] 2026-05-28 15:14:13
+
+[RUN] psb_spmm
+[DATE] 2026-05-28 16:06:35
+
+[RUN] psb_spmm
+[DATE] 2026-05-28 17:38:01
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx:  differences
+[RUN] psb_spmm
+[DATE] 2026-05-28 17:41:51
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[RUN] psb_spmm
+[DATE] 2026-05-29 08:15:00
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[RUN] psb_spmm
+[DATE] 2026-05-29 08:29:09
+
+[RUN] psb_spmm
+[DATE] 2026-05-29 08:33:00
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[RUN] psb_spmm
+[DATE] 2026-05-29 12:18:37
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[RUN] psb_spmm
+[DATE] 2026-05-29 14:53:57
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[RUN] psb_spmm
+[DATE] 2026-05-29 15:07:42
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[RUN] psb_spmm
+[DATE] 2026-05-30 12:38:05
+[RUN] psb_spmm
+[DATE] 2026-05-30 12:40:05
+
+[DIFF] serial/sol_x1_y1_a1_b1.mtx vs parallel/sol_x1_y1_a1_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y1_a1_b2.mtx vs parallel/sol_x1_y1_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y1_a1_b3.mtx vs parallel/sol_x1_y1_a1_b3.mtx: 1117229 differences
+[DIFF] serial/sol_x1_y1_a2_b1.mtx vs parallel/sol_x1_y1_a2_b1.mtx: 1078470 differences
+[DIFF] serial/sol_x1_y1_a2_b2.mtx vs parallel/sol_x1_y1_a2_b2.mtx: 1341885 differences
+[DIFF] serial/sol_x1_y1_a2_b3.mtx vs parallel/sol_x1_y1_a2_b3.mtx: 1411816 differences
+[DIFF] serial/sol_x1_y1_a3_b1.mtx vs parallel/sol_x1_y1_a3_b1.mtx: 1422000 differences
+[DIFF] serial/sol_x1_y1_a3_b2.mtx vs parallel/sol_x1_y1_a3_b2.mtx: 1171656 differences
+[DIFF] serial/sol_x1_y1_a3_b3.mtx vs parallel/sol_x1_y1_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x1_y2_a1_b1.mtx vs parallel/sol_x1_y2_a1_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y2_a1_b2.mtx vs parallel/sol_x1_y2_a1_b2.mtx: 1101118 differences
+[DIFF] serial/sol_x1_y2_a1_b3.mtx vs parallel/sol_x1_y2_a1_b3.mtx: 1437048 differences
+[DIFF] serial/sol_x1_y2_a2_b1.mtx vs parallel/sol_x1_y2_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y2_a2_b2.mtx vs parallel/sol_x1_y2_a2_b2.mtx: 1424281 differences
+[DIFF] serial/sol_x1_y2_a2_b3.mtx vs parallel/sol_x1_y2_a2_b3.mtx: 1411968 differences
+[DIFF] serial/sol_x1_y2_a3_b1.mtx vs parallel/sol_x1_y2_a3_b1.mtx: 1411359 differences
+[DIFF] serial/sol_x1_y2_a3_b2.mtx vs parallel/sol_x1_y2_a3_b2.mtx: 1368648 differences
+[DIFF] serial/sol_x1_y2_a3_b3.mtx vs parallel/sol_x1_y2_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x1_y3_a1_b1.mtx vs parallel/sol_x1_y3_a1_b1.mtx: 1078470 differences
+[DIFF] serial/sol_x1_y3_a1_b2.mtx vs parallel/sol_x1_y3_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y3_a1_b3.mtx vs parallel/sol_x1_y3_a1_b3.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y3_a2_b1.mtx vs parallel/sol_x1_y3_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y3_a2_b2.mtx vs parallel/sol_x1_y3_a2_b2.mtx: 1085005 differences
+[DIFF] serial/sol_x1_y3_a2_b3.mtx vs parallel/sol_x1_y3_a2_b3.mtx: 1102485 differences
+[DIFF] serial/sol_x1_y3_a3_b1.mtx vs parallel/sol_x1_y3_a3_b1.mtx: 1105069 differences
+[DIFF] serial/sol_x1_y3_a3_b2.mtx vs parallel/sol_x1_y3_a3_b2.mtx: 1424117 differences
+[DIFF] serial/sol_x1_y3_a3_b3.mtx vs parallel/sol_x1_y3_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x1_y4_a1_b1.mtx vs parallel/sol_x1_y4_a1_b1.mtx: 1105829 differences
+[DIFF] serial/sol_x1_y4_a1_b2.mtx vs parallel/sol_x1_y4_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y4_a1_b3.mtx vs parallel/sol_x1_y4_a1_b3.mtx: 1355728 differences
+[DIFF] serial/sol_x1_y4_a2_b1.mtx vs parallel/sol_x1_y4_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x1_y4_a2_b2.mtx vs parallel/sol_x1_y4_a2_b2.mtx: 1110541 differences
+[DIFF] serial/sol_x1_y4_a2_b3.mtx vs parallel/sol_x1_y4_a2_b3.mtx: 1108413 differences
+[DIFF] serial/sol_x1_y4_a3_b1.mtx vs parallel/sol_x1_y4_a3_b1.mtx: 1031715 differences
+[DIFF] serial/sol_x1_y4_a3_b2.mtx vs parallel/sol_x1_y4_a3_b2.mtx: 1031715 differences
+[DIFF] serial/sol_x1_y4_a3_b3.mtx vs parallel/sol_x1_y4_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x2_y1_a1_b1.mtx vs parallel/sol_x2_y1_a1_b1.mtx: 1103853 differences
+[DIFF] serial/sol_x2_y1_a1_b2.mtx vs parallel/sol_x2_y1_a1_b2.mtx: 1254648 differences
+[DIFF] serial/sol_x2_y1_a1_b3.mtx vs parallel/sol_x2_y1_a1_b3.mtx: 1211936 differences
+[DIFF] serial/sol_x2_y1_a2_b1.mtx vs parallel/sol_x2_y1_a2_b1.mtx: 1249328 differences
+[DIFF] serial/sol_x2_y1_a2_b2.mtx vs parallel/sol_x2_y1_a2_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y1_a2_b3.mtx vs parallel/sol_x2_y1_a2_b3.mtx: 1337032 differences
+[DIFF] serial/sol_x2_y1_a3_b1.mtx vs parallel/sol_x2_y1_a3_b1.mtx: 1419415 differences
+[DIFF] serial/sol_x2_y1_a3_b2.mtx vs parallel/sol_x2_y1_a3_b2.mtx: 1420479 differences
+[DIFF] serial/sol_x2_y1_a3_b3.mtx vs parallel/sol_x2_y1_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x2_y2_a1_b1.mtx vs parallel/sol_x2_y2_a1_b1.mtx: 1326392 differences
+[DIFF] serial/sol_x2_y2_a1_b2.mtx vs parallel/sol_x2_y2_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y2_a1_b3.mtx vs parallel/sol_x2_y2_a1_b3.mtx: 1321984 differences
+[DIFF] serial/sol_x2_y2_a2_b1.mtx vs parallel/sol_x2_y2_a2_b1.mtx: 1198712 differences
+[DIFF] serial/sol_x2_y2_a2_b2.mtx vs parallel/sol_x2_y2_a2_b2.mtx: 1183208 differences
+[DIFF] serial/sol_x2_y2_a2_b3.mtx vs parallel/sol_x2_y2_a2_b3.mtx: 1347064 differences
+[DIFF] serial/sol_x2_y2_a3_b1.mtx vs parallel/sol_x2_y2_a3_b1.mtx: 1436287 differences
+[DIFF] serial/sol_x2_y2_a3_b2.mtx vs parallel/sol_x2_y2_a3_b2.mtx: 1427623 differences
+[DIFF] serial/sol_x2_y2_a3_b3.mtx vs parallel/sol_x2_y2_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x2_y3_a1_b1.mtx vs parallel/sol_x2_y3_a1_b1.mtx: 1078470 differences
+[DIFF] serial/sol_x2_y3_a1_b2.mtx vs parallel/sol_x2_y3_a1_b2.mtx: 1169376 differences
+[DIFF] serial/sol_x2_y3_a1_b3.mtx vs parallel/sol_x2_y3_a1_b3.mtx: 1105981 differences
+[DIFF] serial/sol_x2_y3_a2_b1.mtx vs parallel/sol_x2_y3_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y3_a2_b2.mtx vs parallel/sol_x2_y3_a2_b2.mtx: 1085917 differences
+[DIFF] serial/sol_x2_y3_a2_b3.mtx vs parallel/sol_x2_y3_a2_b3.mtx: 1362264 differences
+[DIFF] serial/sol_x2_y3_a3_b1.mtx vs parallel/sol_x2_y3_a3_b1.mtx: 1118597 differences
+[DIFF] serial/sol_x2_y3_a3_b2.mtx vs parallel/sol_x2_y3_a3_b2.mtx: 1112517 differences
+[DIFF] serial/sol_x2_y3_a3_b3.mtx vs parallel/sol_x2_y3_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x2_y4_a1_b1.mtx vs parallel/sol_x2_y4_a1_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y4_a1_b2.mtx vs parallel/sol_x2_y4_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y4_a1_b3.mtx vs parallel/sol_x2_y4_a1_b3.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y4_a2_b1.mtx vs parallel/sol_x2_y4_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y4_a2_b2.mtx vs parallel/sol_x2_y4_a2_b2.mtx: 1082573 differences
+[DIFF] serial/sol_x2_y4_a2_b3.mtx vs parallel/sol_x2_y4_a2_b3.mtx: 1437960 differences
+[DIFF] serial/sol_x2_y4_a3_b1.mtx vs parallel/sol_x2_y4_a3_b1.mtx: 1031715 differences
+[DIFF] serial/sol_x2_y4_a3_b2.mtx vs parallel/sol_x2_y4_a3_b2.mtx: 1031715 differences
+[DIFF] serial/sol_x2_y4_a3_b3.mtx vs parallel/sol_x2_y4_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x3_y1_a1_b1.mtx vs parallel/sol_x3_y1_a1_b1.mtx: 1100965 differences
+[DIFF] serial/sol_x3_y1_a1_b2.mtx vs parallel/sol_x3_y1_a1_b2.mtx: 1099901 differences
+[DIFF] serial/sol_x3_y1_a1_b3.mtx vs parallel/sol_x3_y1_a1_b3.mtx: 1435072 differences
+[DIFF] serial/sol_x3_y1_a2_b1.mtx vs parallel/sol_x3_y1_a2_b1.mtx: 1429144 differences
+[DIFF] serial/sol_x3_y1_a2_b2.mtx vs parallel/sol_x3_y1_a2_b2.mtx: 1387952 differences
+[DIFF] serial/sol_x3_y1_a2_b3.mtx vs parallel/sol_x3_y1_a2_b3.mtx: 1098229 differences
+[DIFF] serial/sol_x3_y1_a3_b1.mtx vs parallel/sol_x3_y1_a3_b1.mtx: 1423063 differences
+[DIFF] serial/sol_x3_y1_a3_b2.mtx vs parallel/sol_x3_y1_a3_b2.mtx: 1342503 differences
+[DIFF] serial/sol_x3_y1_a3_b3.mtx vs parallel/sol_x3_y1_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x3_y2_a1_b1.mtx vs parallel/sol_x3_y2_a1_b1.mtx: 1331712 differences
+[DIFF] serial/sol_x3_y2_a1_b2.mtx vs parallel/sol_x3_y2_a1_b2.mtx: 1085613 differences
+[DIFF] serial/sol_x3_y2_a1_b3.mtx vs parallel/sol_x3_y2_a1_b3.mtx: 1207984 differences
+[DIFF] serial/sol_x3_y2_a2_b1.mtx vs parallel/sol_x3_y2_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y2_a2_b2.mtx vs parallel/sol_x3_y2_a2_b2.mtx: 1083485 differences
+[DIFF] serial/sol_x3_y2_a2_b3.mtx vs parallel/sol_x3_y2_a2_b3.mtx: 1437048 differences
+[DIFF] serial/sol_x3_y2_a3_b1.mtx vs parallel/sol_x3_y2_a3_b1.mtx: 1079077 differences
+[DIFF] serial/sol_x3_y2_a3_b2.mtx vs parallel/sol_x3_y2_a3_b2.mtx: 1412575 differences
+[DIFF] serial/sol_x3_y2_a3_b3.mtx vs parallel/sol_x3_y2_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x3_y3_a1_b1.mtx vs parallel/sol_x3_y3_a1_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y3_a1_b2.mtx vs parallel/sol_x3_y3_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y3_a1_b3.mtx vs parallel/sol_x3_y3_a1_b3.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y3_a2_b1.mtx vs parallel/sol_x3_y3_a2_b1.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y3_a2_b2.mtx vs parallel/sol_x3_y3_a2_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y3_a2_b3.mtx vs parallel/sol_x3_y3_a2_b3.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y3_a3_b1.mtx vs parallel/sol_x3_y3_a3_b1.mtx: 1080445 differences
+[DIFF] serial/sol_x3_y3_a3_b2.mtx vs parallel/sol_x3_y3_a3_b2.mtx: 1412423 differences
+[DIFF] serial/sol_x3_y3_a3_b3.mtx vs parallel/sol_x3_y3_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x3_y4_a1_b1.mtx vs parallel/sol_x3_y4_a1_b1.mtx: 1437656 differences
+[DIFF] serial/sol_x3_y4_a1_b2.mtx vs parallel/sol_x3_y4_a1_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y4_a1_b3.mtx vs parallel/sol_x3_y4_a1_b3.mtx: 1408928 differences
+[DIFF] serial/sol_x3_y4_a2_b1.mtx vs parallel/sol_x3_y4_a2_b1.mtx: 1080749 differences
+[DIFF] serial/sol_x3_y4_a2_b2.mtx vs parallel/sol_x3_y4_a2_b2.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y4_a2_b3.mtx vs parallel/sol_x3_y4_a2_b3.mtx: 1437960 differences
+[DIFF] serial/sol_x3_y4_a3_b1.mtx vs parallel/sol_x3_y4_a3_b1.mtx: 1031715 differences
+[DIFF] serial/sol_x3_y4_a3_b2.mtx vs parallel/sol_x3_y4_a3_b2.mtx: 1031715 differences
+[DIFF] serial/sol_x3_y4_a3_b3.mtx vs parallel/sol_x3_y4_a3_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x4_y1_a1_b1.mtx vs parallel/sol_x4_y1_a1_b1.mtx: 1437048 differences
+[DIFF] serial/sol_x4_y1_a1_b2.mtx vs parallel/sol_x4_y1_a1_b2.mtx: 1114949 differences
+[DIFF] serial/sol_x4_y1_a1_b3.mtx vs parallel/sol_x4_y1_a1_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x4_y1_a2_b1.mtx vs parallel/sol_x4_y1_a2_b1.mtx: 1418199 differences
+[DIFF] serial/sol_x4_y1_a2_b2.mtx vs parallel/sol_x4_y1_a2_b2.mtx: 1345239 differences
+[DIFF] serial/sol_x4_y1_a2_b3.mtx vs parallel/sol_x4_y1_a2_b3.mtx: 1031715 differences
+[DIFF] serial/sol_x4_y1_a3_b1.mtx vs parallel/sol_x4_y1_a3_b1.mtx: 1437959 differences
+[RUN] psb_spmm
+[DATE] 2026-05-30 13:02:08
+

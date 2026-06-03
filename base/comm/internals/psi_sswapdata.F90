@@ -254,7 +254,8 @@ contains
     integer(psb_mpk_), allocatable :: prcid(:)
     type(psb_comm_baseline_handle), pointer     :: baseline_comm_handle
     integer(psb_ipk_) :: err_act, i, idx_pt, total_send_, total_recv_,&
-        & snd_pt, rcv_pt, pnti, n
+      & snd_pt, rcv_pt, pnti, n
+    integer(psb_ipk_) :: y_nrows, idx_min, idx_max
     logical :: do_send,do_recv
     logical, parameter :: usersend=.false.
     logical                                     :: debug
@@ -313,6 +314,7 @@ contains
       baseline_comm_handle%comid = mpi_request_null
       call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
+      y_nrows = y%get_nrows()
       pnti   = 1
       do i=1, num_neighbors
         proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
@@ -325,7 +327,7 @@ contains
           if (debug) write(*,*) my_rank,'Posting receive from',prcid(i),rcv_pt
           p2ptag = psb_double_swap_tag
           call mpi_irecv(y%combuf(rcv_pt),nerv,&
-            & psb_mpi_r_dpk_,prcid(i),&
+            & psb_mpi_r_spk_,prcid(i),&
             & p2ptag, icomm,baseline_comm_handle%comid(i,2),iret)
         end if
         pnti   = pnti + nerv + nesd + 3
@@ -345,6 +347,15 @@ contains
           info = psb_err_internal_error_
           call psb_errpush(info,name,a_err='baseline gather metadata out of bounds')
           goto 9999
+        end if
+        if (nesd > 0) then
+          idx_min = minval(comm_indexes%v(idx_pt:idx_pt+nesd-1))
+          idx_max = maxval(comm_indexes%v(idx_pt:idx_pt+nesd-1))
+          if ((idx_min < 1) .or. (idx_max > y_nrows)) then
+            info = psb_err_internal_error_
+            call psb_errpush(info,name,a_err='baseline gather index out of bounds')
+            goto 9999
+          end if
         end if
         if ((idx_pt < 1) .or. (nesd < 0) .or. (idx_pt+max(0,nesd)-1 > size(y%combuf))) then
           info = psb_err_internal_error_
@@ -378,7 +389,7 @@ contains
 
         if ((nesd>0).and.(proc_to_comm /= my_rank)) then 
           call mpi_isend(y%combuf(snd_pt),nesd,&
-            & psb_mpi_r_dpk_,prcid(i),&
+            & psb_mpi_r_spk_,prcid(i),&
             & p2ptag,icomm,baseline_comm_handle%comid(i,1),iret)
         end if
 
@@ -458,6 +469,15 @@ contains
           info = psb_err_internal_error_
           call psb_errpush(info,name,a_err='baseline scatter metadata out of bounds')
           goto 9999
+        end if
+        if (nerv > 0) then
+          idx_min = minval(comm_indexes%v(idx_pt:idx_pt+nerv-1))
+          idx_max = maxval(comm_indexes%v(idx_pt:idx_pt+nerv-1))
+          if ((idx_min < 1) .or. (idx_max > y_nrows)) then
+            info = psb_err_internal_error_
+            call psb_errpush(info,name,a_err='baseline scatter index out of bounds')
+            goto 9999
+          end if
         end if
         if ((rcv_pt < 1) .or. (nerv < 0) .or. (rcv_pt+max(0,nerv)-1 > size(y%combuf))) then
           info = psb_err_internal_error_
@@ -891,11 +911,11 @@ contains
               & y%combuf(1),                            &  ! send buffer
               & neighbor_comm_handle%send_counts,       &
               & neighbor_comm_handle%send_displs_v,     &  ! positional (baseline layout)
-              & psb_mpi_r_dpk_,                         &
+              & psb_mpi_r_spk_,                         &
               & y%combuf(1),                            &  ! recv buffer (baseline layout)
               & neighbor_comm_handle%recv_counts,       &
               & neighbor_comm_handle%recv_displs_v,     &  ! positional (baseline layout)
-              & psb_mpi_r_dpk_,                         &
+              & psb_mpi_r_spk_,                         &
               & neighbor_comm_handle%graph_comm,        &
               & mpi_info_null,                          &
               & neighbor_comm_handle%persistent_request, iret)
@@ -1737,7 +1757,7 @@ subroutine psi_sswap_baseline_multivect(ctxt,swap_status,beta,y,comm_indexes, &
         if (debug) write(*,*) my_rank,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_double_swap_tag
            call mpi_irecv(y%combuf(rcv_pt),n*nerv,&
-             & psb_mpi_r_dpk_,prcid(i),&
+             & psb_mpi_r_spk_,prcid(i),&
              & p2ptag, icomm,baseline_comm_handle%comid(i,2),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -1782,7 +1802,7 @@ subroutine psi_sswap_baseline_multivect(ctxt,swap_status,beta,y,comm_indexes, &
 
       if ((nesd>0).and.(proc_to_comm /= my_rank)) then 
            call mpi_isend(y%combuf(snd_pt),n*nesd,&
-             & psb_mpi_r_dpk_,prcid(i),&
+             & psb_mpi_r_spk_,prcid(i),&
              & p2ptag,icomm,baseline_comm_handle%comid(i,1),iret)
       end if
 
@@ -2012,11 +2032,11 @@ subroutine psi_sswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
           & y%combuf(1),                        &  ! send buffer
           & neighbor_comm_handle%send_counts,     &
           & neighbor_comm_handle%send_displs,     &
-          & psb_mpi_r_dpk_,                     &
+          & psb_mpi_r_spk_,                     &
           & y%combuf(total_send_ + 1),            &  ! recv buffer
           & n*neighbor_comm_handle%recv_counts,   &
           & n*neighbor_comm_handle%recv_displs,    &
-          & psb_mpi_r_dpk_,                     &
+          & psb_mpi_r_spk_,                     &
           & neighbor_comm_handle%graph_comm,      &
           & neighbor_comm_handle%comm_request, iret)
       if (iret /= mpi_success) then
@@ -2233,11 +2253,11 @@ subroutine psi_sswap_neighbor_topology_multivect_persistent(ctxt,swap_status,bet
             & y%combuf(1),                          &  ! send buffer
             & n*neighbor_comm_handle%send_counts,   &
             & n*neighbor_comm_handle%send_displs,    &
-            & psb_mpi_r_dpk_,                       &
+          & psb_mpi_r_spk_,                       &
             & y%combuf(total_send_ + 1),            &  ! recv buffer
             & n*neighbor_comm_handle%recv_counts,   &
             & n*neighbor_comm_handle%recv_displs,    &
-            & psb_mpi_r_dpk_,                       &
+          & psb_mpi_r_spk_,                       &
             & neighbor_comm_handle%graph_comm,      &
             & mpi_info_null,                        &
             & neighbor_comm_handle%persistent_request, iret)
