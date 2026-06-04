@@ -23,11 +23,11 @@ program main
     integer(psb_ipk_)       :: tests_number, count, last_percent
 
     ! sparse matrices
-    type(psb_sspmat_type)           :: a
-    type(psb_lsspmat_type)          :: aux_a
+    type(psb_sspmat_type)   :: a
+    type(psb_lsspmat_type)  :: aux_a
 
     ! matrix descriptor data structure
-    type(psb_desc_type)             :: desc_a
+    type(psb_desc_type)     :: desc_a
 
     ! Communicator variable
     type(psb_ctxt_type)     :: ctxt
@@ -61,10 +61,6 @@ program main
     matrix_file = "matrix/1138_bus.mtx"
     inquire(file=matrix_file, exist=matrix_exists)
     if (.not.matrix_exists) then
-        matrix_file = "../../comm/spmv/Geo_1438.mtx"
-        inquire(file=matrix_file, exist=matrix_exists)
-    end if
-    if (.not.matrix_exists) then
         if (my_rank == psb_root_) then
             write(psb_out_unit,*) 'Matrix file not found. Expected matrix/1138_bus.mtx'
         end if
@@ -80,6 +76,9 @@ program main
         call generate_vectors(rows,cols) 
     end if
 
+    call psb_bcast(ctxt,rows)
+    call psb_bcast(ctxt,cols)
+    
     call psb_barrier(ctxt)
 
     !! Read and distribute matrix once
@@ -98,7 +97,7 @@ program main
         call psb_abort(ctxt)
     end if
 
-    !! 1138_bus matrix (sparse) - reuse distributed matrix across all parameter combinations
+    !! bcsstk29 matrix (sparse) - reuse distributed matrix across all parameter combinations
     do i=1,size(x)
         do j=1,size(y)
             do k=1,size(alpha)
@@ -125,11 +124,13 @@ program main
 contains
 
     subroutine print_progress(current, total, last_percent, label)
+        use iso_fortran_env, only: error_unit
         implicit none
         integer(psb_ipk_), intent(in)    :: current, total
         integer(psb_ipk_), intent(inout) :: last_percent
         character(len=*), intent(in)     :: label
         integer(psb_ipk_)                :: percent, filled, width, i
+        character(len=160)               :: line
 
         if (total <= 0) return
         percent = int(real(current) / real(total) * 100.0)
@@ -139,17 +140,29 @@ contains
         width = 30
         filled = int(real(percent) / 100.0 * width)
 
-        write(*,'(A)',advance='no') "[INFO]    Progress " // trim(label) // ": ["
+        line = "[INFO]    Progress " // trim(label) // ": ["
         do i = 1, filled
-            write(*,'(A)',advance='no') "#"
+            line = trim(line) // "#"
         end do
         do i = filled + 1, width
-            write(*,'(A)',advance='no') "-"
+            line = trim(line) // "-"
         end do
-        write(*,'(A,I3,A,I0,A,I0,A)',advance='no') "] ", percent, "% (", current, "/", total, ")"
-        write(*,'(A)',advance='no') char(13)
-        call flush(6)
-        if (percent == 100) write(*,'(A)') ""
+        line = trim(line) // "] "
+        write(line(len_trim(line)+1:), '(I3)') percent
+        line = trim(line) // "% (" // trim(adjustl(itoa(current))) // "/" // trim(adjustl(itoa(total))) // ")"
+        if (percent < 100) then
+            write(error_unit,'(A)') char(13) // char(27) // "[2K" // trim(line) // char(27) // "[1A"
+        else
+            write(error_unit,'(A)') char(13) // char(27) // "[2K" // trim(line)
+        end if
+        call flush(error_unit)
     end subroutine print_progress
+
+    pure function itoa(i) result(str)
+        implicit none
+        integer(psb_ipk_), intent(in) :: i
+        character(len=32) :: str
+        write(str,'(I0)') i
+    end function itoa
 
 end program main

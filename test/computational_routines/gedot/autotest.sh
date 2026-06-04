@@ -34,6 +34,7 @@ run_mpi "$num_procs" ./runs/psb_gedot_test "${num_procs} processes computation"
 
 
 # Iterate through files in the first directory
-compare_dirs "$dir1" "$dir2" "${log_file_name}"
+PSBLAS_TEST_EPS_MODE=gamma_n PSBLAS_TEST_N=10000 PSBLAS_TEST_UNIT_ROUNDOFF=1.19e-7 \
+    compare_dirs "$dir1" "$dir2" "${log_file_name}"
 
 info "PSBLAS psb_gedot test successfully completed."

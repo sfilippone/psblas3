@@ -13,24 +13,24 @@ module psb_spmm_test
         implicit none 
 
         ! input parameters
-        character(len = *), intent(in)      :: x_file, y_file
-        real(psb_spk_), intent(in)          :: alpha, beta
-        type(psb_sspmat_type), intent(inout) :: a
-        type(psb_desc_type), intent(inout)   :: desc_a
-        integer(psb_ipk_), intent(in)       :: rows, cols
+        character(len = *), intent(in)          :: x_file, y_file
+        real(psb_spk_), intent(in)              :: alpha, beta
+        type(psb_sspmat_type), intent(inout)    :: a
+        type(psb_desc_type), intent(inout)      :: desc_a
+        integer(psb_ipk_), intent(in)           :: rows, cols
 
-        character(len=:), allocatable       :: output_file_name       
+        character(len=:), allocatable           :: output_file_name       
 
         ! vectors
-        type(psb_s_vect_type)           	:: x, y
+        type(psb_s_vect_type)           	    :: x, y
 
         ! communication context
-        type(psb_ctxt_type), intent(in)     :: ctxt
-        integer(psb_ipk_)               	:: my_rank, np, info, err_act
+        type(psb_ctxt_type), intent(in)         :: ctxt
+        integer(psb_ipk_)               	    :: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
-        real(psb_spk_), allocatable     	:: x_global(:), y_global(:)
-        logical                         :: exists
+        real(psb_spk_), allocatable     	    :: x_global(:), y_global(:)
+        logical                                 :: exists
 
         info = psb_success_
 
@@ -42,9 +42,9 @@ module psb_spmm_test
         endif
 
         ! Prepare input buffers on all ranks; root reads from disk
-        allocate(x_global(cols))
-        allocate(y_global(rows))
         if(my_rank == psb_root_) then
+            allocate(x_global(cols))
+            allocate(y_global(rows))
             call mm_array_read(x_global,info,filename=x_file)
             call mm_array_read(y_global,info,filename=y_file)
         end if
@@ -119,8 +119,16 @@ module psb_spmm_test
             output_file_name = output_file_name // "_b3.mtx"
         end if
 
-        ! Save result to output file
-        call mm_array_write(y,"Result vector",info,filename=output_file_name)
+        ! Gather result on root and save to output file
+        call psb_gather(y_global,y,desc_a,info,root=psb_root_)
+        if(info /= psb_success_) then
+            write(psb_out_unit,*) "Error in psb_gather to collect y result"
+            goto 9999
+        end if
+
+        if (my_rank == psb_root_) then
+            call mm_array_write(y_global,"Result vector",info,filename=output_file_name)
+        end if
 
         ! Deallocate
         call psb_gefree(x, desc_a,info)
@@ -135,8 +143,10 @@ module psb_spmm_test
             goto 9999
         end if
 
-        deallocate(x_global)
-        deallocate(y_global)
+        if(my_rank == 0) then
+            deallocate(x_global)
+            deallocate(y_global)
+        end if
 
         return
 
@@ -161,7 +171,8 @@ module psb_spmm_test
 
         integer(psb_ipk_), intent(in)               :: rows, cols
         real(psb_spk_), allocatable                 :: x(:), y(:)
-        integer(psb_ipk_)                           :: i, info
+        integer(psb_ipk_)                           :: i, info, nseed
+        integer, allocatable                        :: seed(:)
         logical                                     :: exists
 
         inquire(file='vectors/', exist=exists)
@@ -172,7 +183,10 @@ module psb_spmm_test
         allocate(x(cols))
         allocate(y(rows))
         
-        call random_init(repeatable=.true.,image_distinct=.true.) 
+        call random_seed(size=nseed)
+        allocate(seed(nseed))
+        seed = 12345
+        call random_seed(put=seed)
         call random_number(x)
         call random_number(y)
 
@@ -220,6 +234,7 @@ module psb_spmm_test
         call mm_array_write(x,"Null vector",info,filename="vectors/x4.mtx")
         call mm_array_write(y,"Null vector",info,filename="vectors/y4.mtx")
 
+        deallocate(seed)
         deallocate(x)
         deallocate(y)
 
@@ -247,7 +262,10 @@ module psb_spmm_test
         ! Skip comment lines (starting with %)
         do
            read(unit, '(A)', iostat=ret) line
-           if (ret /= 0) exit
+           if (ret /= 0) then
+              print *, 'Error reading file or end of file reached without finding header.'
+              stop
+           end if
            if (line(1:1) /= '%') then
               read(line, *) rows, cols, nnz
               found = .true.

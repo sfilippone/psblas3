@@ -183,11 +183,13 @@ program main
 contains
 
     subroutine print_progress(current, total, last_percent, label)
+        use iso_fortran_env, only: error_unit
         implicit none
         integer(psb_ipk_), intent(in)    :: current, total
         integer(psb_ipk_), intent(inout) :: last_percent
         character(len=*), intent(in)     :: label
         integer(psb_ipk_)                :: percent, filled, width, i
+        character(len=160)               :: line
 
         if (total <= 0) return
         percent = int(real(current) / real(total) * 100.0)
@@ -197,14 +199,29 @@ contains
         width = 30
         filled = int(real(percent) / 100.0 * width)
 
-        write(*,'(A)',advance='no') "[INFO]    Progress " // trim(label) // ": ["
+        line = "[INFO]    Progress " // trim(label) // ": ["
         do i = 1, filled
-            write(*,'(A)',advance='no') "#"
+            line = trim(line) // "#"
         end do
         do i = filled + 1, width
-            write(*,'(A)',advance='no') "-"
+            line = trim(line) // "-"
         end do
-        write(*,'(A,I3,A,I0,A,I0,A)') "] ", percent, "% (", current, "/", total, ")"
+        line = trim(line) // "] "
+        write(line(len_trim(line)+1:), '(I3)') percent
+        line = trim(line) // "% (" // trim(adjustl(itoa(current))) // "/" // trim(adjustl(itoa(total))) // ")"
+        if (percent < 100) then
+            write(error_unit,'(A)') char(13) // char(27) // "[2K" // trim(line) // char(27) // "[1A"
+        else
+            write(error_unit,'(A)') char(13) // char(27) // "[2K" // trim(line)
+        end if
+        call flush(error_unit)
     end subroutine print_progress
+
+    pure function itoa(i) result(str)
+        implicit none
+        integer(psb_ipk_), intent(in) :: i
+        character(len=32) :: str
+        write(str,'(I0)') i
+    end function itoa
 
 end program main

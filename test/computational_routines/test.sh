@@ -6,6 +6,7 @@ separator=$(printf "%0.s=" $(seq 1 $terminal_width)) # Generate separator of cor
 flag=0
 log_file_name="psblas_test_results.log"
 base_dir=$(pwd)
+failed_tests=""
 
 # Define color codes
 GREEN="\033[0;32m"
@@ -92,10 +93,12 @@ for dir in "$base_dir"/*/; do
     ( # excecute script in a subshell, otherwise the dir search will stop
         cd "$dir"
 
+        autotest_status=0
         # Check if autotest.sh exists before executing it
         if [ -f autotest.sh ]; then
             chmod +x autotest.sh
-            ./autotest.sh 
+            ./autotest.sh
+            autotest_status=$?
         else
             echo -e "${YELLOW}[WARNING] autotest.sh not found in $(pwd). Skipping $(basename "$dir") kernel${RESET}"
         fi
@@ -113,7 +116,13 @@ for dir in "$base_dir"/*/; do
         else
             echo -e "${YELLOW}[WARNING] No .log files found in $(pwd). Skipping log append.${RESET}"
         fi
+
+        # Propagate the kernel's pass/fail status to the parent shell
+        exit $autotest_status
     )
+    if [ $? -ne 0 ]; then
+        failed_tests="${failed_tests}${base_name} "
+    fi
 
     # Return to the parent directory
     echo -e "${BLUE}[INFO]\t  Leaving directory: $(pwd)/$(basename "$dir")${RESET}"
@@ -124,4 +133,10 @@ done
 echo -e "${BLUE}[INFO]\t  Finished processing all subdirectories.${RESET}"
 
 
-echo -e "${GREEN}[INFO]\t  All tests completed successfully. Results are logged in ${log_file_name}.${RESET}"
+if [ -z "$failed_tests" ]; then
+    echo -e "${GREEN}[INFO]\t  All tests completed successfully. Results are logged in ${log_file_name}.${RESET}"
+    exit 0
+else
+    echo -e "${RED}[FAIL]\t  Some tests failed: ${failed_tests%% }. Results are logged in ${log_file_name}.${RESET}"
+    exit 1
+fi
