@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -70,7 +70,7 @@ Module psb_s_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_sasb_vect(x, desc_a, info,mold, scratch)
+    subroutine psb_sasb_vect(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -78,8 +78,9 @@ Module psb_s_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_s_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_sasb_vect
-    subroutine psb_sasb_vect_r2(x, desc_a, info,mold, scratch)
+    subroutine psb_sasb_vect_r2(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -87,6 +88,7 @@ Module psb_s_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_s_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_sasb_vect_r2
     subroutine psb_sasb_multivect(x, desc_a, info,mold, scratch, n)
       import
@@ -250,13 +252,14 @@ Module psb_s_tools_mod
   end interface
 
   interface psb_spasb
-    subroutine psb_sspasb(a,desc_a, info, afmt, upd, mold, bld_and)
+    subroutine psb_sspasb(a,desc_a, info, afmt, upd, mold, dupl, bld_and)
       import
       implicit none
       type(psb_sspmat_type), intent (inout)   :: a
       type(psb_desc_type), intent(inout)        :: desc_a
       integer(psb_ipk_), intent(out)                    :: info
       integer(psb_ipk_),optional, intent(in)            :: upd
+      integer(psb_ipk_),optional, intent(in)            :: dupl
       character(len=*), optional, intent(in)  :: afmt
       class(psb_s_base_sparse_mat), intent(in), optional :: mold
       logical, intent(in), optional :: bld_and
@@ -437,6 +440,14 @@ Module psb_s_tools_mod
       import
       type(psb_s_vect_type), intent(inout) :: x
       integer(psb_lpk_), intent(in)          :: index
+      type(psb_desc_type), intent(inout)     :: desc_a
+      integer(psb_ipk_), intent(out)         :: info
+      real(psb_spk_)                        :: res
+    end function
+    function psb_s_getmatelem(a,rowindex,colindex,desc_a,info) result(res)
+      import
+      type(psb_sspmat_type), intent(inout)   :: a
+      integer(psb_lpk_), intent(in)          :: rowindex, colindex
       type(psb_desc_type), intent(inout)     :: desc_a
       integer(psb_ipk_), intent(out)         :: info
       real(psb_spk_)                        :: res

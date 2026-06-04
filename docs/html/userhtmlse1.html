@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="userhtml.css"> 
 </head><body 
 >
-   <!--l. 57--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 58--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlse2.html" >next</a>] [<a 
 href="userhtmlli2.html" >prev</a>] [<a 
 href="userhtmlli2.html#tailuserhtmlli2.html" >prev-tail</a>] [<a 
@@ -18,7 +18,7 @@ href="#tailuserhtmlse1.html">tail</a>] [<a
 href="userhtml.html#userhtmlse1.html" >up</a>] </p></div>
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x4-30001"></a>Introduction</h3>
-<!--l. 59--><p class="noindent" >The PSBLAS library, developed with the aim to facilitate the parallelization of
+<!--l. 60--><p class="noindent" >The PSBLAS library, developed with the aim to facilitate the parallelization of
 computationally intensive scientific applications, is designed to address parallel
 implementation of iterative solvers for sparse linear systems through the
 distributed memory paradigm. It includes routines for multiplying sparse
@@ -27,30 +27,31 @@ diagonal entries, preprocessing sparse matrices, and contains additional
 routines for dense matrix operations. The current implementation of PSBLAS
 addresses a distributed memory execution model operating with message
 passing.
-<!--l. 70--><p class="indent" >   The PSBLAS library version 3 is implemented in the Fortran&#x00A0;2008&#x00A0;<span class="cite">[<a 
+<!--l. 71--><p class="indent" >   The PSBLAS library version 3 is implemented in the Fortran&#x00A0;2008&#x00A0;<span class="cite">[<a 
 href="userhtmlli3.html#Xmetcalf">17</a>]</span>
 programming language, with reuse and/or adaptation of existing Fortran&#x00A0;77 and
 Fortran&#x00A0;95 software, plus a handful of C routines.
-<!--l. 75--><p class="indent" >   The use of Fortran&#x00A0;2008 offers a number of advantages over Fortran&#x00A0;95, mostly
+<!--l. 76--><p class="indent" >   The use of Fortran&#x00A0;2008 offers a number of advantages over Fortran&#x00A0;95, mostly
 in the handling of requirements for evolution and adaptation of the library to new
 computing architectures and integration of new algorithms. For a detailed
 discussion of our design see&#x00A0;<span class="cite">[<a 
 href="userhtmlli3.html#XSparse03">11</a>]</span>; other works discussing advanced programming in
 Fortran&#x00A0;2008 include&#x00A0;<span class="cite">[<a 
 href="userhtmlli3.html#XDesPat:11">21</a>,&#x00A0;<a 
-href="userhtmlli3.html#XRouXiaXu:11">19</a>]</span>; sufficient support for Fortran&#x00A0;2008 is now available
-from many compilers, including recent versions of the GNU Fortran compiler from
-the Free Software Foundation, and the FLANG compiler from the LLVM
-project.
-<!--l. 87--><p class="indent" >   Previous approaches have been based on mixing Fortran&#x00A0;95, with its support for
+href="userhtmlli3.html#XRouXiaXu:11">19</a>]</span>; sufficient support for Fortran&#x00A0;2008 is now
+available from many compilers, including recent versions of the GNU Fortran
+compiler from the Free Software Foundation, the FLANG compiler from the
+LLVM project, and the Intel OneAPI compiler. The README file contains
+a list of compilers against which we have successfully tested the current
+release.
+<!--l. 91--><p class="indent" >   Previous approaches have been based on mixing Fortran&#x00A0;95, with its support for
 object-based design, with other languages; these have been advocated by a number
 of authors, e.g.&#x00A0;<span class="cite">[<a 
-href="userhtmlli3.html#Xmachiels">16</a>]</span>. Moreover, the Fortran&#x00A0;95 facilities for dynamic memory
-management and interface overloading greatly enhance the usability of the PSBLAS
-subroutines. In this way, the library can take care of runtime memory requirements
-that are quite difficult or even impossible to predict at implementation or
-compilation time.
-<!--l. 97--><p class="indent" >   The presentation of the PSBLAS library follows the general structure of the
+href="userhtmlli3.html#Xmachiels">16</a>]</span>. The Fortran&#x00A0;95 facilities for dynamic memory management and
+interface overloading ensure that the library can take care of runtime memory
+requirements that are quite difficult or even impossible to predict at implementation
+or compilation time.
+<!--l. 99--><p class="indent" >   The presentation of the PSBLAS library follows the general structure of the
 proposal for serial Sparse BLAS&#x00A0;<span class="cite">[<a 
 href="userhtmlli3.html#Xsblas97">8</a>,&#x00A0;<a 
 href="userhtmlli3.html#Xsblas02">9</a>]</span>, which in its turn is based on the proposal for
@@ -58,16 +59,15 @@ BLAS on dense matrices&#x00A0;<span class="cite">[<a
 href="userhtmlli3.html#XBLAS1">15</a>,&#x00A0;<a 
 href="userhtmlli3.html#XBLAS2">5</a>,&#x00A0;<a 
 href="userhtmlli3.html#XBLAS3">6</a>]</span>.
-<!--l. 102--><p class="indent" >   The applicability of sparse iterative solvers to many different areas causes
-some terminology problems because the same concept may be denoted
-through different names depending on the application area. The PSBLAS
-features presented in this document will be discussed referring to a finite
-difference discretization of a Partial Differential Equation (PDE). However,
-the scope of the library is wider than that: for example, it can be applied
-to finite element discretizations of PDEs, and even to different classes of
-problems such as nonlinear optimization, for example in optimal control
-problems.
-<!--l. 112--><p class="indent" >   The design of a solver for sparse linear systems is driven by many conflicting
+<!--l. 104--><p class="indent" >   The applicability of sparse iterative solvers to many different areas causes some
+terminology problems because the same concept may be denoted by different names
+depending on the application area. The PSBLAS features presented in this document
+will be discussed taking as a reference a finite difference discretization of a Partial
+Differential Equation (PDE). However, the scope of the library is wider than that: it
+can be applied to finite element and other discretizations of PDEs, and even to
+different classes of problems such as nonlinear optimization, for example in optimal
+control problems.
+<!--l. 114--><p class="indent" >   The design of a solver for sparse linear systems is driven by many conflicting
 objectives, such as limiting occupation of storage resources, exploiting regularities in
 the input data, exploiting hardware characteristics of the parallel platform. To
                                                                   
@@ -88,12 +88,12 @@ applications.
                                                                   
 
                                                                   
-   <!--l. 129--><div class="crosslinks"><p class="noindent">[<a 
+   <!--l. 131--><div class="crosslinks"><p class="noindent">[<a 
 href="userhtmlse2.html" >next</a>] [<a 
 href="userhtmlli2.html" >prev</a>] [<a 
 href="userhtmlli2.html#tailuserhtmlli2.html" >prev-tail</a>] [<a 
 href="userhtmlse1.html" >front</a>] [<a 
 href="userhtml.html#userhtmlse1.html" >up</a>] </p></div>
-<!--l. 129--><p class="indent" >   <a 
+<!--l. 131--><p class="indent" >   <a 
  id="tailuserhtmlse1.html"></a>  
 </body></html> 

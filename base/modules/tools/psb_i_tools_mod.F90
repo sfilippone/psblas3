@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -69,7 +69,7 @@ Module psb_i_tools_mod
 
 
   interface psb_geasb
-    subroutine psb_iasb_vect(x, desc_a, info,mold, scratch)
+    subroutine psb_iasb_vect(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -77,8 +77,9 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_i_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_iasb_vect
-    subroutine psb_iasb_vect_r2(x, desc_a, info,mold, scratch)
+    subroutine psb_iasb_vect_r2(x, desc_a, info,mold, scratch,dupl)
       import
       implicit none
       type(psb_desc_type), intent(in)      ::  desc_a
@@ -86,6 +87,7 @@ Module psb_i_tools_mod
       integer(psb_ipk_), intent(out)                 ::  info
       class(psb_i_base_vect_type), intent(in), optional :: mold
       logical, intent(in), optional        :: scratch
+      integer(psb_ipk_), optional, intent(in) :: dupl
     end subroutine psb_iasb_vect_r2
     subroutine psb_iasb_multivect(x, desc_a, info,mold, scratch, n)
       import

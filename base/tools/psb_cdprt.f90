@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -169,7 +169,7 @@ contains
     else
       data_ = psb_comm_halo_
     end if
-    call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    call desc_p%get_list_p(data_,vpnt,totxch,idxr,idxs,info)
     res = totxch
   end function get_nxchg
   
@@ -201,7 +201,7 @@ contains
       verb_ = 1
     end if
     
-    call psb_cd_v_get_list(data_,desc_p,vpnt,totxch,idxr,idxs,info)
+    call desc_p%get_list_p(data_,vpnt,totxch,idxr,idxs,info)
     if (glob) &
          &   call psb_realloc(max(idxr,idxs,1),gidx,info)
 

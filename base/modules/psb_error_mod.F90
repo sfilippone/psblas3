@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -509,7 +509,6 @@ contains
       write(tmpmsg,'("PSBLAS Error (",i0,") in subroutine: ",a)')&
            & err_c,trim(r_name)
     end if
-
     
     select case (err_c)
     case(:psb_success_)
@@ -750,7 +749,7 @@ contains
       achmsg(1) = tmpmsg
       write(achmsg(2),'("Index lists are inconsistent: some indices are orphans")')
 
-    case(psb_err_partfunc_toomuchprocs_)
+    case(psb_err_partfunc_toomanyprocs_)
       allocate(achmsg(4)) 
       achmsg(1) = tmpmsg
       write(achmsg(2),&

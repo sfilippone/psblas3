@@ -51,14 +51,13 @@ The main reference for the serial sparse BLAS is:
 
 ## Installing
 
-To compile and run our software you will need the following
-prerequisites (see also SERIAL below):
+  To compile (using configure/make/make install) and run our software
+  you will need the following 
+  prerequisites (see also SERIAL below):
 
-1. A working version of MPI
+  1. A working version of MPI.
 
-2. A version of the BLAS; if you don't have a specific version for your
-   platform you may try ATLAS available from
-   http://math-atlas.sourceforge.net/ 
+2. A version of the BLAS; you can specify a specific version with `--with-blas`
 
 3. We have had good results with  the METIS library, from 
    https://github.com/KarypisLab/METIS.
@@ -70,12 +69,20 @@ prerequisites (see also SERIAL below):
    We use the C interface to AMD.
 
 6. If you have CUDA available, use
-   --enable-cuda           to compile CUDA-enabled methods
-   --with-cudadir=<path>   to specify the CUDA toolkit location
-   --with-cudacc=XX,YY,ZZ  to specify a list of target CCs (compute
-   			   capabilities) to compile the CUDA code for.
+   - `--enable-cuda`           to compile CUDA-enabled methods
+   - `--with-cudadir=<path>`   to specify the CUDA toolkit location
+   - `--with-cudacc=XX,YY,ZZ`  to specify a list of target CCs (compute
+   								  capabilities).
+   CUDA versions have specific compatibility requirements;
+   for example:
+     - CUDA version 11.8 supports GNU compilers up to version 11
+     - CUDA versions 12.3 through 12.6 support GNU compilers up to version 13
+     - CUDA versions 12.8 and 12.9 support  GNU compilers up to version 14
+     - CUDA version 13.0 supports  GNU compilers up to version 15      
+     For further information please refer to the CUDA documentation at
+     https://developer.nvidia.com/cuda/gpus
 
-The configure script will generate a Make.inc file suitable for building
+The configure script will generate a `Make.inc` file suitable for building
 the library. The script is capable of recognizing the needed libraries
 with their default names; if they are in unusual places consider adding
 the paths with `--with-libs`, or explicitly specifying the names in
@@ -94,7 +101,7 @@ the paths with `--with-libs`, or explicitly specifying the names in
 > (see [http://modules.sourceforge.net/](http://modules.sourceforge.net/)), and load the relevant
 > variables with (e.g.) 
 > ```
-> module load gcc/13.2.0 openmpi/4.1.6
+> module load gcc/14.2.0 openmpi/5.0.8
 > ```
 > This will delegate to the modules setup to make sure that the version of
 > openmpi in use is the one compiled with the gnu46 compilers. After the
@@ -106,11 +113,20 @@ After you have Make.inc fixed,  run
 make
 ``` 
 to  compile the library; go to the test directory and its subdirectories
-to get test programs done. If you specify `--prefix=/path` you can do make
-install and the libraries will be installed under `/path/lib`, while the
-module files will be installed under `/path/modules`. The regular and
-experimental C interface header files are under `/path/include`.
-
+to get test programs done.
+You can then install with
+ ```
+ make install
+ ```
+ We recommend specifying  `--prefix=/path` in the configure step, so that
+ the libraries will be installed under `/path/lib`,
+ the module files will be installed under `/path/modules`, the documentation under `/path/docs` and so on.
+The C interface header files are under `/path/include`.
+If `/path` is a system directory, you may need 
+ ```
+ sudo make install
+ ```
+If you do not specifye `--with-prefix` the usual default of `/usr` applies.
 ### Packaging changes, CUDA and GPU support
 
 This version of PSBLAS incorporates into a single package three
@@ -121,12 +137,12 @@ entities that were previously separated:
 | PSBLAS-EXT | a library providing additional storage formats for matrices and vectors |
 | SPGPU      | a package of kernels for NVIDIA GPUs originally written by Davide Barbieri and Salvatore Filippone; see the license file [cuda/License-spgpu.md](cuda/License-spgpu.md) |
 
-Moreover, the module and library previously called psb_krylovv are now called
+Moreover, the module and library previously called psb_krylov are now called
 psb_linsolve, but their usage is otherwise unchanged.								
 
 ### OpenACC
 There is a highly experimental version of an OpenACC interface,
-you can access it by speficifying
+you can compile it by speficifying
 ```bash
 --enable-openacc  --with-extraopenacc="-foffload=nvptx-none=-march=sm_70"
 ```
@@ -144,7 +160,7 @@ cover what we use internally, it's not a complete replacement).
 ### Integers
 
 We have two kind of integers: IPK for local indices, and LPK for
-global indices. They can be specified independently at configure time,
+global indices. Their size  can be specified at configure time,
 e.g.
 ```bash
 --with-ipk=4 --with-lpk=8
@@ -153,18 +169,75 @@ which is asking for 4-bytes local indices, and 8-bytes global indices
 (this is the default). 
 
 ## CMAKE
-There is initial support for building with CMAKE. As of this time, it does not compile the CUDA part.
+PSBLAS supports building with CMake (version 3.11 or higher). This method handles the automatic detection of compilers, MPI, and linear algebra libraries.
+Standard Compilation (Without CUDA)
+To perform a standard compilation, run:
+### 1. Create and enter a dedicated build directory
+```
+mkdir build
+cd build
+```
+### 2. Configure the project
+```
+cmake ..
+```
+### 3. Compile the libraries
+```
+make
+```
+If you wish to install PSBLAS in a specific location (similar to using the --prefix option in the legacy configure script), you must define the CMAKE_INSTALL_PREFIX variable.
+To set a custom installation path, run the configuration command as follows:
+#### Example: Installing PSBLAS to a specific folder in your home directory
+```
+cmake -DCMAKE_INSTALL_PREFIX=/home/user/psblas_install
+```
+### Compiling with CUDA Support
+To enable GPU support via CUDA, you must set the PSB_BUILD_CUDA option to ON during the configuration step.
+Important Compatibility Note: CUDA support is strictly incompatible with 8-byte local integers. If you manually set CMAKE_PSB_IPK to 8, CUDA support will be automatically disabled by the system.
+To build with CUDA enabled:
 
-## LLVM
-The library has been successfully compiled and tested with LLVM version 20.1.0-rc2.
+```
+cmake -DPSB_BUILD_CUDA=ON ..
+```
+The compilation then proceed as before through make
+When this flag is active, CMake will search for the CUDAToolkit, enable the CUDA language, and define necessary macros such as PSB_HAVE_CUDA.
+
+### Customizing Integer Sizes
+You can override the default integer sizes (4-byte local IPK and 8-byte global LPK) using the following variables:
+Example: Using 8-byte global integers (default) and 4-byte local integers
+```
+cmake -DCMAKE_PSB_IPK=4 -DCMAKE_PSB_LPK=8 ..
+```
+
+### 4. Installation
+To install the libraries, header files, and Fortran modules to your system (or a custom path defined by -DCMAKE_INSTALL_PREFIX), run:
+```
+make install
+```
+The files will be organized into the lib, include, and modules subdirectories within the installation prefix, same as the configure build.
+## MPI and Compilers
+ The library has been successfully compiled and tested with multiple compilers
+ and MPI implementations; this release has been successfully tested with:
+ - MPICH 4.2.3, 4.3.0, 4.3.2
+ - OpenMPI 4.1.8. 5.0.7, 5.0.8, 5.0.9
+ 
+ combined with
+ 
+ - GNU compilers 10.5.0, 11.5.0, 12.5.0, 13.3.0, 14.2.0 14.3.0, 15.2.0
+ - LLVM  20.1.0 and 21.1.0 (except OpenMPI 4.1.8 which does not build with LLVM)
+ 
+ Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2 and 2025.3
+
+ As of this release, the NVIDIA compiler 25.7 fails to handle our code.
+ Cray, IBM and NAg compilers have been used for testing in the past, but not on this version.
  			   
 ## Documentation
 
 Further information on installation and configuration can be found in the documentation.
 See [docs/psblas-3.9.pdf](docs/psblas-3.9.pdf); an HTML version of the same document is
 available in docs/html. Please consult the sample programs, especially
-- [test/pargen/psb_s_pde2d.F90](test/pargen/psb_s_pde2d.F90) [test/pargen/psb_d_pde2d.F90](test/pargen/psb_d_pde2d.F90)
-- [test/pargen/psb_s_pde2d.F90](test/pargen/psb_s_pde3d.F90) [test/pargen/psb_d_pde2d.F90](test/pargen/psb_d_pde3d.F90)
+- [test/pdegen/psb_s_pde2d.F90](test/pdegen/psb_s_pde2d.F90) [test/pdegen/psb_d_pde2d.F90](test/pdegen/psb_d_pde2d.F90)
+- [test/pdegen/psb_s_pde2d.F90](test/pdegen/psb_s_pde3d.F90) [test/pdegen/psb_d_pde2d.F90](test/pdegens/psb_d_pde3d.F90)
 
 which contain examples for the solution of linear systems obtained by the discretization of a generic second-order differential equation in two:
 ```math
@@ -208,18 +281,19 @@ Salvatore Filippone
 
 **Contributors** (_roughly reverse cronological order_):
 
+- Fabio      Durastante
 - Luca       Pepè Sciarria
 - Theophane  Loloum
-- Fabio      Durastante
 - Dimitri    Walther
+- Pasqua     D'Ambra
 - Andea      Di Iorio
 - Stefano    Petrilli
 - Soren      Rasmussen
 - Zaak       Beekman
 - Ambra	     Abdullahi Hassan
-- Pasqua     D'Ambra
 - Alfredo    Buttari
 - Daniela    di Serafino
+- Thomas     Amestoy
 - Michele    Martone
 - Michele    Colajanni
 - Fabio      Cerioni

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -118,7 +118,7 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
   debug_level = psb_get_debug_level()
 
   ctxt = desc_a%get_context()
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -150,7 +150,7 @@ Subroutine psb_lc_remote_mat(a,desc_a,b,info)
 
   call desc_a%indxmap%fnd_owner(a%ia(1:nz),iprc,info)
 
-  icomm = desc_a%get_mpic()
+  icomm = ctxt%get_mpic()
   sdsz(:)=0
   rvsz(:)=0
   sdsi(:)=0

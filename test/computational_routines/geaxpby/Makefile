@@ -8,9 +8,11 @@ include $(INCDIR)/Make.inc.psblas
 LIBDIR = $(INSTALLDIR)/lib/
 PSBLAS_LIB = -L$(LIBDIR) -lpsb_util -lpsb_base
 LDLIBS = $(PSBLDLIBS)
-EXEDIR = ./runs
 
 FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
+
+EXEDIR=./runs
+
 
 GREEN=\033[0;32m
 RED=\033[0;31m
@@ -23,12 +25,15 @@ all: runsd psb_geaxpby_test
 	@printf "$(GREEN)[INFO]\t  Compilation success!$(END_COLOUR)\n" 
 
 runsd: 	
-	@(if test ! -d $(EXEDIR) ; then mkdir $(EXEDIR); fi)
+	@(if test ! -d runs ; then mkdir runs; fi)
 	@printf "$(BLUE)[INFO]\t  Build directory $(EXEDIR) correctly initialized$(END_COLOUR)\n"
 
+
 psb_geaxpby_test:
-	@$(FLINK) $(LOPT) psb_geaxpby_test.f90 ../utils/psb_test_utils.o -o $(EXEDIR)/psb_geaxpby_test -I../utils/ -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
-	@printf "$(BLUE)[INFO]\t  Testing files for psb_geaxpby linked and compiled correctly$(END_COLOUR)\n" 
+	@$(FLINK) $(LOPT) psb_geaxpby_test.f90 geaxpby.f90 -o psb_geaxpby_test -I$(MODDIR) -I. $(PSBLAS_LIB) $(LDLIBS) 
+	@mv psb_geaxpby_test $(EXEDIR)
+	@printf "$(BLUE)[INFO]\t  Testing files generated correctly$(END_COLOUR)\n" 
+
 
 clean: 
 	@rm -f $(OBJS)\

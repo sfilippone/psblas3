@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -35,7 +35,7 @@ module psb_const_mod
   use iso_fortran_env
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: psb_i2pk_ = int16
-  ! This is always a 4-byte integer, for MPI-related stuff
+  ! This is always a 4-byte integer.
   integer, parameter  :: psb_mpk_ = int32
   ! This is always an 8-byte  integer.
   integer, parameter  :: psb_epk_ = int64
@@ -51,7 +51,7 @@ module psb_const_mod
   ! This is  a 2-byte integer, just in case
   integer, parameter  :: i2ndig=4
   integer, parameter  :: psb_i2pk_ = selected_int_kind(i2ndig)
-  ! This is always a 4-byte integer, for MPI-related stuff
+  ! This is always a 4-byte integer.
   integer, parameter  :: indig=8
   integer, parameter  :: psb_mpk_ = selected_int_kind(indig)
   ! This is always an 8-byte  integer.
@@ -136,10 +136,10 @@ module psb_const_mod
   !
   ! Version
   !
-  character(len=*), parameter    :: psb_version_string_ = "3.9.0"
+  character(len=*), parameter    :: psb_version_string_ = "3.9.1"
   integer(psb_ipk_), parameter   :: psb_version_major_  = 3
   integer(psb_ipk_), parameter   :: psb_version_minor_  = 9
-  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 0
+  integer(psb_ipk_), parameter   :: psb_patchlevel_     = 1
 
   !
   !     Handy & miscellaneous constants
@@ -185,11 +185,12 @@ module psb_const_mod
   !  The up/down constant are defined in pairs having
   !  opposite values. We make use of this fact in the heapsort routine.
   !
-  integer(psb_ipk_), parameter :: psb_sort_up_       = 1, psb_sort_down_     = -1
-  integer(psb_ipk_), parameter :: psb_lsort_up_      = 2, psb_lsort_down_    = -2
-  integer(psb_ipk_), parameter :: psb_asort_up_      = 3, psb_asort_down_    = -3
-  integer(psb_ipk_), parameter :: psb_alsort_up_     = 4, psb_alsort_down_   = -4
-  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_  = 0, psb_sort_keep_idx_ =  1
+  integer(psb_ipk_), parameter :: psb_sort_up_       = 1, psb_sort_down_      = -1
+  integer(psb_ipk_), parameter :: psb_lsort_up_      = 2, psb_lsort_down_     = -2
+  integer(psb_ipk_), parameter :: psb_asort_up_      = 3, psb_asort_down_     = -3
+  integer(psb_ipk_), parameter :: psb_alsort_up_     = 4, psb_alsort_down_    = -4
+  integer(psb_ipk_), parameter :: psb_sort_ovw_idx_  = 0, psb_sort_keep_idx_  =  1
+  integer(psb_ipk_), parameter :: psb_sort_reord_x_  = 0, psb_sort_noreord_x_ =  1
   integer(psb_ipk_), parameter :: psb_heap_resize    = 200
   integer(psb_ipk_), parameter :: psb_find_any_      = 0
   integer(psb_ipk_), parameter :: psb_find_first_ge_ = 1
@@ -202,13 +203,16 @@ module psb_const_mod
   !
 
   !
-  ! State of matrices.
+  ! State of matrices/vectors.
   !
   integer(psb_ipk_), parameter :: psb_invalid_ = -1
   integer(psb_ipk_), parameter :: psb_spmat_null_=0, psb_spmat_bld_=1
   integer(psb_ipk_), parameter :: psb_spmat_asb_=2, psb_spmat_upd_=4
+  integer(psb_ipk_), parameter :: psb_matbld_noremote_ = 0
+  integer(psb_ipk_), parameter :: psb_matbld_remote_   = 1
 
-  integer(psb_ipk_), parameter :: psb_matbld_noremote_=0, psb_matbld_remote_=1
+  integer(psb_ipk_), parameter :: psb_vect_null_=0, psb_vect_bld_=1
+  integer(psb_ipk_), parameter :: psb_vect_asb_=2, psb_vect_upd_=4
 
   
   integer(psb_ipk_), parameter :: psb_ireg_flgs_=10, psb_ip2_=0
@@ -222,9 +226,10 @@ module psb_const_mod
   ! Duplicate coefficients handling
   ! These are usually set while calling spcnv as one of its
   ! optional arugments.
-  integer(psb_ipk_), parameter :: psb_dupl_add_   = 0
-  integer(psb_ipk_), parameter :: psb_dupl_ovwrt_ = 1
-  integer(psb_ipk_), parameter :: psb_dupl_err_   = 2
+  integer(psb_ipk_), parameter :: psb_dupl_null_  = 0
+  integer(psb_ipk_), parameter :: psb_dupl_add_   = 1
+  integer(psb_ipk_), parameter :: psb_dupl_ovwrt_ = 2
+  integer(psb_ipk_), parameter :: psb_dupl_err_   = 3
   integer(psb_ipk_), parameter :: psb_dupl_def_   = psb_dupl_add_
   ! Matrix update mode
   integer(psb_ipk_), parameter :: psb_upd_srch_   = 98764
@@ -282,7 +287,7 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_parm_differs_among_procs_=550
   integer(psb_ipk_), parameter, public :: psb_err_entry_out_of_bounds_=551
   integer(psb_ipk_), parameter, public :: psb_err_inconsistent_index_lists_=552
-  integer(psb_ipk_), parameter, public :: psb_err_partfunc_toomuchprocs_=570
+  integer(psb_ipk_), parameter, public :: psb_err_partfunc_toomanyprocs_=570
   integer(psb_ipk_), parameter, public :: psb_err_partfunc_toofewprocs_=575
   integer(psb_ipk_), parameter, public :: psb_err_partfunc_wrong_pid_=580
   integer(psb_ipk_), parameter, public :: psb_err_no_optional_arg_=581
@@ -321,14 +326,22 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_invalid_irst_ =5002
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preci_=5003
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preca_=5004
-
+  integer(psb_ipk_), parameter, public :: psb_err_incoherent_comm_state_  = 6000 ! Used when communication type bitmask has more then one bit flipped
+  integer(psb_ipk_), parameter, public :: psb_err_topology_error_         = 7000
+  integer(psb_ipk_), parameter, public :: psb_err_topology_invalid_args_  = 7001
+  integer(psb_ipk_), parameter, public :: psb_err_topology_args_mismatch_ = 7002
 
   type :: psb_ctxt_type
     integer(psb_mpk_), allocatable :: ctxt
   contains
     procedure, pass(ctxt) :: get_i_ctxt => psb_get_i_ctxt
+    procedure, pass(ctxt) :: get_mpic   => get_mpic
+    procedure, pass(ctxt) :: set_mpic   => set_mpic
   end type psb_ctxt_type
+  logical, parameter :: try_newins=.true.
 
+  private :: get_mpic, set_mpic
+  
 contains
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
@@ -357,5 +370,27 @@ contains
     end if
 
   end subroutine psb_get_i_ctxt
+  
+  function get_mpic(ctxt) result(val)
+    implicit none 
+    integer(psb_mpk_) :: val 
+    class(psb_ctxt_type), intent(in) :: ctxt
+
+    if (allocated(ctxt%ctxt)) then
+      val = ctxt%ctxt
+    else
+      val = -1
+    end if
+
+  end function get_mpic
+  
+  subroutine set_mpic(ctxt,val)
+    implicit none 
+    integer(psb_mpk_) :: val 
+    class(psb_ctxt_type), intent(inout) :: ctxt
+
+    ctxt%ctxt = val
+
+  end subroutine set_mpic
 
 end module psb_const_mod

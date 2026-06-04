@@ -29,8 +29,11 @@ LIBNAME=$(UTILLIBNAME)
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) 
 CINCLUDES=-I. -I$(INCDIR)
 
-objs: $(OBJS)
-	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+objs: mods $(OBJS)
+
+mods: $(MODOBJS)
+	$(INSTALL) -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
+
 lib:  $(HERE)/$(LIBNAME) 
 	/bin/cp -p $(CPUPDFLAG) $(HERE)/$(LIBNAME) $(LIBDIR)
 

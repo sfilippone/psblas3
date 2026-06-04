@@ -3,43 +3,34 @@
 !!
 !! Author: Luca Pepé Sciarria, Staccone Simone (Tor Vergata University)
 module psb_spmm_test
-    implicit none
-
+    
     contains
 
-    subroutine psb_spmm_kernel(mtx_file,x_file, y_file, alpha, beta, ctxt)
+    subroutine psb_spmm_kernel(a, desc_a, rows, cols, x_file, y_file, alpha, beta, ctxt)
         use psb_base_mod
         use psb_util_mod
 
         implicit none 
 
         ! input parameters
-        character(len = *), intent(in)      :: mtx_file, x_file, y_file
-        real(psb_spk_), intent(in)          :: alpha, beta
+        character(len = *), intent(in)          :: x_file, y_file
+        real(psb_spk_), intent(in)              :: alpha, beta
+        type(psb_sspmat_type), intent(inout)    :: a
+        type(psb_desc_type), intent(inout)      :: desc_a
+        integer(psb_ipk_), intent(in)           :: rows, cols
 
-        character(len=:), allocatable       :: output_file_name       
-
-        ! sparse matrices
-        type(psb_sspmat_type)           	:: a
-        type(psb_lsspmat_type)          	:: aux_a
+        character(len=:), allocatable           :: output_file_name       
 
         ! vectors
-        type(psb_s_vect_type)           	:: x, y
-
-        ! matrix descriptor data structure
-        type(psb_desc_type)             	:: desc_a
+        type(psb_s_vect_type)           	    :: x, y
 
         ! communication context
-        type(psb_ctxt_type), intent(in)     :: ctxt
-        integer(psb_ipk_)               	:: my_rank, np, info, err_act
-
-        ! matrix parameters
-        integer(psb_ipk_)               	:: rows, cols, nnz
-        integer(psb_ipk_)               	:: nr, nt ! In BLOCK ROWS distributin, the number of rows 
+        type(psb_ctxt_type), intent(in)         :: ctxt
+        integer(psb_ipk_)               	    :: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
-        real(psb_spk_), allocatable     	:: x_global(:), y_global(:)
-        integer(psb_ipk_)               	:: i
+        real(psb_spk_), allocatable     	    :: x_global(:), y_global(:)
+        logical                                 :: exists
 
         info = psb_success_
 
@@ -50,26 +41,7 @@ module psb_spmm_test
             call psb_error(ctxt) 
         endif
 
-        call mm_mat_read(aux_a,info,filename=mtx_file)
-        if(info /= psb_success_) then
-            write(psb_out_unit,*) "Error while reading matric ", mtx_file
-            goto 9999        
-        end if 
-
-
-        ! part_block it's a macro defined in psb_blockpart_mod to identify BLOCK ROWS distribution
-        call psb_matdist(aux_a, a, ctxt,desc_a,info,fmt="COO",parts=part_block) 
-
-
-        rows    = aux_a%get_nrows()
-        cols    = aux_a%get_ncols()
-        nnz     = aux_a%get_nzeros()
-
-        call psb_bcast(ctxt,rows)
-        call psb_bcast(ctxt,cols)
-        call psb_bcast(ctxt,nnz)
-
-        ! Generate random array for b using always the same seed
+        ! Prepare input buffers on all ranks; root reads from disk
         if(my_rank == psb_root_) then
             allocate(x_global(cols))
             allocate(y_global(rows))
@@ -105,6 +77,7 @@ module psb_spmm_test
         end if
 
 
+
         ! y = alpha * A * x + beta * y
         call psb_spmm(alpha,a,x,beta,y,desc_a,info)
         if(info /= psb_success_) then
@@ -113,9 +86,17 @@ module psb_spmm_test
         end if
 
         ! Make the root process be the one that saves everything on file
-        if(np == 1) then 
+        if(np == 1) then
+            inquire(file='serial/', exist=exists)
+            if (.not.exists) then
+                call system('mkdir serial/')
+            end if
             output_file_name = "serial/"
-        else 
+        else
+            inquire(file='parallel/', exist=exists)
+            if (.not.exists) then
+                call system('mkdir parallel/')
+            end if
             output_file_name = "parallel/"
         end if
 
@@ -138,8 +119,16 @@ module psb_spmm_test
             output_file_name = output_file_name // "_b3.mtx"
         end if
 
-        ! Save result to output file
-        call mm_array_write(y,"Result vector",info,filename=output_file_name)
+        ! Gather result on root and save to output file
+        call psb_gather(y_global,y,desc_a,info,root=psb_root_)
+        if(info /= psb_success_) then
+            write(psb_out_unit,*) "Error in psb_gather to collect y result"
+            goto 9999
+        end if
+
+        if (my_rank == psb_root_) then
+            call mm_array_write(y_global,"Result vector",info,filename=output_file_name)
+        end if
 
         ! Deallocate
         call psb_gefree(x, desc_a,info)
@@ -151,18 +140,6 @@ module psb_spmm_test
         call psb_gefree(y, desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,*) "Error in vector y free routine"
-            goto 9999
-        end if
-
-        call psb_spfree(a, desc_a,info)
-        if(info /= psb_success_) then
-            write(psb_out_unit,*) "Error in matrix A free routine"
-            goto 9999
-        end if
-
-        call psb_cdfree(desc_a,info)
-        if(info /= psb_success_) then
-            write(psb_out_unit,*) "Error in matrix descriptor free routine"
             goto 9999
         end if
 
@@ -181,6 +158,7 @@ module psb_spmm_test
         stop
     end subroutine
 
+
     !> @brief Function to randomly generate x and y vectors 
     !!        and save them on multiple files based on their
     !!        coefficients values.
@@ -193,12 +171,22 @@ module psb_spmm_test
 
         integer(psb_ipk_), intent(in)               :: rows, cols
         real(psb_spk_), allocatable                 :: x(:), y(:)
-        integer(psb_ipk_)                           :: i, info
+        integer(psb_ipk_)                           :: i, info, nseed
+        integer, allocatable                        :: seed(:)
+        logical                                     :: exists
 
-        allocate(x(rows))
-        allocate(y(cols))
+        inquire(file='vectors/', exist=exists)
+        if (.not.exists) then
+            call system('mkdir vectors/')
+        end if
+
+        allocate(x(cols))
+        allocate(y(rows))
         
-        call random_init(repeatable=.true.,image_distinct=.true.) 
+        call random_seed(size=nseed)
+        allocate(seed(nseed))
+        seed = 12345
+        call random_seed(put=seed)
         call random_number(x)
         call random_number(y)
 
@@ -207,11 +195,11 @@ module psb_spmm_test
         call mm_array_write(y,"Positive vector",info,filename="vectors/y1.mtx")
 
         ! Write only negative in x_2
-        do i=1,rows 
+        do i=1,cols
             x(i) = -x(i)
         end do  
 
-        do i=1,cols
+        do i=1,rows
             y(i) = -y(i)
         end do
 
@@ -220,12 +208,12 @@ module psb_spmm_test
 
 
         ! Since numbers are less than one and always positive, we have to generate negative ones subtractiong 50
-        do i=1,rows
+        do i=1,cols
             x(i) = -x(i) ! Make the values positive again  
             x(i) = x(i) - 0.5
         end do   
 
-        do i=1,cols
+        do i=1,rows
             y(i) = -y(i) ! Make the values positive again  
             y(i) = y(i) - 0.5
         end do
@@ -235,17 +223,18 @@ module psb_spmm_test
         call mm_array_write(y,"Random vector",info,filename="vectors/y3.mtx")
 
         ! Write zero in x_4
-        do i=1,rows
+        do i=1,cols
             x(i) = 0
         end do   
 
-        do i=1,cols
+        do i=1,rows
             y(i) = 0
         end do
 
         call mm_array_write(x,"Null vector",info,filename="vectors/x4.mtx")
         call mm_array_write(y,"Null vector",info,filename="vectors/y4.mtx")
 
+        deallocate(seed)
         deallocate(x)
         deallocate(y)
 
@@ -273,7 +262,10 @@ module psb_spmm_test
         ! Skip comment lines (starting with %)
         do
            read(unit, '(A)', iostat=ret) line
-           if (ret /= 0) exit
+           if (ret /= 0) then
+              print *, 'Error reading file or end of file reached without finding header.'
+              stop
+           end if
            if (line(1:1) /= '%') then
               read(line, *) rows, cols, nnz
               found = .true.

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -44,10 +44,10 @@ module psb_d_hsort_mod
   use psb_const_mod
 
   interface psb_hsort
-    subroutine psb_dhsort(x,ix,dir,flag)
+    subroutine psb_dhsort(x,ix,dir,flag,reord)
       import 
       real(psb_dpk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_dhsort
   end interface psb_hsort

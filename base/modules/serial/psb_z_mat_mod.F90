@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -78,6 +78,8 @@
 !
 module psb_z_mat_mod
 
+  use psb_z_vect_mod
+  use psb_i_vect_mod
   use psb_z_base_mat_mod
   use psb_z_csr_mat_mod,  only : psb_z_csr_sparse_mat, psb_lz_csr_sparse_mat,&
        & psb_z_ecsr_sparse_mat
@@ -661,9 +663,8 @@ module psb_z_mat_mod
 
   interface
     subroutine psb_z_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
-      use psb_z_vect_mod, only : psb_z_vect_type
-      use psb_i_vect_mod, only : psb_i_vect_type
-      import :: psb_ipk_, psb_lpk_, psb_zspmat_type
+      import :: psb_ipk_, psb_lpk_, psb_zspmat_type, &
+           & psb_z_vect_type, psb_i_vect_type
       class(psb_zspmat_type), intent(inout) :: a
       type(psb_z_vect_type), intent(inout)  :: val
       type(psb_i_vect_type), intent(inout)  :: ia, ja

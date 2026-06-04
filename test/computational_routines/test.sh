@@ -6,7 +6,7 @@ separator=$(printf "%0.s=" $(seq 1 $terminal_width)) # Generate separator of cor
 flag=0
 log_file_name="psblas_test_results.log"
 base_dir=$(pwd)
-skip=true
+failed_tests=""
 
 # Define color codes
 GREEN="\033[0;32m"
@@ -14,6 +14,7 @@ RED="\033[0;31m"
 BLUE="\033[0;34m"
 YELLOW="\033[33m" 
 RESET="\033[0m"
+
 
 # Function to center text
 center_text() {
@@ -40,54 +41,40 @@ echo -e "${BLUE}[INFO]\t  Starting environment check for required modules...${RE
 
 
 # Check and load required modules
-required_modules=("gnu/12.2.1-sys" "mpich/4.2.2" "cuda/12.5")
+# required_modules=("gnu/12.2.1-sys" "mpich/4.2.2" "cuda/12.5")
 
-for module in "${required_modules[@]}"; do
-    if ! module list 2>&1 | grep -q "$module"; then
-        echo -e "${YELLOW}[WARNING] Module not found, loading $module${RESET}"
-        module load "$module"
-        flag=1
-        if ! grep -q "module load $module" "$HOME/.bashrc"; then
-            echo -e "[INFO]\t  Adding 'module load $module' to $bashrc..."
-            echo "module load $module" >> "$HOME/.bashrc"
-        # else
-        #     echo "'module load $module' is already present in $bashrc."
-        fi
-    else
-        echo -e "[INFO]\t  Found module $module."
-    fi
-done
-
-# Update .bashrc if necessary
-if [ $flag -eq 1 ]; then
-    echo -e "[INFO]\t  Reloading $HOME/.bashrc..."
-    source ~/.bashrc
-fi
-
-# Inform the user about environment persistence
-if [ "$$" -eq "$PPID" ]; then
-    echo -e "${YELLOW}[WARNING] Modules loaded in this script will not persist after the script finishes.${RESET}"
-    echo -e "${YELLOW}[WARNING] Run the script using 'source autotest.sh' to make the changes persist.${RESET}"
-fi
+# for module in "${required_modules[@]}"; do
+#     if ! module list 2>&1 | grep -q "$module"; then
+#         echo -e "${YELLOW}[WARNING] Module not found, loading $module${RESET}"
+#         module load "$module"
+#         flag=1
+#         if ! grep -q "module load $module" "$HOME/.bashrc"; then
+#             echo -e "[INFO]\t  Adding 'module load $module' to $bashrc..."
+#             echo "module load $module" >> "$HOME/.bashrc"
+#         # else
+#         #     echo "'module load $module' is already present in $bashrc."
+#         fi
+#     else
+#         echo -e "[INFO]\t  Found module $module."
+#     fi
+# done
+# 
+# # Update .bashrc if necessary
+# if [ $flag -eq 1 ]; then
+#     echo -e "[INFO]\t  Reloading $HOME/.bashrc..."
+#     source ~/.bashrc
+# fi
+# 
+# # Inform the user about environment persistence
+# if [ "$$" -eq "$PPID" ]; then
+#     echo -e "${YELLOW}[WARNING] Modules loaded in this script will not persist after the script finishes.${RESET}"
+#     echo -e "${YELLOW}[WARNING] Run the script using 'source autotest.sh' to make the changes persist.${RESET}"
+# fi
 
 echo -e "${BLUE}[INFO]\t  Environment check for required modules completed.${RESET}"
 echo ""
 
-if [ ! -f "./utils/psb_test_utils.o" ]; then
-    echo -e "${YELLOW}[WARNING] Executable not found. Compiling utils...${RESET}"
-    cd utils/
-    make
-    cd ..
-else
-    if [ $skip = false ]; then
-        echo -e "${BLUE}[INFO]\t  The executable already exists, but recompilation was forced.${RESET}"
-        cd utils/
-        make
-        cd ..
-    else
-        echo -e "${BLUE}[INFO]\t  The executable already exists. Skipping the make process.${RESET}"
-    fi
-fi
+
 
 # Iterate through first-layer subdirectories
 for dir in "$base_dir"/*/; do    
@@ -95,35 +82,47 @@ for dir in "$base_dir"/*/; do
     if [ "$dir" = "." ]; then
         continue
     fi
-    # Skip 'utils' subdirectory
-    if [[ "$(basename "$dir")" == "utils" ]]; then
-        continue
-    fi
     
     echo -e "${BLUE}${separator}${RESET}"
-    echo -e "${BLUE}[INFO]\t  Entering directory: $(pwd)/$(basename "$dir")${RESET}"
+    base_name=$(basename "$dir")
+    if [ "$base_name" = "common" ]; then
+        continue
+    fi
+
+    echo -e "${BLUE}[INFO]\t  Entering directory: $(pwd)/${base_name}${RESET}"
     ( # excecute script in a subshell, otherwise the dir search will stop
         cd "$dir"
 
+        autotest_status=0
         # Check if autotest.sh exists before executing it
         if [ -f autotest.sh ]; then
             chmod +x autotest.sh
-            ./autotest.sh 
+            ./autotest.sh
+            autotest_status=$?
         else
             echo -e "${YELLOW}[WARNING] autotest.sh not found in $(pwd). Skipping $(basename "$dir") kernel${RESET}"
         fi
 
-        # Append contents of any .log file in the subdirectory to the main log file
-        #log_files=$(find . -maxdepth 1 -type f -name "*.log")
-        #if [ -n "$log_files" ]; then
-            #for log_file in $log_files; do
-                # cat "$log_file" >> "../${log_file_name}"
-                # echo ' ' >> "../${log_file_name}"
-            #done
-        #else
-        #    echo -e "${YELLOW}[WARNING] No .log files found in $(pwd). Skipping log append.${RESET}"
-        #fi
+        # Append contents of any .log file in the standardized logs/ directory (fallback to local *.log)
+        log_files=$(find ./logs -maxdepth 1 -type f -name "*.log" 2>/dev/null)
+        if [ -z "$log_files" ]; then
+            log_files=$(find . -maxdepth 1 -type f -name "*.log")
+        fi
+        if [ -n "$log_files" ]; then
+            for log_file in $log_files; do
+                cat "$log_file" >> "../${log_file_name}"
+                echo ' ' >> "../${log_file_name}"
+            done
+        else
+            echo -e "${YELLOW}[WARNING] No .log files found in $(pwd). Skipping log append.${RESET}"
+        fi
+
+        # Propagate the kernel's pass/fail status to the parent shell
+        exit $autotest_status
     )
+    if [ $? -ne 0 ]; then
+        failed_tests="${failed_tests}${base_name} "
+    fi
 
     # Return to the parent directory
     echo -e "${BLUE}[INFO]\t  Leaving directory: $(pwd)/$(basename "$dir")${RESET}"
@@ -134,4 +133,10 @@ done
 echo -e "${BLUE}[INFO]\t  Finished processing all subdirectories.${RESET}"
 
 
-echo -e "${GREEN}[INFO]\t  All tests completed successfully. Results are logged in ${log_file_name}.${RESET}"
+if [ -z "$failed_tests" ]; then
+    echo -e "${GREEN}[INFO]\t  All tests completed successfully. Results are logged in ${log_file_name}.${RESET}"
+    exit 0
+else
+    echo -e "${RED}[FAIL]\t  Some tests failed: ${failed_tests%% }. Results are logged in ${log_file_name}.${RESET}"
+    exit 1
+fi

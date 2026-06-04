@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -86,6 +86,7 @@ module psb_c_cuda_vect_mod
     procedure, nopass  :: device_wait  => c_cuda_device_wait
     procedure, pass(x) :: free_buffer  => c_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => c_cuda_maybe_free_buffer
+    procedure, pass(x) :: check_addr  => c_cuda_check_addr
     procedure, pass(x) :: dot_v    => c_cuda_dot_v
     procedure, pass(x) :: dot_a    => c_cuda_dot_a
     procedure, pass(y) :: axpby_v  => c_cuda_axpby_v
@@ -218,6 +219,17 @@ contains
     x%i_buf_sz=0
 
   end subroutine c_cuda_free_buffer
+
+  subroutine c_cuda_check_addr(x)
+    class(psb_c_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_) info;
+    select type(ii=> x) 
+    class is (psb_c_vect_cuda) 
+      info = checkMultiVecDeviceFloatComplex(x%deviceVect)      
+    class default
+      write(0,*) 'Check addr: cuda  version, why am I here? '
+    end select
+  end subroutine c_cuda_check_addr
 
   subroutine c_cuda_gthzv_x(i,n,idx,x,y)
     use psb_cuda_env_mod
@@ -560,12 +572,20 @@ contains
   end subroutine c_cuda_sctb_buf
 
 
-  subroutine c_cuda_bld_x(x,this)
+  subroutine c_cuda_bld_x(x,this,scratch)
     use psb_base_mod
     complex(psb_spk_), intent(in)           :: this(:)
     class(psb_c_vect_cuda), intent(inout) :: x
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call psb_realloc(size(this),x%v,info)
     if (info /= 0) then 
       info=psb_err_alloc_request_
@@ -578,11 +598,19 @@ contains
 
   end subroutine c_cuda_bld_x
 
-  subroutine c_cuda_bld_mn(x,n)
+  subroutine c_cuda_bld_mn(x,n,scratch)
     integer(psb_mpk_), intent(in) :: n
     class(psb_c_vect_cuda), intent(inout) :: x
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     call x%all(n,info)
     if (info /= 0) then 
       call psb_errpush(info,'c_cuda_bld_n',i_err=(/n,n,n,n,n/))
@@ -679,26 +707,34 @@ contains
     call x%set_scal(czero)
   end subroutine c_cuda_zero
 
-  subroutine c_cuda_asb_m(n, x, info)
+  subroutine c_cuda_asb_m(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
     integer(psb_mpk_), intent(in)        :: n
     class(psb_c_vect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)       :: info
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_mpk_) :: nd
-    
+
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
     if (x%is_dev()) then 
       nd  = getMultiVecDeviceSize(x%deviceVect)
       if (nd < n) then 
         call x%sync()
-        call x%psb_c_base_vect_type%asb(n,info)      
+        call x%psb_c_base_vect_type%asb(n,info,scratch=scratch_)      
         if (info == psb_success_) call x%sync_space(info)
         call x%set_host()
       end if
     else   !
       if (x%get_nrows()<n) then 
-        call x%psb_c_base_vect_type%asb(n,info)      
+        call x%psb_c_base_vect_type%asb(n,info,scratch=scratch_)      
         if (info == psb_success_) call x%sync_space(info)
         call x%set_host()      
       end if
@@ -1252,11 +1288,11 @@ contains
     call x%free(info)
   end subroutine c_cuda_vect_finalize
 
-  subroutine c_cuda_ins_v(n,irl,val,dupl,x,info)
+  subroutine c_cuda_ins_v(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none 
     class(psb_c_vect_cuda), intent(inout)        :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl
+    integer(psb_ipk_), intent(in)               :: n, dupl, maxr
     class(psb_i_base_vect_type), intent(inout)  :: irl
     class(psb_c_base_vect_type), intent(inout)  :: val
     integer(psb_ipk_), intent(out)              :: info
@@ -1285,7 +1321,7 @@ contains
     if (.not.done_cuda) then 
       if (irl%is_dev()) call irl%sync()
       if (val%is_dev()) call val%sync()
-      call x%ins(n,irl%v,val%v,dupl,info)
+      call x%ins(n,irl%v,val%v,dupl,maxr,info)
     end if
 
     if (info /= 0) then 
@@ -1295,11 +1331,11 @@ contains
 
   end subroutine c_cuda_ins_v
   
-  subroutine c_cuda_ins_a(n,irl,val,dupl,x,info)
+  subroutine c_cuda_ins_a(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none 
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl
+    integer(psb_ipk_), intent(in)        :: n, dupl, maxr
     integer(psb_ipk_), intent(in)        :: irl(:)
     complex(psb_spk_), intent(in)           :: val(:)
     integer(psb_ipk_), intent(out)       :: info
@@ -1308,7 +1344,7 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call x%psb_c_base_vect_type%ins(n,irl,val,dupl,info)
+    call x%psb_c_base_vect_type%ins(n,irl,val,dupl,maxr,info)
     call x%set_host()
 
   end subroutine c_cuda_ins_a
@@ -1513,12 +1549,14 @@ contains
 
   end subroutine c_cuda_multi_bld_x
 
-  subroutine c_cuda_multi_bld_n(x,m,n)
+  subroutine c_cuda_multi_bld_n(x,m,n,scratch)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_c_multivect_cuda), intent(inout) :: x
     integer(psb_ipk_) :: info
+    logical, intent(in), optional        :: scratch
 
     call x%all(m,n,info)
+    call x%asb(m,n,info,scratch=scratch)
     if (info /= 0) then 
       call psb_errpush(info,'c_cuda_multi_bld_n',i_err=(/m,n,n,n,n/))
     end if
@@ -1914,7 +1952,7 @@ contains
     call x%set_host()
   end subroutine c_cuda_multi_zero
 
-  subroutine c_cuda_multi_asb(m,n, x, info)
+  subroutine c_cuda_multi_asb(m,n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none 
@@ -1922,12 +1960,14 @@ contains
     class(psb_c_multivect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)       :: info
     integer(psb_ipk_) :: nd, nc
+    logical, intent(in), optional        :: scratch
 
+    info = 0
 
     x%m_nrows = m
     x%m_ncols = n
     if (x%is_host()) then 
-      call x%psb_c_base_multivect_type%asb(m,n,info)
+      call x%psb_c_base_multivect_type%asb(m,n,info,scratch)
       if (info == psb_success_) call x%sync_space(info)
     else if (x%is_dev()) then 
       nd  = getMultiVecDevicePitch(x%deviceVect)
@@ -2064,11 +2104,11 @@ contains
     call x%set_sync()
   end subroutine c_cuda_multi_vect_finalize
 
-  subroutine c_cuda_multi_ins(n,irl,val,dupl,x,info)
+  subroutine c_cuda_multi_ins(n,irl,val,dupl,x,maxr,info)
     use psi_serial_mod
     implicit none 
     class(psb_c_multivect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl
+    integer(psb_ipk_), intent(in)        :: n, dupl,maxr
     integer(psb_ipk_), intent(in)        :: irl(:)
     complex(psb_spk_), intent(in)           :: val(:,:)
     integer(psb_ipk_), intent(out)       :: info
@@ -2077,7 +2117,7 @@ contains
 
     info = 0
     if (x%is_dev()) call x%sync()
-    call x%psb_c_base_multivect_type%ins(n,irl,val,dupl,info)
+    call x%psb_c_base_multivect_type%ins(n,irl,val,dupl,maxr,info)
     call x%set_host()
 
   end subroutine c_cuda_multi_ins

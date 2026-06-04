@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -3657,8 +3657,8 @@ end subroutine psb_c_cp_csr_from_fmt
 
 #if defined(PSB_OPENMP)
 subroutine psb_ccsrspspmm(a,b,c,info)
-  use psb_c_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_ccsrspspmm
+  use psb_c_csr_mat_mod, psb_protect_name => psb_ccsrspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -4204,8 +4204,8 @@ end subroutine psb_ccsrspspmm
 #else
 
 subroutine psb_ccsrspspmm(a,b,c,info)
-  use psb_c_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_ccsrspspmm
+  use psb_c_csr_mat_mod, psb_protect_name => psb_ccsrspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -4238,7 +4238,7 @@ subroutine psb_ccsrspspmm(a,b,c,info)
   ! Estimate number of nonzeros on output.
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = max(nint(0.5*(nza+nzb)),ma,mb,na,nb)  
+  nzc = max(nint(0.25*(nza+nzb)),ma,nb)  
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
@@ -4276,9 +4276,9 @@ contains
 
     nze = min(size(c%val),size(c%ja))
     isz = max(ma,na,mb,nb)
-    call psb_realloc(isz,row,info)
-    if (info == 0) call psb_realloc(isz,idxs,info)
-    if (info == 0) call psb_realloc(isz,irow,info)
+    call psb_realloc(nb,row,info)
+    if (info == 0) call psb_realloc(max(na,nb),idxs,info)
+    if (info == 0) call psb_realloc(nb,irow,info)
     if (info /= 0) return
     row  = dzero
     irow = 0
@@ -6580,8 +6580,8 @@ end subroutine psb_lc_cp_csr_from_fmt
 !!$end subroutine psb_lc_csr_clean_zeros
 
 subroutine psb_lccsrspspmm(a,b,c,info)
-  use psb_c_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_lccsrspspmm
+  use psb_c_csr_mat_mod, psb_protect_name => psb_lccsrspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -6613,7 +6613,7 @@ subroutine psb_lccsrspspmm(a,b,c,info)
 
   nza = a%get_nzeros()
   nzb = b%get_nzeros()
-  nzc = 2*(nza+nzb)
+  nzc = max(nint(0.25*(nza+nzb)),ma,nb)  
   call c%allocate(ma,nb,nzc)
 
   call csr_spspmm(a,b,c,info)
@@ -6651,9 +6651,9 @@ contains
 
     nze = min(size(c%val),size(c%ja))
     isz = max(ma,na,mb,nb)
-    call psb_realloc(isz,row,info)
-    if (info == 0) call psb_realloc(isz,idxs,info)
-    if (info == 0) call psb_realloc(isz,irow,info)
+    call psb_realloc(nb,row,info)
+    if (info == 0) call psb_realloc(max(na,nb),idxs,info)
+    if (info == 0) call psb_realloc(nb,irow,info)
     if (info /= 0) return
     row  = dzero
     irow = 0

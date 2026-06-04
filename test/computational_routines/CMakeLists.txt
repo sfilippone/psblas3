@@ -28,21 +28,21 @@ file(MAKE_DIRECTORY ${EXEDIR})
 set(PSBLAS_LIBS  psblas::util psblas::prec psblas::base) 
 
 
-include(${CMAKE_CURRENT_LIST_DIR}/utils/CMakeLists.txt)
-
 include(${CMAKE_CURRENT_LIST_DIR}/geaxpby/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/gedot/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/spmm/CMakeLists.txt)
 
+
 # Create executables
-add_executable(psb_geaxpby_test ${geaxpby_source_files} ${utils_source_files})
-add_executable(psb_gedot_test ${gedot_source_files} ${utils_source_files})
-add_executable(psb_spmm_test ${spmm_source_files} ${utils_source_files})
+add_executable(psb_geaxpby_test ${geaxpby_source_files})
+add_executable(psb_gedot_test ${gedot_source_files})
+add_executable(psb_spmm_test ${spmm_source_files})
 
 # Link the necessary libraries
 target_link_libraries(psb_geaxpby_test ${PSBLAS_LIBS})
 target_link_libraries(psb_gedot_test ${PSBLAS_LIBS})
 target_link_libraries(psb_spmm_test ${PSBLAS_LIBS})
+
 
 # Set output directory
 set_target_properties(psb_geaxpby_test PROPERTIES

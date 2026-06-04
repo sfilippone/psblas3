@@ -2,7 +2,6 @@ module psb_c_psblas_cbind_mod
   use iso_c_binding
   use psb_base_mod
   use psb_objhandle_mod
-  use psb_base_string_cbind_mod
 
 contains
 
@@ -430,14 +429,13 @@ contains
   function psb_c_cgecmp(xh,ch,zh,cdh) bind(c) result(res)
     implicit none
     integer(psb_c_ipk_)    :: res
-
+    real(c_float_complex), value :: ch
     type(psb_c_cvector)  :: xh,zh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_c_vect_type), pointer :: xp,zp
     integer(psb_c_ipk_)          :: info
-    real(c_float_complex), value :: ch
 
     res = -1
 

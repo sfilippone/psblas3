@@ -1,42 +1,39 @@
 #!/bin/bash
 
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+source "${script_dir}/../common/testlib.sh"
+
 # Variables definition
-num_procs=$(nproc)
+dir1="serial"
+dir2="parallel"
+num_procs=$(get_num_procs)
+log_dir="logs"
+log_file_name="${log_dir}/psblas_geaxpby_test.log"
 
-
-# Define color codes
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-BLUE="\033[0;34m"
-YELLOW="\033[33m" 
-RESET="\033[0m"
+ensure_dirs runs serial parallel vectors "${log_dir}"
+log_header "${log_file_name}" "psb_geaxpby"
 
 
 # Check if the executable ELF file exists
 if [ ! -f "./runs/psb_geaxpby_test" ]; then
-    echo -e "${YELLOW}[WARNING] Executable not found. Running make...${RESET}"
+    warn "Executable not found. Running make..."
     make
     if [ ! -f "./runs/psb_geaxpby_test" ]; then
-        echo -e "${RED}[ERROR]    Failed to create executable. Check make command.${RESET}"
+        err "Failed to create executable. Check make command."
     fi
 else
-    echo -e "${BLUE}[INFO]\t  The executable already exists. Skipping the make process.${RESET}"
+    info "The executable already exists. Skipping the make process."
 fi
 
 # Excecute tests and save results
-echo -e "${BLUE}[INFO]\t  Running the PSBLAS psb_geaxpby test...${RESET}"
-echo ""
-echo -e "${BLUE}[INFO]\t  Starting single process computation${RESET}"
-mpirun -np 1 ./runs/psb_geaxpby_test
-echo -e "${BLUE}[INFO]\t  Single process computation terminated correctly${RESET}"
-echo ""
-echo -e "${BLUE}[INFO]\t  Starting $num_procs processes computation${RESET}"
-mpirun -np $num_procs ./runs/psb_geaxpby_test
-echo -e "${BLUE}[INFO]\t  Multiple processes computation terminated correctly${RESET}"
+info "Running the PSBLAS psb_geaxpby test..."
+echo "" >> "${log_file_name}"
+run_mpi 1 ./runs/psb_geaxpby_test "single process computation"
+run_mpi "$num_procs" ./runs/psb_geaxpby_test "${num_procs} processes computation"
 
-rm -f results/*
-rm -f -r results/
+# Iterate through files in the first directory
+compare_dirs "$dir1" "$dir2" "${log_file_name}"
 
-echo -e "${BLUE}[INFO]\t  PSBLAS psb_geaxpby test succesfully completed.${RESET}"
+info "PSBLAS psb_geaxpby test successfully completed."
 
 

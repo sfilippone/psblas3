@@ -1246,7 +1246,7 @@ An integer value; 0 means no error has been detected.
 
 This function computes the entrywise product between two vectors $x$ and
 $y$
-\[dot \leftarrow x(i) y(i).\]
+\[y(i) \leftarrow x(i) y(i).\]
 
 \fortinline|psb_gemlt(x, y, desc_a, info)|
 
@@ -1313,7 +1313,7 @@ $y$
 
 This function computes the entrywise division between two vectors $x$ and
 $y$
-\[/ \leftarrow x(i)/y(i).\]
+\[y(i) \leftarrow x(i)/y(i).\]
 
 \fortinline|psb_gediv(x, y, desc_a, info, [flag)|
 
@@ -1385,7 +1385,7 @@ $y$
 
 This function computes the entrywise inverse of a vector $x$ and puts it into
 $y$
-\[/ \leftarrow 1/x(i).\]
+\[y(i) \leftarrow 1/x(i).\]
 
 \fortinline|psb_geinv(x, y, desc_a, info, [flag)|
 

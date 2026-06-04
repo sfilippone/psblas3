@@ -6,6 +6,7 @@ FOBJS = psi_iovrl_restr.o psi_iovrl_save.o psi_iovrl_upd.o \
 	psi_dovrl_restr.o psi_dovrl_save.o psi_dovrl_upd.o \
 	psi_covrl_restr.o psi_covrl_save.o psi_covrl_upd.o \
 	psi_zovrl_restr.o psi_zovrl_save.o psi_zovrl_upd.o \
+	psi_i2ovrl_restr_a.o psi_i2ovrl_save_a.o psi_i2ovrl_upd_a.o \
 	psi_movrl_restr_a.o psi_movrl_save_a.o psi_movrl_upd_a.o \
 	psi_eovrl_restr_a.o psi_eovrl_save_a.o psi_eovrl_upd_a.o \
 	psi_sovrl_restr_a.o psi_sovrl_save_a.o psi_sovrl_upd_a.o \
@@ -21,6 +22,7 @@ MPFOBJS = psi_dswapdata.o psi_dswaptran.o\
 	psi_zswapdata.o psi_zswaptran.o  \
 	psi_dswapdata_a.o psi_dswaptran_a.o \
 	psi_sswapdata_a.o  psi_sswaptran_a.o \
+	psi_i2swapdata_a.o psi_i2swaptran_a.o \
 	psi_mswapdata_a.o psi_mswaptran_a.o \
 	psi_eswapdata_a.o psi_eswaptran_a.o \
 	psi_cswapdata_a.o psi_cswaptran_a.o  \
@@ -31,16 +33,16 @@ MODDIR=../../modules
 FINCLUDES=$(FMFLAG). $(FMFLAG)$(MODDIR) $(FMFLAG)$(INCDIR)
 CINCLUDES=-I. 
 
-objs: mpfobjs $(FOBJS) $(MPFOBJS)
+objs: mpfobjs $(FOBJS)
 lib: objs
 	$(AR) $(LIBDIR)/$(LIBNAME) $(MPFOBJS) $(MPFOBJS2) $(FOBJS) $(FOBJS2) $(COBJS)
 	$(RANLIB) $(LIBDIR)/$(LIBNAME)
 
 $(FOBJS) $(FBOJS2): $(MODDIR)/psi_mod.o
-mpfobjs: 
-	(make $(MPFOBJS) FC="$(MPFC)" )	
+mpfobjs:  $(MODDIR)/psi_mod.o
+	(make $(MPFOBJS) FC="$(MPFC)" )
 
 clean:
-	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS) $(FOBJS2) $(MPFOBJS2) *$(.mod)
+	/bin/rm -f $(MPFOBJS) $(FOBJS) $(COBJS) $(FOBJS2) $(MPFOBJS2) *$(.mod) *.smod
 
 veryclean: clean

@@ -242,7 +242,7 @@ if test x"$psblas_cv_fc" == "x" ; then
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
+        	FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_XLF_10 $FDEFINES";		  sed -e's/([0-9]*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -258,7 +258,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
    psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
    if test x"$psblas_shvs" != x""; then
      AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
@@ -276,7 +276,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_fc="flang";
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/[^0-9]*//g'`;
    if test x"$psblas_shvs" != x""; then
      AC_MSG_NOTICE([[Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  ]])
@@ -288,7 +288,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    fi  
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
-    
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_INTEL $FDEFINES"
    psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
    psblas_cv_fc="nag";
@@ -599,55 +599,61 @@ fi
 PAC_FORTRAN_TEST_TR15581( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for TR15581. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_EXTENDS( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_CLASS_TBP( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for CLASS and type bound procedures. 
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_SOURCE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SOURCE= allocation. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_HAVE_MOVE_ALLOC(
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOVE_ALLOC. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_ISO_C_BIND( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for ISO_C_BINDING. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_SAME_TYPE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for SAME_TYPE_AS. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_EXTENDS_TYPE( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
 )
 
 PAC_FORTRAN_TEST_MOLD( 
 	[],
         [AC_MSG_ERROR([Sorry, cannot build PSBLAS without support for MOLD= allocation. 
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8.])]
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])]
+)
+
+PAC_FORTRAN_TEST_SUBMODULES(
+	[],
+	[AC_MSG_ERROR([Sorry, cannot build without support for SUBMODULES.
+	Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0.])],
 )
 
 PAC_FORTRAN_TEST_VOLATILE(
@@ -680,6 +686,41 @@ PAC_FORTRAN_TEST_FLUSH(
 	[FDEFINES="$psblas_cv_define_prepend-DPSB_HAVE_FLUSH_STMT $FDEFINES"],
 )
 
+######################
+# Extract version data
+######################
+#PAC_EXTRACT_PSBLAS_VERSION
+CFILE="base/modules/psb_const_mod.F90";
+PSBLASMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
+PSBLASMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
+PSBLASPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
+PSBLASSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+PSBLASDUPNUL=`cat $CFILE| grep dupl_null | $AWK '{print $6;}'`;
+PSBLASDUPADD=`cat $CFILE| grep "psb_dupl_add_   =" | $AWK '{print $6;}'`;
+PSBLASDUPOVW=`cat $CFILE| grep dupl_ovwrt| $AWK '{print $6;}'`;
+PSBLASDUPERR=`cat $CFILE| grep dupl_err| $AWK '{print $6;}'`;
+PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$// `;
+PSBLASUPDSRC=`cat $CFILE| grep "psb_upd_srch_   ="| $AWK '{print $6;}' `;
+PSBLASUPDPRM=`cat $CFILE| grep "psb_upd_perm_   ="| $AWK '{print $6;}' `;
+PSBLASUPDDEF=`cat $CFILE| grep "psb_upd_dflt_   ="| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
+PSBLASBLDNOR=`cat $CFILE| grep matbld_noremote| $AWK '{print $6;}'`;
+PSBLASBLDRMT=`cat $CFILE| grep matbld_remote| $AWK '{print $6;}'`;	
+
+CFILE="base/modules/desc/psb_desc_const_mod.f90";
+PSBSWPSND=`cat $CFILE| grep swap_send| $AWK '{print $6;}'`;
+PSBSWPRCV=`cat $CFILE| grep swap_recv| $AWK '{print $6;}'`;
+PSBSWPSYN=`cat $CFILE| grep swap_sync| $AWK '{print $6;}'`;
+PSBSWPMPI=`cat $CFILE| grep swap_mpi| $AWK '{print $6;}'`;	
+PSBNONE=`cat $CFILE| grep psb_none| $AWK '{print $6;}'`;
+PSBSUM=`cat $CFILE| grep psb_sum| $AWK '{print $6;}'`;
+PSBAVG=`cat $CFILE| grep psb_avg| $AWK '{print $6;}'`;
+PSBSQRT=`cat $CFILE| grep square_root| $AWK '{print $6;}'`;
+PSBSETZ=`cat $CFILE| grep psb_setzero| $AWK '{print $6;}'`;
+PSBCLCSTR=`cat $CFILE| grep collective_start| $AWK '{print $6;}'`;
+PSBCLCEND=`cat $CFILE| grep collective_end| $AWK '{print $6;}'`;
+PSBCLCSYN=`cat $CFILE| grep collective_sync| $AWK '{print $6;}'`;
+
+AC_MSG_RESULT([ version  $PSBLASSTRING])
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
@@ -704,18 +745,9 @@ fi
 ###############################################################################
 #	Parachute rules for ar and ranlib ... (could cause problems)
 ###############################################################################
-
-if test "X$AR" == "X" ; then
-  AR="ar"
-fi
-
-if test "X$RANLIB" == "X" ; then
-  RANLIB="ranlib"
-fi
-
-# This should be portable
-AR="${AR} -cDr"
-
+AC_PROG_AR
+AR="${AR} -cr"
+AC_PROG_RANLIB
 
 ###############################################################################
 #		BLAS  library presence checks
@@ -834,7 +866,6 @@ if test "x$pac_cv_ipk_size" != "x4"; then
   pac_cv_cuda="no";
   PSB_HAVE_CUDA="no";
   CUDA_CC="";	
-  SPGPU_LIBS="";	
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
@@ -853,12 +884,11 @@ else
       PAC_CHECK_CUDA_VERSION()
       dnl PAC_CHECK_SPGPU()
       PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+      if (( ${PSB_CUDA_VERSION} > 15010 )); then
          AC_MSG_NOTICE([Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA])
          pac_cv_cuda="no";
          PSB_HAVE_CUDA="no";
          CUDA_CC="";	
-         SPGPU_LIBS="";	
          CUDAD="";
          CUDALD="";
          CUDEFINES="";
@@ -876,16 +906,17 @@ else
          CHAVECUDA="#define PSB_HAVE_CUDA"
          CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
          CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
-         SPGPU_LIBS="-lspgpu";	
+	 dnl    SPGPU_LIBS="-lspgpu";	
          CUDAD=cudad;
+         CUDAMODS=cudamods;
          CUDALD=cudald;
-         LCUDA="-lpsb_cuda";	
+         LPSB_CUDA="-lpsb_cuda -lpsb_ext";	
          EXTRALDLIBS="-lstdc++";
          AC_MSG_NOTICE([At this point GPUTARGET is $CUDAD $CUDALD])
    
          PAC_ARG_WITH_CUDACC()
          if test "x$pac_cv_cudacc" == "x"; then
-            pac_cv_cudacc="50,60,70,75,80,86";
+            pac_cv_cudacc="75,80,86";
             CUDA_CC="$pac_cv_cudacc";
          fi
          if (( $pac_cv_cuda_version >= 11070  ))
@@ -898,8 +929,8 @@ else
          done
          if test "x$pac_cv_cuda_version" != "xunknown"; then
          dnl      CUDEFINES="$CUDEFINES ${CUDA_DEFINES}"
-          FCUDEFINES=" ${CUDA_DEFINES}"
-          dnl CCUDEFINES=" ${CUDA_DEFINES}"
+	 FCUDEFINES=" ${CUDA_DEFINES}"
+	 dnl         CCUDEFINES=" ${CUDA_DEFINES}"
           dnl CXXCUDEFINES=" ${CUDA_DEFINES}"	
         fi
      fi
@@ -938,6 +969,7 @@ dnl   fi
    FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
 dnl   AC_MSG_NOTICE([OpenACC 3 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
    OACCD=oaccd;
+   OACCMODS=oaccmods;
    OACCLD=oaccld;
 
    #FCOPT="$FCOPT    $FCOPENACC";
@@ -1051,6 +1083,36 @@ FDEFINES=$(PSBFDEFINES)
 
 AC_SUBST(PSB_IPKDEF)
 AC_SUBST(PSB_LPKDEF)
+AC_SUBST(PSBLASMAJOR)
+AC_SUBST(PSBLASMINOR)
+AC_SUBST(PSBLASPATCH)
+AC_SUBST(PSBLASSTRING)
+AC_SUBST(PSBLASDUPNUL)
+AC_SUBST(PSBLASDUPADD)
+AC_SUBST(PSBLASDUPOVW)
+AC_SUBST(PSBLASDUPERR)
+AC_SUBST(PSBLASDUPDEF)
+AC_SUBST(PSBLASDUPDEF)
+AC_SUBST(PSBLASUPDSRC)
+AC_SUBST(PSBLASUPDPRM)
+AC_SUBST(PSBLASUPDDEF)
+AC_SUBST(PSBLASBLDNOR)
+AC_SUBST(PSBLASBLDRMT)
+
+AC_SUBST(PSBSWPSND)
+AC_SUBST(PSBSWPRCV)
+AC_SUBST(PSBSWPSYN)
+AC_SUBST(PSBSWPMPI)
+AC_SUBST(PSBNONE)
+AC_SUBST(PSBSUM)
+AC_SUBST(PSBAVG)
+AC_SUBST(PSBSQRT)
+AC_SUBST(PSBSETZ)
+AC_SUBST(PSBCLCSTR)
+AC_SUBST(PSBCLCEND)
+AC_SUBST(PSBCLCSYN)
+
+
 AC_SUBST(CSERIALMPI)
 AC_SUBST(CHAVE_OPENMP)
 AC_SUBST(CHAVEMETIS)
@@ -1070,13 +1132,13 @@ AC_SUBST(METHDLIBNAME)
 AC_SUBST(UTILLIBNAME)
 AC_SUBST(METISINCFILE)
 AC_SUBST(OACCD)
+AC_SUBST(OACCMODS)
 AC_SUBST(OACCLD)
 AC_SUBST(FCOPENACC)
 AC_SUBST(CCOPENACC)
 AC_SUBST(CXXOPENACC)
 
 AC_SUBST(SPGPU_FLAGS)
-AC_SUBST(SPGPU_LIBS)
 dnl AC_SUBST(SPGPU_DIR)
 dnl AC_SUBST(SPGPU_INCLUDES)
 dnl AC_SUBST(SPGPU_INCDIR)
@@ -1093,8 +1155,9 @@ AC_SUBST(PSB_CUDA_SHORT_VERSION)
 AC_SUBST(CUDA_NVCC)
 AC_SUBST(CUDEFINES)
 AC_SUBST(CUDAD)
+AC_SUBST(CUDAMODS)
 AC_SUBST(CUDALD)
-AC_SUBST(LCUDA)
+AC_SUBST(LPSB_CUDA)
 AC_SUBST(LIBRSB_LIBS)
 AC_SUBST(LIBRSB_INCLUDES)
 AC_SUBST(LIBRSB_INCDIR)
@@ -1128,6 +1191,8 @@ AC_MSG_NOTICE([
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+        EXTRA_OPT             : ${EXTRA_OPT}
+
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
@@ -1148,7 +1213,9 @@ dnl Note : we should use LDLIBS sooner or later!
 
 	LIBRARYPATH           : ${LIBRARYPATH}
 	INCLUDEPATH           : ${INCLUDEPATH}
-	MODULE_PATH            : ${MODULE_PATH}
+	MODULE_PATH           : ${MODULE_PATH}
+
+	INSTALL_DIR           : ${INSTALL_DIR}
 
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.

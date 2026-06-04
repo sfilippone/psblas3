@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -34,108 +34,104 @@
 !   These subroutines save the overlap region of a vector; they are used
 !   for the transpose  matrix-vector product when there is a nonempty overlap.
 !                                              
-subroutine  psi_movrl_saver1(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_movrl_saver1
+submodule (psi_m_comm_a_mod)  psi_m_ovrl_save_a_impl
+  use psb_base_mod
+contains
+  module subroutine  psi_movrl_saver1(x,xs,desc_a,info)
+    implicit none
 
-  use psb_realloc_mod
+    integer(psb_mpk_), intent(inout)  :: x(:)
+    integer(psb_mpk_), allocatable    :: xs(:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer(psb_ipk_), intent(out)             :: info
 
-  implicit none
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me, err_act, i, idx, isz
+    character(len=20) :: name, ch_err
 
-  integer(psb_mpk_), intent(inout)  :: x(:)
-  integer(psb_mpk_), allocatable    :: xs(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
+    name='psi_movrl_saver1'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, isz
-  character(len=20) :: name, ch_err
+    isz = size(desc_a%ovrlap_elem,1)
+    call psb_realloc(isz,xs,info) 
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  name='psi_movrl_saver1'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    do i=1, isz
+      idx   = desc_a%ovrlap_elem(i,1)
+      xs(i) = x(idx)
+    end do
 
-  isz = size(desc_a%ovrlap_elem,1)
-  call psb_realloc(isz,xs,info) 
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  do i=1, isz
-    idx   = desc_a%ovrlap_elem(i,1)
-    xs(i) = x(idx)
-  end do
-
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-end subroutine psi_movrl_saver1
-
-
-subroutine  psi_movrl_saver2(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_movrl_saver2
-
-  use psb_realloc_mod
-
-  implicit none
-
-  integer(psb_mpk_), intent(inout)  :: x(:,:)
-  integer(psb_mpk_), allocatable    :: xs(:,:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)             :: info
-
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, i, idx, isz, nc
-  character(len=20) :: name, ch_err
-
-  name='psi_movrl_saver2'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  isz = size(desc_a%ovrlap_elem,1)
-  nc  = size(x,2)
-  call psb_realloc(isz,nc,xs,info) 
-  if (info /= psb_success_) then 
-    info = psb_err_alloc_dealloc_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  do i=1, isz
-    idx     = desc_a%ovrlap_elem(i,1)
-    xs(i,:) = x(idx,:)
-  end do
-
-  call psb_erractionrestore(err_act)
-  return  
+    call psb_erractionrestore(err_act)
+    return  
 
 9999 call psb_error_handler(ctxt,err_act)
 
-  return
-end subroutine psi_movrl_saver2
+    return
+  end subroutine psi_movrl_saver1
+
+
+  module subroutine  psi_movrl_saver2(x,xs,desc_a,info)
+    implicit none
+
+    integer(psb_mpk_), intent(inout)  :: x(:,:)
+    integer(psb_mpk_), allocatable    :: xs(:,:)
+    type(psb_desc_type), intent(in)  :: desc_a
+    integer(psb_ipk_), intent(out)             :: info
+
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_) :: np, me, err_act, i, idx, isz, nc
+    character(len=20) :: name, ch_err
+
+    name='psi_movrl_saver2'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    nc  = size(x,2)
+    call psb_realloc(isz,nc,xs,info) 
+    if (info /= psb_success_) then 
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    do i=1, isz
+      idx     = desc_a%ovrlap_elem(i,1)
+      xs(i,:) = x(idx,:)
+    end do
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_movrl_saver2
+end submodule psi_m_ovrl_save_a_impl

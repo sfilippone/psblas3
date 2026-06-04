@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -152,10 +152,10 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
     call psb_errpush(info,name,i_err=(/liwork/),a_err='integer')
     goto 9999
   endif
-  !! if (iam == root) then
-  !!   write (*, fmt = *) 'start matdist',root, size(iwork),&
-  !!        &nrow, ncol, nnzero,nrhs
-  !! endif
+  if (iam == root) then
+    write (*, fmt = *) 'start matdist',root, size(iwork),&
+         &nrow, ncol, nnzero,nrhs
+  endif
   if (use_parts) then 
     call psb_cdall(ctxt,desc_a,info,mg=nrow,parts=parts)
   else if (use_vg) then 
@@ -238,6 +238,10 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
         if (j_count > nrow) exit
         if (j_count > lastigp) exit
       end do      
+      if (j_count > lastigp) then
+        iproc = iproc + 1
+        lastigp = lastigp + vsz(iproc+1)
+      end if
     end if
 
     ! now we should insert rows i_count..j_count-1
@@ -313,12 +317,6 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
       end do
     endif
     i_count = j_count
-    if ((use_vsz).and.(j_count <= nrow)) then 
-      if (j_count > lastigp) then
-        iproc = iproc + 1
-        lastigp = lastigp + vsz(iproc+1)
-      end if
-    end if
   end do
 
   call psb_barrier(ctxt)
@@ -359,7 +357,7 @@ subroutine psb_dmatdist(a_glob, a, ctxt, desc_a,&
     goto 9999
   end if
 
-  !! if (iam == root) write (*, fmt = *) 'end matdist'     
+  if (iam == root) write (*, fmt = *) 'end matdist'     
 
   call psb_erractionrestore(err_act)
   return
@@ -490,10 +488,10 @@ subroutine psb_ldmatdist(a_glob, a, ctxt, desc_a,&
     call psb_errpush(info,name,l_err=(/liwork/),a_err='integer')
     goto 9999
   endif
-  !! if (iam == root) then
-  !!   write (*, fmt = *) 'start matdist',root, size(iwork),&
-  !!        &nrow, ncol, nnzero,nrhs
-  !! endif
+  if (iam == root) then
+    write (*, fmt = *) 'start matdist',root, size(iwork),&
+         &nrow, ncol, nnzero,nrhs
+  endif
   if (use_parts) then 
     call psb_cdall(ctxt,desc_a,info,mg=nrow,parts=parts)
   else if (use_vg) then 
@@ -700,7 +698,7 @@ subroutine psb_ldmatdist(a_glob, a, ctxt, desc_a,&
     goto 9999
   end if
 
-  !! if (iam == root) write (*, fmt = *) 'end matdist'     
+  if (iam == root) write (*, fmt = *) 'end matdist'     
 
   call psb_erractionrestore(err_act)
   return

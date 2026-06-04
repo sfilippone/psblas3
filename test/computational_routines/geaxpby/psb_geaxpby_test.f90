@@ -71,149 +71,41 @@
 !!          Intent: out.
 !!          Specified as: An integer value; 0 means no error has been detected.
 !!
-program main
-    use psb_base_mod
-    use psb_util_mod 
-    use psb_test_utils
+module psb_geaxpby_test
 
-    implicit none
+    contains
 
-    ! MPI variables
-    integer(psb_ipk_)               :: my_rank, np
-
-    ! Communicator variable
-    type(psb_ctxt_type)             :: ctxt
-
-    ! parameters array
-    character(len=64)               :: x(4),y(4)  
-    real(psb_dpk_)                  :: alpha(3), beta(3)
-    integer(psb_ipk_)               :: arr_size  
-    integer(psb_ipk_)               :: tests_number, count
-
-    ! cycle indexes variables
-    integer(psb_ipk_)               :: i,j,k,h,l
-    integer(psb_ipk_)               :: info, ret, unit
-
-    ! others
-    character(len=:), allocatable   :: output_file_name
-    type(psb_test_info)             :: test_info
-    
-    ! result vectors
-    real(psb_spk_), allocatable     :: y_single(:)
-    real(psb_dpk_), allocatable     :: y_double(:)
-
-
-    ! Initialize parameters
-    x(1) = "vectors/x1.mtx"
-    x(2) = "vectors/x2.mtx"
-    x(3) = "vectors/x3.mtx"
-    x(4) = "vectors/x4.mtx"
-
-    y(1) = "vectors/y1.mtx"
-    y(2) = "vectors/y2.mtx"
-    y(3) = "vectors/y3.mtx"
-    y(4) = "vectors/y4.mtx"
-
-    alpha(1) = done
-    alpha(2) = -done
-    alpha(3) = dzero
-
-    beta(1) = done
-    beta(2) = -done
-    beta(3) = dzero
-
-    arr_size = 10000
-
-    !! Initialize test metadata
-    test_info%total_tests = size(x) * size(y) * size(alpha) * size(beta)
-    test_info%threshold_type = VALUE
-    test_info%threshold = 1.0D-06
-    test_info%kernel_name = "psb_geaxpby"
-
-    call psb_test_init(test_info)
-
-    if(test_info%my_rank == psb_root_) then
-        psb_out_unit = test_info%output_unit
-        call psb_test_generate_input_vectors(arr_size) 
-        allocate(y_single(arr_size))
-        allocate(y_double(arr_size))
-    end if
-
-    call psb_bcast(test_info%ctxt,test_info%output_unit)
-    call psb_barrier(test_info%ctxt)
-
-    if(test_info%my_rank == psb_root_) write(*,'(A)') "[INFO]    Starting test excecution ..."
-
-    do i=1,size(x)
-        do j=1,size(y)
-            do k=1,size(alpha)
-                do h=1,size(beta)
-
-                    call psb_geaxpby_real_kernel(x(i), y(j), alpha(k),beta(h), arr_size, test_info%ctxt, y_single, y_double)
-
-                    if(test_info%my_rank == psb_root_) then
-                        if(test_info%np > 1) then 
-                            ! If the program is being run on multiple processes, we need to
-                            ! check the result on the root process with the one computed only using 
-                            ! a single process
-                            call psb_test_process_vector_check(y_single, test_info)
-                        else
-                            call psb_test_single_double_vector_check(y_single,y_double,test_info, arr_size) 
-                            
-                            ! If the program is being run on a single process, we can save the result directly
-                            call psb_test_save_vector_result(y_single, test_info)
-                        end if
-
-                        test_info%current_test = test_info%current_test + 1                        
-                    end if
-                    call psb_barrier(test_info%ctxt)
-                end do
-            end do
-        end do
-    end do
-    
-    call psb_test_exit(test_info)
-
-contains
-
-    !> @brief This subroutine implements the psb_geaxpby kernel for real vectors 
-    !!        performing the operation y = alpha * x + beta * y. It reads input from files, 
-    !!        performs the operation, and outputs the result.
+    !> @brief Function to excecute psb_geaxpby in single precision and
+    !!        save the results on file
     !!
-    !! @param x_file: file name of the input vector x
-    !! @param y_file: file name of the input vector y
-    !! @param alpha: scalar alpha
-    !! @param beta: scalar beta
-    !! @param arr_size: size of the vectors
-    !! @param ctxt: communication context
-    !! @param y_single_global: single precision output vector
-    !! @param y_double_global: double precision output vector
-    !!
-    subroutine psb_geaxpby_real_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, y_single_global, y_double_global)
-        ! implicit none 
+    subroutine psb_geaxpby_kernel(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
+        use psb_base_mod
+        use psb_util_mod
+
+        implicit none 
 
         ! input parameters
         character(len = *), intent(in)              :: x_file, y_file
-        real(psb_dpk_), intent(in)                  :: alpha, beta
+        real(psb_spk_), intent(in)                  :: alpha, beta
         integer(psb_ipk_), intent(in)               :: arr_size
         type(psb_ctxt_type), intent(in)             :: ctxt
 
+        ! output parameters
+        integer(psb_ipk_), intent(out)              :: ret
+        character(len=:), allocatable, intent(out)  :: output_file_name       
+
         ! vectors
-        type(psb_s_vect_type)                       :: x_single, y_single
-        type(psb_d_vect_type)                       :: x_double, y_double 
+        type(psb_s_vect_type)           	        :: x, y
 
         ! matrix descriptor data structure
-        type(psb_desc_type)                         :: desc_a
+        type(psb_desc_type)             	        :: desc_a
 
         ! communication context
-        integer(psb_ipk_)                           :: my_rank, np, info, err_act
+        integer(psb_ipk_)               	        :: my_rank, np, info, err_act
 
         ! variables outside PSLBALS data structures
-        real(psb_spk_), allocatable                 :: x_single_global(:) 
-        real(psb_spk_), allocatable, intent(inout)  :: y_single_global(:)
-        real(psb_dpk_), allocatable                 :: x_double_global(:) 
-        real(psb_dpk_), allocatable, intent(inout)  :: y_double_global(:)
-        integer(psb_ipk_)                           :: i, nl
+        real(psb_spk_), allocatable     	        :: x_global(:), y_global(:)
+        integer(psb_ipk_)               	        :: i
 
         ! others
         logical                                     :: exists
@@ -231,23 +123,14 @@ contains
 
         ! Generate random array for b using always the same seed
         if(my_rank == psb_root_) then
-            allocate(x_single_global(arr_size))
-            allocate(x_double_global(arr_size))
-
-            call mm_array_read(x_single_global,info,filename=x_file)
-            call mm_array_read(y_single_global,info,filename=y_file)
-            call mm_array_read(x_double_global,info,filename=x_file)
-            call mm_array_read(y_double_global,info,filename=y_file)
+            allocate(x_global(arr_size))
+            allocate(y_global(arr_size))
+            call mm_array_read(x_global,info,filename=x_file)
+            call mm_array_read(y_global,info,filename=y_file)
         end if
 
         ! Allocate descriptor as if it was a block rows distribution
-        nl = (arr_size)/np + mod(arr_size,np)
-
-        call psb_bcast(test_info%ctxt,test_info%output_unit)
-        call psb_barrier(test_info%ctxt)
-
-
-        call psb_cdall(ctxt, desc_a, info,nl=nl)
+        call psb_cdall(ctxt, desc_a, info,nl=arr_size/np)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error allocating desc_a data structure"
             goto 9999
@@ -260,122 +143,425 @@ contains
         end if
 
 
-        call psb_geall(x_single,desc_a,info)
+        call psb_geall(x,desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error allocating single precision x data structure"
+            write(psb_out_unit,'(A)') "Error allocating x data structure"
             goto 9999
         end if
 
-        call psb_geall(x_double,desc_a,info)
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error allocating double precision x data structure"
-            goto 9999
-        end if
 
         ! Populate x class using data from x_global vector
-        call psb_scatter(x_single_global,x_single,desc_a,info,root=psb_root_)
+        call psb_scatter(x_global,x,desc_a,info,root=psb_root_)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_scatter to populate single precision x data structure"
-            return 
-        end if
-
-        call psb_scatter(x_double_global,x_double,desc_a,info,root=psb_root_)
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_scatter to populate double precision x data structure"
-            return 
-        end if
-
-        call psb_geall(y_single,desc_a,info)
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error allocating single precision y data structure"
+            write(psb_out_unit,'(A)') "Error in psb_scatter to populate x data structure"
             goto 9999
         end if
 
-        call psb_geall(y_double,desc_a,info)
+
+        call psb_geall(y,desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error allocating double precision y data structure"
+            write(psb_out_unit,'(A)') "Error allocating y data structure"
             goto 9999
         end if
 
         ! Populate y class using data from y_global vector
-        call psb_scatter(y_single_global,y_single,desc_a,info,root=psb_root_)
+        call psb_scatter(y_global,y,desc_a,info,root=psb_root_)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_scatter to populate single precision y data structure"
-            goto 9999
-        end if
-
-        call psb_scatter(y_double_global,y_double,desc_a,info,root=psb_root_)
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_scatter to populate double precision y data structure"
+            write(psb_out_unit,'(A)') "Error in psb_scatter to populate y data structure"
             goto 9999
         end if
 
 
         ! y = alpha * x + beta * y
-        call psb_geaxpby(real(alpha,psb_spk_),x_single,real(beta,psb_spk_),y_single,desc_a,info)
+        call psb_geaxpby(alpha,x,beta,y,desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in psb_geaxpby routine"
             goto 9999
         end if
 
-        ! y = alpha * x + beta * y
-        call psb_geaxpby(alpha,x_double,beta,y_double,desc_a,info)
+        ! Make the root process be the one that saves everything on file
+        if(np == 1) then 
+            ! Check if output directory exists
+            inquire(file='serial/', exist=exists)
+            if (.not.exists) then
+                call system('mkdir serial/')
+            end if
+            output_file_name = "serial/"
+        else 
+            ! Check if output directory exists
+            inquire(file='parallel/', exist=exists)
+            if (.not.exists) then
+                call system('mkdir parallel/')
+            end if
+            output_file_name = "parallel/"
+        end if
+
+        output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10)
+
+        if(alpha == sone) then 
+            output_file_name = output_file_name // "_a1"
+        else if(alpha == -sone) then 
+            output_file_name = output_file_name // "_a2"
+        else if(alpha == szero) then
+            output_file_name = output_file_name // "_a3"
+        end if
+
+        if(beta == sone) then 
+            output_file_name = output_file_name // "_b1.mtx"
+        else if(beta == -sone) then 
+            output_file_name = output_file_name // "_b2.mtx"
+        else if(beta == szero) then
+            output_file_name = output_file_name // "_b3.mtx"
+        end if
+
+        ! gather the result combining all the partial ones
+        call psb_gather(y_global, y, desc_a, info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_geaxpby routine"
+            write(psb_out_unit,'(A)') "Error gathering global vector x to write on file"
             goto 9999
         end if
 
-        ! Gather final result
-        call psb_gather(y_single_global, y_single, desc_a, info, psb_root_) 
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_gather routine"
-            goto 9999
+        ! Save result to output file
+        if(my_rank == psb_root_) then
+            call mm_array_write(y_global,"Result vector",info,filename=output_file_name)
         end if
-    
-        call psb_gather(y_double_global, y_double, desc_a, info, psb_root_) 
-        if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in psb_gather routine"
-            goto 9999
-        end if
-
 
         ! Deallocate
-        9999 call psb_gefree(x_single, desc_a,info)
+        call psb_gefree(x, desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in single precision vector x free routine"
+            write(psb_out_unit,'(A)') "Error in vector x free routine"
+            goto 9999
         end if
 
-        call psb_gefree(y_single, desc_a,info)
+        call psb_gefree(y, desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in single precision vector y free routine"
+            write(psb_out_unit,'(A)') "Error in vector y free routine"
+            goto 9999
         end if
 
-        call psb_gefree(x_double, desc_a,info)
+        call psb_cdfree(desc_a,info)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in double precision vector x free routine"
+            write(psb_out_unit,'(A)') "Error in matrix descriptor free routine"
+            goto 9999
         end if
 
-        call psb_gefree(y_double, desc_a,info)
+        if(my_rank == 0) then
+            deallocate(x_global)
+            deallocate(y_global)
+        end if
+
+        return
+
+
+        ! Error handling
+        9999 ret = -1 
+        stop
+
+    end subroutine
+
+
+
+    !> @brief Function to excecute psb_geaxpby in double precision and
+    !!        compare the results with the ones on file
+    !!
+    subroutine psb_geaxpby_check(x_file, y_file, alpha, beta, arr_size, ctxt, ret, output_file_name)
+        use psb_base_mod
+        use psb_util_mod
+
+        implicit none 
+
+        ! input parameters
+        character(len = *), intent(in)              :: x_file, y_file
+        real(psb_dpk_), intent(in)                  :: alpha, beta
+        integer(psb_ipk_), intent(in)               :: arr_size
+        type(psb_ctxt_type), intent(in)             :: ctxt
+
+        ! output parameters
+        integer(psb_ipk_), intent(out)              :: ret
+        character(len=:), allocatable, intent(out)  :: output_file_name      
+        ! vectors
+        type(psb_d_vect_type)           	        :: x, y
+        type(psb_s_vect_type)           	        :: y_check
+
+        ! matrix descriptor data structure
+        type(psb_desc_type)             	        :: desc_a
+
+        ! communication context
+        integer(psb_ipk_)               	        :: my_rank, np, info, err_act
+
+        ! variables outside PSLBALS data structures
+        real(psb_dpk_), allocatable     	        :: x_global(:), y_global(:) 
+        integer(psb_ipk_)               	        :: i
+
+        ! others
+        logical                                     :: exists
+ 
+
+
+
+        info = psb_success_
+
+        call psb_info(ctxt,my_rank,np)
+
+        if (my_rank < 0) then 
+            ! This should not happen, but just in case
+            call psb_error(ctxt) 
+        endif
+
+        ! Generate random array for b using always the same seed
+        if(my_rank == psb_root_) then
+            allocate(x_global(arr_size))
+            allocate(y_global(arr_size))
+            call mm_array_read(x_global,info,filename=x_file)
+            call mm_array_read(y_global,info,filename=y_file)
+        end if
+
+        ! Allocate descriptor as if it was a block rows distribution
+        call psb_cdall(ctxt, desc_a, info,nl=10000/np)
         if(info /= psb_success_) then
-            write(psb_out_unit,'(A)') "Error in double precision vector y free routine"
+            write(psb_out_unit,'(A)') "Error allocating desc_a data structure"
+            goto 9999
+        end if
+
+        call psb_cdasb(desc_a, info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error assembling desc_a data structure"
+            goto 9999
+        end if
+
+
+        call psb_geall(x,desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error allocating x data structure"
+            goto 9999
+        end if
+
+
+        ! Populate x class using data from x_global vector
+        call psb_scatter(x_global,x,desc_a,info,root=psb_root_)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error in psb_scatter to populate x data structure"
+            goto 9999
+        end if
+
+
+        call psb_geall(y,desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error allocating y data structure"
+            goto 9999
+        end if
+
+        ! Populate y class using data from y_global vector
+        call psb_scatter(y_global,y,desc_a,info,root=psb_root_)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error in psb_scatter to populate y data structure"
+            goto 9999
+        end if
+
+
+        call psb_geall(y_check,desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error allocating y_check data structure"
+            goto 9999
+        end if
+
+
+        ! y = alpha * x + beta * y
+        call psb_geaxpby(alpha,x,beta,y,desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error in psb_geaxpby routine"
+            goto 9999
+        end if
+
+
+        ! gather the result combining all the partial ones
+        call psb_gather(y_global, y, desc_a, info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error gathering global vector y used for comparison"
+            goto 9999
+        end if
+
+        if(my_rank == psb_root_) then 
+            ! Make the root process be the one that saves everything on file
+            if(np == 1) then 
+                ! Check if output directory exists
+                inquire(file='serial/', exist=exists)
+                if(.not.exists) then
+                    write(psb_out_unit,'(A)') "Error in psb_geaxpby_check routine, no single precision result is saved on file"
+                    goto 9999
+                end if
+                output_file_name = "serial/"
+            else 
+                ! Check if output directory exists
+                inquire(file='parallel/', exist=exists)
+                if(.not.exists) then
+                    write(psb_out_unit,'(A)') "Error in psb_geaxpby_check routine, no single precision result is saved on file"
+                    goto 9999
+                end if
+                output_file_name = "parallel/"
+            end if
+    
+            output_file_name = output_file_name // "sol_" // x_file(9:10) // "_" // y_file(9:10)
+    
+            if(alpha == done) then 
+                output_file_name = output_file_name // "_a1"
+            else if(alpha == -done) then 
+                output_file_name = output_file_name // "_a2"
+            else if(alpha == dzero) then
+                output_file_name = output_file_name // "_a3"
+            end if
+    
+            if(beta == done) then 
+                output_file_name = output_file_name // "_b1.mtx"
+            else if(beta == -done) then 
+                output_file_name = output_file_name // "_b2.mtx"
+            else if(beta == dzero) then
+                output_file_name = output_file_name // "_b3.mtx"
+            end if
+    
+
+            ! Read single precision result from file
+            call mm_array_read(y_check,info,filename=output_file_name)
+            if(info /= psb_success_) then
+                write(psb_out_unit,'(A)') "Error in mm_array_read for y_check data structure"
+                goto 9999
+            end if
+            
+            ! 5.96e-08 is 2^-24 (Single precision unit roundoff)
+            ! 1.19e-07 is 2^-23 (Single precision unit interval)
+            do i=1, arr_size
+                !! write(*, *) abs(y_global(i) - y_check%v%v(i)) > 5.96D-08, &
+                !! & y_global(i), y_check%v%v(i), output_file_name
+                if(abs(y_global(i) - y_check%v%v(i)) > 1.19e-07) then
+                   ret = -i
+                   write(psb_out_unit, '(A,F10.8)') "Y computed in double precision: ", y_global(i) 
+                   write(psb_out_unit, '(A,F10.8)') "Y read from single precision file: ", y_check%v%v(i) 
+                   write(psb_out_unit, '(A,F10.8)') "Diff: ", abs(y_global(i) - y_check%v%v(i)) 
+                   exit
+                end if
+            end do
+        end if 
+        
+        ! Deallocate
+        call psb_gefree(x, desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error in vector x free routine"
+            goto 9999
+        end if
+
+        call psb_gefree(y, desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error in vector y free routine"
+            goto 9999
+        end if
+
+        call psb_gefree(y_check, desc_a,info)
+        if(info /= psb_success_) then
+            write(psb_out_unit,'(A)') "Error in vector y_check free routine"
+            goto 9999
         end if
 
 
         call psb_cdfree(desc_a,info)
         if(info /= psb_success_) then
             write(psb_out_unit,'(A)') "Error in matrix descriptor free routine"
+            goto 9999
         end if
 
         if(my_rank == 0) then
-            deallocate(x_single_global)
-            deallocate(x_double_global)
+            deallocate(x_global)
+            deallocate(y_global)
         end if
+
+        ret = 0
 
         return
 
+
+        ! Error handling
+        9999 ret = -1 
+        stop
 
     end subroutine
 
 
 
-end program main
+    !> @brief Function to randomly generate x and y vectors 
+    !!        and save them on multiple files based on their
+    !!        coefficients values.
+    !!
+    subroutine generate_vectors(arr_size)
+        use psb_base_mod
+        use psb_util_mod
+
+        implicit none 
+
+        integer(psb_ipk_), intent(in)               :: arr_size
+        real(psb_dpk_), allocatable                 :: x(:), y(:)
+        integer(psb_ipk_)                           :: i, info
+        logical                                     :: exists
+
+
+        ! Check if output directory exists
+        inquire(file='vectors/', exist=exists)
+        if (.not.exists) then
+            call system('mkdir vectors/')
+        end if
+
+        allocate(x(arr_size))
+        allocate(y(arr_size))
+        
+        call random_init(repeatable=.true.,image_distinct=.true.) 
+        call random_number(x)
+        call random_number(y)
+
+        ! Write only positive in x_1
+        call mm_array_write(x,"Positive vector",info,filename="vectors/x1.mtx")
+        call mm_array_write(y,"Positive vector",info,filename="vectors/y1.mtx")
+
+        ! Write only negative in x_2
+        do i=1,arr_size 
+            x(i) = -x(i)
+        end do  
+
+        do i=1,arr_size
+            y(i) = -y(i)
+        end do
+
+        call mm_array_write(x,"Negative vector",info,filename="vectors/x2.mtx")
+        call mm_array_write(y,"Negative vector",info,filename="vectors/y2.mtx")
+
+
+        ! Since numbers are less than one and always positive, we have to generate negative ones subtractiong 50
+        do i=1,arr_size
+            x(i) = -x(i) ! Make the values positive again  
+            x(i) = x(i) - 0.5
+        end do   
+
+        do i=1,arr_size
+            y(i) = -y(i) ! Make the values positive again  
+            y(i) = y(i) - 0.5
+        end do
+
+        ! Write random in x_3
+        call mm_array_write(x,"Random vector",info,filename="vectors/x3.mtx")
+        call mm_array_write(y,"Random vector",info,filename="vectors/y3.mtx")
+
+        ! Write zero in x_4
+        do i=1,arr_size
+            x(i) = 0
+        end do   
+
+        do i=1,arr_size
+            y(i) = 0
+        end do
+
+        call mm_array_write(x,"Null vector",info,filename="vectors/x4.mtx")
+        call mm_array_write(y,"Null vector",info,filename="vectors/y4.mtx")
+
+        deallocate(x)
+        deallocate(y)
+
+    end subroutine
+
+end module psb_geaxpby_test

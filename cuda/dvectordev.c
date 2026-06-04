@@ -14,7 +14,7 @@
   /*      documentation and/or other materials provided with the distribution. */
   /*   3. The name of the PSBLAS group or the names of its contributors may */
   /*      not be used to endorse or promote products derived from this */
-  /*      software without specific written permission. */
+  /*      software without specific prior written permission. */
  
   /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS */
   /* ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED */
@@ -40,6 +40,14 @@
 int registerMappedDouble(void  *buff, void **d_p, int n, double dummy)
 {
   return registerMappedMemory(buff,d_p,((size_t) n)*sizeof(double));
+}
+
+int checkMultiVecDeviceDouble(void* deviceMultiVec)
+{
+  struct MultiVectDevice *devVec = (struct MultiVectDevice *) deviceMultiVec;
+  fprintf(stderr,"checkMultiVecDeviceInt Size: %d  Pointer %p\n",
+	  devVec->size_,devVec->v_);
+  return(0);
 }
 
 int writeMultiVecDeviceDouble(void* deviceVec, double* hostVec)

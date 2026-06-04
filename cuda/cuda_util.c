@@ -14,7 +14,7 @@
   /*      documentation and/or other materials provided with the distribution. */
   /*   3. The name of the PSBLAS group or the names of its contributors may */
   /*      not be used to endorse or promote products derived from this */
-  /*      software without specific written permission. */
+  /*      software without specific prior written permission. */
  
   /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS */
   /* ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED */
@@ -37,6 +37,9 @@ static int hasUVA=-1;
 static struct cudaDeviceProp *prop=NULL;
 static spgpuHandle_t psb_cuda_handle = NULL;
 static cublasHandle_t psb_cublas_handle = NULL;
+#if PSB_CUDA_VERSION >= 13000
+static int memoryClockRate=-1;
+#endif
 #if defined(TRACK_CUDA_MALLOC)
 static int64_t total_cuda_mem = 0;
 #endif
@@ -244,14 +247,14 @@ int gpuInit(int dev)
 void gpuClose()
 {
   cudaStream_t st1, st2;
-  if (! psb_cuda_handle)
+  if ((! psb_cuda_handle)&&(! psb_cublas_handle)) {
     st1=spgpuGetStream(psb_cuda_handle);
-  if (! psb_cublas_handle)
     cublasGetStream(psb_cublas_handle,&st2);
+    if (st1 != st2) 
+      psb_cudaDestroyCublasHandle();
+  }
   FcusparseDestroy();
   psb_cudaDestroyHandle();
-  if (st1 != st2) 
-    psb_cudaDestroyCublasHandle();
   free(prop);
   prop=NULL;
   hasUVA=-1;
@@ -310,17 +313,28 @@ int getGPUMultiProcessors()
 
 int getGPUMemoryBusWidth()
 { int count=0;
-#if CUDART_VERSION >= 5000
+#if PSB_CUDA_VERSION >= 5000
   if (prop!=NULL) 
     count = prop->memoryBusWidth;
 #endif
   return(count);
 }
+
+#if PSB_CUDA_VERSION >= 13000
+int getGPUMemoryClockRate(int dev)
+#else
 int getGPUMemoryClockRate()
+#endif
 { int count=0;
-#if CUDART_VERSION >= 5000
+#if PSB_CUDA_VERSION >= 5000
+#if PSB_CUDA_VERSION >= 13000
+  cudaDeviceGetAttribute(&memoryClockRate,
+			 cudaDevAttrMemoryClockRate, dev);
+  count = memoryClockRate;
+#else
   if (prop!=NULL) 
     count = prop->memoryClockRate;
+#endif
 #endif
   return(count);
 }

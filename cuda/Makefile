@@ -47,18 +47,21 @@ COBJS= elldev.o hlldev.o diagdev.o hdiagdev.o vectordev.o  ivectordev.o dnsdev.o
 
 OBJS=$(COBJS) $(FOBJS)
 
-lib: objs ilib cudalib spgpulib
+lib: mods objs ilib cudalib spgpulib
 	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
-$(COBJS): spgpuinc
 
-objs: spgpuinc $(OBJS) iobjs cudaobjs spgpuobjs
-	/bin/cp -p *$(.mod) $(MODDIR)
-	/bin/cp -p *.h $(INCDIR)
+mods: $(FOBJS) includes
+	$(INSTALL) -p *$(.mod) $(MODDIR)
+
+includes: spgpuinc
+	$(INSTALL) -p *.h $(INCDIR)
+
+objs: mods $(OBJS) iobjs cudaobjs spgpuobjs
 
 spgpuinc:
-	$(MAKE) -C spgpu includes	
+	$(MAKE) -C spgpu incl	
 spgpuobjs:
 	$(MAKE) -C spgpu objs
 spgpulib:
@@ -124,10 +127,10 @@ iobjs: $(FOBJS)
 cudaobjs: $(FOBJS)
 	$(MAKE) -C CUDA objs
 
-ilib: objs
-	$(MAKE) -C impl lib LIBNAME=$(LIBNAME)
+ilib: objs spgpulib 
+	$(MAKE) -C impl lib 
 cudalib: objs ilib
-	$(MAKE) -C CUDA lib LIBNAME=$(LIBNAME)
+	$(MAKE) -C CUDA lib 
 
 clean: cclean iclean cudaclean spgpuclean
 	/bin/rm -f  $(FOBJS) *$(.mod) *.a

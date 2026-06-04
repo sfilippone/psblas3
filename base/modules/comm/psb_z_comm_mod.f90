@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -37,46 +37,42 @@ module psb_z_comm_mod
   use psb_z_multivect_mod, only : psb_z_multivect_type, psb_z_base_multivect_type
 
   interface psb_ovrl
-    subroutine psb_zovrl_vect(x,desc_a,info,work,update,mode)
+    subroutine psb_zovrl_vect(x,desc_a,info,update,mode)
       import
       implicit none
-      type(psb_z_vect_type), intent(inout)    :: x
+      type(psb_z_vect_type), intent(inout)  :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      complex(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: update,mode
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: update,mode
     end subroutine psb_zovrl_vect
-    subroutine psb_zovrl_multivect(x,desc_a,info,work,update,mode)
+    subroutine psb_zovrl_multivect(x,desc_a,info,update,mode)
       import
       implicit none
-      type(psb_z_multivect_type), intent(inout)    :: x
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      complex(psb_dpk_), intent(inout), optional, target :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: update,mode
+      type(psb_z_multivect_type), intent(inout) :: x
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional     :: update,mode
     end subroutine psb_zovrl_multivect
   end interface psb_ovrl
 
   interface psb_halo
-    subroutine psb_zhalo_vect(x,desc_a,info,work,tran,mode,data)
+    subroutine psb_zhalo_vect(x,desc_a,info,tran,mode,data)
       import
       implicit none
-      type(psb_z_vect_type), intent(inout)   :: x
+      type(psb_z_vect_type), intent(inout)  :: x
       type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      complex(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,data
+      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in), optional :: mode,data
       character, intent(in), optional         :: tran
     end subroutine psb_zhalo_vect
-    subroutine psb_zhalo_multivect(x,desc_a,info,work,tran,mode,data)
+    subroutine psb_zhalo_multivect(x,desc_a,info,tran,mode,data)
       import
       implicit none
-      type(psb_z_multivect_type), intent(inout)   :: x
-      type(psb_desc_type), intent(in)         :: desc_a
-      integer(psb_ipk_), intent(out)                    :: info
-      complex(psb_dpk_), target, optional, intent(inout) :: work(:)
-      integer(psb_ipk_), intent(in), optional           :: mode,data
-      character, intent(in), optional         :: tran
+      type(psb_z_multivect_type), intent(inout) :: x
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional     :: mode,data
+      character, intent(in), optional             :: tran
     end subroutine psb_zhalo_multivect
   end interface psb_halo
 

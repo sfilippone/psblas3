@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -139,7 +139,7 @@ subroutine psb_lz_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   debug_level = psb_get_debug_level()
 
   ctxt = desc_r%get_context()
-  icomm = desc_r%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 
@@ -437,7 +437,7 @@ subroutine psb_z_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
   debug_level = psb_get_debug_level()
 
   ctxt = desc_r%get_context()
-  icomm = desc_r%get_mpic()
+  icomm = ctxt%get_mpic()
 
   Call psb_info(ctxt, me, np)
 

@@ -171,7 +171,7 @@ contains
     if (a%is_dev()) call a%sync()
 
     res = 8
-    res = res + psb_sizeof_dp * size(a%val)
+    res = res + (2*psb_sizeof_dp) * size(a%val)
     res = res + psb_sizeof_ip * size(a%ja)
     res = res + psb_sizeof_ip * size(a%irn)
     res = res + psb_sizeof_ip * size(a%idiag)

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -2824,8 +2824,8 @@ subroutine psb_z_csc_print(iout,a,iv,head,ivr,ivc)
 end subroutine psb_z_csc_print
 
 subroutine psb_zcscspspmm(a,b,c,info)
-  use psb_z_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_zcscspspmm
+  use psb_z_csc_mat_mod, psb_protect_name => psb_zcscspspmm
+  use psb_serial_mod
 
   implicit none
 
@@ -4664,8 +4664,8 @@ subroutine psb_lz_csc_print(iout,a,iv,head,ivr,ivc)
 end subroutine psb_lz_csc_print
 
 subroutine psb_lzcscspspmm(a,b,c,info)
-  use psb_z_mat_mod
-  use psb_serial_mod, psb_protect_name => psb_lzcscspspmm
+  use psb_z_csc_mat_mod, psb_protect_name => psb_lzcscspspmm
+  use psb_serial_mod
 
   implicit none
 

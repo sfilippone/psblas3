@@ -1286,9 +1286,9 @@ class="pplb7t-x-x-120">Notes</span>
   class="enumerate" id="x12-85006x3">
      <!--l. 600--><p class="noindent" >Providing  a  good  estimate  for  the  number  of  nonzeroes  <span 
 class="zplmr7m-">nnz </span>in  the
-     assembled matrix may substantially improve performance in the matrix
-     build  phase,  as  it  will  reduce  or  eliminate  the  need  for  (potentially
-     multiple) data reallocations;
+     assembled matrix may improve performance in the matrix build phase,
+     as  it  will  reduce  or  eliminate  the  need  for  (potentially  multiple)  data
+     reallocations;
      </li>
 <li 
   class="enumerate" id="x12-85008x4">
@@ -1621,7 +1621,7 @@ class="zplmr7y-">- </span>1  should  be  one  of  the  local  indices,  but  are
 <li 
   class="enumerate" id="x12-86016x8">
      <!--l. 724--><p class="noindent" >Coefficients from different rows may also be mixed up freely in a single
-     call, according to the application needs;
+     call (in COO format), according to the application needs;
      </li>
 <li 
   class="enumerate" id="x12-86018x9">
@@ -2673,7 +2673,7 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">6.17    </span> <a 
- id="x12-950006.17"></a>psb_glob_to_loc &#8212; Global to local indices convertion</h4>
+ id="x12-950006.17"></a>psb_glob_to_loc &#8212; Global to local indices conversion</h4>
                                                                   
 
                                                                   
@@ -2707,7 +2707,8 @@ class="newline" />Type: <span
 class="pplb7t-">required</span><br 
 class="newline" />Intent: <span 
 class="pplb7t-">in, inout</span>.<br 
-class="newline" />Specified as: a rank one integer array.<br 
+class="newline" />Specified as: a rank one integer array of global indices, i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lpk_</span></span></span>.<br 
 class="newline" />
      </dd><dt class="description">
      <!--l. 1265--><p class="noindent" >
@@ -2790,8 +2791,11 @@ class="description">
      <!--l. 1293--><p class="noindent" >If <span 
 class="zplmr7m-">y </span>is present, then <span 
 class="zplmr7m-">y </span>is overwritten with the translated integer indices,
-     and <span 
-class="zplmr7m-">x </span>is left unchanged. Scope: <span 
+     and  <span 
+class="zplmr7m-">x </span>is  left  unchanged;  since  <span 
+class="zplmr7m-">y </span>contains  local  indices  it  should  use
+     <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ipk_</span></span></span>. Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
@@ -2813,12 +2817,12 @@ class="pplb7t-">out</span>.<br
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
 <!--l. 1307--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
-     <ol  class="enumerate1" >
-<li 
-  class="enumerate" id="x12-95002x1">
                                                                   
 
                                                                   
+     <ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x12-95002x1">
      <!--l. 1309--><p class="noindent" >If an input index is out of range, then the corresponding output index is
      set to a negative number;
      </li>
@@ -2858,7 +2862,10 @@ class="description">
 <span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1328--><p class="noindent" >An integer vector of indices to be converted.<br 
+     <!--l. 1328--><p class="noindent" >An integer vector of indices to be converted; if <span 
+class="zplmr7m-">y </span>is present, they are local
+     indices, i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_ipk_</span></span></span><br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -2868,12 +2875,12 @@ class="pplb7t-">in, inout</span>.<br
 class="newline" />Specified as: a rank one integer array.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1333--><p class="noindent" >
+     <!--l. 1334--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 1333--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1334--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -2886,11 +2893,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 1338--><p class="noindent" >
+     <!--l. 1339--><p class="noindent" >
 <span 
 class="pplb7t-">iact</span> </dt><dd 
 class="description">
-     <!--l. 1338--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+     <!--l. 1339--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
@@ -2901,25 +2908,26 @@ class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span cla
 class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">I</span></span></span>gnore.</dd></dl>
-<!--l. 1346--><p class="indent" >
+<!--l. 1347--><p class="indent" >
                                                                   
 
                                                                   
      <dl class="description"><dt class="description">
-     <!--l. 1347--><p class="noindent" >
+     <!--l. 1348--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1347--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1348--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1349--><p class="noindent" >
 <span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1348--><p class="noindent" >If  <span 
-class="zplmr7m-">y </span>is  not  present,  then  <span 
-class="zplmr7m-">x </span>is  overwritten  with  the  translated  integer
-     indices. Scope: <span 
+     <!--l. 1349--><p class="noindent" >If <span 
+class="zplmr7m-">y </span>is not present, then <span 
+class="zplmr7m-">x </span>is overwritten with the translated integer global
+     indices, i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lpk_</span></span></span> Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -2927,14 +2935,15 @@ class="newline" />Intent: <span
 class="pplb7t-">inout</span>.<br 
 class="newline" />Specified as: a rank one integer array.
      </dd><dt class="description">
-     <!--l. 1354--><p class="noindent" >
+     <!--l. 1355--><p class="noindent" >
 <span 
 class="pplb7t-">y</span> </dt><dd 
 class="description">
-     <!--l. 1354--><p class="noindent" >If  <span 
-class="zplmr7m-">y </span>is  not  present,  then  <span 
-class="zplmr7m-">y </span>is  overwritten  with  the  translated  integer
-     indices, and <span 
+     <!--l. 1355--><p class="noindent" >If <span 
+class="zplmr7m-">y </span>not present, then <span 
+class="zplmr7m-">y </span>is overwritten with the translated global indices
+     i.e. <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_lpk_</span></span></span>, and <span 
 class="zplmr7m-">x </span>is left unchanged. Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
@@ -2943,11 +2952,11 @@ class="newline" />Intent: <span
 class="pplb7t-">out</span>.<br 
 class="newline" />Specified as: a rank one integer array.
      </dd><dt class="description">
-     <!--l. 1361--><p class="noindent" >
+     <!--l. 1362--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1361--><p class="noindent" >Error code.<br 
+     <!--l. 1362--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -2966,26 +2975,26 @@ class="newline" />An integer value; 0 means no error has been detected.</dd></dl
    <pre class="verbatim" id="verbatim-52">
 call&#x00A0;psb_is_owned(x,&#x00A0;desc_a)
 </pre>
-<!--l. 1378--><p class="nopar" >
-<!--l. 1380--><p class="indent" >
+<!--l. 1379--><p class="nopar" >
+<!--l. 1381--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1381--><p class="noindent" >
+     <!--l. 1382--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1381--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1382--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1382--><p class="noindent" >
+     <!--l. 1382--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1383--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1383--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1384--><p class="noindent" >
+<span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1383--><p class="noindent" >Integer index.<br 
+     <!--l. 1384--><p class="noindent" >Integer index.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -2995,12 +3004,12 @@ class="pplb7t-">in</span>.<br
 class="newline" />Specified as: a scalar integer.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1388--><p class="noindent" >
+     <!--l. 1389--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 1388--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1389--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3012,22 +3021,22 @@ href="userhtmlse3.html#descdata"><span
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.</dd></dl>
-<!--l. 1395--><p class="indent" >
+<!--l. 1396--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1396--><p class="noindent" >
+     <!--l. 1397--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1396--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1397--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1398--><p class="noindent" >
 <span 
 class="pplb7t-">Function value</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 1397--><p class="noindent" >A logical mask which is true if <span 
+     <!--l. 1398--><p class="noindent" >A logical mask which is true if <span 
 class="zplmr7m-">x </span>is owned by the current process Scope:
      <span 
 class="pplb7t-">local </span><br 
@@ -3036,12 +3045,12 @@ class="pplb7t-">required</span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 1405--><p class="noindent" ><span 
+<!--l. 1406--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-97002x1">
-     <!--l. 1407--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1408--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">.true.</span></span></span> value for an index that is strictly owned by
      the current process, excluding the halo indices</li></ol>
                                                                   
@@ -3055,26 +3064,26 @@ class="cmtt-10">.true.</span></span></span> value for an index that is strictly 
    <pre class="verbatim" id="verbatim-53">
 call&#x00A0;psb_owned_index(y,&#x00A0;x,&#x00A0;desc_a,&#x00A0;info)
 </pre>
-<!--l. 1418--><p class="nopar" >
-<!--l. 1420--><p class="indent" >
+<!--l. 1419--><p class="nopar" >
+<!--l. 1421--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1421--><p class="noindent" >
+     <!--l. 1422--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1421--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1422--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1422--><p class="noindent" >
+     <!--l. 1422--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1423--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1423--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1424--><p class="noindent" >
+<span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1423--><p class="noindent" >Integer indices.<br 
+     <!--l. 1424--><p class="noindent" >Integer indices.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3084,12 +3093,12 @@ class="pplb7t-">in, inout</span>.<br
 class="newline" />Specified as: a scalar or a rank one integer array.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1428--><p class="noindent" >
+     <!--l. 1429--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 1428--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1429--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3102,11 +3111,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 1433--><p class="noindent" >
+     <!--l. 1434--><p class="noindent" >
 <span 
 class="pplb7t-">iact</span> </dt><dd 
 class="description">
-     <!--l. 1433--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+     <!--l. 1434--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
@@ -3117,22 +3126,22 @@ class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span cla
 class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">I</span></span></span>gnore.</dd></dl>
-<!--l. 1441--><p class="indent" >
+<!--l. 1442--><p class="indent" >
                                                                   
 
                                                                   
      <dl class="description"><dt class="description">
-     <!--l. 1442--><p class="noindent" >
+     <!--l. 1443--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1442--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1443--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1444--><p class="noindent" >
 <span 
 class="pplb7t-">y</span> </dt><dd 
 class="description">
-     <!--l. 1443--><p class="noindent" >A logical mask which is true for all corresponding entries of <span 
+     <!--l. 1444--><p class="noindent" >A logical mask which is true for all corresponding entries of <span 
 class="zplmr7m-">x </span>that are
      owned by the current process Scope: <span 
 class="pplb7t-">local </span><br 
@@ -3142,11 +3151,11 @@ class="newline" />Intent: <span
 class="pplb7t-">out</span>.<br 
 class="newline" />Specified as: a scalar or rank one logical array.
      </dd><dt class="description">
-     <!--l. 1449--><p class="noindent" >
+     <!--l. 1450--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1449--><p class="noindent" >Error code.<br 
+     <!--l. 1450--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3154,12 +3163,12 @@ class="pplb7t-">required </span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 1457--><p class="noindent" ><span 
+<!--l. 1458--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-98002x1">
-     <!--l. 1459--><p class="noindent" >This  routine  returns  a  <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1460--><p class="noindent" >This  routine  returns  a  <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">.true.</span></span></span> value  for  those  indices  that  are  strictly
      owned by the current process, excluding the halo indices</li></ol>
                                                                   
@@ -3173,26 +3182,26 @@ class="cmtt-10">.true.</span></span></span> value  for  those  indices  that  ar
    <pre class="verbatim" id="verbatim-54">
 call&#x00A0;psb_is_local(x,&#x00A0;desc_a)
 </pre>
-<!--l. 1470--><p class="nopar" >
-<!--l. 1472--><p class="indent" >
+<!--l. 1471--><p class="nopar" >
+<!--l. 1473--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1473--><p class="noindent" >
+     <!--l. 1474--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1473--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1474--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1474--><p class="noindent" >
+     <!--l. 1474--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1475--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1475--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1476--><p class="noindent" >
+<span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1475--><p class="noindent" >Integer index.<br 
+     <!--l. 1476--><p class="noindent" >Integer index.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3202,12 +3211,12 @@ class="pplb7t-">in</span>.<br
 class="newline" />Specified as: a scalar integer.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1480--><p class="noindent" >
+     <!--l. 1481--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 1480--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1481--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3219,22 +3228,22 @@ href="userhtmlse3.html#descdata"><span
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.</dd></dl>
-<!--l. 1487--><p class="indent" >
+<!--l. 1488--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1488--><p class="noindent" >
+     <!--l. 1489--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1488--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1489--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1490--><p class="noindent" >
 <span 
 class="pplb7t-">Function value</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 1489--><p class="noindent" >A logical mask which is true if <span 
+     <!--l. 1490--><p class="noindent" >A logical mask which is true if <span 
 class="zplmr7m-">x </span>is local to the current process Scope:
      <span 
 class="pplb7t-">local </span><br 
@@ -3243,12 +3252,12 @@ class="pplb7t-">required</span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" /></dd></dl>
-<!--l. 1497--><p class="noindent" ><span 
+<!--l. 1498--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-99002x1">
-     <!--l. 1499--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1500--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">.true.</span></span></span> value for an index that is local to the current
      process, including the halo indices</li></ol>
                                                                   
@@ -3262,26 +3271,26 @@ class="cmtt-10">.true.</span></span></span> value for an index that is local to 
    <pre class="verbatim" id="verbatim-55">
 call&#x00A0;psb_local_index(y,&#x00A0;x,&#x00A0;desc_a,&#x00A0;info)
 </pre>
-<!--l. 1509--><p class="nopar" >
-<!--l. 1511--><p class="indent" >
+<!--l. 1510--><p class="nopar" >
+<!--l. 1512--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1512--><p class="noindent" >
+     <!--l. 1513--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1512--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1513--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1513--><p class="noindent" >
+     <!--l. 1513--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1514--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1514--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1515--><p class="noindent" >
+<span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1514--><p class="noindent" >Integer indices.<br 
+     <!--l. 1515--><p class="noindent" >Integer indices.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3291,12 +3300,12 @@ class="pplb7t-">in, inout</span>.<br
 class="newline" />Specified as: a scalar or a rank one integer array.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1519--><p class="noindent" >
+     <!--l. 1520--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 1519--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1520--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3309,11 +3318,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 1524--><p class="noindent" >
+     <!--l. 1525--><p class="noindent" >
 <span 
 class="pplb7t-">iact</span> </dt><dd 
 class="description">
-     <!--l. 1524--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
+     <!--l. 1525--><p class="noindent" >specifies action to be taken in case of range errors. Scope: <span 
 class="pplb7t-">global </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">optional</span><br 
@@ -3324,22 +3333,22 @@ class="cmtt-10">I</span></span></span>gnore, <span class="obeylines-h"><span cla
 class="cmtt-10">W</span></span></span>arning or <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">A</span></span></span>bort, default <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">I</span></span></span>gnore.</dd></dl>
-<!--l. 1532--><p class="indent" >
+<!--l. 1533--><p class="indent" >
                                                                   
 
                                                                   
      <dl class="description"><dt class="description">
-     <!--l. 1533--><p class="noindent" >
+     <!--l. 1534--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1533--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1534--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1535--><p class="noindent" >
 <span 
 class="pplb7t-">y</span> </dt><dd 
 class="description">
-     <!--l. 1534--><p class="noindent" >A logical mask which is true for all corresponding entries of <span 
+     <!--l. 1535--><p class="noindent" >A logical mask which is true for all corresponding entries of <span 
 class="zplmr7m-">x </span>that are
      local to the current process Scope: <span 
 class="pplb7t-">local </span><br 
@@ -3349,11 +3358,11 @@ class="newline" />Intent: <span
 class="pplb7t-">out</span>.<br 
 class="newline" />Specified as: a scalar or rank one logical array.
      </dd><dt class="description">
-     <!--l. 1540--><p class="noindent" >
+     <!--l. 1541--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1540--><p class="noindent" >Error code.<br 
+     <!--l. 1541--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3361,12 +3370,12 @@ class="pplb7t-">required </span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 1548--><p class="noindent" ><span 
+<!--l. 1549--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-100002x1">
-     <!--l. 1550--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1551--><p class="noindent" >This routine returns a <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">.true.</span></span></span> value for those indices that are local to the
      current process, including the halo indices.</li></ol>
                                                                   
@@ -3380,26 +3389,26 @@ class="cmtt-10">.true.</span></span></span> value for those indices that are loc
    <pre class="verbatim" id="verbatim-56">
 call&#x00A0;psb_get_boundary(bndel,&#x00A0;desc,&#x00A0;info)
 </pre>
-<!--l. 1566--><p class="nopar" >
-<!--l. 1568--><p class="indent" >
+<!--l. 1567--><p class="nopar" >
+<!--l. 1569--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1569--><p class="noindent" >
+     <!--l. 1570--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1569--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1570--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1570--><p class="noindent" >
+     <!--l. 1570--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1571--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1571--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1572--><p class="noindent" >
+<span 
 class="pplb7t-">desc</span> </dt><dd 
 class="description">
-     <!--l. 1571--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1572--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3411,19 +3420,19 @@ href="userhtmlse3.html#descdata"><span
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.</dd></dl>
-<!--l. 1578--><p class="indent" >
+<!--l. 1579--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1579--><p class="noindent" >
+     <!--l. 1580--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1579--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1580--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1581--><p class="noindent" >
 <span 
 class="pplb7t-">bndel</span> </dt><dd 
 class="description">
-     <!--l. 1580--><p class="noindent" >The list of boundary elements on the calling process, in local numbering.<br 
+     <!--l. 1581--><p class="noindent" >The list of boundary elements on the calling process, in local numbering.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3434,14 +3443,14 @@ class="newline" />Specified as: a rank one array with the ALLOCATABLE attribute,
      integer.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1587--><p class="noindent" >
+     <!--l. 1588--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 1587--><p class="noindent" >Error code.<br 
+     <!--l. 1588--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3449,18 +3458,18 @@ class="pplb7t-">required </span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 1594--><p class="noindent" ><span 
+<!--l. 1595--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-101002x1">
-     <!--l. 1596--><p class="noindent" >If there are no boundary elements (i.e., if the local part of the connectivity
+     <!--l. 1597--><p class="noindent" >If there are no boundary elements (i.e., if the local part of the connectivity
      graph  is  self-contained)  the  output  vector  is  set  to  the  &#8220;not  allocated&#8221;
      state.
      </li>
 <li 
   class="enumerate" id="x12-101004x2">
-     <!--l. 1599--><p class="noindent" >Otherwise  the  size  of  <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1600--><p class="noindent" >Otherwise  the  size  of  <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">bndel</span></span></span> will  be  exactly  equal  to  the  number  of
      boundary elements.</li></ol>
                                                                   
@@ -3474,26 +3483,26 @@ class="cmtt-10">bndel</span></span></span> will  be  exactly  equal  to  the  nu
    <pre class="verbatim" id="verbatim-57">
 call&#x00A0;psb_get_overlap(ovrel,&#x00A0;desc,&#x00A0;info)
 </pre>
-<!--l. 1609--><p class="nopar" >
-<!--l. 1611--><p class="indent" >
+<!--l. 1610--><p class="nopar" >
+<!--l. 1612--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1612--><p class="noindent" >
+     <!--l. 1613--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1612--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1613--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1613--><p class="noindent" >
+     <!--l. 1613--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1614--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1614--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1615--><p class="noindent" >
+<span 
 class="pplb7t-">desc</span> </dt><dd 
 class="description">
-     <!--l. 1614--><p class="noindent" >the communication descriptor.<br 
+     <!--l. 1615--><p class="noindent" >the communication descriptor.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3505,19 +3514,19 @@ href="userhtmlse3.html#descdata"><span
 class="cmtt-10">psb</span><span 
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.</dd></dl>
-<!--l. 1621--><p class="indent" >
+<!--l. 1622--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1622--><p class="noindent" >
+     <!--l. 1623--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1622--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1623--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1624--><p class="noindent" >
 <span 
 class="pplb7t-">ovrel</span> </dt><dd 
 class="description">
-     <!--l. 1623--><p class="noindent" >The list of overlap elements on the calling process, in local numbering.<br 
+     <!--l. 1624--><p class="noindent" >The list of overlap elements on the calling process, in local numbering.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3528,14 +3537,14 @@ class="newline" />Specified as: a rank one array with the ALLOCATABLE attribute,
      integer.<br 
 class="newline" />
      </dd><dt class="description">
-     <!--l. 1630--><p class="noindent" >
+     <!--l. 1631--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 1630--><p class="noindent" >Error code.<br 
+     <!--l. 1631--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3543,17 +3552,17 @@ class="pplb7t-">required </span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 1637--><p class="noindent" ><span 
+<!--l. 1638--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-102002x1">
-     <!--l. 1639--><p class="noindent" >If  there  are  no  overlap  elements  the  output  vector  is  set  to  the  &#8220;not
+     <!--l. 1640--><p class="noindent" >If  there  are  no  overlap  elements  the  output  vector  is  set  to  the  &#8220;not
      allocated&#8221; state.
      </li>
 <li 
   class="enumerate" id="x12-102004x2">
-     <!--l. 1641--><p class="noindent" >Otherwise the size of <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1642--><p class="noindent" >Otherwise the size of <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">ovrel</span></span></span> will be exactly equal to the number of overlap
      elements.</li></ol>
                                                                   
@@ -3568,26 +3577,26 @@ class="cmtt-10">ovrel</span></span></span> will be exactly equal to the number o
 call&#x00A0;psb_sp_getrow(row,&#x00A0;a,&#x00A0;nz,&#x00A0;ia,&#x00A0;ja,&#x00A0;val,&#x00A0;info,&#x00A0;&amp;
 &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;&#x00A0;append,&#x00A0;nzin,&#x00A0;lrw)
 </pre>
-<!--l. 1654--><p class="nopar" >
-<!--l. 1656--><p class="indent" >
+<!--l. 1655--><p class="nopar" >
+<!--l. 1657--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1657--><p class="noindent" >
+     <!--l. 1658--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1657--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1658--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1658--><p class="noindent" >
+     <!--l. 1658--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1659--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1659--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1660--><p class="noindent" >
+<span 
 class="pplb7t-">row</span> </dt><dd 
 class="description">
-     <!--l. 1659--><p class="noindent" >The (first) row to be extracted.<br 
+     <!--l. 1660--><p class="noindent" >The (first) row to be extracted.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span><br 
 class="newline" />Type:<span 
@@ -3597,11 +3606,11 @@ class="pplb7t-">in</span>.<br
 class="newline" />Specified as: an integer <span 
 class="zplmr7m-">&#x003E; </span>0.
      </dd><dt class="description">
-     <!--l. 1664--><p class="noindent" >
+     <!--l. 1665--><p class="noindent" >
 <span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 1664--><p class="noindent" >the matrix from which to get rows.<br 
+     <!--l. 1665--><p class="noindent" >the matrix from which to get rows.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span><br 
 class="newline" />Type:<span 
@@ -3614,11 +3623,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tspmat</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 1669--><p class="noindent" >
+     <!--l. 1670--><p class="noindent" >
 <span 
 class="pplb7t-">append</span> </dt><dd 
 class="description">
-     <!--l. 1669--><p class="noindent" >Whether to append or overwrite existing output.<br 
+     <!--l. 1670--><p class="noindent" >Whether to append or overwrite existing output.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span><br 
 class="newline" />Type:<span 
@@ -3630,11 +3639,11 @@ class="newline" />Specified as: a logical value default: false (overwrite).
 
                                                                   
      </dd><dt class="description">
-     <!--l. 1674--><p class="noindent" >
+     <!--l. 1675--><p class="noindent" >
 <span 
 class="pplb7t-">nzin</span> </dt><dd 
 class="description">
-     <!--l. 1674--><p class="noindent" >Input size to be appended to.<br 
+     <!--l. 1675--><p class="noindent" >Input size to be appended to.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span><br 
 class="newline" />Type:<span 
@@ -3645,11 +3654,11 @@ class="newline" />Specified as: an integer <span
 class="zplmr7m-">&#x003E; </span>0. When append is true, specifies how many
      entries in the output vectors are already filled.
      </dd><dt class="description">
-     <!--l. 1680--><p class="noindent" >
+     <!--l. 1681--><p class="noindent" >
 <span 
 class="pplb7t-">lrw</span> </dt><dd 
 class="description">
-     <!--l. 1680--><p class="noindent" >The last row to be extracted.<br 
+     <!--l. 1681--><p class="noindent" >The last row to be extracted.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span><br 
 class="newline" />Type:<span 
@@ -3660,19 +3669,19 @@ class="newline" />Specified as: an integer <span
 class="zplmr7m-">&#x003E; </span>0, default: <span 
 class="zplmr7m-">row</span>.
      </dd></dl>
-<!--l. 1696--><p class="indent" >
+<!--l. 1697--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1697--><p class="noindent" >
+     <!--l. 1698--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1697--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1698--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1699--><p class="noindent" >
 <span 
 class="pplb7t-">nz</span> </dt><dd 
 class="description">
-     <!--l. 1698--><p class="noindent" >the number of elements returned by this call.<br 
+     <!--l. 1699--><p class="noindent" >the number of elements returned by this call.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3681,11 +3690,11 @@ class="newline" />Intent: <span
 class="pplb7t-">out</span>.<br 
 class="newline" />Returned as: an integer scalar.
      </dd><dt class="description">
-     <!--l. 1703--><p class="noindent" >
+     <!--l. 1704--><p class="noindent" >
 <span 
 class="pplb7t-">ia</span> </dt><dd 
 class="description">
-     <!--l. 1703--><p class="noindent" >the row indices.<br 
+     <!--l. 1704--><p class="noindent" >the row indices.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3695,14 +3704,14 @@ class="pplb7t-">inout</span>.<br
 class="newline" />Specified as: an integer array with the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
      </dd><dt class="description">
-     <!--l. 1708--><p class="noindent" >
+     <!--l. 1709--><p class="noindent" >
 <span 
 class="pplb7t-">ja</span> </dt><dd 
 class="description">
                                                                   
 
                                                                   
-     <!--l. 1708--><p class="noindent" >the column indices of the elements to be inserted.<br 
+     <!--l. 1709--><p class="noindent" >the column indices of the elements to be inserted.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3712,11 +3721,11 @@ class="pplb7t-">inout</span>.<br
 class="newline" />Specified as: an integer array with the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
      </dd><dt class="description">
-     <!--l. 1713--><p class="noindent" >
+     <!--l. 1714--><p class="noindent" >
 <span 
 class="pplb7t-">val</span> </dt><dd 
 class="description">
-     <!--l. 1713--><p class="noindent" >the elements to be inserted.<br 
+     <!--l. 1714--><p class="noindent" >the elements to be inserted.<br 
 class="newline" />Scope:<span 
 class="pplb7t-">local</span>.<br 
 class="newline" />Type:<span 
@@ -3726,11 +3735,11 @@ class="pplb7t-">inout</span>.<br
 class="newline" />Specified as: a real array with the <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">ALLOCATABLE</span></span></span> attribute.
      </dd><dt class="description">
-     <!--l. 1718--><p class="noindent" >
+     <!--l. 1719--><p class="noindent" >
 <span 
 class="pplb7t-">info</span> </dt><dd 
 class="description">
-     <!--l. 1718--><p class="noindent" >Error code.<br 
+     <!--l. 1719--><p class="noindent" >Error code.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3738,12 +3747,12 @@ class="pplb7t-">required </span><br
 class="newline" />Intent: <span 
 class="pplb7t-">out</span>.<br 
 class="newline" />An integer value; 0 means no error has been detected.</dd></dl>
-<!--l. 1725--><p class="noindent" ><span 
+<!--l. 1726--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-103002x1">
-     <!--l. 1727--><p class="noindent" >The output <span 
+     <!--l. 1728--><p class="noindent" >The output <span 
 class="zplmr7m-">nz </span>is always the size of the output generated by the current
      call; thus, if <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">append=.true.</span></span></span>, the total output size will be <span 
@@ -3756,12 +3765,12 @@ class="cmtt-10">nzin+1:nzin+nz</span></span></span> of the
      </li>
 <li 
   class="enumerate" id="x12-103004x2">
-     <!--l. 1731--><p class="noindent" >When <span class="obeylines-h"><span class="verb"><span 
+     <!--l. 1732--><p class="noindent" >When <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">append=.true.</span></span></span> the output arrays are reallocated as necessary;
      </li>
 <li 
   class="enumerate" id="x12-103006x3">
-     <!--l. 1733--><p class="noindent" >The  row  and  column  indices  are  returned  in  the  local  numbering
+     <!--l. 1734--><p class="noindent" >The  row  and  column  indices  are  returned  in  the  local  numbering
      scheme;  if  the  global  numbering  is  desired,  the  user  may  employ  the
      <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_loc_to_glob</span></span></span> routine on the output.</li></ol>
@@ -3770,7 +3779,7 @@ class="cmtt-10">psb_loc_to_glob</span></span></span> routine on the output.</li>
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">6.26    </span> <a 
  id="x12-1040006.26"></a>psb_sizeof &#8212; Memory occupation</h4>
-<!--l. 1744--><p class="noindent" >This function computes the memory occupation of a PSBLAS object.
+<!--l. 1745--><p class="noindent" >This function computes the memory occupation of a PSBLAS object.
                                                                   
 
                                                                   
@@ -3779,26 +3788,26 @@ isz&#x00A0;=&#x00A0;psb_sizeof(a)
 isz&#x00A0;=&#x00A0;psb_sizeof(desc_a)
 isz&#x00A0;=&#x00A0;psb_sizeof(prec)
 </pre>
-<!--l. 1751--><p class="nopar" >
-<!--l. 1753--><p class="indent" >
+<!--l. 1752--><p class="nopar" >
+<!--l. 1754--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1754--><p class="noindent" >
+     <!--l. 1755--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1754--><p class="noindent" >Asynchronous.
-     </dd><dt class="description">
-     <!--l. 1755--><p class="noindent" >
-<span 
-class="pplb7t-">On Entry</span> </dt><dd 
-class="description">
-     <!--l. 1755--><p class="noindent" >
+     <!--l. 1755--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
      <!--l. 1756--><p class="noindent" >
 <span 
+class="pplb7t-">On Entry</span> </dt><dd 
+class="description">
+     <!--l. 1756--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1757--><p class="noindent" >
+<span 
 class="pplb7t-">a</span> </dt><dd 
 class="description">
-     <!--l. 1756--><p class="noindent" >A sparse matrix <span 
+     <!--l. 1757--><p class="noindent" >A sparse matrix <span 
 class="zplmr7m-">A</span>. <br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
@@ -3812,12 +3821,12 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_Tspmat</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 1762--><p class="noindent" >
+     <!--l. 1763--><p class="noindent" >
 <span 
 class="pplb7t-">desc</span><span 
 class="pplb7t-">_a</span> </dt><dd 
 class="description">
-     <!--l. 1762--><p class="noindent" >Communication descriptor.<br 
+     <!--l. 1763--><p class="noindent" >Communication descriptor.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
@@ -3830,11 +3839,11 @@ class="cmtt-10">psb</span><span
 class="cmtt-10">_desc</span><span 
 class="cmtt-10">_type</span></a>.
      </dd><dt class="description">
-     <!--l. 1767--><p class="noindent" >
+     <!--l. 1768--><p class="noindent" >
 <span 
 class="pplb7t-">prec</span> </dt><dd 
 class="description">
-     <!--l. 1767--><p class="noindent" >Scope: <span 
+     <!--l. 1768--><p class="noindent" >Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Type: <span 
 class="pplb7t-">required</span><br 
@@ -3849,95 +3858,106 @@ class="cmtt-10">_type</span></a>.
 
                                                                   
      </dd><dt class="description">
-     <!--l. 1772--><p class="noindent" >
+     <!--l. 1773--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1772--><p class="noindent" >
-     </dd><dt class="description">
      <!--l. 1773--><p class="noindent" >
+     </dd><dt class="description">
+     <!--l. 1774--><p class="noindent" >
 <span 
 class="pplb7t-">Function value</span> </dt><dd 
 class="description">
-     <!--l. 1773--><p class="noindent" >The memory occupation of the object specified in the calling sequence, in
+     <!--l. 1774--><p class="noindent" >The memory occupation of the object specified in the calling sequence, in
      bytes.<br 
 class="newline" />Scope: <span 
 class="pplb7t-">local </span><br 
 class="newline" />Returned as: an <span class="obeylines-h"><span class="verb"><span 
-class="cmtt-10">integer(psb_long_int_k_)</span></span></span> number.</dd></dl>
+class="cmtt-10">integer(psb_lpk_)</span></span></span> number.</dd></dl>
                                                                   
 
                                                                   
    <h4 class="subsectionHead"><span class="titlemark">6.27    </span> <a 
  id="x12-1050006.27"></a>Sorting utilities &#8212; </h4>
-<!--l. 1783--><p class="noindent" ><span 
+<!--l. 1784--><p class="noindent" ><span 
+class="pplb7t-x-x-120">psb</span><span 
+class="pplb7t-x-x-120">_isort &#8212; Sorting by the Insertion-sort algorithm</span>
+<!--l. 1787--><p class="noindent" ><span 
 class="pplb7t-x-x-120">psb</span><span 
 class="pplb7t-x-x-120">_msort &#8212; Sorting by the Merge-sort algorithm</span>
-<!--l. 1786--><p class="noindent" ><span 
+<!--l. 1790--><p class="noindent" ><span 
 class="pplb7t-x-x-120">psb</span><span 
 class="pplb7t-x-x-120">_qsort &#8212; Sorting by the Quicksort algorithm</span>
-<!--l. 1789--><p class="noindent" ><span 
+<!--l. 1793--><p class="noindent" ><span 
 class="pplb7t-x-x-120">psb</span><span 
 class="pplb7t-x-x-120">_hsort &#8212; Sorting by the Heapsort algorithm</span>
                                                                   
 
                                                                   
    <pre class="verbatim" id="verbatim-60">
-call&#x00A0;psb_msort(x,ix,dir,flag)
-call&#x00A0;psb_qsort(x,ix,dir,flag)
-call&#x00A0;psb_hsort(x,ix,dir,flag)
+call&#x00A0;psb_isort(x,ix,dir,flag,reord)
+call&#x00A0;psb_msort(x,ix,dir,flag,reord)
+call&#x00A0;psb_qsort(x,ix,dir,flag,reord)
+call&#x00A0;psb_hsort(x,ix,dir,flag,reord)
 </pre>
-<!--l. 1794--><p class="nopar" >
-<!--l. 1796--><p class="indent" >   These serial routines sort a sequence <span 
+<!--l. 1799--><p class="nopar" >
+<!--l. 1801--><p class="indent" >   These serial routines sort a sequence <span 
 class="zplmr7m-">X </span>into ascending or descending order. The
-argument meaning is identical for the three calls; the only difference is the algorithm
-used to accomplish the task (see Usage Notes below).
+argument meaning is identical for all calls; the only difference is the algorithm used
+to accomplish the task (see Usage Notes below).
      <dl class="description"><dt class="description">
-     <!--l. 1801--><p class="noindent" >
+     <!--l. 1806--><p class="noindent" >
 <span 
 class="pplb7t-">Type:</span> </dt><dd 
 class="description">
-     <!--l. 1801--><p class="noindent" >Asynchronous.
+     <!--l. 1806--><p class="noindent" >Asynchronous.
      </dd><dt class="description">
-     <!--l. 1802--><p class="noindent" >
+     <!--l. 1807--><p class="noindent" >
 <span 
 class="pplb7t-">On Entry</span> </dt><dd 
 class="description">
-     <!--l. 1802--><p class="noindent" >
+     <!--l. 1807--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1803--><p class="noindent" >
+     <!--l. 1808--><p class="noindent" >
 <span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1803--><p class="noindent" >The sequence to be sorted.<br 
+     <!--l. 1808--><p class="noindent" >The sequence to be sorted.<br 
 class="newline" />Type:<span 
 class="pplb7t-">required</span>.<br 
 class="newline" />Specified as: an integer, real or complex array of rank 1.
      </dd><dt class="description">
-     <!--l. 1806--><p class="noindent" >
+     <!--l. 1811--><p class="noindent" >
 <span 
 class="pplb7t-">ix</span> </dt><dd 
 class="description">
-     <!--l. 1806--><p class="noindent" >A vector of indices.<br 
+     <!--l. 1811--><p class="noindent" >A vector of indices.<br 
 class="newline" />Type:<span 
 class="pplb7t-">optional</span>.<br 
-class="newline" />Specified as: an integer array of (at least) the same size as <span 
-class="zplmr7m-">X</span>.
+class="newline" />Specified  as:  an  integer  array  of  (at  least)  the  same  size  as  <span 
+class="zplmr7m-">X</span>.  This
+     argument is required when <span 
+class="zplmr7m-">reord </span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">psb</span>_<span 
+class="zplmr7m-">sort</span>_<span 
+class="zplmr7m-">noreord</span>_<span 
+class="zplmr7m-">x</span>_.
      </dd><dt class="description">
-     <!--l. 1809--><p class="noindent" >
+     <!--l. 1815--><p class="noindent" >
 <span 
 class="pplb7t-">dir</span> </dt><dd 
 class="description">
-     <!--l. 1809--><p class="noindent" >The desired ordering.<br 
+     <!--l. 1815--><p class="noindent" >The desired ordering.<br 
 class="newline" />Type:<span 
 class="pplb7t-">optional</span>.<br 
 class="newline" />Specified as: an integer value:
          <dl class="description"><dt class="description">
-         <!--l. 1812--><p class="noindent" >
+         <!--l. 1818--><p class="noindent" >
      <span 
 class="pplb7t-">Integer and real data:</span> </dt><dd 
 class="description">
-         <!--l. 1812--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+         <!--l. 1818--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_sort_up_</span></span></span>,                 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_sort_down_</span></span></span>,                 <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_asort_up_</span></span></span>,
@@ -3948,11 +3968,11 @@ class="cmtt-10">psb_sort_up_</span></span></span>.
 
                                                                   
          </dd><dt class="description">
-         <!--l. 1815--><p class="noindent" >
+         <!--l. 1821--><p class="noindent" >
      <span 
 class="pplb7t-">Complex data:</span> </dt><dd 
 class="description">
-         <!--l. 1815--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+         <!--l. 1821--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_lsort_up_</span></span></span>,               <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_lsort_down_</span></span></span>,               <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_asort_up_</span></span></span>,
@@ -3960,11 +3980,11 @@ class="cmtt-10">psb_asort_up_</span></span></span>,
 class="cmtt-10">psb_asort_down_</span></span></span>; default <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_lsort_up_</span></span></span>.</dd></dl>
      </dd><dt class="description">
-     <!--l. 1819--><p class="noindent" >
+     <!--l. 1825--><p class="noindent" >
 <span 
 class="pplb7t-">flag</span> </dt><dd 
 class="description">
-     <!--l. 1819--><p class="noindent" >Whether to keep the original values in <span 
+     <!--l. 1825--><p class="noindent" >Whether to keep the original values in <span 
 class="zplmr7m-">IX</span>.<br 
 class="newline" />Type:<span 
 class="pplb7t-">optional</span>.<br 
@@ -3973,62 +3993,96 @@ class="cmtt-10">psb_sort_ovw_idx_</span></span></span> or <span class="obeylines
 class="cmtt-10">psb_sort_keep_idx_</span></span></span>;
      default <span class="obeylines-h"><span class="verb"><span 
 class="cmtt-10">psb_sort_ovw_idx_</span></span></span>.
+     </dd><dt class="description">
+     <!--l. 1829--><p class="noindent" >
+<span 
+class="pplb7t-">reord</span> </dt><dd 
+class="description">
+     <!--l. 1829--><p class="noindent" >Whether to reorder the input vector <span 
+class="zplmr7m-">x </span>or just return <span 
+class="zplmr7m-">IX </span>for further
+     usage.<br 
+class="newline" />Type:<span 
+class="pplb7t-">optional</span>.<br 
+class="newline" />Specified as: an integer value <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_reord_x_</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_noreord_x_</span></span></span>;
+     default <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">psb_sort_reord_x_</span></span></span>.
      </dd></dl>
-<!--l. 1826--><p class="indent" >
+<!--l. 1837--><p class="indent" >
      <dl class="description"><dt class="description">
-     <!--l. 1827--><p class="noindent" >
+     <!--l. 1838--><p class="noindent" >
 <span 
 class="pplb7t-">On Return</span> </dt><dd 
 class="description">
-     <!--l. 1827--><p class="noindent" >
+     <!--l. 1838--><p class="noindent" >
      </dd><dt class="description">
-     <!--l. 1828--><p class="noindent" >
+     <!--l. 1839--><p class="noindent" >
 <span 
 class="pplb7t-">x</span> </dt><dd 
 class="description">
-     <!--l. 1828--><p class="noindent" >The sequence of values, in the chosen ordering.<br 
+     <!--l. 1839--><p class="noindent" >The  sequence  of  values;  if  <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">reord=psb_sort_reord_x_</span></span></span> it  will  be  in  the
+     chosen ordering.<br 
 class="newline" />Type:<span 
 class="pplb7t-">required</span>.<br 
 class="newline" />Specified as: an integer, real or complex array of rank 1.
      </dd><dt class="description">
-     <!--l. 1831--><p class="noindent" >
+     <!--l. 1843--><p class="noindent" >
 <span 
 class="pplb7t-">ix</span> </dt><dd 
 class="description">
-     <!--l. 1831--><p class="noindent" >A vector of indices.<br 
+     <!--l. 1843--><p class="noindent" >A vector of indices.<br 
 class="newline" />Type: <span 
 class="pplb7t-">Optional </span><br 
-class="newline" />An integer array of rank 1, whose entries are moved to the same position
-     as the corresponding entries in <span 
-class="zplmr7m-">x</span>.</dd></dl>
-<!--l. 1837--><p class="noindent" ><span 
+class="newline" />An  integer  array  of  rank  1,  whose  <span 
+class="zplmr7m-">i</span>-th  entry  gives  the  position  of  the
+     (sorted) value of <span 
+class="zplmr7m-">x </span>in the original sequence.</dd></dl>
+                                                                  
+
+                                                                  
+<!--l. 1849--><p class="noindent" ><span 
 class="pplb7t-x-x-120">Notes</span>
      <ol  class="enumerate1" >
 <li 
   class="enumerate" id="x12-105002x1">
-     <!--l. 1839--><p class="noindent" >For integer or real data the sorting can be performed in the up/down
+     <!--l. 1851--><p class="noindent" >For integer or real data the sorting can be performed in the up/down
      direction, on the natural or absolute values;
      </li>
 <li 
   class="enumerate" id="x12-105004x2">
-     <!--l. 1841--><p class="noindent" >For complex data the sorting can be done in a lexicographic order (i.e.:
+     <!--l. 1853--><p class="noindent" >For complex data the sorting can be done in a lexicographic order (i.e.:
      sort on the real part with ties broken according to the imaginary part) or
      on the absolute values;
-                                                                  
-
-                                                                  
      </li>
 <li 
   class="enumerate" id="x12-105006x3">
-     <!--l. 1844--><p class="noindent" >The   routines   return   the   items   in   the   chosen   ordering;   the   output
+     <!--l. 1856--><p class="noindent" >The   routines   return   the   items   in   the   chosen   ordering;   the   output
      difference is the handling of ties (i.e. items with an equal value) in the
-     original input. With the merge-sort algorithm ties are preserved in the
-     same relative order as they had in the original sequence, while this is not
-     guaranteed for quicksort or heapsort;
+     original input. With the insertion-sort or merge-sort algorithms ties are
+     preserved in the same relative order as they had in the original sequence,
+     while this is not guaranteed for quicksort or heapsort;
      </li>
 <li 
   class="enumerate" id="x12-105008x4">
-     <!--l. 1850--><p class="noindent" >If <span 
+     <!--l. 1862--><p class="noindent" >If <span 
+class="zplmr7m-">reord </span><span 
+class="zplmr7t-">= </span><span 
+class="zplmr7m-">psb</span>_<span 
+class="zplmr7m-">sort</span>_<span 
+class="zplmr7m-">noreord</span>_<span 
+class="zplmr7m-">x</span>_, then the input sequence <span 
+class="zplmr7m-">x </span>is not reordered;
+     the output is given in <span 
+class="zplmr7m-">ix</span>. Calling without <span 
+class="zplmr7m-">ix </span>in this case is flagged as an
+     error;
+     </li>
+<li 
+  class="enumerate" id="x12-105010x5">
+     <!--l. 1865--><p class="noindent" >If <span 
 class="zplmr7m-">flag </span><span 
 class="zplmr7t-">= </span><span 
 class="zplmr7m-">psb</span>_<span 
@@ -4062,8 +4116,8 @@ class="zplmr7t-">) </span>occupied
      in the original data sequence;
      </li>
 <li 
-  class="enumerate" id="x12-105010x5">
-     <!--l. 1855--><p class="noindent" >If <span 
+  class="enumerate" id="x12-105012x6">
+     <!--l. 1870--><p class="noindent" >If <span 
 class="zplmr7m-">flag </span><span 
 class="zplmr7t-">= </span><span 
 class="zplmr7m-">psb</span>_<span 
@@ -4075,19 +4129,42 @@ class="zplmr7m-">ix</span><span
 class="zplmr7t-">(:) </span>have already been initialized by the user;
      </li>
 <li 
-  class="enumerate" id="x12-105012x6">
-     <!--l. 1857--><p class="noindent" >The three sorting algorithms have a similar <span 
+  class="enumerate" id="x12-105014x7">
+                                                                  
+
+                                                                  
+     <!--l. 1872--><p class="noindent" >Three sorting algorithms have a similar <span 
 class="zplmr7m-">O</span><span 
 class="zplmr7t-">(</span><span 
 class="zplmr7m-">n</span> log <span 
 class="zplmr7m-">n</span><span 
-class="zplmr7t-">) </span>expected running time;
+class="zplmr7t-">) </span>expected running time,
+     whereas insertion sort has an expected running time <span 
+class="zplmr7m-">O</span><span 
+class="zplmr7t-">(</span><span 
+class="zplmr7m-">n</span><sup><span 
+class="pplr7t-x-x-76">2</span></sup><span 
+class="zplmr7t-">)</span>; of the other three,
      in the average case quicksort will be the fastest and merge-sort the slowest.
      However note that:
          <ol  class="enumerate2" >
 <li 
-  class="enumerate" id="x12-105014x1">
-         <!--l. 1861--><p class="noindent" >The                  worst                  case                  running                  time
+  class="enumerate" id="x12-105016x1">
+         <!--l. 1877--><p class="noindent" >The  best  case  running  time  for  insertion  sort  is  <span 
+class="zplmr7t-">&#x03A9;(</span><span 
+class="zplmr7m-">n</span><span 
+class="zplmr7t-">) </span>while  the
+         average and worst case are <span 
+class="zplmr7m-">O</span><span 
+class="zplmr7t-">(</span><span 
+class="zplmr7m-">n</span><sup><span 
+class="pplr7t-x-x-76">2</span></sup><span 
+class="zplmr7t-">)</span>; moreover, for very short input
+         sequences this is likely to be the fastest method;
+         </li>
+<li 
+  class="enumerate" id="x12-105018x2">
+         <!--l. 1881--><p class="noindent" >The                  worst                  case                  running                  time
          for quicksort is <span 
 class="zplmr7m-">O</span><span 
 class="zplmr7t-">(</span><span 
@@ -4098,8 +4175,8 @@ class="zplmr7t-">)</span>; the algorithm implemented here follows the
          apply;
          </li>
 <li 
-  class="enumerate" id="x12-105016x2">
-         <!--l. 1864--><p class="noindent" >The  worst  case  running  time  for  merge-sort  and  heap-sort  is
+  class="enumerate" id="x12-105020x3">
+         <!--l. 1884--><p class="noindent" >The  worst  case  running  time  for  merge-sort  and  heap-sort  is
          <span 
 class="zplmr7m-">O</span><span 
 class="zplmr7t-">(</span><span 
@@ -4108,16 +4185,13 @@ class="zplmr7m-">n</span><span
 class="zplmr7t-">) </span>as the average case;
          </li>
 <li 
-  class="enumerate" id="x12-105018x3">
-         <!--l. 1866--><p class="noindent" >The  merge-sort  algorithm  is  implemented  to  take  advantage  of
-         subsequences that may be already in the desired ordering prior to
-         the subroutine call; this situation is relatively common when dealing
-         with groups of indices of sparse matrix entries, thus merge-sort is
-                                                                  
-
-                                                                  
-         the preferred choice when a sorting is needed by other routines in
-         the library.</li></ol>
+  class="enumerate" id="x12-105022x4">
+         <!--l. 1886--><p class="noindent" >The  merge-sort  algorithm  is  implemented  to  take  advantage  of
+         subsequences  that  may  be  already  in  the  desired  ordering  prior
+         to  the  subroutine  call;  this  situation  is  relatively  common  when
+         dealing  with  groups  of  indices  of  sparse  matrix  entries,  thus
+         merge-sort is the preferred choice when a sorting routine is needed
+         for preprocessing matrix data.</li></ol>
      </li></ol>
                                                                   
 

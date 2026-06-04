@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -56,14 +56,28 @@ module psb_s_vect_mod
     procedure, pass(x) :: get_fmt  => s_vect_get_fmt
     procedure, pass(x) :: is_remote_build => s_vect_is_remote_build
     procedure, pass(x) :: set_remote_build => s_vect_set_remote_build
-    procedure, pass(x) :: get_dupl => s_vect_get_dupl
-    procedure, pass(x) :: set_dupl => s_vect_set_dupl 
     procedure, pass(x) :: get_nrmv => s_vect_get_nrmv
     procedure, pass(x) :: set_nrmv => s_vect_set_nrmv
     procedure, pass(x) :: all      => s_vect_all
     procedure, pass(x) :: reall    => s_vect_reall
     procedure, pass(x) :: zero     => s_vect_zero
     procedure, pass(x) :: asb      => s_vect_asb
+    procedure, pass(x) :: set_dupl => s_vect_set_dupl 
+    procedure, pass(x) :: get_dupl => s_vect_get_dupl
+    procedure, pass(x) :: set_ncfs => s_vect_set_ncfs 
+    procedure, pass(x) :: get_ncfs => s_vect_get_ncfs
+    procedure, pass(x) :: set_state => s_vect_set_state
+    procedure, pass(x) :: set_null  => s_vect_set_null
+    procedure, pass(x) :: set_bld   => s_vect_set_bld
+    procedure, pass(x) :: set_upd   => s_vect_set_upd
+    procedure, pass(x) :: set_asb   => s_vect_set_asb
+    procedure, pass(x) :: get_state => s_vect_get_state
+    procedure, pass(x) :: is_null   => s_vect_is_null
+    procedure, pass(x) :: is_bld    => s_vect_is_bld
+    procedure, pass(x) :: is_upd    => s_vect_is_upd
+    procedure, pass(x) :: is_asb    => s_vect_is_asb
+    procedure, pass(x) :: reinit    => s_vect_reinit
+
     procedure, pass(x) :: gthab    => s_vect_gthab
     procedure, pass(x) :: gthzv    => s_vect_gthzv
     generic, public    :: gth      => gthab, gthzv
@@ -91,8 +105,10 @@ module psb_s_vect_mod
     procedure, pass(x) :: set_host => s_vect_set_host
     procedure, pass(x) :: set_dev  => s_vect_set_dev
     procedure, pass(x) :: set_sync => s_vect_set_sync
+    procedure, pass(x) :: check_addr => s_vect_check_addr
 
     procedure, pass(x) :: get_entry => s_vect_get_entry
+    procedure, pass(x) :: set_entry => s_vect_set_entry
 
     procedure, pass(x) :: dot_v    => s_vect_dot_v
     procedure, pass(x) :: dot_a    => s_vect_dot_a
@@ -194,7 +210,11 @@ contains
     implicit none
     class(psb_s_vect_type), intent(in) :: x
     integer(psb_ipk_) :: res
-    res = x%dupl
+    if (allocated(x%v)) then 
+      res = x%v%get_dupl()
+    else
+      res = psb_dupl_null_
+    end if
   end function s_vect_get_dupl
 
   subroutine s_vect_set_dupl(x,val)
@@ -202,12 +222,116 @@ contains
     class(psb_s_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in), optional :: val
 
-    if (present(val)) then
-      x%dupl = val
-    else
-      x%dupl = psb_dupl_def_
+    if (allocated(x%v)) then 
+      if (present(val)) then
+        call x%v%set_dupl(val)
+      else
+        call x%v%set_dupl(psb_dupl_def_)
+      end if
     end if
   end subroutine s_vect_set_dupl
+
+  function s_vect_get_ncfs(x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    if (allocated(x%v)) then 
+      res = x%v%get_ncfs()
+    else
+      res = 0
+    end if
+  end function s_vect_get_ncfs
+
+  subroutine s_vect_set_ncfs(x,val)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in), optional :: val
+
+    if (allocated(x%v)) then 
+      if (present(val)) then
+        call x%v%set_ncfs(val)
+      else
+        call x%v%set_ncfs(0)
+      end if
+    end if
+  end subroutine s_vect_set_ncfs
+
+  function s_vect_get_state(x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(in) :: x
+    integer(psb_ipk_) :: res
+    if (allocated(x%v)) then 
+      res = x%v%get_state()
+    else
+      res = psb_vect_null_
+    end if
+  end function s_vect_get_state
+
+  function s_vect_is_null(x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%get_state() == psb_vect_null_)
+  end function s_vect_is_null
+
+  function s_vect_is_bld(x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%get_state() == psb_vect_bld_)
+  end function s_vect_is_bld
+
+  function s_vect_is_upd(x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%get_state() == psb_vect_upd_)
+  end function s_vect_is_upd
+
+  function s_vect_is_asb(x) result(res)
+    implicit none
+    class(psb_s_vect_type), intent(in) :: x
+    logical :: res
+    res = (x%get_state() == psb_vect_asb_)
+  end function s_vect_is_asb
+
+  subroutine  s_vect_set_state(n,x)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    if (allocated(x%v)) then 
+      call x%v%set_state(n)
+    end if
+  end subroutine s_vect_set_state
+
+
+  subroutine  s_vect_set_null(x)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+
+    call x%set_state(psb_vect_null_)
+  end subroutine s_vect_set_null
+
+  subroutine  s_vect_set_bld(x)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+
+    call x%set_state(psb_vect_bld_)
+  end subroutine s_vect_set_bld
+
+  subroutine  s_vect_set_upd(x)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+
+    call x%set_state(psb_vect_upd_)
+  end subroutine s_vect_set_upd
+
+  subroutine  s_vect_set_asb(x)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+
+    call x%set_state(psb_vect_asb_)
+  end subroutine s_vect_set_asb
 
   function s_vect_get_nrmv(x) result(res)
     implicit none
@@ -223,7 +347,6 @@ contains
 
     x%nrmv = val
   end subroutine s_vect_set_nrmv
-        
 
   function s_vect_is_remote_build(x) result(res)
     implicit none
@@ -294,15 +417,30 @@ contains
     info = psb_success_
     call y%free(info)
     if ((info==0).and.allocated(x%v)) then
+      !
+      ! Using sourced allocation here creates
+      ! problems with handling of memory allocated
+      ! elsewhere (e.g. accelerators), hence delegation
+      ! to %bld method
+      ! 
       call y%bld(x%get_vect(),mold=x%v)
     end if
   end subroutine s_vect_clone
 
-  subroutine s_vect_bld_x(x,invect,mold)
+  subroutine s_vect_bld_x(x,invect,mold,scratch)
     real(psb_spk_), intent(in)          :: invect(:)
     class(psb_s_vect_type), intent(inout) :: x
     class(psb_s_base_vect_type), intent(in), optional :: mold
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
+
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
 
     info = psb_success_
     if (allocated(x%v)) &
@@ -314,17 +452,25 @@ contains
       allocate(x%v,stat=info, mold=psb_s_get_base_vect_default())
     endif
 
-    if (info == psb_success_) call x%v%bld(invect)
+    if (info == psb_success_) call x%v%bld(invect,scratch=scratch_)
 
   end subroutine s_vect_bld_x
 
 
-  subroutine s_vect_bld_mn(x,n,mold)
+  subroutine s_vect_bld_mn(x,n,mold,scratch)
     integer(psb_mpk_), intent(in) :: n
     class(psb_s_vect_type), intent(inout) :: x
     class(psb_s_base_vect_type), intent(in), optional :: mold
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
     class(psb_s_base_vect_type), pointer :: mld
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
 
     info = psb_success_
     if (allocated(x%v)) &
@@ -335,17 +481,25 @@ contains
     else
       allocate(x%v,stat=info, mold=psb_s_get_base_vect_default())
     endif
-    if (info == psb_success_) call x%v%bld(n)
+    if (info == psb_success_) call x%v%bld(n,scratch=scratch_)
 
   end subroutine s_vect_bld_mn
 
-  subroutine s_vect_bld_en(x,n,mold)
+  subroutine s_vect_bld_en(x,n,mold,scratch)
     integer(psb_epk_), intent(in) :: n
     class(psb_s_vect_type), intent(inout) :: x
     class(psb_s_base_vect_type), intent(in), optional :: mold
+    logical, intent(in), optional        :: scratch
+
+    logical :: scratch_
     integer(psb_ipk_) :: info
 
     info = psb_success_
+    if (present(scratch)) then
+      scratch_ = scratch
+    else
+      scratch_ = .false.
+    end if
 
     if (allocated(x%v)) &
          & call x%free(info)
@@ -355,7 +509,7 @@ contains
     else
       allocate(x%v,stat=info, mold=psb_s_get_base_vect_default())
     endif
-    if (info == psb_success_) call x%v%bld(n)
+    if (info == psb_success_) call x%v%bld(n,scratch=scratch_)
 
   end subroutine s_vect_bld_en
 
@@ -390,6 +544,13 @@ contains
 
   end subroutine s_vect_set_vect
 
+  subroutine s_vect_check_addr(x)
+    class(psb_s_vect_type), intent(inout) :: x
+
+    integer(psb_ipk_) :: info
+    if (allocated(x%v)) call x%v%check_addr()
+
+  end subroutine s_vect_check_addr
 
   function constructor(x) result(this)
     real(psb_spk_)   :: x(:)
@@ -457,8 +618,20 @@ contains
     else
       info = psb_err_alloc_dealloc_
     end if
+    call x%set_bld()
   end subroutine s_vect_all
 
+  subroutine s_vect_reinit(x, info, clear)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)      :: info
+    logical, intent(in), optional       :: clear
+
+    if (allocated(x%v)) call x%v%reinit(info,clear)
+    call x%set_upd()
+
+  end subroutine s_vect_reinit
+ 
   subroutine s_vect_reall(n, x, info)
 
     implicit none
@@ -483,16 +656,18 @@ contains
 
   end subroutine s_vect_zero
 
-  subroutine s_vect_asb(n, x, info)
+  subroutine s_vect_asb(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
     integer(psb_ipk_), intent(in)         :: n
     class(psb_s_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
+    logical, intent(in), optional        :: scratch
 
     if (allocated(x%v)) then
-      call x%v%asb(n,info)
+      call x%v%asb(n,info,scratch=scratch)
+      call x%set_asb()
     end if
   end subroutine s_vect_asb
 
@@ -547,11 +722,11 @@ contains
 
   end subroutine s_vect_free
 
-  subroutine s_vect_ins_a(n,irl,val,x,info)
+  subroutine s_vect_ins_a(n,irl,val,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_s_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n
+    integer(psb_ipk_), intent(in)               :: n, maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_spk_), intent(in)        :: val(:)
     integer(psb_ipk_), intent(out)              :: info
@@ -564,15 +739,15 @@ contains
       return
     end if
     dupl = x%get_dupl()
-    call  x%v%ins(n,irl,val,dupl,info)
+    call  x%v%ins(n,irl,val,dupl,maxr,info)
 
   end subroutine s_vect_ins_a
 
-  subroutine s_vect_ins_v(n,irl,val,x,info)
+  subroutine s_vect_ins_v(n,irl,val,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_s_vect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n
+    integer(psb_ipk_), intent(in)               :: n, maxr
     class(psb_i_vect_type), intent(inout)       :: irl
     class(psb_s_vect_type), intent(inout)       :: val
     integer(psb_ipk_), intent(out)              :: info
@@ -585,7 +760,7 @@ contains
       return
     end if
     dupl = x%get_dupl()
-    call  x%v%ins(n,irl%v,val%v,dupl,info)
+    call  x%v%ins(n,irl%v,val%v,dupl,maxr,info)
 
   end subroutine s_vect_ins_v
 
@@ -607,6 +782,7 @@ contains
       if (allocated(x%v%v)) then 
         call x%v%sync()
         if (info == psb_success_) call tmp%bld(x%v%v)
+        call x%v%base_cpy(tmp)
         call x%v%free(info)
       endif
     end if
@@ -687,12 +863,20 @@ contains
 
   function s_vect_get_entry(x,index) result(res)
     implicit none
-    class(psb_s_vect_type), intent(in) :: x
+    class(psb_s_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index
     real(psb_spk_) :: res
-    res = 0
+    res = szero
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function s_vect_get_entry
+
+  subroutine s_vect_set_entry(x,index,val)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: index
+    real(psb_spk_) :: val
+    if (allocated(x%v)) call x%v%set_entry(index,val)
+  end subroutine s_vect_set_entry
 
   function s_vect_dot_v(n,x,y) result(res)
     implicit none
@@ -1255,7 +1439,7 @@ contains
     if (allocated(x%v)) then
       res = x%v%minreal(n)
     else
-      res = szero
+      res = HUGE(sone)
     end if
 
   end function s_vect_min
@@ -1564,19 +1748,20 @@ contains
   end subroutine s_mvect_bld_x
 
 
-  subroutine s_mvect_bld_n(x,m,n,mold)
+  subroutine s_mvect_bld_n(x,m,n,mold,scratch)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_s_multivect_type), intent(out) :: x
     class(psb_s_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-
+    logical, intent(in), optional        :: scratch
+    
     info = psb_success_
     if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_s_get_base_multivect_default())
     endif
-    if (info == psb_success_) call x%v%bld(m,n)
+    if (info == psb_success_) call x%v%bld(m,n,scratch=scratch)
 
   end subroutine s_mvect_bld_n
 
@@ -1806,11 +1991,11 @@ contains
 
   end subroutine s_mvect_free
 
-  subroutine s_mvect_ins(n,irl,val,x,info)
+  subroutine s_mvect_ins(n,irl,val,x,maxr,info)
     use psi_serial_mod
     implicit none
     class(psb_s_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n
+    integer(psb_ipk_), intent(in)               :: n,maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
     real(psb_spk_), intent(in)        :: val(:,:)
     integer(psb_ipk_), intent(out)              :: info
@@ -1823,7 +2008,7 @@ contains
       return
     end if
     dupl = x%get_dupl()
-    call  x%v%ins(n,irl,val,dupl,info)
+    call  x%v%ins(n,irl,val,dupl,maxr,info)
 
   end subroutine s_mvect_ins
 
@@ -2057,3 +2242,4 @@ contains
 !!$  end function s_mvect_asum
 
 end module psb_s_multivect_mod
+

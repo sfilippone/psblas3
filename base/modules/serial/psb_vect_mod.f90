@@ -1,4 +1,5 @@
 module psb_vect_mod
+  use psb_i2_vect_mod
   use psb_i_vect_mod
   use psb_l_vect_mod  
   use psb_s_vect_mod

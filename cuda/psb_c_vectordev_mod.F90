@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -44,6 +44,15 @@ module psb_c_vectordev_mod
     end function registerMappedFloatComplex
   end interface
 
+  interface 
+    function checkMultiVecDeviceFloatComplex(deviceVec) &
+         & result(res) bind(c,name='checkMultiVecDeviceFloatComplex')
+      use iso_c_binding
+      integer(c_int)             :: res
+      type(c_ptr), value         :: deviceVec
+    end function checkMultiVecDeviceFloatComplex
+  end interface
+  
   interface writeMultiVecDevice 
     function writeMultiVecDeviceFloatComplex(deviceVec,hostVec) &
          & result(res) bind(c,name='writeMultiVecDeviceFloatComplex')

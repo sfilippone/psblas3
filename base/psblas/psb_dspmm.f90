@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -51,11 +51,10 @@
 !    desc_a  -  type(psb_desc_type).   The communication descriptor.
 !    info    -  integer.               Return code
 !    trans   -  character(optional).   Whether A or A'. Default:  'N' 
-!    work(:) -  real,(optional).    Working area.
 !    doswap  -  logical(optional).     Whether to performe halo updates.
 ! 
-subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
-     & trans, work, doswap)   
+subroutine psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
+     & trans, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmv_vect
   use psi_mod
   implicit none
@@ -66,7 +65,6 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_dspmat_type), intent(in)        :: a
   type(psb_desc_type), intent(in)          :: desc_a
   integer(psb_ipk_), intent(out)                     :: info
-  real(psb_dpk_), optional, target, intent(inout) :: work(:)
   character, intent(in), optional          :: trans
   logical, intent(in), optional            :: doswap
 
@@ -74,10 +72,10 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me,&
        & err_act, iix, jjx, iia, jja,  nrow, ncol, lldx, lldy, &
-       & liwork, iiy, jjy, ib, ip, idx
+       & iiy, jjy, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter       :: nb=4
-  real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
+  real(psb_dpk_), pointer :: xp(:), yp(:)
   real(psb_dpk_), allocatable :: xvsave(:)
   character                :: trans_
   character(len=20)        :: name, ch_err
@@ -163,34 +161,6 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     goto 9999
   end if
 
-  iwork => null()
-  ! check for presence/size of a work area
-  liwork= 2*ncol
-
-  if (present(work)) then
-    if (size(work) >= liwork) then
-      aliw =.false.
-    else
-      aliw=.true.
-    endif
-  else
-    aliw=.true.
-  end if
-
-  if (aliw) then
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='Allocate'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  else
-    iwork => work
-  endif
-
-  if (debug_level >= psb_debug_comp_) &
-       & write(debug_unit,*) me,' ',trim(name),' Allocated work ', info
 
   if (trans_ == 'N') then
     !  Matrix is not transposed
@@ -203,13 +173,13 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         if (do_timings) call psb_barrier(ctxt)
         if (do_timings) call psb_tic(mv_phase1)
         if (doswap_) call psi_swapdata(psb_swap_send_,&
-             & dzero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+             & dzero,x%v,desc_a,info,data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase1)
         if (do_timings) call psb_tic(mv_phase2)          
         call a%ad%spmm(alpha,x%v,beta,y%v,info)
         if (do_timings) call psb_tic(mv_phase3)
         if (doswap_) call psi_swapdata(psb_swap_recv_,&
-             & dzero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+             & dzero,x%v,desc_a,info,data=psb_comm_halo_)
         if (do_timings) call psb_toc(mv_phase3)
         if (do_timings) call psb_tic(mv_phase4)          
         call a%and%spmm(alpha,x%v,done,y%v,info)
@@ -225,7 +195,7 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
         if (do_timings) call psb_tic(mv_phase11)          
         if (doswap_) then
           call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-               & dzero,x%v,desc_a,iwork,info,data=psb_comm_halo_)
+               & dzero,x%v,desc_a,info,data=psb_comm_halo_)
         end if
         if (do_timings) call psb_toc(mv_phase11)
         if (do_timings) call psb_tic(mv_phase12)          
@@ -269,9 +239,9 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
 
     if (doswap_) then
       call psi_swaptran(ior(psb_swap_send_,psb_swap_recv_),&
-           & done,y%v,desc_a,iwork,info)
+           & done,y%v,desc_a,info)
       if (info == psb_success_) call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-           & done,y%v,desc_a,iwork,info,data=psb_comm_ovr_)
+           & done,y%v,desc_a,info,data=psb_comm_ovr_)
 
       if (debug_level >= psb_debug_comp_) &
            & write(debug_unit,*) me,' ',trim(name),' swaptran ', info
@@ -284,18 +254,6 @@ subroutine  psb_dspmv_vect(alpha,a,x,beta,y,desc_a,info,&
     end if
 
   end if
-
-  if (aliw) deallocate(iwork,stat=info)
-  if (debug_level >= psb_debug_comp_) &
-       & write(debug_unit,*) me,' ',trim(name),' deallocat ',aliw, info
-  if(info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    ch_err='Deallocate iwork'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  nullify(iwork)
 
   call psb_erractionrestore(err_act)
   if (debug_level >= psb_debug_comp_) then 
@@ -651,7 +609,7 @@ end subroutine psb_dspmm
 !!$       documentation and/or other materials provided with the distribution.
 !!$    3. The name of the PSBLAS group or the names of its contributors may
 !!$       not be used to endorse or promote products derived from this
-!!$       software without specific written permission.
+!!$       software without specific prior written permission.
 !!$ 
 !!$  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !!$  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED

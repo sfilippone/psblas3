@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -65,7 +65,7 @@ subroutine psb_s_diag_dump(prec,info,prefix,head)
 end subroutine psb_s_diag_dump
 
 
-subroutine psb_s_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+subroutine psb_s_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
   use psb_base_mod
   use psb_s_diagprec, psb_protect_name =>  psb_s_diag_apply_vect
   implicit none 
@@ -76,7 +76,6 @@ subroutine psb_s_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   type(psb_s_vect_type),intent(inout)   :: y
   integer(psb_ipk_), intent(out)              :: info
   character(len=1), optional        :: trans
-  real(psb_spk_),intent(inout), optional, target :: work(:)
   integer(psb_ipk_) :: err_act, nrow, ierr(5)
   character(len=20)  :: name='s_diag_prec_apply'
   real(psb_spk_), pointer :: ww(:)

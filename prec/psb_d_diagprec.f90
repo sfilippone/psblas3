@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -56,7 +56,7 @@ module psb_d_diagprec
   
   
   interface  
-    subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    subroutine psb_d_diag_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
       import :: psb_ipk_, psb_desc_type, psb_d_diag_prec_type, psb_d_vect_type, psb_dpk_
       type(psb_desc_type),intent(in)    :: desc_data
       class(psb_d_diag_prec_type), intent(inout)  :: prec
@@ -65,7 +65,6 @@ module psb_d_diagprec
       type(psb_d_vect_type),intent(inout)   :: y
       integer(psb_ipk_), intent(out)              :: info
       character(len=1), optional        :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
     end subroutine psb_d_diag_apply_vect
   end interface
   

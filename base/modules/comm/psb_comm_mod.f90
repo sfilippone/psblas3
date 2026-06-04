@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -31,6 +31,7 @@
 !    
 module psb_comm_mod
 
+  use psb_i2_comm_a_mod
   use psb_m_comm_a_mod
   use psb_e_comm_a_mod
   use psb_s_comm_a_mod
@@ -44,5 +45,17 @@ module psb_comm_mod
   use psb_d_comm_mod
   use psb_c_comm_mod
   use psb_z_comm_mod
+
+  ! Import scheme symbols and re-export them as public symbols from this module.
+  use psb_comm_schemes_mod, only: psb_comm_handle_type, psb_comm_isend_irecv_, &
+    & psb_comm_ineighbor_alltoallv_, psb_comm_persistent_ineighbor_alltoallv_, &
+    & psb_comm_rma_pull_, psb_comm_rma_push_, psb_comm_unknown_, &
+    & psb_comm_status_unknown_, psb_comm_status_start_, psb_comm_status_wait_, &
+    & psb_comm_status_sync_
+
+  public :: psb_comm_handle_type, psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
+    & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_, &
+    & psb_comm_unknown_, psb_comm_status_unknown_, psb_comm_status_start_, &
+    & psb_comm_status_wait_, psb_comm_status_sync_
 
 end module psb_comm_mod

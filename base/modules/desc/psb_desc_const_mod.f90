@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -39,29 +39,40 @@ module psb_desc_const_mod
   !
   !     Communication, prolongation & restriction
   !
-  integer(psb_ipk_), parameter :: psb_nohalo_=0,  psb_halo_=1
+  integer(psb_ipk_), parameter :: psb_nohalo_ = 0
+  integer(psb_ipk_), parameter :: psb_halo_   = 1
   ! For overlap update. 
-  integer(psb_ipk_), parameter :: psb_none_=0,  psb_sum_=1
-  integer(psb_ipk_), parameter :: psb_avg_=2,  psb_square_root_=3
-  integer(psb_ipk_), parameter :: psb_setzero_=4
+  integer(psb_ipk_), parameter :: psb_none_        = 0
+  integer(psb_ipk_), parameter :: psb_sum_         = 1
+  integer(psb_ipk_), parameter :: psb_avg_         = 2
+  integer(psb_ipk_), parameter :: psb_square_root_ = 3
+  integer(psb_ipk_), parameter :: psb_setzero_     = 4
 
   ! The following are bit fields. 
-  integer(psb_ipk_), parameter :: psb_swap_send_=1, psb_swap_recv_=2
-  integer(psb_ipk_), parameter :: psb_swap_sync_=4, psb_swap_mpi_=8
-  integer(psb_ipk_), parameter :: psb_collective_start_=1, psb_collective_end_=2
-  integer(psb_ipk_), parameter :: psb_collective_sync_=4
+  integer(psb_ipk_), parameter :: psb_swap_send_  = 1
+  integer(psb_ipk_), parameter :: psb_swap_recv_  = 2
+  integer(psb_ipk_), parameter :: psb_swap_sync_  = 4
+  integer(psb_ipk_), parameter :: psb_swap_mpi_   = 8
+  integer(psb_ipk_), parameter :: psb_swap_start_ = 16
+  integer(psb_ipk_), parameter :: psb_swap_wait_  = 32
+  integer(psb_ipk_), parameter :: psb_collective_start_  = 1
+  integer(psb_ipk_), parameter :: psb_collective_end_    = 2
+  integer(psb_ipk_), parameter :: psb_collective_sync_   = 4
 
   ! Choice among lists on which to base data exchange
-  integer(psb_ipk_), parameter :: psb_no_comm_=-1
-  integer(psb_ipk_), parameter :: psb_comm_halo_=1, psb_comm_ovr_=2
-  integer(psb_ipk_), parameter :: psb_comm_ext_=3,  psb_comm_mov_=4
+  integer(psb_ipk_), parameter :: psb_no_comm_    = -1
+  integer(psb_ipk_), parameter :: psb_comm_halo_  =  1
+  integer(psb_ipk_), parameter :: psb_comm_ovr_   =  2
+  integer(psb_ipk_), parameter :: psb_comm_ext_   =  3
+  integer(psb_ipk_), parameter :: psb_comm_mov_   =  4
   ! Types of mapping between descriptors.
   integer(psb_ipk_), parameter :: psb_map_xhal_        = 123
   integer(psb_ipk_), parameter :: psb_map_asov_        = psb_map_xhal_+1
   integer(psb_ipk_), parameter :: psb_map_aggr_        = psb_map_asov_+1 
   integer(psb_ipk_), parameter :: psb_map_gen_linear_  = psb_map_aggr_+1 
 
-  integer(psb_ipk_), parameter :: psb_ovt_xhal_ = psb_map_xhal_, psb_ovt_asov_=psb_map_asov_
+  integer(psb_ipk_), parameter :: psb_ovt_xhal_ = psb_map_xhal_
+  integer(psb_ipk_), parameter :: psb_ovt_asov_ = psb_map_asov_
   !
   ! Entries and values in desc%matrix_data
   !

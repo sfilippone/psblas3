@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -44,10 +44,10 @@ module psb_c_isort_mod
   use psb_const_mod
 
   interface psb_isort
-    subroutine psb_cisort(x,ix,dir,flag)
+    subroutine psb_cisort(x,ix,dir,flag,reord)
       import 
       complex(psb_spk_), intent(inout)  :: x(:) 
-      integer(psb_ipk_), optional, intent(in)    :: dir, flag
+      integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
       integer(psb_ipk_), optional, intent(inout) :: ix(:)
     end subroutine psb_cisort
   end interface psb_isort

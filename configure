@@ -651,8 +651,9 @@ LIBRSB_DIR
 LIBRSB_INCDIR
 LIBRSB_INCLUDES
 LIBRSB_LIBS
-LCUDA
+LPSB_CUDA
 CUDALD
+CUDAMODS
 CUDAD
 CUDEFINES
 CUDA_NVCC
@@ -666,12 +667,12 @@ FCUDEFINES
 CUDA_DEFINES
 CUDA_DIR
 EXTRALDLIBS
-SPGPU_LIBS
 SPGPU_FLAGS
 CXXOPENACC
 CCOPENACC
 FCOPENACC
 OACCLD
+OACCMODS
 OACCD
 METISINCFILE
 UTILLIBNAME
@@ -690,6 +691,32 @@ CINTMETIS
 CHAVEMETIS
 CHAVE_OPENMP
 CSERIALMPI
+PSBCLCSYN
+PSBCLCEND
+PSBCLCSTR
+PSBSETZ
+PSBSQRT
+PSBAVG
+PSBSUM
+PSBNONE
+PSBSWPMPI
+PSBSWPSYN
+PSBSWPRCV
+PSBSWPSND
+PSBLASBLDRMT
+PSBLASBLDNOR
+PSBLASUPDDEF
+PSBLASUPDPRM
+PSBLASUPDSRC
+PSBLASDUPDEF
+PSBLASDUPERR
+PSBLASDUPOVW
+PSBLASDUPADD
+PSBLASDUPNUL
+PSBLASSTRING
+PSBLASPATCH
+PSBLASMINOR
+PSBLASMAJOR
 PSB_LPKDEF
 PSB_IPKDEF
 FINCLUDES
@@ -705,7 +732,6 @@ INSTALL_LIBDIR
 INSTALL_DIR
 INSTALL
 MPIFCC
-AR
 FLIBS
 CLINK
 FLINK
@@ -726,6 +752,7 @@ BASEMODNAME
 CDEFINES
 FDEFINES
 LAPACK_LIBS
+AR
 OPENMP_CXXFLAGS
 OPENMP_CFLAGS
 OPENMP_FCFLAGS
@@ -4255,7 +4282,10 @@ _ACEOF
       break
     fi
   done
-  rm -f core conftest*
+  # aligned with autoconf, so not including core; see bug#72225.
+  rm -f -r a.out a.exe b.out conftest.$ac_ext conftest.$ac_objext \
+    conftest.dSYM conftest1.$ac_ext conftest1.$ac_objext conftest1.dSYM \
+    conftest2.$ac_ext conftest2.$ac_objext conftest2.dSYM
   unset am_i ;;
 esac
 fi
@@ -5905,7 +5935,7 @@ else
 fi
 
 
-am__api_version='1.17'
+am__api_version='1.18'
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether sleep supports fractional seconds" >&5
 printf %s "checking whether sleep supports fractional seconds... " >&6; }
@@ -6074,10 +6104,14 @@ am_lf='
 '
 case `pwd` in
   *[\\\"\#\$\&\'\`$am_lf]*)
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
     as_fn_error $? "unsafe absolute working directory name" "$LINENO" 5;;
 esac
 case $srcdir in
   *[\\\"\#\$\&\'\`$am_lf\ \	]*)
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
     as_fn_error $? "unsafe srcdir value: '$srcdir'" "$LINENO" 5;;
 esac
 
@@ -6602,9 +6636,133 @@ AMTAR='$${TAR-tar}'
 
 
 # We'll loop over all known methods to create a tar archive until one works.
-_am_tools='gnutar  pax cpio none'
+_am_tools='gnutar plaintar pax cpio none'
 
-am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
+# The POSIX 1988 'ustar' format is defined with fixed-size fields.
+      # There is notably a 21 bits limit for the UID and the GID.  In fact,
+      # the 'pax' utility can hang on bigger UID/GID (see automake bug#8343
+      # and bug#13588).
+      am_max_uid=2097151 # 2^21 - 1
+      am_max_gid=$am_max_uid
+      # The $UID and $GID variables are not portable, so we need to resort
+      # to the POSIX-mandated id(1) utility.  Errors in the 'id' calls
+      # below are definitely unexpected, so allow the users to see them
+      # (that is, avoid stderr redirection).
+      am_uid=`id -u || echo unknown`
+      am_gid=`id -g || echo unknown`
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether UID '$am_uid' is supported by ustar format" >&5
+printf %s "checking whether UID '$am_uid' is supported by ustar format... " >&6; }
+      if test x$am_uid = xunknown; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: ancient id detected; assuming current UID is ok, but dist-ustar might not work" >&5
+printf "%s\n" "$as_me: WARNING: ancient id detected; assuming current UID is ok, but dist-ustar might not work" >&2;}
+      elif test $am_uid -le $am_max_uid; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+      else
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+        _am_tools=none
+      fi
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether GID '$am_gid' is supported by ustar format" >&5
+printf %s "checking whether GID '$am_gid' is supported by ustar format... " >&6; }
+      if test x$gm_gid = xunknown; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: ancient id detected; assuming current GID is ok, but dist-ustar might not work" >&5
+printf "%s\n" "$as_me: WARNING: ancient id detected; assuming current GID is ok, but dist-ustar might not work" >&2;}
+      elif test $am_gid -le $am_max_gid; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+      else
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+        _am_tools=none
+      fi
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking how to create a ustar tar archive" >&5
+printf %s "checking how to create a ustar tar archive... " >&6; }
+
+  # Go ahead even if we have the value already cached.  We do so because we
+  # need to set the values for the 'am__tar' and 'am__untar' variables.
+  _am_tools=${am_cv_prog_tar_ustar-$_am_tools}
+
+  for _am_tool in $_am_tools; do
+    case $_am_tool in
+    gnutar)
+      for _am_tar in tar gnutar gtar; do
+        { echo "$as_me:$LINENO: $_am_tar --version" >&5
+   ($_am_tar --version) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); } && break
+      done
+      am__tar="$_am_tar --format=ustar -chf - "'"$$tardir"'
+      am__tar_="$_am_tar --format=ustar -chf - "'"$tardir"'
+      am__untar="$_am_tar -xf -"
+      ;;
+    plaintar)
+      # Must skip GNU tar: if it does not support --format= it doesn't create
+      # ustar tarball either.
+      (tar --version) >/dev/null 2>&1 && continue
+      am__tar='tar chf - "$$tardir"'
+      am__tar_='tar chf - "$tardir"'
+      am__untar='tar xf -'
+      ;;
+    pax)
+      am__tar='pax -L -x ustar -w "$$tardir"'
+      am__tar_='pax -L -x ustar -w "$tardir"'
+      am__untar='pax -r'
+      ;;
+    cpio)
+      am__tar='find "$$tardir" -print | cpio -o -H ustar -L'
+      am__tar_='find "$tardir" -print | cpio -o -H ustar -L'
+      am__untar='cpio -i -H ustar -d'
+      ;;
+    none)
+      am__tar=false
+      am__tar_=false
+      am__untar=false
+      ;;
+    esac
+
+    # If the value was cached, stop now.  We just wanted to have am__tar
+    # and am__untar set.
+    test -n "${am_cv_prog_tar_ustar}" && break
+
+    # tar/untar a dummy directory, and stop if the command works.
+    rm -rf conftest.dir
+    mkdir conftest.dir
+    echo GrepMe > conftest.dir/file
+    { echo "$as_me:$LINENO: tardir=conftest.dir && eval $am__tar_ >conftest.tar" >&5
+   (tardir=conftest.dir && eval $am__tar_ >conftest.tar) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+    rm -rf conftest.dir
+    if test -s conftest.tar; then
+      { echo "$as_me:$LINENO: $am__untar <conftest.tar" >&5
+   ($am__untar <conftest.tar) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+      { echo "$as_me:$LINENO: cat conftest.dir/file" >&5
+   (cat conftest.dir/file) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+      grep GrepMe conftest.dir/file >/dev/null 2>&1 && break
+    fi
+  done
+  rm -rf conftest.dir
+
+  if test ${am_cv_prog_tar_ustar+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) am_cv_prog_tar_ustar=$_am_tool ;;
+esac
+fi
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $am_cv_prog_tar_ustar" >&5
+printf "%s\n" "$am_cv_prog_tar_ustar" >&6; }
 
 
 
@@ -6989,7 +7147,7 @@ if test x"$psblas_cv_fc" == "x" ; then
 	# TODO : discover the exact conditions when the usage of -WF is needed.
 	psblas_cv_define_prepend="-WF,"
         if eval "$MPIFC -qversion 2>&1 | grep -e\"Version: 10\.\" 2>/dev/null"; then
-        	FDEFINES="$psblas_cv_define_prepend-DXLF_10 $FDEFINES";		  sed -e's/(0-9*).*/$1/p'
+        	FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_XLF_10 $FDEFINES";		  sed -e's/(0-9*).*/$1/p'
         fi
 
  # Note : there could be problems with old xlf compiler versions ( <10.1 )
@@ -7005,7 +7163,7 @@ if test x"$psblas_cv_fc" == "x" ; then
    psblas_flang_version=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi'`;
    psblas_flang_shv=`flang-new --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/^0-9*//g'`;
    if test x"$psblas_shvs" != x""; then
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  " >&5
@@ -7024,7 +7182,7 @@ printf "%s\n" "$as_me: Running  with LLVM $psblas_flang_version  ($psblas_flang_
    psblas_flang_shv=`flang --version |grep flang| sed -e 's/^ *flang.* version *//gi' | sed -e's/\./ /g' | awk '{print $1}'`;
    psblas_cv_fc="flang";
    psblas_cv_define_prepend="";
-   FDEFINES="$psblas_cv_define_prepend-DFLANG $FDEFINES"
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_FLANG $FDEFINES"
    psblas_shvs=`echo $psblas_flang_shv|sed -e's/^0-9*//g'`;
    if test x"$psblas_shvs" != x""; then
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Running  with LLVM $psblas_flang_version  ($psblas_flang_shv).  " >&5
@@ -7037,7 +7195,7 @@ printf "%s\n" "$as_me: Running  with LLVM $psblas_flang_version  ($psblas_flang_
    fi
  elif eval "$MPIFC -V 2>&1 | grep Intel.*Fortran.*Compiler 2>/dev/null" ; then
    # Intel compiler identification
-
+   FDEFINES="$psblas_cv_define_prepend-DPSB_CMP_INTEL $FDEFINES"
    psblas_cv_fc="ifc";
  elif eval "$MPIFC -v  2>&1 | grep NAG 2>/dev/null" ; then
    psblas_cv_fc="nag";
@@ -8106,7 +8264,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for TR15581.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8155,7 +8313,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for EXTENDS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8220,7 +8378,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for CLASS and type bound procedures.
- Please get a Fortran compiler that supports them, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports them, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8271,7 +8429,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for SOURCE= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8312,7 +8470,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for MOVE_ALLOC.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8352,7 +8510,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for ISO_C_BINDING.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8403,7 +8561,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for SAME_TYPE_AS.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8452,7 +8610,7 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for EXTENDS_TYPE_OF.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
 esac
 fi
@@ -8503,8 +8661,63 @@ printf "%s\n" "no" >&6; }
 		     echo "configure: failed program was:" >&5
 		     cat conftest.$ac_ext >&5
 		      as_fn_error $? "Sorry, cannot build PSBLAS without support for MOLD= allocation.
- Please get a Fortran compiler that supports it, e.g. GNU Fortran 4.8." "$LINENO" 5
+ Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5
  ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking support for Fortran SUBMODULES" >&5
+printf %s "checking support for Fortran SUBMODULES... " >&6; }
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+ ac_exeext=''
+ ac_ext='F90'
+  ac_fc=${MPIFC-$FC};
+ cat > conftest.$ac_ext <<_ACEOF
+
+module conftest
+
+  interface
+    module subroutine foo(v)
+      integer, intent(inout) :: v(:)
+    end subroutine foo
+  end interface
+end module conftest
+submodule (conftest) conftest_impl
+
+contains
+  module subroutine foo(v)
+     integer, intent(inout) :: v(:)
+     integer :: i
+     do i=1,size(v)
+	v(i)=i
+     end do
+  end subroutine foo
+end submodule
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"
+then :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+		     :
+else case e in #(
+  e)   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+		     echo "configure: failed program was:" >&5
+		     cat conftest.$ac_ext >&5
+		      as_fn_error $? "Sorry, cannot build without support for SUBMODULES.
+	Please get a Fortran compiler that supports it, e.g. GNU Fortran 6.0." "$LINENO" 5 ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -8745,6 +8958,42 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+######################
+# Extract version data
+######################
+#PAC_EXTRACT_PSBLAS_VERSION
+CFILE="base/modules/psb_const_mod.F90";
+PSBLASMAJOR=`cat $CFILE| grep version_major | $AWK '{print $6;}'`;
+PSBLASMINOR=`cat $CFILE| grep version_minor| $AWK '{print $6;}'`;
+PSBLASPATCH=`cat $CFILE| grep patchlevel| $AWK '{print $6;}'`;
+PSBLASSTRING=`cat $CFILE | grep version_string | $AWK '{print $6;}'`;
+PSBLASDUPNUL=`cat $CFILE| grep dupl_null | $AWK '{print $6;}'`;
+PSBLASDUPADD=`cat $CFILE| grep "psb_dupl_add_   =" | $AWK '{print $6;}'`;
+PSBLASDUPOVW=`cat $CFILE| grep dupl_ovwrt| $AWK '{print $6;}'`;
+PSBLASDUPERR=`cat $CFILE| grep dupl_err| $AWK '{print $6;}'`;
+PSBLASDUPDEF=`cat $CFILE| grep dupl_def| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$// `;
+PSBLASUPDSRC=`cat $CFILE| grep "psb_upd_srch_   ="| $AWK '{print $6;}' `;
+PSBLASUPDPRM=`cat $CFILE| grep "psb_upd_perm_   ="| $AWK '{print $6;}' `;
+PSBLASUPDDEF=`cat $CFILE| grep "psb_upd_dflt_   ="| $AWK '{print $6;}' | tr a-z A-Z | sed s/\_$//`;
+PSBLASBLDNOR=`cat $CFILE| grep matbld_noremote| $AWK '{print $6;}'`;
+PSBLASBLDRMT=`cat $CFILE| grep matbld_remote| $AWK '{print $6;}'`;
+
+CFILE="base/modules/desc/psb_desc_const_mod.f90";
+PSBSWPSND=`cat $CFILE| grep swap_send| $AWK '{print $6;}'`;
+PSBSWPRCV=`cat $CFILE| grep swap_recv| $AWK '{print $6;}'`;
+PSBSWPSYN=`cat $CFILE| grep swap_sync| $AWK '{print $6;}'`;
+PSBSWPMPI=`cat $CFILE| grep swap_mpi| $AWK '{print $6;}'`;
+PSBNONE=`cat $CFILE| grep psb_none| $AWK '{print $6;}'`;
+PSBSUM=`cat $CFILE| grep psb_sum| $AWK '{print $6;}'`;
+PSBAVG=`cat $CFILE| grep psb_avg| $AWK '{print $6;}'`;
+PSBSQRT=`cat $CFILE| grep square_root| $AWK '{print $6;}'`;
+PSBSETZ=`cat $CFILE| grep psb_setzero| $AWK '{print $6;}'`;
+PSBCLCSTR=`cat $CFILE| grep collective_start| $AWK '{print $6;}'`;
+PSBCLCEND=`cat $CFILE| grep collective_end| $AWK '{print $6;}'`;
+PSBCLCSYN=`cat $CFILE| grep collective_sync| $AWK '{print $6;}'`;
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result:  version  $PSBLASSTRING" >&5
+printf "%s\n" " version  $PSBLASSTRING" >&6; }
 
 ###############################################################################
 #	Additional pathname stuff (yes, it is redundant and confusing...)
@@ -8769,18 +9018,215 @@ fi
 ###############################################################################
 #	Parachute rules for ar and ranlib ... (could cause problems)
 ###############################################################################
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}ar", so it can be a program name with args.
+set dummy ${ac_tool_prefix}ar; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_AR+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -n "$AR"; then
+  ac_cv_prog_AR="$AR" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_AR="${ac_tool_prefix}ar"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
 
-if test "X$AR" == "X" ; then
-  AR="ar"
+fi ;;
+esac
+fi
+AR=$ac_cv_prog_AR
+if test -n "$AR"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $AR" >&5
+printf "%s\n" "$AR" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
 fi
 
-if test "X$RANLIB" == "X" ; then
-  RANLIB="ranlib"
+
+fi
+if test -z "$ac_cv_prog_AR"; then
+  ac_ct_AR=$AR
+  # Extract the first word of "ar", so it can be a program name with args.
+set dummy ar; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_ac_ct_AR+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -n "$ac_ct_AR"; then
+  ac_cv_prog_ac_ct_AR="$ac_ct_AR" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_AR="ar"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi ;;
+esac
+fi
+ac_ct_AR=$ac_cv_prog_ac_ct_AR
+if test -n "$ac_ct_AR"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_ct_AR" >&5
+printf "%s\n" "$ac_ct_AR" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
 fi
 
-# This should be portable
-AR="${AR} -cDr"
+  if test "x$ac_ct_AR" = x; then
+    AR=":"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+printf "%s\n" "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    AR=$ac_ct_AR
+  fi
+else
+  AR="$ac_cv_prog_AR"
+fi
 
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
+set dummy ${ac_tool_prefix}ranlib; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_RANLIB+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -n "$RANLIB"; then
+  ac_cv_prog_RANLIB="$RANLIB" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_RANLIB="${ac_tool_prefix}ranlib"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi ;;
+esac
+fi
+RANLIB=$ac_cv_prog_RANLIB
+if test -n "$RANLIB"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $RANLIB" >&5
+printf "%s\n" "$RANLIB" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_prog_RANLIB"; then
+  ac_ct_RANLIB=$RANLIB
+  # Extract the first word of "ranlib", so it can be a program name with args.
+set dummy ranlib; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_ac_ct_RANLIB+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -n "$ac_ct_RANLIB"; then
+  ac_cv_prog_ac_ct_RANLIB="$ac_ct_RANLIB" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_RANLIB="ranlib"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi ;;
+esac
+fi
+ac_ct_RANLIB=$ac_cv_prog_ac_ct_RANLIB
+if test -n "$ac_ct_RANLIB"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_ct_RANLIB" >&5
+printf "%s\n" "$ac_ct_RANLIB" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+  if test "x$ac_ct_RANLIB" = x; then
+    RANLIB=":"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+printf "%s\n" "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    RANLIB=$ac_ct_RANLIB
+  fi
+else
+  RANLIB="$ac_cv_prog_RANLIB"
+fi
+
+AR="$AR -cr"
 
 ###############################################################################
 #		BLAS  library presence checks
@@ -10850,7 +11296,6 @@ printf "%s\n" "$as_me: For CUDA I need psb_ipk_ to be 4 bytes but it is $pac_cv_
   pac_cv_cuda="no";
   PSB_HAVE_CUDA="no";
   CUDA_CC="";
-  SPGPU_LIBS="";
   CUDAD="";
   CUDALD="";
   CUDEFINES="";
@@ -11093,13 +11538,12 @@ LIBS="$SAVE_LIBS"
 CPPFLAGS="$SAVE_CPPFLAGS"
 
             PSB_CUDA_VERSION="$pac_cv_cuda_version";
-      if (( ${PSB_CUDA_VERSION} > 12080 )); then
+      if (( ${PSB_CUDA_VERSION} > 15010 )); then
          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA" >&5
 printf "%s\n" "$as_me: Unsupported CUDA version ${PSB_CUDA_VERSION} disabling CUDA" >&6;}
          pac_cv_cuda="no";
          PSB_HAVE_CUDA="no";
          CUDA_CC="";
-         SPGPU_LIBS="";
          CUDAD="";
          CUDALD="";
          CUDEFINES="";
@@ -11118,10 +11562,10 @@ printf "%s\n" "$as_me: CUDA version ${PSB_CUDA_VERSION}" >&6;}
          CHAVECUDA="#define PSB_HAVE_CUDA"
          CSHORTVCUDA="#define PSB_CUDA_SHORT_VERSION ${PSB_CUDA_SHORT_VERSION}"
          CVERSIONCUDA="#define PSB_CUDA_VERSION ${PSB_CUDA_VERSION}"
-         SPGPU_LIBS="-lspgpu";
-         CUDAD=cudad;
+	          CUDAD=cudad;
+         CUDAMODS=cudamods;
          CUDALD=cudald;
-         LCUDA="-lpsb_cuda";
+         LPSB_CUDA="-lpsb_cuda -lpsb_ext";
          EXTRALDLIBS="-lstdc++";
          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: At this point GPUTARGET is $CUDAD $CUDALD" >&5
 printf "%s\n" "$as_me: At this point GPUTARGET is $CUDAD $CUDALD" >&6;}
@@ -11139,7 +11583,7 @@ fi
 
 
          if test "x$pac_cv_cudacc" == "x"; then
-            pac_cv_cudacc="50,60,70,75,80,86";
+            pac_cv_cudacc="75,80,86";
             CUDA_CC="$pac_cv_cudacc";
          fi
          if (( $pac_cv_cuda_version >= 11070  ))
@@ -11151,8 +11595,8 @@ fi
            CUDEFINES="$CUDEFINES -gencode arch=compute_$cc,code=sm_$cc";
          done
          if test "x$pac_cv_cuda_version" != "xunknown"; then
-                   FCUDEFINES=" ${CUDA_DEFINES}"
-                            fi
+         	 FCUDEFINES=" ${CUDA_DEFINES}"
+	                   fi
      fi
   fi
 fi
@@ -11541,6 +11985,7 @@ fi
    CXXOPENACC="$CXXOPENACC   $EXTRAOPENACC";
    FCOPENACC="$FCOPENACC   $EXTRAOPENACC";
    OACCD=oaccd;
+   OACCMODS=oaccmods;
    OACCLD=oaccld;
 
    #FCOPT="$FCOPT    $FCOPENACC";
@@ -11647,6 +12092,37 @@ FDEFINES=$(PSBFDEFINES)
 	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c $< -o $@
 .cpp.o:
 	$(CXX) $(CXXOPT) $(CXXINCLUDES) $(CXXDEFINES) -c $< -o $@'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -13045,6 +13521,8 @@ fi
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+        EXTRA_OPT             : ${EXTRA_OPT}
+
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
@@ -13064,7 +13542,9 @@ fi
 
 	LIBRARYPATH           : ${LIBRARYPATH}
 	INCLUDEPATH           : ${INCLUDEPATH}
-	MODULE_PATH            : ${MODULE_PATH}
+	MODULE_PATH           : ${MODULE_PATH}
+
+	INSTALL_DIR           : ${INSTALL_DIR}
 
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.
@@ -13083,6 +13563,8 @@ printf "%s\n" "$as_me:
    	FCOPT                 : ${FCOPT}
    	CCOPT                 : ${CCOPT}
 
+        EXTRA_OPT             : ${EXTRA_OPT}
+
 	CUDA 		      : ${PSB_HAVE_CUDA}
 	CUDA_CC               : ${pac_cv_cudacc}
 
@@ -13102,7 +13584,9 @@ printf "%s\n" "$as_me:
 
 	LIBRARYPATH           : ${LIBRARYPATH}
 	INCLUDEPATH           : ${INCLUDEPATH}
-	MODULE_PATH            : ${MODULE_PATH}
+	MODULE_PATH           : ${MODULE_PATH}
+
+	INSTALL_DIR           : ${INSTALL_DIR}
 
 	If you are satisfied, run 'make' to build ${PACKAGE_NAME} and its documentation; otherwise
 	type  ./configure --help=short for a complete list of configure options specific to ${PACKAGE_NAME}.

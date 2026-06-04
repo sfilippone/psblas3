@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -73,15 +73,14 @@ module psb_s_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_spk_), optional       :: work(:)
     end subroutine psb_s_map_U2V_a
-    subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
+    subroutine psb_s_map_U2V_v(alpha,x,beta,y,map,info,vtx,vty)
       use psb_s_vect_mod, only : psb_s_vect_type
       import :: psb_ipk_, psb_spk_, psb_slinmap_type
-      implicit none 
+      implicit none
       class(psb_slinmap_type), intent(in) :: map
       real(psb_spk_), intent(in)     :: alpha,beta
       type(psb_s_vect_type), intent(inout)  :: x,y
-      integer(psb_ipk_), intent(out)           :: info 
-      real(psb_spk_), optional       :: work(:)
+      integer(psb_ipk_), intent(out)           :: info
       type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_s_map_U2V_v
   end interface
@@ -97,15 +96,14 @@ module psb_s_linmap_mod
       integer(psb_ipk_), intent(out)           :: info 
       real(psb_spk_), optional       :: work(:)
     end subroutine psb_s_map_V2U_a
-    subroutine psb_s_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
+    subroutine psb_s_map_V2U_v(alpha,x,beta,y,map,info,vtx,vty)
       use psb_s_vect_mod, only : psb_s_vect_type
       import :: psb_ipk_, psb_spk_, psb_slinmap_type
-      implicit none 
+      implicit none
       class(psb_slinmap_type), intent(in) :: map
       real(psb_spk_), intent(in)     :: alpha,beta
       type(psb_s_vect_type), intent(inout)  :: x,y
-      integer(psb_ipk_), intent(out)           :: info 
-      real(psb_spk_), optional       :: work(:)
+      integer(psb_ipk_), intent(out)           :: info
       type(psb_s_vect_type), optional, target, intent(inout)  :: vtx,vty
     end subroutine psb_s_map_V2U_v
   end interface

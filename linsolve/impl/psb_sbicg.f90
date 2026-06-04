@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -112,11 +112,10 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), optional, intent(out)       :: iter
   real(psb_spk_), optional, intent(out) :: err
 ! !$   local data
-  real(psb_spk_), allocatable, target   :: aux(:)
   type(psb_s_vect_type), allocatable, target :: wwrk(:)
   type(psb_s_vect_type), pointer  :: ww, q, r, p,&
        & zt, pt, z, rt, qt
-  integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, it, itrace_,&
        & n_row, n_col, istop_, err_act
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -188,10 +187,7 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   end if
 
 
-  naux=4*n_col 
-
-  allocate(aux(naux),stat=info)
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=9_psb_ipk_)
+  call psb_geall(wwrk,desc_a,info,n=9_psb_ipk_)
   if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v)  
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_non_
@@ -239,7 +235,7 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
     if (itx >= itmax_) exit restart  
     it = 0      
     call psb_geaxpby(sone,b,szero,r,desc_a,info)
-    if (info == psb_success_) call psb_spmm(-sone,a,x,sone,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-sone,a,x,sone,r,desc_a,info)
     if (debug_level >= psb_debug_ext_)&
          & write(debug_unit,*) me,' ',trim(name),' Done spmm',info
     if (info == psb_success_) call psb_geaxpby(sone,r,szero,rt,desc_a,info)
@@ -265,8 +261,8 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
       if (debug_level >= psb_debug_ext_) &
            & write(debug_unit,*) me,' ',trim(name),'iteration: ',itx
 
-      call prec%apply(r,z,desc_a,info,work=aux)
-      if (info == psb_success_) call prec%apply(rt,zt,desc_a,info,trans='c',work=aux)
+      call prec%apply(r,z,desc_a,info)
+      if (info == psb_success_) call prec%apply(rt,zt,desc_a,info,trans='c')
 
       rho_old = rho    
       rho = psb_gedot(rt,z,desc_a,info)
@@ -286,10 +282,8 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
         call psb_geaxpby(sone,zt,beta,pt,desc_a,info)
       end if
 
-      call psb_spmm(sone,a,p,szero,q,desc_a,info,&
-           & work=aux)
-      call psb_spmm(sone,a,pt,szero,qt,desc_a,info,&
-           & work=aux,trans='c')
+      call psb_spmm(sone,a,p,szero,q,desc_a,info)
+      call psb_spmm(sone,a,pt,szero,qt,desc_a,info,trans='c')
 
       sigma = psb_gedot(pt,q,desc_a,info)
       if (sigma == szero) then
@@ -319,11 +313,6 @@ subroutine psb_sbicg_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(err)) err = derr
 
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
-  if (info == psb_success_) deallocate(aux,stat=info)
-  if (info /= psb_success_) then
-    call psb_errpush(info,name)
-    goto 9999
-  end if
 
   call psb_erractionrestore(err_act)
   return

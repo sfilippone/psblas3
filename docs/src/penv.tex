@@ -94,12 +94,12 @@ Specified as: an integer variable.
 Scope: {\bf local}.\\
 Type: {\bf required}.\\
 Intent: {\bf out}.\\
-Specified as: an integer value. $-1 \le iam \le np-1$\
+Returned as: an integer value. $-1 \le iam \le np-1$\
 \item[np] Number of processes in the PSBLAS virtual parallel machine.\\
 Scope: {\bf global}.\\
 Type: {\bf required}.\\
 Intent: {\bf out}.\\
-Specified as: an integer variable. \
+Returned as: an integer variable. \
 \end{description}
 
 
@@ -153,8 +153,9 @@ Specified as: a logical  variable, default value: true.
   same program, or to enter and exit multiple times into the parallel
   environment, this routine may be called to 
   selectively close the contexts with \verb|close=.false.|, while on
-  the last call it should be called with \verb|close=.true.| to
-  shutdown in a clean way the entire parallel environment.
+  the last instance it should close in a clean way the entire
+  parallel environment with \verb|close=.true.|
+  
 \end{enumerate}
 
 

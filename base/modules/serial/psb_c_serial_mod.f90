@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -60,24 +60,8 @@ module psb_c_serial_mod
       type(psb_cspmat_type), intent(out) :: c
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_cspspmm
-    subroutine psb_ccsrspspmm(a,b,c,info)
-      use psb_c_mat_mod, only : psb_c_csr_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_c_csr_sparse_mat), intent(in) :: a,b
-      type(psb_c_csr_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_ccsrspspmm
-    subroutine psb_ccscspspmm(a,b,c,info)
-      use psb_c_mat_mod, only : psb_c_csc_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_c_csc_sparse_mat), intent(in) :: a,b
-      type(psb_c_csc_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_ccscspspmm
-  end interface
-
+  end interface psb_spspmm
+  
   interface psb_symbmm
     subroutine psb_csymbmm(a,b,c,info)
       use psb_c_mat_mod, only : psb_cspmat_type
@@ -113,6 +97,16 @@ module psb_c_serial_mod
       type(psb_c_csr_sparse_mat), intent(inout)  :: c
     end subroutine psb_cbase_numbmm
   end interface psb_numbmm
+
+  interface psb_aplusat
+    subroutine psb_caplusat(ain,aout,info)
+      use psb_c_mat_mod, only : psb_cspmat_type
+      import :: psb_ipk_
+      implicit none
+      type(psb_cspmat_type) :: ain, aout
+      integer(psb_ipk_) :: info
+    end subroutine psb_caplusat
+  end interface 
 
   interface psb_rwextd
     subroutine psb_crwextd(nr,a,info,b,rowscale)
@@ -232,22 +226,6 @@ module psb_c_serial_mod
       type(psb_lcspmat_type), intent(out) :: c
       integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_lcspspmm
-    subroutine psb_lccsrspspmm(a,b,c,info)
-      use psb_c_mat_mod, only : psb_lc_csr_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_lc_csr_sparse_mat), intent(in) :: a,b
-      type(psb_lc_csr_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_lccsrspspmm
-    subroutine psb_lccscspspmm(a,b,c,info)
-      use psb_c_mat_mod, only : psb_lc_csc_sparse_mat
-      import :: psb_ipk_
-      implicit none 
-      class(psb_lc_csc_sparse_mat), intent(in) :: a,b
-      type(psb_lc_csc_sparse_mat), intent(out) :: c
-      integer(psb_ipk_), intent(out)          :: info
-    end subroutine psb_lccscspspmm
   end interface psb_spspmm
 
   interface psb_symbmm

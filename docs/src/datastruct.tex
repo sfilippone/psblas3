@@ -26,7 +26,7 @@ defined in the library as follows:
 \item[psb\_mpk\_] Kind parameter for 4-bytes integer data, as is
   always used by MPI; 
 \item[psb\_epk\_] Kind parameter for 8-bytes integer data, as is
-  always used by the \fortinline|sizeof| methods;
+  always returned by the \fortinline|sizeof| methods;
 \item[psb\_ipk\_] Kind parameter for ``local'' integer indices and data;
   with default build options this is a 4 bytes integer;
 \item[psb\_lpk\_] Kind parameter for ``global'' integer indices and data;
@@ -47,9 +47,9 @@ developer's documentation.
 
 \subsection{Descriptor data structure}
 \label{sec:desc}
-All the general matrix informations and elements to be
-exchanged among processes are stored within a data structure of the
-type \hypertarget{descdata}{{\tt psb\_desc\_type}}. 
+All the general matrix information and the identification of elements
+to be exchanged among processes are stored within a data structure of
+the type \hypertarget{descdata}{{\tt psb\_desc\_type}}. 
 Every structure of this type is associated with a discretization
 pattern and enables data communications and other operations that are
 necessary for implementing the various algorithms of interest to us. 

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -57,7 +57,7 @@ subroutine psb_iins_vect(m, irw, val, x, desc_a, info, local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: i, loc_rows,loc_cols
+  integer(psb_ipk_) :: i, loc_rows, loc_cols
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: dupl_
   type(psb_ctxt_type) :: ctxt
@@ -127,7 +127,7 @@ subroutine psb_iins_vect(m, irw, val, x, desc_a, info, local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  call x%ins(m,irl,val,info) 
+  call x%ins(m,irl,val,loc_rows,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
@@ -198,7 +198,7 @@ subroutine psb_iins_vect_v(m, irw, val, x, desc_a, info, local)
   logical, intent(in), optional        :: local
 
   !locals.....
-  integer(psb_ipk_) :: i, loc_rows,loc_cols,err_act
+  integer(psb_ipk_) :: i, loc_rows, loc_cols, err_act
   integer(psb_lpk_) :: mglob
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np, me
@@ -261,7 +261,7 @@ subroutine psb_iins_vect_v(m, irw, val, x, desc_a, info, local)
     call desc_a%indxmap%g2l(irw%v%v(1:m),irl(1:m),info,owned=.true.)
   end if
 
-  call x%ins(m,irl,lval,info) 
+  call x%ins(m,irl,lval,loc_rows,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999
@@ -368,7 +368,7 @@ subroutine psb_iins_vect_r2(m, irw, val, x, desc_a, info, local)
   do i=1,n
 
     if (.not.allocated(x(i)%v)) info = psb_err_invalid_vect_state_
-    if (info == 0) call x(i)%ins(m,irl,val(:,i),info) 
+    if (info == 0) call x(i)%ins(m,irl,val(:,i),loc_rows,info) 
     if (info /= 0) exit
   end do
   if (info /= 0) then 
@@ -475,7 +475,7 @@ subroutine psb_iins_multivect(m, irw, val, x, desc_a, info, local)
   else
     call desc_a%indxmap%g2l(irw(1:m),irl(1:m),info,owned=.true.)
   end if
-  call x%ins(m,irl,val,info) 
+  call x%ins(m,irl,val,loc_rows,info) 
   if (info /= 0) then 
     call psb_errpush(info,name)
     goto 9999

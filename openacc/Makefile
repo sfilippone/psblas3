@@ -38,8 +38,10 @@ lib: objs ilib
 	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
 
-objs: $(OBJS) iobjs
-	/bin/cp -p *$(.mod) $(MODDIR)
+objs: mods $(OBJS) iobjs
+
+mods: $(FOBJS)
+	$(INSTALL) -p *$(.mod) $(MODDIR)
 
 iobjs: $(OBJS)
 	$(MAKE) -C impl objs 

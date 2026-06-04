@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -35,90 +35,90 @@
 !                                              
 !    
 !    
-subroutine  psi_zovrl_restr_vect(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_zovrl_restr_vect
-  use psb_z_base_vect_mod
+submodule (psi_z_comm_v_mod)  psi_z_ovrl_restr_v_impl
+  use psb_base_mod
+contains
+  module subroutine  psi_zovrl_restr_vect(x,xs,desc_a,info)
 
-  implicit none
+    implicit none
 
-  class(psb_z_base_vect_type)     :: x
-  complex(psb_dpk_)               :: xs(:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
+    class(psb_z_base_vect_type)     :: x
+    complex(psb_dpk_)               :: xs(:)
+    type(psb_desc_type), intent(in) :: desc_a
+    integer(psb_ipk_), intent(out)            :: info
 
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, isz
-  integer(psb_ipk_) :: err_act, i, idx
-  character(len=20) :: name, ch_err
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_) :: np, me, isz
+    integer(psb_ipk_) :: err_act, i, idx
+    character(len=20) :: name, ch_err
 
-  name='psi_zovrl_restr_vect'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
+    name='psi_zovrl_restr_vect'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
 
-  isz = size(desc_a%ovrlap_elem,1)
+    isz = size(desc_a%ovrlap_elem,1)
 
-  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,zzero)
+    call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,zzero)
 
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-end subroutine psi_zovrl_restr_vect
-
-
-subroutine  psi_zovrl_restr_multivect(x,xs,desc_a,info)
-  use psi_mod, psi_protect_name =>   psi_zovrl_restr_multivect
-  use psb_z_base_vect_mod
-
-  implicit none
-
-  class(psb_z_base_multivect_type)     :: x
-  complex(psb_dpk_)               :: xs(:,:)
-  type(psb_desc_type), intent(in) :: desc_a
-  integer(psb_ipk_), intent(out)            :: info
-
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, isz,nc
-  integer(psb_ipk_) :: err_act, i, idx
-  character(len=20) :: name, ch_err
-
-  name='psi_zovrl_restr_mv'
-  info = psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-  ctxt = desc_a%get_context()
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  isz = size(desc_a%ovrlap_elem,1)
-  call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,zzero)
-
-  call psb_erractionrestore(err_act)
-  return  
+    call psb_erractionrestore(err_act)
+    return  
 
 9999 call psb_error_handler(ctxt,err_act)
 
-  return
-end subroutine psi_zovrl_restr_multivect
+    return
+  end subroutine psi_zovrl_restr_vect
+
+
+  module subroutine  psi_zovrl_restr_multivect(x,xs,desc_a,info)
+
+    implicit none
+
+    class(psb_z_base_multivect_type)     :: x
+    complex(psb_dpk_)               :: xs(:,:)
+    type(psb_desc_type), intent(in) :: desc_a
+    integer(psb_ipk_), intent(out)            :: info
+
+    ! locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_mpk_) :: np, me, isz,nc
+    integer(psb_ipk_) :: err_act, i, idx
+    character(len=20) :: name, ch_err
+
+    name='psi_zovrl_restr_mv'
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    if  (psb_errstatus_fatal()) then
+      info = psb_err_internal_error_ ;    goto 9999
+    end if
+    ctxt = desc_a%get_context()
+    call psb_info(ctxt, me, np)
+    if (np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+
+    isz = size(desc_a%ovrlap_elem,1)
+    call x%sct(isz,desc_a%ovrlap_elem(:,1),xs,zzero)
+
+    call psb_erractionrestore(err_act)
+    return  
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+  end subroutine psi_zovrl_restr_multivect
+end submodule psi_z_ovrl_restr_v_impl
 
 

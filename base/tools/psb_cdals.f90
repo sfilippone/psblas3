@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -175,7 +175,7 @@ subroutine psb_cdals(m, n, parts, ctxt, desc, info)
     if (info == psb_success_) then
       call parts(iglob,m,np,prc_v,nprocs)
       if (nprocs > np) then
-        info=psb_err_partfunc_toomuchprocs_
+        info=psb_err_partfunc_toomanyprocs_
         call psb_errpush(info,name,l_err=(/3_psb_lpk_,np*lone,nprocs*lone,iglob/))
         goto 9999
       else if (nprocs <= 0) then

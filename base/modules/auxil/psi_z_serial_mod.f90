@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -35,7 +35,7 @@ module psi_z_serial_mod
   interface psb_gelp 
     ! 2-D version
     subroutine psb_m_zgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       complex(psb_dpk_), intent(inout)     ::  x(:,:)
       integer(psb_mpk_), intent(in)      ::  iperm(:)
@@ -43,7 +43,7 @@ module psi_z_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_zgelp
     subroutine psb_m_zgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_mpk_,psb_dpk_
+      import
       implicit none
       complex(psb_dpk_), intent(inout)     ::  x(:)
       integer(psb_mpk_), intent(in)      ::  iperm(:)
@@ -51,7 +51,7 @@ module psi_z_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_m_zgelpv
     subroutine psb_e_zgelp(trans,iperm,x,info)
-      import :: psb_ipk_, psb_epk_, psb_dpk_
+      import
       implicit none
       complex(psb_dpk_), intent(inout)     ::  x(:,:)
       integer(psb_epk_), intent(in)      ::  iperm(:)
@@ -59,7 +59,7 @@ module psi_z_serial_mod
       character, intent(in)              :: trans
     end subroutine psb_e_zgelp
     subroutine psb_e_zgelpv(trans,iperm,x,info)
-      import :: psb_ipk_, psb_epk_, psb_dpk_
+      import
       implicit none
       complex(psb_dpk_), intent(inout)     ::  x(:)
       integer(psb_epk_), intent(in)      ::  iperm(:)
@@ -70,7 +70,7 @@ module psi_z_serial_mod
 
   interface psb_geaxpby
     subroutine psi_zaxpby(m,n,alpha, x, beta, y, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m, n
       complex(psb_dpk_), intent (in)       ::  x(:,:)
@@ -79,7 +79,7 @@ module psi_z_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_zaxpby
     subroutine psi_zaxpbyv(m,alpha, x, beta, y, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_dpk_), intent (in)       ::  x(:)
@@ -88,7 +88,7 @@ module psi_z_serial_mod
       integer(psb_ipk_), intent(out)     :: info
     end subroutine psi_zaxpbyv
     subroutine psi_zaxpbyv2(m,alpha, x, beta, y, z, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_dpk_), intent (in)       ::  x(:)
@@ -101,7 +101,7 @@ module psi_z_serial_mod
 
   interface psi_upd_xyz
     subroutine psi_z_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_dpk_), intent (in)       ::  x(:)
@@ -114,7 +114,7 @@ module psi_z_serial_mod
   
   interface psi_xyzw
     subroutine psi_zxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
-      import :: psb_ipk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: m
       complex(psb_dpk_), intent (in)       :: x(:)
@@ -128,21 +128,21 @@ module psi_z_serial_mod
   
   interface psi_gth
     subroutine psi_zgthmv(n,k,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       complex(psb_dpk_) :: x(:,:), y(:),alpha,beta
     end subroutine psi_zgthmv
     subroutine psi_zgthv(n,idx,alpha,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       complex(psb_dpk_) :: x(:), y(:),alpha,beta
     end subroutine psi_zgthv
     subroutine psi_zgthzmv(n,k,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -150,7 +150,7 @@ module psi_z_serial_mod
 
     end subroutine psi_zgthzmv
     subroutine psi_zgthzmm(n,k,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
@@ -158,8 +158,7 @@ module psi_z_serial_mod
 
     end subroutine psi_zgthzmm
     subroutine psi_zgthzv(n,idx,x,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
-      implicit none
+      import
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
       complex(psb_dpk_) :: x(:), y(:)
@@ -168,21 +167,21 @@ module psi_z_serial_mod
 
   interface psi_sct
     subroutine psi_zsctmm(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       complex(psb_dpk_) :: beta, x(:,:), y(:,:)
     end subroutine psi_zsctmm
     subroutine psi_zsctmv(n,k,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
       complex(psb_dpk_) :: beta, x(:), y(:,:)
     end subroutine psi_zsctmv
     subroutine psi_zsctv(n,idx,x,beta,y)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
 
       integer(psb_mpk_) :: n
@@ -193,7 +192,7 @@ module psi_z_serial_mod
 
   interface psi_exscan
     subroutine psi_z_exscanv(n,x,info,shift)
-      import :: psb_ipk_, psb_mpk_, psb_dpk_
+      import
       implicit none
       integer(psb_ipk_), intent(in)      :: n
       complex(psb_dpk_), intent (inout)    :: x(:)

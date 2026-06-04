@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -121,13 +121,13 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
 ! =   local data
-  complex(psb_dpk_), allocatable, target   :: aux(:), gamma(:),&
+  complex(psb_dpk_), allocatable, target   :: gamma(:),&
        & gamma1(:), gamma2(:), taum(:,:), sigma(:)
   type(psb_z_vect_type), allocatable, target :: wwrk(:),uh(:), rh(:)
   type(psb_z_vect_type), Pointer  :: ww, q, r, rt0, p, v, &
        & s, t, z, f
 
-  integer(psb_ipk_) :: itmax_, naux, it, itrace_,&
+  integer(psb_ipk_) :: itmax_, it, itrace_,&
        & n_row, n_col, nl, err_act
   integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False.  
@@ -213,10 +213,6 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  naux=4*n_col 
-  allocate(aux(naux),gamma(0:nl),gamma1(nl),&
-       &gamma2(nl),taum(nl,nl),sigma(nl), stat=info)
-
   if (info /= psb_success_) then 
      info=psb_err_alloc_dealloc_
      call psb_errpush(info,name)
@@ -263,7 +259,7 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
 
     it = 0      
     call psb_geaxpby(zone,b,zzero,r,desc_a,info)
-    if (info == psb_success_) call psb_spmm(-zone,a,x,zone,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-zone,a,x,zone,r,desc_a,info)
     
     if (info == psb_success_) call prec%apply(r,desc_a,info)
 
@@ -318,7 +314,7 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
 ! =          call psb_geaxpby(zone,rh(:,0:j),-beta,uh(:,0:j),desc_a,info)
           call psb_geaxpby(zone,rh(k),-beta,uh(k),desc_a,info)
         end do
-        call psb_spmm(zone,a,uh(j),zzero,uh(j+1),desc_a,info,work=aux)
+        call psb_spmm(zone,a,uh(j),zzero,uh(j+1),desc_a,info)
 
         call prec%apply(uh(j+1),desc_a,info)
 
@@ -340,7 +336,7 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
           call psb_geaxpby(-alpha,uh(k+1),zone,rh(k),desc_a,info)        
         end do
         call psb_geaxpby(alpha,uh(0),zone,x,desc_a,info)
-        call psb_spmm(zone,a,rh(j),zzero,rh(j+1),desc_a,info,work=aux)
+        call psb_spmm(zone,a,rh(j),zzero,rh(j+1),desc_a,info)
 
         call prec%apply(rh(j+1),desc_a,info)
                 
@@ -403,7 +399,6 @@ Subroutine psb_zcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
   if (info == psb_success_) call psb_gefree(uh,desc_a,info)
   if (info == psb_success_) call psb_gefree(rh,desc_a,info)
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
-  if (info == psb_success_) deallocate(aux,stat=info)
   if (info /= psb_success_) then
      call psb_errpush(info,name)
      goto 9999

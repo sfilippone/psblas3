@@ -6,7 +6,11 @@ extern "C" {
 #endif
 
 #include <float.h>
+#ifdef __cplusplus
+#include <complex>
+#else
 #include <complex.h>
+#endif
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -40,6 +44,7 @@ extern "C" {
 
   /* Environment routines */
   void    psb_c_init(psb_c_ctxt *cctxt);
+  void    psb_c_init_from_fint(psb_c_ctxt *cctxt, psb_i_t f_comm);
   void    psb_c_exit(psb_c_ctxt cctxt);
   void    psb_c_exit_ctxt(psb_c_ctxt cctxt);
   void    psb_c_abort(psb_c_ctxt cctxt);
@@ -52,6 +57,13 @@ extern "C" {
 
   psb_i_t psb_c_get_index_base();
   void psb_c_set_index_base(psb_i_t base);
+  /* GPU environment  routines */
+  #ifdef PSB_HAVE_CUDA
+  void    psb_c_cuda_init(psb_c_ctxt *cctxt);
+  void    psb_c_cuda_init_opt(psb_c_ctxt *cctxt, psb_m_t ngpu);
+  void    psb_c_cuda_exit();
+  psb_m_t psb_c_cuda_getDeviceCount();
+  #endif
 
   void   psb_c_mbcast(psb_c_ctxt cctxt, psb_i_t n, psb_m_t *v, psb_i_t root);
   void   psb_c_ibcast(psb_c_ctxt cctxt, psb_i_t n, psb_i_t *v, psb_i_t root);
@@ -70,30 +82,28 @@ extern "C" {
   void psb_c_delete_ctxt(psb_c_ctxt *);
   psb_i_t    psb_c_cdall_vg(psb_l_t ng, psb_i_t *vg, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_l_t *vl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vl_lidx(psb_i_t nl, psb_l_t *vl, psb_i_t *lidx, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_repl(psb_l_t n, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdasb(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdasb_format(psb_c_descriptor *cd, const char *afmt);
   psb_i_t    psb_c_cdfree(psb_c_descriptor *cd);
   psb_i_t    psb_c_cdins(psb_i_t nz, const psb_l_t *ia, const psb_l_t *ja, psb_c_descriptor *cd);
-
+  psb_i_t    psb_c_cdins_lidx(psb_i_t nz, const psb_l_t *ja, const psb_i_t *lidx, psb_c_descriptor *cd);
+  bool       psb_c_is_owned(psb_l_t gindex, psb_c_descriptor *cd);
+  bool       psb_c_cd_is_asb(psb_c_descriptor *cd);
+  psb_i_t    psb_c_cd_check_addr(psb_c_descriptor *cd);
+  
 
   psb_i_t    psb_c_cd_get_local_rows(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_local_cols(psb_c_descriptor *cd);
   psb_l_t    psb_c_cd_get_global_rows(psb_c_descriptor *cd);
+  psb_l_t    psb_c_cd_get_global_cols(psb_c_descriptor *cd);
   psb_i_t    psb_c_cd_get_global_indices(psb_l_t idx[], psb_i_t nidx, bool owned, psb_c_descriptor *cd);
   psb_i_t    psb_c_g2l(psb_c_descriptor *cdh,psb_l_t gindex,bool cowned);
 
 
-  /*  legal values for upd argument */
-#define psb_upd_srch_   98764
-#define psb_upd_perm_   98765
-#define psb_upd_def_   psb_upd_srch_
-  /*  legal values for dupl argument */
-#define psb_dupl_ovwrt_  0
-#define psb_dupl_add_    1
-#define psb_dupl_err_    2
-#define psb_dupl_def_    psb_dupl_ovwrt_
-
+ 
   /* legal values for afmt */
 #define PSB_AFMT_CSR     "CSR"
 #define PSB_AFMT_CSC     "CSC"
@@ -104,6 +114,17 @@ extern "C" {
 #define psb_NoTrans_    "N"
 #define psb_Trans_      "T"
 #define psb_ConjTrans_  "C"
+
+#if 0
+  /*  legal values for upd argument */
+#define psb_upd_srch_   98764
+#define psb_upd_perm_   98765
+#define psb_upd_def_    psb_upd_srch_
+  /*  legal values for dupl argument */
+#define psb_dupl_ovwrt_  0
+#define psb_dupl_add_    1
+#define psb_dupl_err_    2
+#define psb_dupl_def_    psb_dupl_ovwrt_
 
   /*  legal values for halo swap modes argument */
 #define  psb_swap_send_  1
@@ -117,7 +138,7 @@ extern "C" {
 #define psb_avg_         2
 #define psb_square_root_ 3
 #define psb_setzero_     4
-
+#endif
 
 #ifdef __cplusplus
 }

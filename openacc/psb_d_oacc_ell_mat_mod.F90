@@ -143,10 +143,18 @@ contains
     !       but with size 0, then CREATE,UPDATE and DELETE
     !       will fail
     !
-    if (psb_size(a%val)>0)   call acc_delete_finalize(a%val)
-    if (psb_size(a%ja)>0)    call acc_delete_finalize(a%ja)
-    if (psb_size(a%irn)>0)   call acc_delete_finalize(a%irn)
-    if (psb_size(a%idiag)>0) call acc_delete_finalize(a%idiag)
+    if (psb_size(a%val)>0)   then
+      !$acc exit data delete(a%val) finalize
+    end if
+    if (psb_size(a%ja)>0)    then
+      !$acc exit data delete(a%ja) finalize
+    end if
+    if (psb_size(a%irn)>0)   then
+      !$acc exit data delete(a%irn) finalize
+    end if
+    if (psb_size(a%idiag)>0) then
+      !$acc exit data delete(a%idiag) finalize
+    end if
     return
   end subroutine d_oacc_ell_free_dev_space
 
@@ -186,10 +194,18 @@ contains
     !       but with size 0, then CREATE,UPDATE and DELETE
     !       will fail
     !
-    if (psb_size(a%val)>0)   call acc_copyin(a%val)
-    if (psb_size(a%ja)>0)    call acc_copyin(a%ja)
-    if (psb_size(a%irn)>0)   call acc_copyin(a%irn)
-    if (psb_size(a%idiag)>0) call acc_copyin(a%idiag)
+    if (psb_size(a%val)>0)   then
+      !$acc enter data copyin(a%val) 
+    end if
+    if (psb_size(a%ja)>0)    then
+      !$acc enter data copyin(a%ja)
+    end if
+    if (psb_size(a%irn)>0)   then
+      !$acc enter data copyin(a%irn)
+    end if
+    if (psb_size(a%idiag)>0) then
+      !$acc enter data copyin(a%idiag)
+    end if
   end subroutine d_oacc_ell_sync_dev_space
 
   function d_oacc_ell_is_host(a) result(res)
@@ -256,15 +272,31 @@ contains
     !       will fail
     !
     if (a%is_dev()) then
-      if (psb_size(a%val)>0)   call acc_update_self(a%val)
-      if (psb_size(a%ja)>0)    call acc_update_self(a%ja)
-      if (psb_size(a%irn)>0)   call acc_update_self(a%irn)
-      if (psb_size(a%idiag)>0) call acc_update_self(a%idiag)
+      if (psb_size(a%val)>0)   then
+        !$acc update self(a%val)
+      end if
+      if (psb_size(a%ja)>0)    then
+        !$acc update self(a%ja)
+      end if
+      if (psb_size(a%irn)>0)   then
+        !$acc update self(a%irn)
+      end if
+      if (psb_size(a%idiag)>0) then
+        !$acc update self(a%idiag)
+      end if
     else if (a%is_host()) then
-      if (psb_size(a%val)>0)         call acc_update_device(a%val)
-      if (psb_size(a%ja)>0)          call acc_update_device(a%ja)
-      if (psb_size(a%irn)>0)         call acc_update_device(a%irn)
-      if (psb_size(a%idiag)>0)       call acc_update_device(a%idiag)
+      if (psb_size(a%val)>0)         then
+        !$acc update device(a%val)
+      end if
+      if (psb_size(a%ja)>0)          then
+        !$acc update device(a%ja)
+      end if
+      if (psb_size(a%irn)>0)         then
+        !$acc update device(a%irn)
+      end if
+      if (psb_size(a%idiag)>0)       then
+        !$acc update device(a%idiag)
+      end if
     end if
     call tmpa%set_sync()
   end subroutine d_oacc_ell_sync

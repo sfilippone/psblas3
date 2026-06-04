@@ -144,9 +144,15 @@ contains
     !       but with size 0, then CREATE,UPDATE and DELETE
     !       will fail
     !
-    if (psb_size(a%val)>0) call acc_delete_finalize(a%val)
-    if (psb_size(a%ja)>0)  call acc_delete_finalize(a%ja)
-    if (psb_size(a%irp)>0) call acc_delete_finalize(a%irp)
+    if (psb_size(a%val)>0) then
+      !$acc exit data delete(a%val) finalize
+    end if
+    if (psb_size(a%ja)>0)  then
+      !$acc exit data delete(a%ja) finalize
+    end if
+    if (psb_size(a%irp)>0) then
+      !$acc exit data delete(a%irp) finalize
+    end if
 
     return
   end subroutine d_oacc_csr_free_dev_space
@@ -257,9 +263,15 @@ contains
     !       but with size 0, then CREATE,UPDATE and DELETE
     !       will fail
     !
-    if (psb_size(a%val)>0) call acc_copyin(a%val)
-    if (psb_size(a%ja)>0)  call acc_copyin(a%ja)
-    if (psb_size(a%irp)>0) call acc_copyin(a%irp)
+    if (psb_size(a%val)>0) then
+      !$acc enter data copyin(a%val)
+    end if
+    if (psb_size(a%ja)>0)  then
+      !$acc enter data copyin(a%ja)
+    end if
+    if (psb_size(a%irp)>0) then
+      !$acc enter data copyin(a%irp)
+    end if
   end subroutine d_oacc_csr_sync_dev_space
 
   subroutine d_oacc_csr_sync(a)
@@ -275,13 +287,25 @@ contains
     !       will fail
     !
     if (a%is_dev()) then
-      if (psb_size(a%val)>0) call acc_update_self(a%val)
-      if (psb_size(a%ja)>0)  call acc_update_self(a%ja)
-      if (psb_size(a%irp)>0) call acc_update_self(a%irp)
+      if (psb_size(a%val)>0) then
+        !$acc update self(a%val)
+      end if
+      if (psb_size(a%ja)>0)  then
+        !$acc update self(a%ja)
+      end if
+      if (psb_size(a%irp)>0) then
+        !$acc update self(a%irp)
+      end if
     else if (a%is_host()) then
-      if (psb_size(a%val)>0) call acc_update_device(a%val)
-      if (psb_size(a%ja)>0)  call acc_update_device(a%ja)
-      if (psb_size(a%irp)>0) call acc_update_device(a%irp)
+      if (psb_size(a%val)>0) then
+        !$acc update device(a%val)
+      end if
+      if (psb_size(a%ja)>0)  then
+        !$acc update device(a%ja)
+      end if
+      if (psb_size(a%irp)>0) then
+        !$acc update device(a%irp)
+      end if
     end if
     call tmpa%set_sync()
   end subroutine d_oacc_csr_sync

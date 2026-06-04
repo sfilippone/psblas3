@@ -1,9 +1,9 @@
 set(PSB_base_source_files
   comm/psb_dovrl_a.f90
   comm/psb_dovrl.f90
-#  comm/psb_i2halo_a.f90
+  comm/psb_i2halo_a.f90
   comm/internals/psi_zswaptran.F90
-#  comm/internals/psi_i2ovrl_upd_a.f90
+  comm/internals/psi_i2ovrl_upd_a.f90
   comm/internals/psi_lovrl_save.f90
   comm/internals/psi_movrl_save_a.f90
   comm/internals/psi_sovrl_restr_a.f90
@@ -16,7 +16,8 @@ set(PSB_base_source_files
   comm/internals/psi_lovrl_upd.f90
   comm/internals/psi_dswapdata_a.F90
   comm/internals/psi_movrl_upd_a.f90
-#  comm/internals/psi_i2swaptran_a.F90
+  modules/comm/comm_schemes/psb_comm_rma_mod.F90
+  comm/internals/psi_i2swaptran_a.F90
   comm/internals/psi_dswaptran.F90
   comm/internals/psi_covrl_save_a.f90
   comm/internals/psi_eovrl_restr_a.f90
@@ -31,7 +32,7 @@ set(PSB_base_source_files
   comm/internals/psi_sswaptran.F90
   comm/internals/psi_lswaptran.F90
   comm/internals/psi_mswaptran_a.F90
-#  comm/internals/psi_i2ovrl_restr_a.f90
+  comm/internals/psi_i2ovrl_restr_a.f90
   comm/internals/psi_covrl_restr.f90
   comm/internals/psi_mswapdata_a.F90
   comm/internals/psi_zovrl_restr_a.f90
@@ -49,14 +50,14 @@ set(PSB_base_source_files
   comm/internals/psi_zswapdata_a.F90
   comm/internals/psi_dovrl_save.f90
   comm/internals/psi_covrl_save.f90
-#  comm/internals/psi_i2swapdata_a.F90
+  comm/internals/psi_i2swapdata_a.F90
   comm/internals/psi_dovrl_upd.f90
   comm/internals/psi_eovrl_save_a.f90
   comm/internals/psi_zovrl_upd_a.f90
   comm/internals/psi_zswapdata.F90
   comm/internals/psi_covrl_upd.f90
   comm/internals/psi_cswaptran.F90
-#  comm/internals/psi_i2ovrl_save_a.f90
+  comm/internals/psi_i2ovrl_save_a.f90
   comm/internals/psi_sovrl_upd.f90
   comm/internals/psi_eswapdata_a.F90
   comm/internals/psi_movrl_restr_a.f90
@@ -82,9 +83,9 @@ set(PSB_base_source_files
   comm/psb_zhalo.f90
   comm/psb_movrl_a.f90
   comm/psb_chalo_a.f90
-#  comm/psb_i2scatter_a.F90
+  comm/psb_i2scatter_a.F90
   comm/psb_sgather_a.f90
-#  comm/psb_i2ovrl_a.f90
+  comm/psb_i2ovrl_a.f90
   comm/psb_zovrl_a.f90
   comm/psb_covrl.f90
   comm/psb_shalo.f90
@@ -100,7 +101,7 @@ set(PSB_base_source_files
   comm/psb_zhalo_a.f90
   comm/psb_sscatter_a.F90
   comm/psb_lscatter.F90
-#  comm/psb_i2gather_a.f90
+  comm/psb_i2gather_a.f90
   comm/psb_ihalo.f90
   comm/psb_iovrl.f90
   comm/psb_zspgather.F90
@@ -122,29 +123,29 @@ set(PSB_base_source_files
   comm/psb_mgather_a.f90
   comm/psb_dgather.f90
   comm/psb_lhalo.f90
-  internals/psi_bld_glb_dep_list.F90
-  internals/psi_graph_fnd_owner.F90
-  internals/psi_sort_dl.f90
-  internals/psi_indx_map_fnd_owner.F90
-  internals/psi_fnd_owner.F90
-  internals/psi_bld_tmpovrl.f90
-  internals/psi_symm_dep_list.F90
-  internals/psi_desc_impl.f90
-###  internals/psi_compute_size.f90
-  internals/psi_hash_impl.f90
-  internals/psi_crea_ovr_elem.f90
-  internals/psi_a2a_fnd_owner.F90
-  internals/psi_bld_tmphalo.f90
-  internals/psi_crea_bnd_elem.f90
-  internals/psi_desc_index.F90
-  internals/psi_xtr_loc_dl.F90
-  internals/psi_crea_index.f90
-  internals/psi_srtlist.f90
-  internals/psi_adjcncy_fnd_owner.F90
+  auxil/psi_bld_glb_dep_list.F90
+  auxil/psi_graph_fnd_owner.F90
+  auxil/psi_sort_dl.f90
+  auxil/psi_indx_map_fnd_owner.F90
+  auxil/psi_fnd_owner.F90
+  auxil/psi_bld_tmpovrl.f90
+  auxil/psi_symm_dep_list.F90
+  auxil/psi_desc_impl.f90
+###  auxil/psi_compute_size.f90
+  auxil/psi_hash_impl.f90
+  auxil/psi_crea_ovr_elem.f90
+  auxil/psi_a2a_fnd_owner.F90
+  auxil/psi_bld_tmphalo.f90
+  auxil/psi_crea_bnd_elem.f90
+  auxil/psi_desc_index.F90
+  auxil/psi_xtr_loc_dl.F90
+  auxil/psi_crea_index.f90
+  auxil/psi_srtlist.f90
+  auxil/psi_adjcncy_fnd_owner.F90
   tools/psb_sins.f90
   tools/psb_zspasb.f90
   tools/psb_zspalloc.f90
-#  tools/psb_i2_remote_vect.F90
+  tools/psb_i2_remote_vect.F90
   tools/psb_sfree_a.f90
   tools/psb_cdprt.f90
   tools/psb_c_glob_transpose.F90
@@ -160,7 +161,7 @@ set(PSB_base_source_files
   tools/psb_zallc_a.f90
   tools/psb_d_map.f90
   tools/psb_lfree.f90
-#  tools/psb_i2ins_a.f90
+  tools/psb_i2ins_a.f90
   tools/psb_s_remap.F90
   tools/psb_cspalloc.f90
   tools/psb_glob_to_loc.f90
@@ -177,9 +178,9 @@ set(PSB_base_source_files
   tools/psb_sgetelem.f90
   tools/psb_cspfree.f90
   tools/psb_cins.f90
-#  tools/psb_i2free_a.f90
+  tools/psb_i2free_a.f90
   tools/psb_dspins.F90
-#  tools/psb_i2asb_a.f90
+  tools/psb_i2asb_a.f90
   tools/psb_dsphalo.F90
   tools/psb_d_glob_transpose.F90
   tools/psb_c_par_csr_spspmm.f90
@@ -265,14 +266,18 @@ set(PSB_base_source_files
   tools/psb_zspins.F90
   tools/psb_zins_a.f90
   tools/psb_cdcpy.F90
-#  tools/psb_i2allc_a.f90
+  tools/psb_i2allc_a.f90
   tools/psb_dallc.f90
   tools/psb_cd_renum_block.F90
   tools/psb_dasb_a.f90
   tools/psb_zsprn.f90
   tools/psb_get_overlap.f90
-  serial/psb_crwextd.f90
-  serial/psb_zspspmm.f90
+  serial/psb_saplusat.f90
+  serial/psb_daplusat.f90	
+  serial/psb_caplusat.f90
+  serial/psb_zaplusat.f90	
+  serial/psb_crwextd.f90	
+  serial/psb_zspspmm.F90
   serial/psb_drwextd.f90
   serial/psb_dnumbmm.f90
   serial/psb_damax_s.f90
@@ -343,14 +348,14 @@ set(PSB_base_source_files
   serial/psb_dsymbmm.f90
   serial/psb_samax_s.f90
   serial/psb_lsame.f90
-  serial/psb_dspspmm.f90
+  serial/psb_dspspmm.F90
   serial/psb_ssymbmm.f90
   serial/psb_cgeprt.f90
   serial/psb_sgeprt.f90
-#  serial/psi_i2_serial_impl.F90
+  serial/psi_i2_serial_impl.F90
   serial/psi_e_serial_impl.F90
   serial/psb_zsymbmm.f90
-  serial/psb_cspspmm.f90
+  serial/psb_cspspmm.F90
   serial/psb_aspxpby.f90
   serial/psi_s_serial_impl.F90
   serial/psb_zamax_s.f90
@@ -359,7 +364,7 @@ set(PSB_base_source_files
   serial/psb_casum_s.f90
   serial/psi_d_serial_impl.F90
   serial/psi_c_serial_impl.F90
-  serial/psb_sspspmm.f90
+  serial/psb_sspspmm.F90
   serial/psb_cnumbmm.f90
   psblas/psb_damax.f90
   psblas/psb_dspmm.f90
@@ -426,14 +431,15 @@ set(PSB_base_source_files
   psblas/psb_cinv_vect.f90
   psblas/psb_zasum.f90
   modules/comm/psi_z_comm_v_mod.f90
-#  modules/comm/psb_i2_comm_a_mod.f90
-  modules/comm/psb_m_comm_a_mod.f90
+  modules/comm/psb_m_comm_a_mod.f90	
   modules/comm/psb_z_linmap_mod.f90
   modules/comm/psi_s_comm_a_mod.f90
-#  modules/comm/psi_i2_comm_a_mod.f90
+  modules/comm/psb_i2_comm_a_mod.f90
+  modules/comm/psi_i2_comm_a_mod.f90
+  modules/comm/psi_i2_comm_v_mod.f90
   modules/comm/psi_m_comm_a_mod.f90
   modules/comm/psi_l_comm_v_mod.f90
-  modules/comm/psb_comm_mod.f90
+  modules/comm/psb_comm_mod.F90
   modules/comm/psb_l_comm_mod.f90
   modules/comm/psb_d_linmap_mod.f90
   modules/comm/psi_d_comm_v_mod.f90
@@ -458,7 +464,7 @@ set(PSB_base_source_files
   modules/comm/psb_linmap_mod.f90
   modules/comm/psb_z_comm_a_mod.f90
   modules/comm/psi_c_comm_a_mod.f90
-#  modules/auxil/psb_i2_isort_mod.f90
+  modules/auxil/psb_i2_isort_mod.f90
   modules/auxil/psb_z_ip_reord_mod.F90
   modules/auxil/psi_s_serial_mod.f90
   modules/auxil/psb_s_hsort_x_mod.f90
@@ -466,7 +472,7 @@ set(PSB_base_source_files
   modules/auxil/psb_d_hsort_mod.f90
   modules/auxil/psi_alcx_mod.f90
   modules/auxil/psb_e_ip_reord_mod.F90
-#  modules/auxil/psb_i2_msort_mod.f90
+  modules/auxil/psb_i2_msort_mod.f90
   modules/auxil/psb_rb_idx_tree_mod.f90
   modules/auxil/psb_m_isort_mod.f90
   modules/auxil/psb_e_msort_mod.f90
@@ -485,14 +491,15 @@ set(PSB_base_source_files
   modules/auxil/psb_z_isort_mod.f90
   modules/auxil/psb_e_hsort_mod.f90
   modules/auxil/psi_m_serial_mod.f90
-#  modules/auxil/psi_i2_serial_mod.f90
+  modules/auxil/psi_i2_serial_mod.f90
+  modules/auxil/psb_i2_hsort_x_mod.f90
   modules/auxil/psb_s_isort_mod.f90
   modules/auxil/psb_e_realloc_mod.F90
   modules/auxil/psb_c_hsort_mod.f90
   modules/auxil/psb_z_msort_mod.f90
   modules/auxil/psi_d_serial_mod.f90
   modules/auxil/psb_z_qsort_mod.f90
-#  modules/auxil/psb_i2_hsort_mod.f90
+  modules/auxil/psb_i2_hsort_mod.f90
   modules/auxil/psb_m_msort_mod.f90
   modules/auxil/psb_m_ip_reord_mod.F90
   modules/auxil/psb_string_mod.f90
@@ -505,14 +512,14 @@ set(PSB_base_source_files
   modules/auxil/psb_m_hsort_mod.f90
   modules/auxil/psb_z_realloc_mod.F90
   modules/auxil/psb_z_rb_idx_tree_mod.f90
-#  modules/auxil/psb_i2_ip_reord_mod.F90
-#  modules/auxil/psb_i2_realloc_mod.F90
+  modules/auxil/psb_i2_ip_reord_mod.F90
+  modules/auxil/psb_i2_realloc_mod.F90
   modules/auxil/psb_s_rb_idx_tree_mod.f90
   modules/auxil/psb_c_hsort_x_mod.f90
   modules/auxil/psb_s_ip_reord_mod.F90
   modules/auxil/psb_d_isort_mod.f90
   modules/auxil/psi_z_serial_mod.f90
-#  modules/auxil/psb_i2_qsort_mod.f90
+  modules/auxil/psb_i2_qsort_mod.f90
   modules/auxil/psb_d_msort_mod.f90
   modules/auxil/psb_c_qsort_mod.f90
   modules/auxil/psb_z_hsort_x_mod.f90
@@ -529,7 +536,7 @@ set(PSB_base_source_files
   modules/psi_l_mod.F90
   modules/penv/psi_d_collective_mod.F90
   modules/penv/psi_m_p2p_mod.F90
-#  modules/penv/psi_i2_collective_mod.F90
+  modules/penv/psi_i2_collective_mod.F90
   modules/penv/psi_s_p2p_mod.F90
   modules/penv/psi_e_p2p_mod.F90
   modules/penv/psi_m_collective_mod.F90
@@ -539,7 +546,7 @@ set(PSB_base_source_files
   modules/penv/psi_z_p2p_mod.F90
   modules/penv/psi_c_collective_mod.F90
   modules/penv/psi_collective_mod.F90
-#  modules/penv/psi_i2_p2p_mod.F90
+  modules/penv/psi_i2_p2p_mod.F90
   modules/penv/psi_c_p2p_mod.F90
   modules/penv/psi_e_collective_mod.F90
   modules/penv/psi_z_collective_mod.F90
@@ -558,7 +565,7 @@ set(PSB_base_source_files
   modules/tools/psb_d_tools_mod.F90
   modules/tools/psb_c_tools_mod.F90
   modules/tools/psb_e_tools_a_mod.f90
-#  modules/tools/psb_i2_tools_a_mod.f90
+  modules/tools/psb_i2_tools_a_mod.f90
   modules/tools/psb_c_tools_a_mod.f90
   modules/tools/psb_z_tools_mod.F90
   modules/tools/psb_l_tools_mod.F90
@@ -584,6 +591,7 @@ set(PSB_base_source_files
   modules/serial/psb_s_base_mat_mod.F90
   modules/serial/psb_base_mat_mod.F90
   modules/serial/psb_i_base_vect_mod.F90
+  modules/serial/psb_i2_base_vect_mod.F90
   modules/serial/psb_s_vect_mod.F90
   modules/serial/psb_s_base_vect_mod.F90
   modules/serial/psb_d_base_vect_mod.F90
@@ -592,7 +600,8 @@ set(PSB_base_source_files
   modules/serial/psb_c_vect_mod.F90
   modules/serial/psb_d_mat_mod.F90
   modules/serial/psb_s_mat_mod.F90
-  modules/serial/psb_i_vect_mod.F90
+  modules/serial/psb_i2_vect_mod.F90
+  modules/serial/psb_i_vect_mod.F90	
   modules/serial/psb_d_vect_mod.F90
   modules/serial/psb_c_base_vect_mod.F90
   modules/serial/psb_vect_mod.f90
@@ -612,6 +621,7 @@ set(PSB_base_source_files
   modules/psb_penv_mod.F90
   modules/psb_error_mod.F90
   modules/psb_timers_mod.f90
+  modules/psi_i2_mod.F90
   modules/psi_i_mod.F90
   modules/psi_z_mod.F90
   modules/desc/psb_desc_const_mod.f90

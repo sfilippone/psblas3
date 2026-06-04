@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -435,11 +435,11 @@ contains
 
 
     if (info == psb_success_) call psb_spall(a,desc_a,info,nnz=nnz, &
-         & bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+         & bldmode=psb_matbld_remote_)
     ! define  rhs from boundary conditions; also build initial guess
     if (info == psb_success_) call psb_geall(xv,desc_a,info)
     if (info == psb_success_) call psb_geall(bv,desc_a,info,&
-         & bldmode=psb_matbld_remote_,dupl=psb_dupl_add_)
+         & bldmode=psb_matbld_remote_)
 
     call psb_barrier(ctxt)
     talc = psb_wtime()-t0
@@ -496,9 +496,9 @@ contains
           ! compute gridpoint coordinates
           call idx2ijk(ix,iy,iz,glob_row,idim,idim,idim)
           ! x, y, z coordinates
-          x = (ix-1)*deltah
-          y = (iy-1)*deltah
-          z = (iz-1)*deltah
+          x = (ix)*deltah
+          y = (iy)*deltah
+          z = (iz)*deltah
           zt(k) = f_(x,y,z)
           ! internal point: build discretization
           !
@@ -606,9 +606,9 @@ contains
     t1 = psb_wtime()
     if (info == psb_success_) then
       if (present(amold)) then
-        call psb_spasb(a,desc_a,info,mold=amold)
+        call psb_spasb(a,desc_a,info,mold=amold,dupl=psb_dupl_add_)
       else
-        call psb_spasb(a,desc_a,info,afmt=afmt)
+        call psb_spasb(a,desc_a,info,afmt=afmt,dupl=psb_dupl_add_)
       end if
     end if
     call psb_barrier(ctxt)
@@ -618,8 +618,8 @@ contains
       call psb_errpush(info,name,a_err=ch_err)
       goto 9999
     end if
-    if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold)
-    if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold)
+    if (info == psb_success_) call psb_geasb(xv,desc_a,info,mold=vmold,dupl=psb_dupl_add_)
+    if (info == psb_success_) call psb_geasb(bv,desc_a,info,mold=vmold,dupl=psb_dupl_add_)
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
       ch_err='asb rout.'
@@ -933,7 +933,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=psb_inp_unit
+        call pr_usage(psb_err_unit)
+        call psb_abort(ctxt)
+        stop        
       end if
       read(inp_unit,*) ip
       if (ip >= 3) then
@@ -1070,12 +1072,10 @@ contains
   !
   subroutine pr_usage(iout)
     integer(psb_ipk_) :: iout
-    write(iout,*)'incorrect parameter(s) found'
-    write(iout,*)' usage:  pde3d90 methd prec dim &
-         &[istop itmax itrace]'
-    write(iout,*)' where:'
-    write(iout,*)'     methd:    cgstab cgs rgmres bicgstabl'
-    write(iout,*)'     prec :    bjac diag none'
+    write(iout,*)' usage:  psb_s_pde3d cntrl-file '
+    write(iout,*)' where ctrl-file contains the following:'
+    write(iout,*)'     methd     BICGSTAB CGS  BICG BICGSTABL RGMRES FCG CGR RICHARDSON'
+    write(iout,*)'     prec      bjac diag none'
     write(iout,*)'     dim       number of points along each axis'
     write(iout,*)'               the size of the resulting linear '
     write(iout,*)'               system is dim**3'

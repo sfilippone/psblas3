@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -67,7 +67,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=psb_inp_unit
+        write(psb_err_unit,*) 'Usage: psb_d_fileread ctrl-file '
+        call psb_abort(ctxt)
+        stop        
       end if
       ! Read Input Parameters
       read(inp_unit,*) ip
@@ -187,7 +189,9 @@ contains
           write(psb_err_unit,*) 'Opened file ',trim(filename),' for input'
         end if
       else
-        inp_unit=inp_unit
+        write(psb_err_unit,*) 'Usage: psb_s_fileread ctrl-file '
+        call psb_abort(ctxt)
+        stop        
       end if
       ! Read Input Parameters
       read(inp_unit,*) ip

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -41,24 +41,32 @@
 !  Data Structures and Algorithms
 !  Addison-Wesley
 !
-subroutine psb_mhsort(x,ix,dir,flag)
+subroutine psb_mhsort(x,ix,dir,flag,reord)
   use psb_sort_mod, psb_protect_name => psb_mhsort
   use psb_error_mod
   implicit none 
   integer(psb_mpk_), intent(inout)           :: x(:) 
-  integer(psb_ipk_), optional, intent(in)    :: dir, flag
+  integer(psb_ipk_), optional, intent(in)    :: dir, flag,reord
   integer(psb_ipk_), optional, intent(inout) :: ix(:)
 
-  integer(psb_ipk_) :: flag_, n, i, err_act,info
-  integer(psb_ipk_) :: dir_, l
+  integer(psb_ipk_) :: flag_, err_act, info, reord_
+  integer(psb_ipk_) :: n, i, l, dir_
   integer(psb_mpk_) :: key
   integer(psb_ipk_) :: index
+  integer(psb_mpk_), allocatable :: tx(:) 
 
   integer(psb_ipk_)  :: ierr(5)
   character(len=20)  :: name
 
   name='psb_hsort'
   call psb_erractionsave(err_act)
+
+
+  if (present(reord)) then 
+    reord_ = reord
+  else
+    reord_= psb_sort_reord_x_
+  end if
 
   if (present(flag)) then 
     flag_ = flag
@@ -113,24 +121,57 @@ subroutine psb_mhsort(x,ix,dir,flag)
         ix(i) = i
       end do
     end if
-    l = 0
-    do i=1, n 
-      key   = x(i)
-      index = ix(i)
-      call psi_idx_insert_heap(key,index,l,x,ix,dir_,info)
-      if (l /= i) then 
-        write(psb_err_unit,*) 'Mismatch while heapifying ! '
-      end if
-    end do
-    do i=n, 2, -1 
-      call psi_idx_heap_get_first(key,index,l,x,ix,dir_,info)
-      if (l /= i-1) then 
-        write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
-      end if
-      x(i)  = key
-      ix(i) = index
-    end do
-  else if (.not.present(ix)) then 
+    select case(reord_)
+    case (psb_sort_reord_x_)
+
+      l = 0
+      do i=1, n 
+        key   = x(i)
+        index = ix(i)
+        call psi_idx_insert_heap(key,index,l,x,ix,dir_,info)
+        if (l /= i) then 
+          write(psb_err_unit,*) 'Mismatch while heapifying ! '
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_idx_heap_get_first(key,index,l,x,ix,dir_,info)
+        if (l /= i-1) then 
+          write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        x(i)  = key
+        ix(i) = index
+      end do
+    case(psb_sort_noreord_x_)
+      tx = x
+
+      l = 0
+      do i=1, n 
+        key   = tx(i)
+        index = ix(i)
+        call psi_idx_insert_heap(key,index,l,tx,ix,dir_,info)
+        if (l /= i) then 
+          write(psb_err_unit,*) 'Mismatch while heapifying ! '
+        end if
+      end do
+      do i=n, 2, -1 
+        call psi_idx_heap_get_first(key,index,l,tx,ix,dir_,info)
+        if (l /= i-1) then 
+          write(psb_err_unit,*) 'Mismatch while pulling out of heap ',l,i
+        end if
+        tx(i)  = key
+        ix(i) = index
+      end do
+    end select
+  else if (.not.present(ix)) then
+    select case(reord_)
+    case (psb_sort_reord_x_)
+      !OK
+    case default 
+      ierr(1) = 5; ierr(2) = reord_; 
+      call psb_errpush(psb_err_input_value_invalid_i_,name,i_err=ierr)
+      goto 9999
+    end select
+
     l = 0
     do i=1, n 
       key   = x(i)

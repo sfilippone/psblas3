@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -66,7 +66,8 @@ Subroutine psb_d_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   use psb_comm_mod
   use psb_penv_mod
   use psb_d_tools_mod, psb_protect_name => psb_d_par_csr_spspmm
-  use psb_d_serial_mod, only : psb_dcsrspspmm, psb_dbase_rwextd
+  use psb_d_csr_mat_mod, only : psb_dcsrspspmm
+  use psb_d_serial_mod, only : psb_dbase_rwextd
   Implicit None
 
   type(psb_d_csr_sparse_mat),intent(in)    :: acsr
@@ -166,7 +167,8 @@ Subroutine psb_ld_par_csr_spspmm(acsr,desc_a,bcsr,ccsr,desc_c,info,data)
   use psb_comm_mod
   use psb_penv_mod
   use psb_d_tools_mod, psb_protect_name => psb_ld_par_csr_spspmm
-  use psb_d_serial_mod, only : psb_ldcsrspspmm, psb_ldbase_rwextd
+  use psb_d_csr_mat_mod, only : psb_ldcsrspspmm
+  use psb_d_serial_mod, only : psb_ldbase_rwextd
   Implicit None
 
   type(psb_ld_csr_sparse_mat),intent(in)    :: acsr

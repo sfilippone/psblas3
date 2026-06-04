@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -71,31 +71,29 @@ subroutine psb_s_bjac_dump(prec,info,prefix,head)
 
 end subroutine psb_s_bjac_dump
 
-subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
+subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans)
   use psb_base_mod
   use psb_s_bjacprec, psb_protect_name => psb_s_bjac_apply_vect
   implicit none
-  type(psb_desc_type),intent(in)    :: desc_data
+  type(psb_desc_type),intent(in)                :: desc_data
   class(psb_s_bjac_prec_type), intent(inout)  :: prec
-  real(psb_spk_),intent(in)         :: alpha,beta
-  type(psb_s_vect_type),intent(inout)   :: x
-  type(psb_s_vect_type),intent(inout)   :: y
-  integer(psb_ipk_), intent(out)              :: info
-  character(len=1), optional        :: trans
-  real(psb_spk_),intent(inout), optional, target :: work(:)
+  real(psb_spk_),intent(in)                    :: alpha,beta
+  type(psb_s_vect_type),intent(inout)         :: x
+  type(psb_s_vect_type),intent(inout)         :: y
+  integer(psb_ipk_), intent(out)                :: info
+  character(len=1), optional                    :: trans
 
   ! Local variables
-  integer(psb_ipk_) :: n_row,n_col
-  real(psb_spk_), pointer :: ww(:), aux(:)
+  integer(psb_ipk_)       :: n_row,n_col
   type(psb_s_vect_type) :: wv, wv1
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np,me
-  integer(psb_ipk_) :: err_act, ierr(5)
-  integer(psb_ipk_) :: debug_level, debug_unit
-  logical            :: do_alloc_wrk
-  character          :: trans_
-  character(len=20)  :: name='s_bjac_prec_apply'
-  character(len=20)  :: ch_err
+  type(psb_ctxt_type)     :: ctxt
+  integer(psb_ipk_)       :: np,me
+  integer(psb_ipk_)       :: err_act, ierr(5)
+  integer(psb_ipk_)       :: debug_level, debug_unit
+  logical                 :: do_alloc_wrk
+  character               :: trans_
+  character(len=20)       :: name='s_bjac_prec_apply'
+  character(len=20)       :: ch_err
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -140,18 +138,6 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   end if
 
 
-  if (n_col <= size(work)) then
-    ww => work(1:n_col)
-    if ((4*n_col+n_col) <= size(work)) then
-      aux => work(n_col+1:)
-    else
-      allocate(aux(4*n_col),stat=info)
-
-    endif
-  else
-    allocate(ww(n_col),aux(4*n_col),stat=info)
-  endif
-
   if (info /= psb_success_) then
     call psb_errpush(psb_err_from_subroutine_,name,a_err='Allocate')
     goto 9999
@@ -168,28 +154,28 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       select case(trans_)
       case('N')
         call psb_spsm(sone,prec%av(psb_l_pr_),x,szero,wv,desc_data,info,&
-             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_,work=aux)
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_)
         if(info == psb_success_) call psb_spsm(alpha,prec%av(psb_u_pr_),wv,&
              & beta,y,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_, work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
       case('T')
         call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
-             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_, work=aux)
+             & trans=trans_,scale='L',diag=prec%dv,choice=psb_none_)
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv,&
              & beta,y,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
       case('C')
 
         call psb_spsm(sone,prec%av(psb_u_pr_),x,szero,wv,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_, work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
         call wv1%mlt(sone,prec%dv,wv,szero,info,conjgx=trans_)
 
         if(info == psb_success_)  call psb_spsm(alpha,prec%av(psb_l_pr_),wv1,&
              & beta,y,desc_data,info,&
-             & trans=trans_,scale='U',choice=psb_none_,work=aux)
+             & trans=trans_,scale='U',choice=psb_none_)
 
       end select
       if (info /= psb_success_) then
@@ -203,20 +189,20 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
       select case(trans_)
       case('N')
         call psb_spmm(sone,prec%av(psb_l_pr_),x,szero,wv,desc_data,info,&
-             & trans=trans_,work=aux,doswap=.false.)
+             & trans=trans_,doswap=.false.)
 
         if (info == psb_success_) call wv1%mlt(sone,prec%dv,wv,szero,info)
         if(info == psb_success_) &
              & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1,&
-             & beta,y,desc_data,info, trans=trans_, work=aux,doswap=.false.)
+             & beta,y,desc_data,info, trans=trans_,doswap=.false.)
 
        case('T','C')
          call psb_spmm(sone,prec%av(psb_l_pr_),x,szero,wv,desc_data,info,&
-              & trans=trans_,work=aux,doswap=.false.)
+              & trans=trans_,doswap=.false.)
          if (info == psb_success_) call wv1%mlt(sone,prec%dv,wv,szero,info)
          if (info == psb_success_) &
               & call psb_spmm(alpha,prec%av(psb_u_pr_),wv1, &
-              & beta,y,desc_data,info,trans=trans_,work=aux,doswap=.false.)
+              & beta,y,desc_data,info,trans=trans_,doswap=.false.)
 
       end select
       if (info /= psb_success_) then
@@ -235,15 +221,6 @@ subroutine psb_s_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
   call psb_halo(y,desc_data,info,data=psb_comm_mov_)
 
   if (do_alloc_wrk) call prec%free_wrk(info)
-  if (n_col <= size(work)) then
-    if ((4*n_col+n_col) <= size(work)) then
-    else
-      deallocate(aux)
-    endif
-  else
-    deallocate(ww,aux)
-  endif
-
 
   call psb_erractionrestore(err_act)
   return

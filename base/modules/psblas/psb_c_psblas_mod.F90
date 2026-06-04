@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -421,7 +421,7 @@ module psb_c_psblas_mod
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_cspmv
     subroutine psb_cspmv_vect(alpha, a, x, beta, y,&
-         & desc_a, info, trans, work,doswap)
+         & desc_a, info, trans,doswap)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
       type(psb_cspmat_type), intent(in)    :: a
@@ -430,7 +430,6 @@ module psb_c_psblas_mod
       complex(psb_spk_), intent(in)        :: alpha, beta
       type(psb_desc_type), intent(in)      :: desc_a
       character, optional, intent(in)      :: trans
-      complex(psb_spk_), optional, intent(inout),target :: work(:)
       logical, optional, intent(in)        :: doswap
       integer(psb_ipk_), intent(out)                 :: info
     end subroutine psb_cspmv_vect
@@ -472,7 +471,7 @@ module psb_c_psblas_mod
     end subroutine psb_cspsv
     subroutine psb_cspsv_vect(alpha, t, x, beta, y,&
          & desc_a, info, trans, scale, choice,&
-         & diag, work)
+         & diag)
       import :: psb_desc_type, psb_spk_, psb_ipk_, &
            & psb_c_vect_type, psb_cspmat_type
       type(psb_cspmat_type), intent(inout)   :: t
@@ -483,7 +482,6 @@ module psb_c_psblas_mod
       character, optional, intent(in)        :: trans, scale
       integer(psb_ipk_), optional, intent(in)          :: choice
       type(psb_c_vect_type), intent(inout), optional :: diag
-      complex(psb_spk_), optional, intent(inout), target :: work(:)
       integer(psb_ipk_), intent(out)                   :: info
     end subroutine psb_cspsv_vect
   end interface

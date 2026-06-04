@@ -1,6 +1,6 @@
 include Make.inc
 
-all: dirs based precd linslvd utild cbindd extd  $(CUDAD) $(OACCD) libd
+all: dirs mods objs libd
 	@echo "====================================="
 	@echo "PSBLAS libraries Compilation Successful."
 
@@ -9,13 +9,35 @@ dirs:
 	(if test ! -d include ; then mkdir include; fi; $(INSTALL_DATA) Make.inc  include/Make.inc.psblas)
 	(if test ! -d modules ; then mkdir modules; fi;)	
 
-precd: based
-utild: based	
-linslvd: precd 
-extd:  based
-cudad:  extd
-oaccd:  extd	
-cbindd: based precd linslvd utild 
+mods: basemods utilmods precmods linslvmods cbindmods extmods $(CUDAMODS) $(OACCMODS)
+
+basemods:
+	$(MAKE) -C base mods
+precmods: basemods
+	$(MAKE) -C prec mods
+linslvmods: precmods
+	$(MAKE) -C linsolve mods
+utilmods: basemods
+	$(MAKE) -C util mods 
+cbindmods: basemods precmods linslvmods utilmods extmods $(CUDAMODS)
+	$(MAKE) -C cbind objs
+extmods: basemods  
+	$(MAKE) -C ext mods
+cudamods: extmods  
+	$(MAKE) -C cuda mods
+oaccmods: extmods  
+	$(MAKE) -C openacc mods 
+
+
+objs: mods based precd linslvd utild cbindd extd  $(CUDAD) $(OACCD)
+based: basemods
+precd: precmods
+utild: utilmods	
+linslvd: linslvmods
+extd:  extmods
+cudad:  cudamods
+oaccd:  oaccmods
+cbindd: cbindmods
 
 libd: based precd linslvd utild cbindd extd $(CUDALD) $(OACCLD)
 	$(MAKE) -C base lib
@@ -42,9 +64,9 @@ cbindd:
 	$(MAKE) -C cbind objs 
 extd:   
 	$(MAKE) -C ext objs
-cudad:   
+cudad:   cudamods
 	$(MAKE) -C cuda objs
-oaccd:   
+oaccd:   oaccmods
 	$(MAKE) -C openacc objs 
 
 

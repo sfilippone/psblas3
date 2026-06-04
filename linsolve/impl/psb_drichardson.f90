@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -91,11 +91,10 @@ Subroutine psb_drichardson_vect(a,prec,b,x,eps,desc_a,info,&
   logical           :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: me,np,err_act
-  real(psb_dpk_), allocatable, target   :: aux(:)
   type(psb_d_vect_type), allocatable, target :: wwrk(:)
   type(psb_d_vect_type), pointer  :: q, p, r, z, w
   real(psb_dpk_) :: derr
-  integer(psb_ipk_) :: itmax_, istop_, naux, it, itx, itrace_,&
+  integer(psb_ipk_) :: itmax_, istop_, it, itx, itrace_,&
        &  n_col, n_row,ieg,nspl, istebz
   integer(psb_lpk_) :: mglob
   integer(psb_ipk_) :: debug_level, debug_unit
@@ -155,15 +154,6 @@ Subroutine psb_drichardson_vect(a,prec,b,x,eps,desc_a,info,&
     goto 9999
   end if
 
-  naux=4*n_col
-  allocate(aux(naux), stat=info)
-  if (info == psb_success_) call psb_geall(wwrk,desc_a,info,n=5_psb_ipk_)
-  if (info == psb_success_) call psb_geasb(wwrk,desc_a,info,mold=x%v,scratch=.true.)  
-  if (info /= psb_success_) then 
-    info=psb_err_from_subroutine_non_
-    call psb_errpush(info,name)
-    goto 9999
-  end if
   p  => wwrk(1)
   q  => wwrk(2)
   r  => wwrk(3)
@@ -171,7 +161,7 @@ Subroutine psb_drichardson_vect(a,prec,b,x,eps,desc_a,info,&
   w  => wwrk(5)
 
   call psb_geaxpby(done,b,dzero,r,desc_a,info)
-  if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+  if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info)
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_
     call psb_errpush(info,name)
@@ -186,17 +176,16 @@ Subroutine psb_drichardson_vect(a,prec,b,x,eps,desc_a,info,&
   End If
   
   loop: do itx=1,itmax_
-    call prec%apply(r,z,desc_a,info,work=aux)
+    call prec%apply(r,z,desc_a,info)
     call psb_geaxpby(done,z,done,x,desc_a,info)
     call psb_geaxpby(done,b,dzero,r,desc_a,info)
-    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info,work=aux)
+    if (info == psb_success_) call psb_spmm(-done,a,x,done,r,desc_a,info)
     if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit loop
   end do loop
   call psb_end_conv(methdname,itx,desc_a,stopdat,info,derr,iter)
   if (present(err)) err = derr
 
   if (info == psb_success_) call psb_gefree(wwrk,desc_a,info)
-  if (info == psb_success_) deallocate(aux,stat=info)
   if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)
   
   if(info /= psb_success_) then

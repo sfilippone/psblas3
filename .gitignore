@@ -4,7 +4,11 @@
 *.mtx
 *.smod
 *~
-*.log
+
+*.out
+*.err
+*.csv
+leonardo_comm_script.sh
 
 # header files generated
 /cbind/*.h
@@ -22,9 +26,7 @@ config.status
 docs/src/tmp
 autom4te.cache
 
-build/
-
-
 # the executable from tests
 runs
+data
 

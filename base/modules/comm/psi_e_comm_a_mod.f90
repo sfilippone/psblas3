@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -31,48 +31,47 @@
 !    
 module psi_e_comm_a_mod
   use psi_penv_mod, only : psb_ctxt_type
-  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, psb_epk_
+  use psb_desc_mod, only : psb_desc_type, psb_mpk_, psb_ipk_, &
+       & psb_epk_, psb_i2pk_
 
   interface psi_swapdata
-    subroutine psi_eswapdatam(flag,n,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_eswapdatam(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_epk_)           :: y(:,:), beta
+      integer(psb_epk_), intent(in)           :: beta
+      integer(psb_epk_), intent(inout)        :: y(:,:)
       integer(psb_epk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_eswapdatam
-    subroutine psi_eswapdatav(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_eswapdatav(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_epk_)           :: y(:), beta 
+      integer(psb_epk_), intent(in)           :: beta
+      integer(psb_epk_), intent(inout)        :: y(:)
       integer(psb_epk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_eswapdatav
-      subroutine psi_eswapidxm(ctxt,icomm,flag,n,beta,y,idx,&
+    module subroutine psi_eswapidxm(ctxt,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_mpk_), intent(in)   :: n
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      integer(psb_epk_)        :: y(:,:), beta
+      integer(psb_epk_), intent(in)     :: beta
+      integer(psb_epk_), intent(inout)  :: y(:,:)
       integer(psb_epk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_eswapidxm
-    subroutine psi_eswapidxv(ctxt,icomm,flag,beta,y,idx,&
+    module subroutine psi_eswapidxv(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_Mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      integer(psb_epk_)        :: y(:), beta
+      integer(psb_epk_), intent(in)     :: beta
+      integer(psb_epk_), intent(inout)  :: y(:)
       integer(psb_epk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_eswapidxv
@@ -80,60 +79,56 @@ module psi_e_comm_a_mod
 
 
   interface psi_swaptran
-    subroutine psi_eswaptranm(flag,n,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_eswaptranm(flag,n,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_Mpk_), intent(in)         :: n
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_epk_)           :: y(:,:), beta
+      integer(psb_epk_), intent(in)           :: beta
+      integer(psb_epk_), intent(inout)        :: y(:,:)
       integer(psb_epk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_eswaptranm
-    subroutine psi_eswaptranv(flag,beta,y,desc_a,work,info,data)
-      import 
+    module subroutine psi_eswaptranv(flag,beta,y,desc_a,work,info,data)
       integer(psb_ipk_), intent(in)         :: flag
       integer(psb_ipk_), intent(out)        :: info
-      integer(psb_epk_)           :: y(:), beta
+      integer(psb_epk_), intent(in)           :: beta
+      integer(psb_epk_), intent(inout)        :: y(:)
       integer(psb_epk_),target    :: work(:)
       type(psb_desc_type), target :: desc_a
       integer(psb_ipk_), optional           :: data
     end subroutine psi_eswaptranv
-    subroutine psi_etranidxm(ctxt,icomm,flag,n,beta,y,idx,&
+    module subroutine psi_etranidxm(ctxt,flag,n,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_mpk_), intent(in)   :: n
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      integer(psb_epk_)        :: y(:,:), beta
+      integer(psb_epk_), intent(in)     :: beta
+      integer(psb_epk_), intent(inout)  :: y(:,:)
       integer(psb_epk_),target :: work(:)
       integer(psb_ipk_), intent(in)       :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_etranidxm
-    subroutine psi_etranidxv(ctxt,icomm,flag,beta,y,idx,&
+    module subroutine psi_etranidxv(ctxt,flag,beta,y,idx,&
          & totxch,totsnd,totrcv,work,info)
-      import 
       type(psb_ctxt_type), intent(in) :: ctxt
-      integer(psb_mpk_), intent(in)   :: icomm
       integer(psb_ipk_), intent(in)   :: flag
       integer(psb_ipk_), intent(out)  :: info
-      integer(psb_epk_)        :: y(:), beta
+      integer(psb_epk_), intent(in)     :: beta
+      integer(psb_epk_), intent(inout)  :: y(:)
       integer(psb_epk_),target :: work(:)
       integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd,totrcv
     end subroutine psi_etranidxv
   end interface psi_swaptran
-
+ 
   interface psi_ovrl_upd
-    subroutine  psi_eovrl_updr1(x,desc_a,update,info)
-      import 
+    module subroutine  psi_eovrl_updr1(x,desc_a,update,info)
       integer(psb_epk_), intent(inout), target :: x(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(in)    :: update
       integer(psb_ipk_), intent(out)   :: info
     end subroutine psi_eovrl_updr1
-    subroutine  psi_eovrl_updr2(x,desc_a,update,info)
-      import 
+    module subroutine  psi_eovrl_updr2(x,desc_a,update,info)
       integer(psb_epk_), intent(inout), target :: x(:,:)
       type(psb_desc_type), intent(in)    :: desc_a
       integer(psb_ipk_), intent(in)      :: update
@@ -142,15 +137,13 @@ module psi_e_comm_a_mod
   end interface psi_ovrl_upd
 
   interface psi_ovrl_save
-    subroutine  psi_eovrl_saver1(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_eovrl_saver1(x,xs,desc_a,info)
       integer(psb_epk_), intent(inout) :: x(:)
       integer(psb_epk_), allocatable   :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)   :: info
     end subroutine psi_eovrl_saver1
-    subroutine  psi_eovrl_saver2(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_eovrl_saver2(x,xs,desc_a,info)
       integer(psb_epk_), intent(inout) :: x(:,:)
       integer(psb_epk_), allocatable   :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a
@@ -159,15 +152,13 @@ module psi_e_comm_a_mod
   end interface psi_ovrl_save
 
   interface psi_ovrl_restore
-    subroutine  psi_eovrl_restrr1(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_eovrl_restrr1(x,xs,desc_a,info)
       integer(psb_epk_), intent(inout)  :: x(:)
       integer(psb_epk_)                 :: xs(:)
       type(psb_desc_type), intent(in)  :: desc_a
       integer(psb_ipk_), intent(out)   :: info
     end subroutine psi_eovrl_restrr1
-    subroutine  psi_eovrl_restrr2(x,xs,desc_a,info)
-      import 
+    module subroutine  psi_eovrl_restrr2(x,xs,desc_a,info)
       integer(psb_epk_), intent(inout) :: x(:,:)
       integer(psb_epk_)                :: xs(:,:)
       type(psb_desc_type), intent(in)  :: desc_a

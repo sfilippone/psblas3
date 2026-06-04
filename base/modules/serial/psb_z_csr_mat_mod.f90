@@ -15,7 +15,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -1162,6 +1162,23 @@ module psb_z_csr_mat_mod
     end subroutine psb_lz_csr_aclsum
   end interface
 
+  ! Interfaces for SPSPMM
+  interface 
+    subroutine psb_zcsrspspmm(a,b,c,info)
+      import
+      implicit none 
+      class(psb_z_csr_sparse_mat), intent(in) :: a,b
+      type(psb_z_csr_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_zcsrspspmm
+    subroutine psb_lzcsrspspmm(a,b,c,info)
+      import 
+      implicit none 
+      class(psb_lz_csr_sparse_mat), intent(in) :: a,b
+      type(psb_lz_csr_sparse_mat), intent(out) :: c
+      integer(psb_ipk_), intent(out)          :: info
+    end subroutine psb_lzcsrspspmm
+  end interface
 
 contains
 

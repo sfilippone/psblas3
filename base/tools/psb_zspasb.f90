@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -44,7 +44,7 @@
 !                                            psb_upd_perm_    Permutation(more memory)
 ! 
 !
-subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, bld_and)
+subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, dupl, bld_and)
   use psb_base_mod, psb_protect_name => psb_zspasb
   use psb_sort_mod
   use psi_mod
@@ -59,6 +59,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, bld_and)
   character(len=*), optional, intent(in)   :: afmt
   class(psb_z_base_sparse_mat), intent(in), optional :: mold
   logical, intent(in), optional :: bld_and
+  integer(psb_ipk_), optional, intent(in) :: dupl
   !....Locals....
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: np,me, err_act
@@ -103,7 +104,12 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, bld_and)
   !check on errors encountered in psdspins
 
   if (a%is_bld()) then
-    dupl_ = a%get_dupl()
+    if (present(dupl)) then 
+      dupl_ = dupl
+    else
+      dupl_ = a%get_dupl()
+    end if
+   
     !
     ! First case: we come from a fresh build. 
     ! 
@@ -180,7 +186,7 @@ subroutine psb_zspasb(a,desc_a, info, afmt, upd, mold, bld_and)
   if (bld_and_) then
 !!$    allocate(a%ad,mold=a%a)
 !!$    allocate(a%and,mold=a%a)o    
-    call a%split_nd(n_row,n_col,info)
+!!$    call a%split_nd(n_row,n_col,info)
 !!$    block
 !!$      character(len=1024) :: fname
 !!$      type(psb_z_coo_sparse_mat) :: acoo

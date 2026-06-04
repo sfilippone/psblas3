@@ -14,7 +14,7 @@ CINCLUDES=
 LIBNAME=libpsb_ext.a
 
 
-FOBJS=  psb_d_ell_mat_mod.o psb_d_hll_mat_mod.o \
+MODOBJS=psb_d_ell_mat_mod.o psb_d_hll_mat_mod.o \
 	psb_s_hll_mat_mod.o psb_s_ell_mat_mod.o \
 	psb_c_hll_mat_mod.o psb_c_ell_mat_mod.o \
 	psb_z_hll_mat_mod.o psb_z_ell_mat_mod.o \
@@ -31,13 +31,15 @@ FOBJS=  psb_d_ell_mat_mod.o psb_d_hll_mat_mod.o \
 
 COBJS= 
 
-OBJS=$(COBJS) $(FOBJS)
+OBJS=$(COBJS) $(MODOBJS)
 
 lib: objs ilib 
 	$(AR) $(LIBNAME) $(OBJS)
 	/bin/cp -p $(LIBNAME) $(LIBDIR)
    
-objs: $(OBJS) iobjs
+objs: mods $(OBJS) iobjs
+
+mods: $(MODOBJS)
 	/bin/cp -p *$(.mod) $(MODDIR)
 
 
@@ -65,11 +67,11 @@ psb_s_hll_mat_mod.o psb_c_hll_mat_mod.o psb_d_hll_mat_mod.o psb_z_hll_mat_mod.o:
 ilib: objs
 	$(MAKE) -C impl lib LIBNAME=$(LIBNAME)
 
-iobjs: $(OBJS)
+iobjs: mods
 	$(MAKE) -C impl objs 
 
 clean: cclean iclean
-	/bin/rm -f  $(FOBJS) *$(.mod) *.a
+	/bin/rm -f  $(MODOBJS) *$(.mod) *.a
 
 cclean: 
 	/bin/rm -f  $(COBJS) 

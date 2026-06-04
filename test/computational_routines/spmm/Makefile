@@ -21,7 +21,7 @@ YELLOW=\033[33m
 END_COLOUR=\033[0m
 
 
-all: runsd psb_spmm_test 
+all: runsd psb_spmm_test
 	@printf "$(GREEN)[INFO]\tCompilation success!$(END_COLOUR)\n" 
 
 runsd: 	

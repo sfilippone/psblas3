@@ -4,14 +4,12 @@ module psb_zutil_cbind_mod
    use psb_util_mod
    use psb_base_mod
    use psb_objhandle_mod
-   use psb_base_string_cbind_mod
 
 contains
 
     function psb_c_zmm_mat_write(ah,matrixtitle,filename) bind(c) result(res)
         use psb_base_mod
         use psb_util_mod
-        use psb_base_string_cbind_mod
         implicit none
         integer(psb_c_ipk_) :: res
 
@@ -32,8 +30,8 @@ contains
           return
         end if
 
-        call stringc2f(matrixtitle,mtitle)
-        call stringc2f(filename,fname)
+        call psb_stringc2f(matrixtitle,mtitle)
+        call psb_stringc2f(filename,fname)
 
         call mm_mat_write(ap,mtitle,info,filename=fname)
 
@@ -44,7 +42,6 @@ contains
     function psb_c_zglobal_mat_write(ah,cdh) bind(c) result(res)
         use psb_base_mod
         use psb_util_mod
-        use psb_base_string_cbind_mod
         implicit none
         integer(psb_c_ipk_) :: res
 
@@ -87,7 +84,6 @@ contains
   function psb_c_zglobal_vec_write(vh,cdh) bind(c) result(res)
         use psb_base_mod
         use psb_util_mod
-        use psb_base_string_cbind_mod
         implicit none
         integer(psb_c_ipk_) :: res
 

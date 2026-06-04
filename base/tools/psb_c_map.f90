@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -112,23 +112,22 @@ subroutine psb_c_map_U2V_a(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_c_map_U2V_a
 
-subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
+subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_c_map_U2V_v
   implicit none 
-  class(psb_clinmap_type), intent(in)   :: map
-  complex(psb_spk_), intent(in)        :: alpha,beta
-  type(psb_c_vect_type), intent(inout) :: x,y
-  integer(psb_ipk_), intent(out)                 :: info 
-  complex(psb_spk_), optional          :: work(:)
+  class(psb_clinmap_type), intent(in)                     :: map
+  complex(psb_spk_), intent(in)                               :: alpha,beta
+  type(psb_c_vect_type), intent(inout)                    :: x,y
+  integer(psb_ipk_), intent(out)                            :: info 
   type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
-  type(psb_c_vect_type), target  :: xt, yt
-  type(psb_c_vect_type),pointer  :: ptx, pty
-  complex(psb_spk_), allocatable :: xta(:), yta(:)
-  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2 ,&
+  type(psb_c_vect_type), target   :: xt, yt
+  type(psb_c_vect_type),pointer   :: ptx, pty
+  complex(psb_spk_), allocatable      :: xta(:), yta(:)
+  integer(psb_ipk_)                 :: i, j, nr1, nc1,nr2, nc2 ,&
        &  map_kind, nr, iam, np
-  type(psb_ctxt_type) :: ctxt
-  character(len=20), parameter   :: name='psb_map_U2V_v'
+  type(psb_ctxt_type)               :: ctxt
+  character(len=20), parameter      :: name = 'psb_map_U2V_v'
 
   info = psb_success_
   if (.not.map%is_asb()) then 
@@ -152,7 +151,7 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
       call psb_geasb(yt,map%p_desc_V,info,scratch=.true.,mold=x%v)
       pty => yt
     end if
-    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info,work=work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_U,info)
     if (info == psb_success_) call psb_csmm(cone,map%mat_U2V,x,czero,pty,info)
     if ((info == psb_success_) .and. map%p_desc_V%is_repl().and.(np>1)) then
       yta = pty%get_vect()
@@ -186,7 +185,7 @@ subroutine psb_c_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
     end if
 
     call psb_geaxpby(cone,x,czero,ptx,map%desc_U,info)
-    if (info == psb_success_) call psb_halo(ptx,map%desc_U,info,work=work)
+    if (info == psb_success_) call psb_halo(ptx,map%desc_U,info)
     if (info == psb_success_) call psb_csmm(cone,map%mat_U2V,ptx,czero,pty,info)
     if ((info == psb_success_) .and. map%desc_V%is_repl().and.(np>1)) then
       yta = pty%get_vect()
@@ -294,23 +293,22 @@ subroutine psb_c_map_V2U_a(alpha,x,beta,y,map,info,work)
 
 end subroutine psb_c_map_V2U_a
 
-subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
+subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,vtx,vty)
   use psb_base_mod, psb_protect_name => psb_c_map_V2U_v
   implicit none 
-  class(psb_clinmap_type), intent(in)   :: map
-  complex(psb_spk_), intent(in)        :: alpha,beta
-  type(psb_c_vect_type), intent(inout) :: x,y
-  integer(psb_ipk_), intent(out)                 :: info 
-  complex(psb_spk_), optional          :: work(:)
+  class(psb_clinmap_type), intent(in)                     :: map
+  complex(psb_spk_), intent(in)                               :: alpha,beta
+  type(psb_c_vect_type), intent(inout)                    :: x,y
+  integer(psb_ipk_), intent(out)                            :: info 
   type(psb_c_vect_type), optional, target, intent(inout)  :: vtx,vty
   ! Local
-  type(psb_c_vect_type), target  :: xt, yt
-  type(psb_c_vect_type),pointer  :: ptx, pty
-  complex(psb_spk_), allocatable :: xta(:), yta(:)
-  integer(psb_ipk_) :: i, j, nr1, nc1,nr2, nc2,&
+  type(psb_c_vect_type), target :: xt, yt
+  type(psb_c_vect_type),pointer :: ptx, pty
+  complex(psb_spk_), allocatable    :: xta(:), yta(:)
+  integer(psb_ipk_)               :: i, j, nr1, nc1,nr2, nc2,&
        & map_kind, nr, iam, np
-  type(psb_ctxt_type) :: ctxt
-  character(len=20), parameter   :: name='psb_map_V2U_v'
+  type(psb_ctxt_type)             :: ctxt
+  character(len=20), parameter    :: name = 'psb_map_V2U_v'
 
   info = psb_success_
   if (.not.map%is_asb()) then 
@@ -334,7 +332,7 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
       call psb_geasb(yt,map%p_desc_U,info,scratch=.true.,mold=x%v)
       pty => yt
     end if
-    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info,work=work)
+    if (info == psb_success_) call psb_halo(x,map%p_desc_V,info)
     if (info == psb_success_) call psb_csmm(cone,map%mat_V2U,x,czero,pty,info)
     if ((info == psb_success_) .and. map%p_desc_U%is_repl().and.(np>1)) then
       yta = pty%get_vect()
@@ -369,7 +367,7 @@ subroutine psb_c_map_V2U_v(alpha,x,beta,y,map,info,work,vtx,vty)
 
     call psb_geaxpby(cone,x,czero,ptx,map%desc_V,info)
 
-    if (info == psb_success_) call psb_halo(ptx,map%desc_V,info,work=work)
+    if (info == psb_success_) call psb_halo(ptx,map%desc_V,info)
     if (info == psb_success_) call psb_csmm(cone,map%mat_V2U,ptx,czero,pty,info)
     if ((info == psb_success_) .and. map%desc_U%is_repl().and.(np>1)) then
       yta = pty%get_vect()

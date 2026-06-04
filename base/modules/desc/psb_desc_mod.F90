@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -40,6 +40,7 @@ module psb_desc_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_i_vect_mod
+  use psb_comm_schemes_mod, only: psb_comm_isend_irecv_
 
   implicit none
 
@@ -216,6 +217,7 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
     integer(psb_ipk_), allocatable   :: idx_space(:)
+    integer(psb_ipk_)                :: comm_type = psb_comm_isend_irecv_
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
@@ -224,7 +226,6 @@ module psb_desc_mod
     procedure, pass(desc) :: is_asb          => psb_is_asb_desc
     procedure, pass(desc) :: is_ovl          => psb_is_ovl_desc
     procedure, pass(desc) :: is_repl         => psb_is_repl_desc
-    procedure, pass(desc) :: get_mpic        => psb_cd_get_mpic
     procedure, pass(desc) :: get_dectype     => psb_cd_get_dectype
     procedure, pass(desc) :: get_context     => psb_cd_get_context    
     procedure, pass(desc) :: get_ctxt        => psb_cd_get_context    
@@ -236,15 +237,16 @@ module psb_desc_mod
     procedure, pass(desc) :: get_p_adjcncy   => cd_get_p_adjcncy
     procedure, pass(desc) :: set_p_adjcncy   => cd_set_p_adjcncy
     procedure, pass(desc) :: xtnd_p_adjcncy  => cd_xtnd_p_adjcncy    
-    procedure, pass(desc) :: a_get_list      => psb_cd_get_list
-    procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
-    generic, public       :: get_list => a_get_list, v_get_list
+    procedure, pass(desc) :: a_get_list_p      => psb_cd_get_list_p
+    procedure, pass(desc) :: v_get_list_p      => psb_cd_v_get_list_p
+    generic, public       :: get_list_p => a_get_list_p, v_get_list_p
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
     procedure, pass(desc) :: clone           => psb_cd_clone
     procedure, pass(desc) :: cnv             => psb_cd_cnv
     procedure, pass(desc) :: free            => psb_cdfree
     procedure, pass(desc) :: destroy         => psb_cd_destroy
     procedure, pass(desc) :: nullify         => nullify_desc
+    procedure, pass(desc) :: check_addr      => psb_cd_check_addr
 
     procedure, pass(desc) :: get_fmt         => cd_get_fmt
     procedure, pass(desc) :: fnd_owner       => cd_fnd_owner
@@ -268,7 +270,7 @@ module psb_desc_mod
     procedure, pass(desc) :: g2lv2_ins       => cd_g2lv2_ins
     generic, public       :: g2l_ins         => g2ls2_ins, g2lv2_ins
     generic, public       :: g2lip_ins       => g2ls1_ins, g2lv1_ins
-    
+    procedure, pass(desc) :: set_comm_scheme => psb_desc_set_comm_scheme
 
   end type psb_desc_type
 
@@ -312,7 +314,16 @@ module psb_desc_mod
   integer(psb_lpk_), private, save :: cd_hash_threshold = psb_default_hash_threshold
   integer(psb_ipk_), private, save :: sp_a2av_alg        = psb_sp_a2av_smpl_triad_ 
 
-contains 
+contains
+
+  subroutine psb_desc_set_comm_scheme(desc, comm_type, info)
+    implicit none
+    class(psb_desc_type), intent(inout) :: desc
+    integer(psb_ipk_), intent(in)       :: comm_type
+    integer(psb_ipk_), intent(out)      :: info
+    info = psb_success_
+    desc%comm_type = comm_type
+  end subroutine psb_desc_set_comm_scheme
 
   function psb_m_get_sp_a2av_alg() result(val)
     implicit none
@@ -637,23 +648,6 @@ contains
 
   end function psb_cd_get_dectype
 
-  function psb_cd_get_mpic(desc) result(val)
-    use psb_error_mod
-    implicit none 
-    integer(psb_ipk_) :: val 
-    class(psb_desc_type), intent(in) :: desc
-
-    if (allocated(desc%indxmap)) then
-      val = desc%indxmap%get_mpic()    
-    else
-      val = -1
-!!$      call psb_errpush(psb_err_invalid_cd_state_,'psb_cd_get_mpic')
-!!$      call psb_error()
-    end if
-
-  end function psb_cd_get_mpic
-
-
   function cd_get_p_adjcncy(desc) result(val)
     implicit none 
     integer(psb_ipk_), allocatable   :: val(:)
@@ -741,7 +735,7 @@ contains
 
 
 
-  subroutine psb_cd_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
+  subroutine psb_cd_get_list_p(data,desc,ipnt,totxch,idxr,idxs,info)
     use psb_const_mod
     use psb_error_mod
     use psb_penv_mod
@@ -756,7 +750,7 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act, debug_level, debug_unit
     logical, parameter  :: debug=.false., debugprt=.false.
-    character(len=20), parameter :: name='psb_cd_get_list'
+    character(len=20), parameter :: name='psb_cd_get_list_p'
 
     info = psb_success_
     call psb_erractionsave(err_act)
@@ -768,12 +762,25 @@ contains
     call psb_info(ctxt, me, np)
 
     select case(data) 
-    case(psb_comm_halo_) 
-      ipnt   => desc%halo_index
+    case(psb_comm_halo_)
+      if (allocated(desc%halo_index)) then 
+        ipnt   => desc%halo_index
+      else
+        info = psb_err_invalid_cd_state_
+      end if
     case(psb_comm_ovr_) 
-      ipnt   => desc%ovrlap_index
+      if (allocated(desc%ovrlap_index)) then 
+        ipnt   => desc%ovrlap_index
+      else
+        info = psb_err_invalid_cd_state_
+      end if
+
     case(psb_comm_ext_) 
-      ipnt   => desc%ext_index
+      if (allocated(desc%ext_index)) then 
+        ipnt   => desc%ext_index
+      else
+        info = psb_err_invalid_cd_state_
+      end if
       if (debug_level >= psb_debug_ext_) then
         if (.not.associated(desc%base_desc)) then
           write(debug_unit,*) trim(name),&
@@ -787,12 +794,17 @@ contains
         end if
       end if
     case(psb_comm_mov_) 
-      ipnt   => desc%ovr_mst_idx
+      if (allocated(desc%ovr_mst_idx)) then 
+        ipnt   => desc%ovr_mst_idx
+      else
+        info = psb_err_invalid_cd_state_
+      end if
     case default
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='wrong Data selector')
-      goto 9999
     end select
+    if (info /= 0) goto 9999
+    
     call psb_get_xch_idx(ipnt,totxch,idxs,idxr)
 
 
@@ -804,10 +816,10 @@ contains
 
     return
 
-  end subroutine psb_cd_get_list
+  end subroutine psb_cd_get_list_p
 
 
-  subroutine psb_cd_v_get_list(data,desc,ipnt,totxch,idxr,idxs,info)
+  subroutine psb_cd_v_get_list_p(data,desc,ipnt,totxch,idxr,idxs,info)
     use psb_const_mod
     use psb_error_mod
     use psb_penv_mod
@@ -821,7 +833,7 @@ contains
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_)   :: np, me, err_act, debug_level, debug_unit
     logical, parameter  :: debug=.false., debugprt=.false.
-    character(len=20), parameter :: name='psb_cd_v_get_list'
+    character(len=20), parameter :: name='psb_cd_v_get_list_p'
 
     info = psb_success_
     call psb_erractionsave(err_act)
@@ -833,18 +845,25 @@ contains
     call psb_info(ctxt, me, np)
 
     select case(data) 
-    case(psb_comm_halo_) 
-      ipnt   => desc%v_halo_index%v
-      if (.not.allocated(desc%v_halo_index%v)) &
-           & info = psb_err_inconsistent_index_lists_
+    case(psb_comm_halo_)
+      if (allocated(desc%v_halo_index%v)) then 
+        ipnt   => desc%v_halo_index%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
     case(psb_comm_ovr_) 
-      ipnt   => desc%v_ovrlap_index%v
-      if (.not.allocated(desc%v_ovrlap_index%v)) &
-           & info = psb_err_inconsistent_index_lists_
+      if (allocated(desc%v_ovrlap_index%v)) then 
+        ipnt   => desc%v_ovrlap_index%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
+
     case(psb_comm_ext_) 
-      ipnt   => desc%v_ext_index%v
-      if (.not.allocated(desc%v_ext_index%v)) &
-           & info = psb_err_inconsistent_index_lists_
+      if (allocated(desc%v_ext_index%v)) then 
+        ipnt   => desc%v_ext_index%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
       if (debug_level >= psb_debug_ext_) then
         if (.not.associated(desc%base_desc)) then
           write(debug_unit,*) trim(name),&
@@ -858,17 +877,17 @@ contains
         end if
       end if
     case(psb_comm_mov_) 
-      ipnt   => desc%v_ovr_mst_idx%v
-      if (.not.allocated(desc%v_ovr_mst_idx%v)) &
-           & info = psb_err_inconsistent_index_lists_
-      
+      if (allocated(desc%v_ovr_mst_idx%v)) then 
+        ipnt   => desc%v_ovr_mst_idx%v
+      else
+        info = psb_err_inconsistent_index_lists_
+      end if
     case default
       info=psb_err_from_subroutine_
-    end select
-    if (info /= psb_success_) then
       call psb_errpush(info,name,a_err='wrong Data selector')
-      goto 9999
-    end if
+    end select
+    if (info /= 0) goto 9999
+
     
     call psb_get_v_xch_idx(ipnt,totxch,idxs,idxr)
 
@@ -880,7 +899,7 @@ contains
 
     return
 
-  end subroutine psb_cd_v_get_list
+  end subroutine psb_cd_v_get_list_p
 
   !
   ! Subroutine: psb_cdfree
@@ -1161,6 +1180,60 @@ contains
     return
 
   end subroutine psb_cd_clone
+
+  subroutine psb_cd_check_addr(desc, info)
+
+    use psb_error_mod
+    use psb_penv_mod
+    use psb_realloc_mod
+    implicit none
+    !....parameters...
+
+    class(psb_desc_type), intent(inout), target :: desc
+    integer(psb_ipk_), intent(out)              :: info
+    !locals
+    type(psb_ctxt_type) :: ctxt
+    integer(psb_ipk_)   :: np, me, err_act
+    integer(psb_ipk_)   :: debug_level, debug_unit
+    character(len=20)   :: name
+
+    debug_unit  = psb_get_debug_unit()
+    debug_level = psb_get_debug_level()
+
+    if (psb_get_errstatus() /= 0) return 
+    info = psb_success_
+    call psb_erractionsave(err_act)
+    name = 'psb_cdcpy'
+
+    if (desc%is_asb()) then
+      write(0,*) 'DESC%CHECK_ADDR:  v_halo, v_ext_idx, v_ovrlap_idx,v_ovr_mst'
+      if (info == psb_success_) &
+           & call desc%v_halo_index%check_addr()
+      if (info == psb_success_) &
+           & call desc%v_ext_index%check_addr()
+      if (info == psb_success_) &
+           & call desc%v_ovrlap_index%check_addr()
+      if (info == psb_success_) &
+           & call desc%v_ovr_mst_idx%check_addr()
+      write(0,*) 'DESC%CHECK_ADDR:  done'
+    end if
+    
+    if (info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      call psb_errpush(info,name)
+      goto 9999
+    endif
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),': Done'
+
+    call psb_erractionrestore(err_act)
+    return
+
+9999 call psb_error_handler(ctxt,err_act)
+
+    return
+
+  end subroutine psb_cd_check_addr
 
   
   Subroutine psb_cd_get_recv_idx(tmp,desc,data,info)
