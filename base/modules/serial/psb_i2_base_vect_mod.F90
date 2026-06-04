@@ -33,7 +33,7 @@
 ! package: psb_i2_base_vect_mod
 !
 ! This module contains the definition of the psb_i2_base_vect type which
-! is a container for dense vectors.\
+! is a container for dense vectors.
 !  This is encapsulated instead of being just a simple array to allow for
 !  more complicated situations, such as GPU programming, where the memory
 !  area we are interested in is not easily accessible from the host/Fortran
@@ -66,6 +66,7 @@ module psb_i2_base_vect_mod
     integer(psb_i2pk_), allocatable              :: v(:)
     integer(psb_i2pk_), allocatable              :: combuf(:)
     class(psb_comm_handle_type), allocatable  :: comm_handle 
+    integer(psb_mpk_), allocatable :: comid(:,:)
 
     !> vector bldstate:
     !!    null:   pristine;
@@ -142,7 +143,9 @@ module psb_i2_base_vect_mod
     procedure, nopass  :: device_wait  => i2_base_device_wait
     procedure, pass(x) :: maybe_free_buffer  => i2_base_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => i2_base_free_buffer
-    
+    procedure, pass(x) :: new_comid    => i2_base_new_comid
+    procedure, pass(x) :: free_comid   => i2_base_free_comid
+
     !
     ! Basic info
     procedure, pass(x) :: get_nrows => i2_base_get_nrows
@@ -758,6 +761,7 @@ contains
     info = 0
     if (allocated(x%v)) deallocate(x%v, stat=info)
     if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
+    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
     if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)  
     if ((info == 0).and.allocated(x%comm_handle)) then
       call psb_comm_free(x%comm_handle, info_comm)
@@ -808,6 +812,24 @@ contains
          &  call x%free_buffer(info)
 
   end subroutine i2_base_maybe_free_buffer
+
+  !
+  !> Function  base_free_comid:
+  !! \memberof  psb_i2_base_vect_type
+  !! \brief Free aux MPI communication id buffer
+  !!
+  !!  \param info  return code
+  !!
+  !
+  subroutine i2_base_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none
+    class(psb_i2_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine i2_base_free_comid
   
   function i2_base_get_ncfs(x) result(res)
     implicit none
@@ -1280,6 +1302,17 @@ contains
     call psb_realloc(n,x%combuf,info)
   end subroutine i2_base_new_buffer
 
+  subroutine i2_base_new_comid(n,x,info)
+    use psb_realloc_mod
+    implicit none
+    class(psb_i2_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,2_psb_ipk_,x%comid,info)
+  end subroutine i2_base_new_comid
+
+
   !
   ! shortcut alpha=1 beta=0
   !
@@ -1394,6 +1427,7 @@ module psb_i2_base_multivect_mod
     integer(psb_i2pk_), allocatable              :: v(:,:)
     integer(psb_i2pk_), allocatable              :: combuf(:)
     class(psb_comm_handle_type), allocatable  :: comm_handle 
+    integer(psb_mpk_), allocatable :: comid(:,:)
 
     !> vector bldstate:
     !!    null:   pristine;
@@ -1481,6 +1515,8 @@ module psb_i2_base_multivect_mod
     procedure, nopass  :: device_wait  => i2_base_mlv_device_wait
     procedure, pass(x) :: maybe_free_buffer  => i2_base_mlv_maybe_free_buffer
     procedure, pass(x) :: free_buffer  => i2_base_mlv_free_buffer
+    procedure, pass(x) :: new_comid    => i2_base_mlv_new_comid
+    procedure, pass(x) :: free_comid   => i2_base_mlv_free_comid
 
     !
     ! Gather/scatter. These are needed for MPI interfacing.
@@ -2278,6 +2314,16 @@ contains
     call psb_realloc(n*nc,x%combuf,info)
   end subroutine i2_base_mlv_new_buffer
 
+  subroutine i2_base_mlv_new_comid(n,x,info)
+    use psb_realloc_mod
+    implicit none
+    class(psb_i2_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)              :: n
+    integer(psb_ipk_), intent(out)             :: info
+
+    call psb_realloc(n,2_psb_ipk_,x%comid,info)
+  end subroutine i2_base_mlv_new_comid
+
 
   subroutine i2_base_mlv_maybe_free_buffer(x,info)
     use psb_realloc_mod
@@ -2301,6 +2347,17 @@ contains
     if (allocated(x%combuf)) &
          &  deallocate(x%combuf,stat=info)
   end subroutine i2_base_mlv_free_buffer
+
+  subroutine i2_base_mlv_free_comid(x,info)
+    use psb_realloc_mod
+    implicit none
+    class(psb_i2_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    if (allocated(x%comid)) &
+         &  deallocate(x%comid,stat=info)
+  end subroutine i2_base_mlv_free_comid
+
 
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))

@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -46,7 +46,12 @@ module psb_sort_mod
   use psb_const_mod
   use psb_ip_reord_mod
   use psi_serial_mod
-  
+   
+  use psb_i2_hsort_mod
+  use psb_i2_isort_mod
+  use psb_i2_msort_mod
+  use psb_i2_qsort_mod
+   
   use psb_m_hsort_mod
   use psb_m_isort_mod
   use psb_m_msort_mod
@@ -77,6 +82,7 @@ module psb_sort_mod
   use psb_z_msort_mod
   use psb_z_qsort_mod
 
+  use psb_i2_hsort_x_mod
   use psb_i_hsort_x_mod
   use psb_l_hsort_x_mod
   use psb_s_hsort_x_mod

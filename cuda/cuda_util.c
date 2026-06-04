@@ -14,7 +14,7 @@
   /*      documentation and/or other materials provided with the distribution. */
   /*   3. The name of the PSBLAS group or the names of its contributors may */
   /*      not be used to endorse or promote products derived from this */
-  /*      software without specific written permission. */
+  /*      software without specific prior written permission. */
  
   /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS */
   /* ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED */
@@ -247,14 +247,14 @@ int gpuInit(int dev)
 void gpuClose()
 {
   cudaStream_t st1, st2;
-  if (! psb_cuda_handle)
+  if ((! psb_cuda_handle)&&(! psb_cublas_handle)) {
     st1=spgpuGetStream(psb_cuda_handle);
-  if (! psb_cublas_handle)
     cublasGetStream(psb_cublas_handle,&st2);
+    if (st1 != st2) 
+      psb_cudaDestroyCublasHandle();
+  }
   FcusparseDestroy();
   psb_cudaDestroyHandle();
-  if (st1 != st2) 
-    psb_cudaDestroyCublasHandle();
   free(prop);
   prop=NULL;
   hasUVA=-1;

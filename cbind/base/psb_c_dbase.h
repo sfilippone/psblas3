@@ -37,7 +37,10 @@ psb_i_t    psb_c_dgeasb_options(psb_c_dvector *xh, psb_c_descriptor *cdh, psb_i_
 psb_i_t	   psb_c_dgeasb_options_format(psb_c_dvector *xh, psb_c_descriptor *cdh,
 										psb_i_t dupl, const char *fmt);
 psb_i_t    psb_c_dgefree(psb_c_dvector *xh, psb_c_descriptor *cdh);
+psb_i_t    psb_c_dgereinit(psb_c_dvector *xh, psb_c_descriptor *cdh, bool clear);
 psb_d_t    psb_c_dgetelem(psb_c_dvector *xh,psb_l_t index,psb_c_descriptor *cd);
+psb_d_t	   psb_c_dmatgetelem(psb_c_dspmat *ah,psb_l_t rowindex,psb_l_t colindex,psb_c_descriptor *cdh);	
+
 
 /* sparse matrices*/
 psb_c_dspmat* psb_c_new_dspmat();
@@ -62,8 +65,10 @@ psb_i_t    psb_c_dspasb_opt(psb_c_dspmat *mh, psb_c_descriptor *cdh,
  			const char *afmt, psb_i_t upd, psb_i_t dupl); 
 psb_i_t    psb_c_dsprn(psb_c_dspmat *mh, psb_c_descriptor *cdh, _Bool clear);
 psb_i_t    psb_c_dmat_name_print(psb_c_dspmat *mh, char *name);
-psb_i_t		 psb_c_dvect_set_scal(psb_c_dvector *xh, psb_d_t val);
-psb_i_t		 psb_c_dvect_set_vect(psb_c_dvector *xh, psb_d_t *val, psb_i_t n);
+psb_i_t    psb_c_dvect_set_scal(psb_c_dvector *xh, psb_d_t val);
+psb_i_t	   psb_c_dvect_set_vect(psb_c_dvector *xh, psb_d_t *val, psb_i_t n);
+psb_d_t    psb_c_dvect_get_entry(psb_c_dvector *xh, psb_i_t index);
+psb_i_t    psb_c_dvect_set_entry(psb_c_dvector *xh, psb_i_t index, psb_d_t val);
 
 /* psblas computational routines */
 psb_d_t psb_c_dgedot(psb_c_dvector *xh, psb_c_dvector *yh, psb_c_descriptor *cdh);

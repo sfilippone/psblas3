@@ -14,7 +14,7 @@
 !         documentation and/or other materials provided with the distribution.
 !      3. The name of the PSBLAS group or the names of its contributors may
 !         not be used to endorse or promote products derived from this
-!         software without specific written permission.
+!         software without specific prior written permission.
 !   
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 !    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -1035,6 +1035,8 @@ contains
 ! !$        call psb_error(ctxt)
 ! !$      endif
 ! !$    endif
+    if (close_) call psb_clear_vect_defaults()
+    if (close_) call psb_clear_mat_defaults()
 #if defined(PSB_SERIAL_MPI)
     ! Under serial mode, CLOSE has no effect, but reclaim
     ! the used ctxt number. 
@@ -1044,12 +1046,6 @@ contains
       call psb_close_all_context(psb_mesg_queue)
     else
       call psb_close_context(psb_mesg_queue,ctxt)
-    end if
-    !if ((ctxt /= mpi_comm_null).and.(ctxt /= mpi_comm_world)) then
-    if (allocated(ctxt%ctxt)) then
-      !write(0,*) ctxt%ctxt,mpi_comm_world,mpi_comm_null
-      if ((ctxt%ctxt /= mpi_comm_world).and.(ctxt%ctxt /= mpi_comm_null)) &
-           & call mpi_comm_Free(ctxt%ctxt,info)
     end if
     if (close_) then 
       if (info == 0) call mpi_op_free(mpi_i2amx_op,info)
@@ -1069,12 +1065,16 @@ contains
       if (info == 0) call mpi_op_free(mpi_snrm2_op,info)
       if (info == 0) call mpi_op_free(mpi_dnrm2_op,info)
     end if
+    if (allocated(ctxt%ctxt)) then
+!!$      write(0,*) ctxt%ctxt,mpi_comm_world,mpi_comm_null,mpi_comm_self
+      if ((ctxt%ctxt /= mpi_comm_world).and.(ctxt%ctxt /= mpi_comm_null).and.&
+           & (ctxt%ctxt /= mpi_comm_self)) &
+           & call mpi_comm_Free(ctxt%ctxt,info)
+    end if
     
     if (close_) call mpi_finalize(info)
 
 #endif
-    if (close_) call psb_clear_vect_defaults()
-    if (close_) call psb_clear_mat_defaults()
 
   end subroutine psb_exit_mpik
 
