@@ -30,3 +30,6 @@ autom4te.cache
 runs
 data
 
+# CMake build directory
+build/
+
