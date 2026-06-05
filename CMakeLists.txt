@@ -353,10 +353,41 @@ Replacing `noexecstack` with `execstack`."
   set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
   file(MAKE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY})
 
+  # Build the list of directories that may contain mpi.mod / MPI.mod.
+  # MPICH ships mpi.mod under its include/ dir (already in
+  # MPI_Fortran_INCLUDE_PATH), while OpenMPI ships it under lib/ and leaves
+  # MPI_Fortran_INCLUDE_PATH empty, so we also query the compiler wrapper and
+  # probe lib/ and include/ next to it.
+  set(_mpi_mod_dirs ${MPI_Fortran_INCLUDE_PATH})
+
+  # Ask the wrapper directly (OpenMPI understands --showme:{inc,lib}dirs;
+  # other wrappers simply error out and are ignored).
+  foreach(_showme --showme:incdirs --showme:libdirs)
+    execute_process(
+      COMMAND "${CMAKE_Fortran_COMPILER}" ${_showme}
+      OUTPUT_VARIABLE _showme_out
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_QUIET)
+    if(_showme_out)
+      separate_arguments(_showme_list UNIX_COMMAND "${_showme_out}")
+      list(APPEND _mpi_mod_dirs ${_showme_list})
+    endif()
+  endforeach()
+
+  # Fallback: lib/ and include/ relative to the MPI Fortran compiler wrapper.
+  get_filename_component(_mpi_fc_path "${CMAKE_Fortran_COMPILER}" REALPATH)
+  get_filename_component(_mpi_fc_bin  "${_mpi_fc_path}" DIRECTORY)
+  get_filename_component(_mpi_fc_root "${_mpi_fc_bin}" DIRECTORY)
+  list(APPEND _mpi_mod_dirs "${_mpi_fc_root}/lib" "${_mpi_fc_root}/include")
+
+  if(_mpi_mod_dirs)
+    list(REMOVE_DUPLICATES _mpi_mod_dirs)
+  endif()
+
   # Try to copy mpi.mod or MPI.mod into module directory
   set(_mpi_mod_found FALSE)
   foreach(_mpi_mod_name mpi.mod MPI.mod)
-    foreach(_mpi_inc ${MPI_Fortran_INCLUDE_PATH})
+    foreach(_mpi_inc ${_mpi_mod_dirs})
       if(EXISTS "${_mpi_inc}/${_mpi_mod_name}")
         file(COPY "${_mpi_inc}/${_mpi_mod_name}" DESTINATION "${CMAKE_Fortran_MODULE_DIRECTORY}")
         message(STATUS "Copied ${_mpi_mod_name} from ${_mpi_inc}")
@@ -370,7 +401,7 @@ Replacing `noexecstack` with `execstack`."
   endforeach()
 
   if(NOT _mpi_mod_found)
-    message(WARNING "mpi.mod not found in MPI include paths; assuming it is built-in to mpifort.")
+    message(WARNING "mpi.mod not found in MPI include/lib paths; assuming it is built-in to the MPI Fortran compiler.")
   endif()
 
   #-----------------------------------------------
