@@ -596,7 +596,7 @@ contains
   !  diagonal block (i,i) of tnest independently.
   !  y(i) = alpha * T(i,i)^{-1} x(i) + beta * y(i)
   subroutine psb_d_nest_spsm(alpha, tnest, xnest, beta, ynest, descs, info, &
-       &                     trans, scale, choice, work)
+       &                     trans, scale, choice)
     real(psb_dpk_),               intent(in)              :: alpha, beta
     type(psb_d_nest_sparse_mat),  intent(inout)           :: tnest
     type(psb_d_nest_vect_type),   intent(inout)           :: xnest
@@ -605,7 +605,6 @@ contains
     integer(psb_ipk_),            intent(out)             :: info
     character, optional,          intent(in)              :: trans, scale
     integer(psb_ipk_), optional,  intent(in)              :: choice
-    real(psb_dpk_), optional,     intent(inout), target   :: work(:)
 
     integer(psb_ipk_) :: i
 
@@ -618,7 +617,7 @@ contains
       else
         call psb_spsm(alpha, tnest%mats(i,i), xnest%vects(i), beta, ynest%vects(i), &
              &        descs%descs(i,i), info, trans=trans, scale=scale, &
-             &        choice=choice, work=work)
+             &        choice=choice)
       end if
       if (info /= 0) return
     end do
