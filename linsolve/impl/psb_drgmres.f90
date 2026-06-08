@@ -285,6 +285,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
     end if
     
     call psb_spmm(-done,a,x,done,v(1),desc_a,info,work=aux)
+    if (present(s1)) call psb_gemlt(s1,v(1),desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
@@ -401,10 +402,11 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
         !
         rst = rs
         call psb_geaxpby(done,x,dzero,xt,desc_a,info)
-        call rebuildx(i,h,v,w,w1,xt,rst,c,s,prec,desc_a,info)
+        call rebuildx(i,h,v,w,w1,xt,rst,c,s,prec,desc_a,info,s2=s2)
 
         call psb_geaxpby(done,b,dzero,w1,desc_a,info)
         call psb_spmm(-done,a,xt,done,w1,desc_a,info,work=aux)
+        if (present(s1)) call psb_gemlt(s1,w,desc_a,info)
         rni = psb_geamax(w1,desc_a,info)
         xni = psb_geamax(xt,desc_a,info)
         errnum = rni
@@ -442,7 +444,8 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
           call psb_geaxpby(done,xt,dzero,x,desc_a,info)
 ! =          x = xt 
         case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
-          call  rebuildx(i,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
+          call  rebuildx(i,h,v,w,w1,x,rs,c,s,prec,desc_a,info,s2=s2)
+          !
 
         end select
 
@@ -462,7 +465,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(done,xt,dzero,x,desc_a,info)!      x = xt 
 
     case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
-      call  rebuildx(nl,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
+      call  rebuildx(nl,h,v,w,w1,x,rs,c,s,prec,desc_a,info,s2=s2)          !
     end select
     
     if (itx >= itmax_) then 
@@ -533,11 +536,12 @@ contains
   ! Rebuild solution X from the space V using the factor
   ! stored in R
   !
-  subroutine rebuildx(n,h,v,w,w1,x,rs,c,s,prec,desc_a,info)
+  subroutine rebuildx(n,h,v,w,w1,x,rs,c,s,prec,desc_a,info,s2)
     real(psb_dpk_)   :: c(:), s(:), rs(:), h(:,:)
     type(psb_d_vect_type) :: v(:), w, w1, x
     type(psb_desc_type) :: desc_a
     class(psb_dprec_type) :: prec
+    type(psb_d_vect_type), intent(inout), optional   :: s2
     integer(psb_ipk_) :: info
     integer(psb_ipk_) :: k,n
 
@@ -549,12 +553,13 @@ contains
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' Rebuild x-> RS:',rs(1:n)
-    call w1%zero()
+    call w%zero()
     do k=1, n
-      call psb_geaxpby(rs(k),v(k),done,w1,desc_a,info)
+      call psb_geaxpby(rs(k),v(k),done,w,desc_a,info)
     end do
-    call prec%apply(w1,w,desc_a,info)
-    call psb_geaxpby(done,w,done,x,desc_a,info)
+    if (present(s2)) call psb_gediv(s2,w,desc_a,info)
+    call prec%apply(w,w1,desc_a,info)
+    call psb_geaxpby(done,w1,done,x,desc_a,info)
   end subroutine rebuildx
 
 end subroutine psb_drgmres_vect
