@@ -134,7 +134,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_c_vect_type)              :: w, w1, xt
   real(psb_spk_) :: tmp 
   complex(psb_spk_) :: scal, gm, rti, rti1
-  integer(psb_ipk_) ::litmax, naux, it, k, itrace_,&
+  integer(psb_ipk_) ::itmax_, naux, it, k, itrace_,&
        & n_row, n_col, nl
   integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
@@ -202,9 +202,9 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
   end select
 
   if (present(itmax)) then 
-    litmax = itmax
+    itmax_ = itmax
   else
-    litmax = 1000
+    itmax_ = 1000
   endif
 
   if (present(itrace)) then
@@ -369,7 +369,7 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
     
-    if ((errnum <= eps*errden).or.(itx >= litmax)) exit restart  
+    if ((errnum <= eps*errden).or.(itx >= itmax_)) exit restart  
 
     if (itrace_ > 0) &
          & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
@@ -391,26 +391,8 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_spmm(cone,a,w1,czero,w,desc_a,info,work=aux)
       if (present(s1)) call psb_gemlt(s1,w,desc_a,info)
       !
+      call mgs(i,h,v,w,rs,c,s,desc_a,info)
 
-      do k = 1, i
-        h(k,i) = psb_gedot(v(k),w,desc_a,info)
-        call psb_geaxpby(-h(k,i),v(k),cone,w,desc_a,info)
-      end do
-      h(i+1,i) = psb_genrm2(w,desc_a,info)
-      scal=cone/h(i+1,i)
-      call psb_geaxpby(scal,w,czero,v(i+1),desc_a,info)
-      do k=2,i
-        call crot(1,h(k-1,i),1,h(k,i),1,real(c(k-1),kind=psb_spk_),s(k-1))
-      enddo
-
-
-      rti  = h(i,i)
-      rti1 = h(i+1,i) 
-      call crotg(rti,rti1,tmp,s(i))
-      c(i) = cmplx(tmp,szero)
-      call crot(1,h(i,i),1,h(i+1,i),1,real(c(i),kind=psb_spk_),s(i))
-      h(i+1,i) = czero
-      call crot(1,rs(i),1,rs(i+1),1,real(c(i),kind=psb_spk_),s(i))
       
       select case(istop_)
       case(psb_istop_ani_)
@@ -418,16 +400,9 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
         ! build x and then compute the residual and its infinity norm
         !
         rst = rs
-        call w1%set(czero)
-        call ctrsm('l','u','n','n',i,1,cone,h,size(h,1),rst,size(rst,1))
-        if (debug_level >= psb_debug_ext_) &
-             & write(debug_unit,*) me,' ',trim(name),&
-             & ' Rebuild x-> RS:',rst(1:i)
-        do k=1, i
-          call psb_geaxpby(rst(k),v(k),cone,xt,desc_a,info)
-        end do
-        call prec%apply(xt,desc_a,info)
-        call psb_geaxpby(cone,x,cone,xt,desc_a,info)
+        call psb_geaxpby(cone,x,czero,xt,desc_a,info)
+        call rebuildx(i,h,v,w,w1,xt,rst,c,s,prec,desc_a,info)
+
         call psb_geaxpby(cone,b,czero,w1,desc_a,info)
         call psb_spmm(-cone,a,xt,cone,w1,desc_a,info,work=aux)
         rni = psb_geamax(w1,desc_a,info)
@@ -466,35 +441,9 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
         case(psb_istop_ani_)
           call psb_geaxpby(cone,xt,czero,x,desc_a,info)
 ! =          x = xt 
-        case(psb_istop_bn2_, psb_istop_rn2_abs_)
-          !
-          ! build x
-          !
-          call ctrsm('l','u','n','n',i,1,cone,h,size(h,1),rs,size(rs,1))
-          if (debug_level >= psb_debug_ext_) &
-               & write(debug_unit,*) me,' ',trim(name),&
-               & ' Rebuild x-> RS:',rs(1:i)
-          call w1%set(czero)
-          do k=1, i
-            call psb_geaxpby(rs(k),v(k),cone,w1,desc_a,info)
-          end do
-          call prec%apply(w1,w,desc_a,info)
-          call psb_geaxpby(cone,w,cone,x,desc_a,info)
+        case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
+          call  rebuildx(i,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
 
-        case(psb_istop_rrn2_)
-          !
-          ! build x
-          !
-          call ctrsm('l','u','n','n',i,1,cone,h,size(h,1),rs,size(rs,1))
-          if (debug_level >= psb_debug_ext_) &
-               & write(debug_unit,*) me,' ',trim(name),&
-               & ' Rebuild x-> RS:',rs(1:i)
-          call w1%set(czero)
-          do k=1, i
-            call psb_geaxpby(rs(k),v(k),cone,w1,desc_a,info)
-          end do
-          call prec%apply(w1,w,desc_a,info)
-          call psb_geaxpby(cone,w,cone,x,desc_a,info)          
         end select
 
         if (itrace_ > 0) &
@@ -512,38 +461,11 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
     case(psb_istop_ani_)
       call psb_geaxpby(cone,xt,czero,x,desc_a,info)!      x = xt 
 
-    case(psb_istop_bn2_, psb_istop_rn2_abs_)
-      !
-      ! build x
-      !
-      call ctrsm('l','u','n','n',nl,1,cone,h,size(h,1),rs,size(rs,1))
-      if (debug_level >= psb_debug_ext_) &
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' Rebuild x-> RS:',rs(1:nl)
-      call w1%set(czero)
-      do k=1, nl
-        call psb_geaxpby(rs(k),v(k),cone,w1,desc_a,info)
-      end do
-      call prec%apply(w1,w,desc_a,info)
-      call psb_geaxpby(cone,w,cone,x,desc_a,info)
-      
-    case(psb_istop_rrn2_)
-      !
-      ! build x
-      !
-      call ctrsm('l','u','n','n',nl,1,cone,h,size(h,1),rs,size(rs,1))
-      if (debug_level >= psb_debug_ext_) &
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' Rebuild x-> RS:',rs(1:nl)
-      call w1%set(czero)
-      do k=1, nl
-        call psb_geaxpby(rs(k),v(k),cone,w1,desc_a,info)
-      end do
-      call prec%apply(w1,w,desc_a,info)
-      call psb_geaxpby(cone,w,cone,x,desc_a,info)
+    case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
+      call  rebuildx(nl,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
     end select
     
-    if (itx >= litmax) then 
+    if (itx >= itmax_) then 
       if (itrace_ > 0) then 
         if (mod(itx,itrace_)/=0) &
              &  call log_conv(methdname,me,itx,ione,errnum,errden,deps)
@@ -573,6 +495,67 @@ subroutine psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
 9999 call psb_error_handler(err_act)
   return
+contains
+  !
+  ! Advance one step the Gram-Schmidt process, and apply
+  ! Givens rotations to keep H triangular
+  !
+  subroutine mgs(n,h,v,w,rs,c,s,desc_a,info)
+    complex(psb_spk_)   :: c(:), s(:), h(:,:), rs(:)
+    type(psb_c_vect_type) :: v(:), w
+    type(psb_desc_type) :: desc_a
+    complex(psb_spk_) :: scal, gm, rti, rti1
+    real(psb_spk_) :: tmp
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: k,n
+    !
+    
+    do k = 1, n
+      h(k,n) = psb_gedot(v(k),w,desc_a,info)
+      call psb_geaxpby(-h(k,n),v(k),cone,w,desc_a,info)
+    end do
+    h(n+1,n) = psb_genrm2(w,desc_a,info)
+    scal=cone/h(n+1,n)
+    call psb_geaxpby(scal,w,czero,v(n+1),desc_a,info)
+    do k=2,n
+      call crot(1,h(k-1:k-1,n),1,h(k:k,n),1,real(c(k-1),kind=psb_spk_),s(k-1))
+    enddo
+    
+    rti  = h(n,n)
+    rti1 = h(n+1,n) 
+    call crotg(rti,rti1,tmp,s(n))
+    c(n) = cmplx(tmp,szero)
+    call crot(1,h(n:n,n),1,h(n+1:n+1,n),1,real(c(n),kind=psb_spk_),s(n))
+    call crot(1,rs(n:n),1,rs(n+1:n+1),1,real(c(n),kind=psb_spk_),s(n))
+  end subroutine mgs
+
+  !
+  ! Rebuild solution X from the space V using the factor
+  ! stored in R
+  !
+  subroutine rebuildx(n,h,v,w,w1,x,rs,c,s,prec,desc_a,info)
+    complex(psb_spk_)   :: c(:), s(:), rs(:), h(:,:)
+    type(psb_c_vect_type) :: v(:), w, w1, x
+    type(psb_desc_type) :: desc_a
+    class(psb_cprec_type) :: prec
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: k,n
+
+    !
+    !
+    ! build x
+    !
+    call ctrsm('l','u','n','n',n,1,cone,h,size(h,1),rs,size(rs,1))
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' Rebuild x-> RS:',rs(1:n)
+    call w1%zero()
+    do k=1, n
+      call psb_geaxpby(rs(k),v(k),cone,w1,desc_a,info)
+    end do
+    call prec%apply(w1,w,desc_a,info)
+    call psb_geaxpby(cone,w,cone,x,desc_a,info)
+  end subroutine rebuildx
 
 end subroutine psb_crgmres_vect
 
