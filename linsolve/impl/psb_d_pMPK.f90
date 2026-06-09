@@ -1,4 +1,5 @@
-subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_type, alpha, beta, gamma)
+subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, & 
+                            & base_type, alpha, beta, gamma, mvec_temp)
     use psb_base_mod
     use psb_prec_mod
     implicit none
@@ -10,8 +11,9 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_t
     integer(psb_ipk_), intent(in)               :: s
     type(psb_desc_type), intent(in)             :: desc
     integer(psb_ipk_), intent(out)              :: info
-    character, optional, intent(in)             :: base_type
-    real(psb_dpk_), optional, intent(in)        :: alpha, beta, gamma
+    character, optional, intent(in)                             :: base_type
+    real(psb_dpk_), optional, intent(in)                        :: alpha, beta, gamma
+    type(psb_d_multivect_type), optional, target, intent(inout) :: mvec_temp
 
     integer(psb_ipk_) :: err_act
     real(psb_dpk_)    :: gamma_
@@ -23,7 +25,7 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, base_t
     info = psb_success_
 
     !Check s value
-    if(s <= 0)  then
+    if(s <= 0) then
         info = psb_err_iarg_invalid_value_
         call psb_errpush(info, name)
         goto 9999
@@ -106,11 +108,16 @@ contains
         implicit none
         character(len=20) :: name = "psb_d_pMPK_chebyshev"
         integer(psb_ipk_) :: i, idx_Z, idx_Q, ind_tmp
-        type(psb_d_multivect_type) :: mvec_tmp
+        type(psb_d_multivect_type), pointer :: mvec_tmp
 
-        call psb_geall(mvec_tmp, desc, info, n = 3)    ! I need only tre stored temp vectors
-        call psb_geasb(mvec_tmp, desc, info)
-        
+        if(present(mvec_temp)) then
+            ! TO DO: check dimensions
+            mvec_tmp => mvec_temp
+        else
+            call psb_geall(mvec_tmp, desc, info, n = 3)    ! I need only tre stored temp vectors
+            call psb_geasb(mvec_tmp, desc, info)
+        endif
+
         ! Inizialize first column of temp multivector
         ind_tmp = 1
         call psb_geaxpby(done, vec_in, dzero, mvec_tmp, ind_tmp, desc, info)
@@ -153,7 +160,8 @@ contains
     end subroutine psb_d_pMPK_packd_chebyshev
 end subroutine psb_d_pMPK_packd    
 
-subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info, base_type, alpha, beta, gamma)
+subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  & 
+                            & base_type, alpha, beta, gamma, mvec_temp)
     use psb_base_mod
     use psb_prec_mod
     implicit none
@@ -165,8 +173,9 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info, base_type,
     integer(psb_ipk_), intent(in)               :: s
     type(psb_desc_type), intent(in)             :: desc
     integer(psb_ipk_), intent(out)              :: info
-    character, optional, intent(in)             :: base_type
-    real(psb_dpk_), optional, intent(in)        :: alpha, beta, gamma
+    character, optional, intent(in)                             :: base_type
+    real(psb_dpk_), optional, intent(in)                        :: alpha, beta, gamma
+    type(psb_d_multivect_type), optional, target, intent(inout) :: mvec_temp
 
     integer(psb_ipk_) :: err_act
     real(psb_dpk_)    :: gamma_
@@ -263,10 +272,15 @@ contains
         implicit none
         character(len=20) :: name = "psb_d_pMPK_chebyshev"
         integer(psb_ipk_) :: i, idx_Z, idx_Q, ind_tmp
-        type(psb_d_multivect_type) :: mvec_tmp
+        type(psb_d_multivect_type), pointer :: mvec_tmp
 
-        call psb_geall(mvec_tmp, desc, info, n = 3)    ! I need only tre stored temp vectors
-        call psb_geasb(mvec_tmp, desc, info)
+        if(present(mvec_temp)) then
+            ! TO DO: check dimensions
+            mvec_tmp => mvec_temp
+        else
+            call psb_geall(mvec_tmp, desc, info, n = 3)    ! I need only tre stored temp vectors
+            call psb_geasb(mvec_tmp, desc, info)
+        endif
         
         ! Copy r in the first column of Q
         idx_Q = 1
@@ -308,7 +322,7 @@ contains
             call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
         end do
     
-    9998 call psb_gefree(mvec_tmp, desc, info)
+    9998 if(.not. present(mvec_temp)) call psb_gefree(mvec_tmp, desc, info)
         return
     end subroutine psb_d_pMPK_split_chebyshev
 end subroutine psb_d_pMPK_split
