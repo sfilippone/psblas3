@@ -4,7 +4,7 @@ module psb_pMPK_mod
 
     interface psb_pMPK
         subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, & 
-                                        base_type, alpha, beta, gamma, mvec_temp)
+                                        base_type, alpha, beta, gamma, mvec_temp, farr_temp)
             import psb_dspmat_type, psb_dprec_type, psb_d_vect_type, psb_d_multivect_type, &
                         & psb_ipk_, psb_dpk_, psb_desc_type 
             implicit none
@@ -18,10 +18,11 @@ module psb_pMPK_mod
             character, optional, intent(in)                             :: base_type
             real(psb_dpk_), optional, intent(in)                        :: alpha, beta, gamma
             type(psb_d_multivect_type), optional, target, intent(inout) :: mvec_temp
+            real(psb_dpk_), optional, target, intent(inout)             :: farr_temp(:)
         end subroutine psb_d_pMPK_packd
 
         subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info, & 
-                                        base_type, alpha, beta, gamma, mvec_temp)
+                                        base_type, alpha, beta, gamma, mvec_temp, farr_temp)
             import psb_dspmat_type, psb_dprec_type, psb_d_vect_type, psb_d_multivect_type, &
                         & psb_ipk_, psb_dpk_, psb_desc_type 
             implicit none
@@ -35,7 +36,7 @@ module psb_pMPK_mod
             character, optional, intent(in)                             :: base_type
             real(psb_dpk_), optional, intent(in)                        :: alpha, beta, gamma
             type(psb_d_multivect_type), optional, target, intent(inout) :: mvec_temp
+            real(psb_dpk_), optional, target, intent(inout)             :: farr_temp(:)
         end subroutine psb_d_pMPK_split
     end interface
-
 end module

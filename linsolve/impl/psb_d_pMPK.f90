@@ -1,9 +1,9 @@
 subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, & 
-                            & base_type, alpha, beta, gamma, mvec_temp)
+                            & base_type, alpha, beta, gamma, mvec_temp, farr_temp)
     use psb_base_mod
     use psb_prec_mod
-    implicit none
 
+    implicit none
     type(psb_dspmat_type), intent(in)           :: spmat
     class(psb_dprec_type), intent(inout)        :: prec
     type(psb_d_vect_type), intent(inout)        :: vec_in
@@ -14,12 +14,14 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, &
     character, optional, intent(in)                             :: base_type
     real(psb_dpk_), optional, intent(in)                        :: alpha, beta, gamma
     type(psb_d_multivect_type), optional, target, intent(inout) :: mvec_temp
+    real(psb_dpk_), optional, target, intent(inout)             :: farr_temp(:)
 
     integer(psb_ipk_) :: err_act
     real(psb_dpk_)    :: gamma_
     logical           :: save_r
     character         :: base_type_
     character(len=20) :: name = "psb_d_pMPK"
+    real(psb_dpk_), pointer :: aux(:)
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -40,6 +42,13 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, &
 
     !Select if save r as the first vector of Q using is dimension
     save_r = (mvec_out%get_ncols() == 2*s + 1);
+
+    if(present(farr_temp)) then
+        !TO DO: check dimension
+        aux => farr_temp
+    else
+        allocate(aux(4*desc%get_local_cols()))
+    end if
 
     !Check type base
     if(present(base_type)) then 
@@ -89,18 +98,18 @@ contains
 
         ! First iteration
         idx_Z = 1
-        call prec%apply(mvec_out, idx_Q, mvec_out, idx_Z, desc, info)
+        call prec%apply(mvec_out, idx_Q, mvec_out, idx_Z, desc, info, work = aux)
         idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
-        call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
+        call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info, work = aux)
         
         if(s == 1) return
 
         do i = 2, s
             idx_Z = idx_Z + 1
-            call prec%apply(mvec_out, idx_Q, mvec_out, idx_Z, desc, info)
+            call prec%apply(mvec_out, idx_Q, mvec_out, idx_Z, desc, info, work = aux)
             
             idx_Q = idx_Q + 1
-            call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
+            call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info, work = aux)
         end do
     end subroutine psb_d_pMPK_packd_monomial
 
@@ -124,9 +133,9 @@ contains
 
         ! First iteration
         idx_Z = 1
-        call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info)
+        call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info, work = aux)
         idx_Q = s + 1
-        call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
+        call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info, work = aux)
 
         !Check first early exit
         if(s == 1) goto 9998
@@ -135,9 +144,9 @@ contains
         ind_tmp = ind_tmp + 1
         call psb_geaxpby(alpha, mvec_out, idx_Q, -beta, mvec_tmp, ind_tmp - 1, dzero, mvec_tmp, ind_tmp, desc, info)
         idx_Z = idx_Z + 1
-        call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info)
+        call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info, work = aux)
         idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
-        call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
+        call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info, work = aux)
 
         !Check second early exit
         if(s == 2) goto 9998
@@ -149,10 +158,10 @@ contains
                                 & -gamma_, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, mvec_tmp, ind_tmp, desc, info)
 
             idx_Z = idx_Z + 1
-            call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info)
+            call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info, work = aux)
 
             idx_Q = idx_Q + 1
-            call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info)
+            call psb_spmm(done, spmat, mvec_out, idx_Z, dzero, mvec_out, idx_Q, desc, info, work = aux)
         end do
 
     9998 call psb_gefree(mvec_tmp, desc, info)
@@ -161,7 +170,7 @@ contains
 end subroutine psb_d_pMPK_packd    
 
 subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  & 
-                            & base_type, alpha, beta, gamma, mvec_temp)
+                            & base_type, alpha, beta, gamma, mvec_temp, farr_temp)
     use psb_base_mod
     use psb_prec_mod
     implicit none
@@ -176,12 +185,14 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  &
     character, optional, intent(in)                             :: base_type
     real(psb_dpk_), optional, intent(in)                        :: alpha, beta, gamma
     type(psb_d_multivect_type), optional, target, intent(inout) :: mvec_temp
+    real(psb_dpk_), optional, target, intent(inout)             :: farr_temp(:)
 
     integer(psb_ipk_) :: err_act
     real(psb_dpk_)    :: gamma_
     logical           :: save_r
     character         :: base_type_
     character(len=20) :: name = "psb_d_pMPK"
+    real(psb_dpk_), pointer :: aux(:)
 
     call psb_erractionsave(err_act)
     info = psb_success_
@@ -202,6 +213,13 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  &
 
     !Select if save r as the first vector of Q using is dimension
     save_r = (Q%get_ncols() == s + 1);
+
+    if(present(farr_temp)) then
+        !TO DO: check dimension
+        aux => farr_temp
+    else
+        allocate(aux(4*desc%get_local_cols()))
+    end if
 
     !Check type base
     if(present(base_type)) then 
@@ -237,6 +255,10 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  &
             goto 9999
     end select
 
+    if(.not. present(farr_temp)) then
+        deallocate(aux)
+    end if
+
 9999 call psb_error_handler(err_act)
     return
 
@@ -253,18 +275,18 @@ contains
 
         ! First iteration
         idx_Z = 1
-        call prec%apply(Q, idx_Q, Z, idx_Z, desc, info)
+        call prec%apply(Q, idx_Q, Z, idx_Z, desc, info, work = aux)
         idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
-        call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
+        call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
         
         if(s == 1) return
 
         do i = 2, s
             idx_Z = idx_Z + 1
-            call prec%apply(Q, idx_Q, Z, idx_Z, desc, info)
+            call prec%apply(Q, idx_Q, Z, idx_Z, desc, info, work = aux)
             
             idx_Q = idx_Q + 1
-            call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
+            call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
         end do
     end subroutine psb_d_pMPK_split_monomial
 
@@ -292,9 +314,9 @@ contains
 
         ! First iteration
         idx_Z = 1 
-        call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info)
+        call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info, work = aux)
         idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
-        call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
+        call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
 
         !Check first early exit
         if(s == 1) goto 9998
@@ -303,9 +325,9 @@ contains
         ind_tmp = ind_tmp + 1
         call psb_geaxpby(alpha, Q, idx_Q, -beta, mvec_tmp, ind_tmp - 1, dzero, mvec_tmp, ind_tmp, desc, info)
         idx_Z = idx_Z + 1
-        call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info)
+        call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info, work = aux)
         idx_Q = idx_Q + 1
-        call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
+        call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
 
         !Check second early exit
         if(s == 2) goto 9998
@@ -316,10 +338,10 @@ contains
             call psb_geaxpby(2*alpha, Q, idx_Q, -2*beta, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, &
                                 & -gamma_, mvec_tmp, modulo(ind_tmp - 3, 3) + 1, mvec_tmp, ind_tmp, desc, info)
             idx_Z = idx_Z + 1
-            call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info)
+            call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info, work = aux)
 
             idx_Q = idx_Q + 1
-            call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info)
+            call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
         end do
     
     9998 if(.not. present(mvec_temp)) call psb_gefree(mvec_tmp, desc, info)
