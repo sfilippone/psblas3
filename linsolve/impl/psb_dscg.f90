@@ -44,6 +44,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   real(psb_dpk_)                :: derr
 
   type(psb_d_multivect_type), target  :: aux_mv
+  real(psb_dpk_), allocatable, target :: aux_fa(:)
 
   character(len=3), parameter   :: forwardGS = "FGS"
   character(len=3), parameter   :: lapackLU = "LLU"
@@ -120,7 +121,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   end if
 
   !Allocate and assembly data structure
-  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, s + 1), stat = info)
+  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, s + 1), aux_fa(4*n_col), stat = info)
   if (info == psb_success_) call psb_geall(r, desc_a, info)
   if (info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
   if (info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
@@ -182,7 +183,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   ! First matrix power kernel
   call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
-                  & mvec_temp = aux_mv)
+                  & mvec_temp = aux_mv, farr_temp = aux_fa)
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
@@ -223,7 +224,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     ! Matrix power kernel
     call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
-                  & mvec_temp = aux_mv)
+                  & mvec_temp = aux_mv, farr_temp = aux_fa)
 
     ! Compute rhs for beta
     call psb_gedots(P, Q, beta, desc_a, info, .true.)
@@ -259,7 +260,7 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   if (info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
   if (info == psb_success_) call psb_gefree(aux_mv, desc_a, info)
 
-  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, stat = info)
+  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, aux_fa, stat = info)
   if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
@@ -404,6 +405,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   real(psb_dpk_)                :: derr 
 
   type(psb_d_multivect_type), target  :: aux_mv
+  real(psb_dpk_), allocatable, target :: aux_fa(:)
 
   character(len=3), parameter   :: forwardGS = "FGS"
   character(len=3), parameter   :: lapackLU = "LLU"
@@ -480,7 +482,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   end if
 
   !Allocate and assembly data structure
-  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, 2*s + 1), B2(s, s), c0(s), stat = info)
+  allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, 2*s + 1), B2(s, s), c0(s), aux_fa(4*n_col), stat = info)
   if (info == psb_success_) call psb_geall(r, desc_a, info)
   if (info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
   if (info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
@@ -542,7 +544,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   ! First matrix power kernel
   call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
-                  & mvec_temp = aux_mv)
+                  & mvec_temp = aux_mv, farr_temp = aux_fa)
   if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
@@ -584,7 +586,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
     ! Matrix power kernel
     call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
-                  & mvec_temp = aux_mv)
+                  & mvec_temp = aux_mv, farr_temp = aux_fa)
 
     ! Compute dot products
     call psb_gedots(P, Q, temp_fa(:, 1 : s), desc_a, info, global = .false.)
@@ -633,7 +635,7 @@ subroutine psb_dscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   if (info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
   if (info == psb_success_) call psb_gefree(aux_mv, desc_a, info)
 
-  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, B2, c0, stat = info)
+  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, B2, c0, aux_fa, stat = info)
   if (info /= psb_success_) then
     call psb_errpush(info, name)
     goto 9999
