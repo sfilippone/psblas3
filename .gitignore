@@ -8,6 +8,7 @@
 *.out
 *.err
 *.csv
+*.log
 leonardo_comm_script.sh
 
 # header files generated
