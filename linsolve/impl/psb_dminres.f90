@@ -236,7 +236,7 @@ subroutine psb_dminres_vect(a,prec,b,x,eps,desc_a,info,&
 
    ! res = b - A*x
    call psb_geaxpby(done,b,dzero,res,desc_a,info)
-   if (info == psb_success_) call psb_spmm(-done,a,x,done,res,desc_a,info,work=aux)
+   if (info == psb_success_) call psb_spmm(-done,a,x,done,res,desc_a,info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -269,7 +269,7 @@ subroutine psb_dminres_vect(a,prec,b,x,eps,desc_a,info,&
    ! y  = beta1 * P' * v1, with v1 the first Lanczos vector.
    call psb_geaxpby(done,res,dzero,y,desc_a,info)
    if (info == psb_success_) call psb_geaxpby(done,res,dzero,r1,desc_a,info)
-   if (info == psb_success_) call prec%apply(res,y,desc_a,info,work=aux)
+   if (info == psb_success_) call prec%apply(res,y,desc_a,info)
    if (info /= psb_success_) then
       info=psb_err_from_subroutine_non_
       call psb_errpush(info,name)
@@ -354,7 +354,7 @@ subroutine psb_dminres_vect(a,prec,b,x,eps,desc_a,info,&
 
       s = done/beta
       call psb_geaxpby(s,y,dzero,v,desc_a,info)
-      if (info == psb_success_) call psb_spmm(done,a,v,dzero,y,desc_a,info,work=aux)
+      if (info == psb_success_) call psb_spmm(done,a,v,dzero,y,desc_a,info)
       if (itx >= 2 .and. info == psb_success_) then
          call psb_geaxpby((-beta/oldb),r1,done,y,desc_a,info)
       end if
@@ -374,7 +374,7 @@ subroutine psb_dminres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby((-alfa/beta),r2,done,y,desc_a,info)
       if (info == psb_success_) call psb_geaxpby(done,r2,dzero,r1,desc_a,info)
       if (info == psb_success_) call psb_geaxpby(done,y,dzero,r2,desc_a,info)
-      if (info == psb_success_) call prec%apply(r2,y,desc_a,info,work=aux)
+      if (info == psb_success_) call prec%apply(r2,y,desc_a,info)
       if (info /= psb_success_) then
          info=psb_err_from_subroutine_non_
          call psb_errpush(info,name)
@@ -461,7 +461,7 @@ subroutine psb_dminres_vect(a,prec,b,x,eps,desc_a,info,&
       case(psb_istop_ani_)
          ! Compute true residual only for the ANI stopping criterion.
          call psb_geaxpby(done,b,dzero,res,desc_a,info)
-         if (info == psb_success_) call psb_spmm(-done,a,x,done,res,desc_a,info,work=aux)
+         if (info == psb_success_) call psb_spmm(-done,a,x,done,res,desc_a,info)
          if (info == psb_success_) rni = psb_geamax(res,desc_a,info)
          if (info == psb_success_) xni = psb_geamax(x,desc_a,info)
          errnum = rni
