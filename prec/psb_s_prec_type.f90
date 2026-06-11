@@ -131,7 +131,7 @@ module psb_s_prec_type
   end interface
 
   interface
-    subroutine psb_s_apply2v(prec,x,y,desc_data,info,trans)
+    subroutine psb_s_apply2v(prec,x,y,desc_data,info,trans, work)
       import :: psb_ipk_, psb_desc_type, psb_sprec_type, psb_s_vect_type, psb_spk_
       type(psb_desc_type),intent(in)          :: desc_data
       class(psb_sprec_type), intent(inout)  :: prec
@@ -139,6 +139,7 @@ module psb_s_prec_type
       real(psb_spk_),intent(inout)           :: y(:)
       integer(psb_ipk_), intent(out)          :: info
       character(len=1), optional              :: trans
+      real(psb_spk_),intent(inout), optional, target :: work(:)
     end subroutine psb_s_apply2v
   end interface
 
