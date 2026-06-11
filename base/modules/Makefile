@@ -447,5 +447,4 @@ clean:
 	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod) 
 
 veryclean: clean
-	/bin/rm -f *.h
 
