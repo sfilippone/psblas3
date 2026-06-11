@@ -29,6 +29,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
+! Module: psb_d_nest_tools_mod
+! Author: Simone Staccone (Stack-1)
+!
 !  Nested-specific assembly wrappers for PSBLAS3 — double precision matrix and vector routines
 !
 
@@ -41,13 +44,15 @@ module psb_d_nest_tools_mod
                                psb_geall, psb_geins, psb_geasb, psb_gefree
   use psb_desc_nest_mod, only : psb_desc_nest_type
   use psb_d_nest_mat_mod, only : psb_d_nest_sparse_mat
-  use psb_d_nest_vect_mod, only : psb_d_nest_vect_type
+  use psb_d_mat_mod,      only : psb_dspmat_type
+  use psb_d_base_mat_mod, only : psb_d_coo_sparse_mat
+  use psb_desc_mod,       only : psb_desc_type
   implicit none
 
   private
 
   public :: psb_spall_nest, psb_spins_nest, psb_spasb_nest, psb_spfree_nest, psb_sprn_nest, &
-            psb_geall_nest, psb_geins_nest, psb_geasb_nest, psb_gefree_nest
+            psb_d_nest_rect_block
 
 contains
 
@@ -62,7 +67,7 @@ contains
     integer(psb_ipk_),           intent(out)   :: info
     integer(psb_ipk_),           intent(in), optional :: nnz
 
-    integer(psb_ipk_) :: i, j, linfo
+    integer(psb_ipk_) :: i_block_row, j_block_col, local_info
     character(len=20) :: name
 
     info = psb_success_
@@ -80,30 +85,19 @@ contains
       end if
     end if
 
-    if (.not. allocated(a_nest%blk_present)) then
-      allocate(a_nest%blk_present(a_nest%nrblocks, a_nest%ncblocks), stat=info)
-      if (info /= 0) then
-        info = psb_err_alloc_dealloc_
-        call psb_errpush(info, name)
-        return
-      end if
-      a_nest%blk_present = .false.
-    end if
-
-    do i = 1, a_nest%nrblocks
-      do j = 1, a_nest%ncblocks
-        linfo = psb_success_
+    do i_block_row = 1, a_nest%nrblocks
+      do j_block_col = 1, a_nest%ncblocks
+        local_info = psb_success_
         if (present(nnz)) then
-          call psb_spall(a_nest%mats(i, j), desc_nest%descs(i, j), linfo, nnz=nnz)
+          call psb_spall(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), local_info, nnz=nnz)
         else
-          call psb_spall(a_nest%mats(i, j), desc_nest%descs(i, j), linfo)
+          call psb_spall(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), local_info)
         end if
-        if (linfo /= psb_success_) then
-          info = linfo
+        if (local_info /= psb_success_) then
+          info = local_info
           call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_spall')
           return
         end if
-        a_nest%blk_present(i, j) = .true.
       end do
     end do
 
@@ -114,24 +108,24 @@ contains
   ! The block is lazy-allocated on first insertion if psb_spall_nest
   ! was not called first.
   
-  subroutine psb_spins_nest(blk_i, blk_j, nz, ia, ja, val, a_nest, desc_nest, info)
-    integer(psb_ipk_),           intent(in)    :: blk_i, blk_j, nz
-    integer(psb_lpk_),           intent(in)    :: ia(:), ja(:)
-    real(psb_dpk_),              intent(in)    :: val(:)
+  subroutine psb_spins_nest(block_row, block_col, n_entries, entry_rows, entry_cols, entry_vals, a_nest, desc_nest, info)
+    integer(psb_ipk_),           intent(in)    :: block_row, block_col, n_entries
+    integer(psb_lpk_),           intent(in)    :: entry_rows(:), entry_cols(:)
+    real(psb_dpk_),              intent(in)    :: entry_vals(:)
     type(psb_d_nest_sparse_mat), intent(inout) :: a_nest
     type(psb_desc_nest_type),    intent(inout) :: desc_nest
     integer(psb_ipk_),           intent(out)   :: info
 
-    integer(psb_ipk_) :: nnz_est
+    integer(psb_ipk_) :: nnz_estimate
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_spins_nest'
 
-    if (nz == 0) return
+    if (n_entries == 0) return
 
-    if (blk_i < 1 .or. blk_i > a_nest%nrblocks .or. &
-        blk_j < 1 .or. blk_j > a_nest%ncblocks) then
+    if (block_row < 1 .or. block_row > a_nest%nrblocks .or. &
+        block_col < 1 .or. block_col > a_nest%ncblocks) then
       info = psb_err_invalid_input_
       call psb_errpush(info, name, a_err='invalid block indices')
       return
@@ -144,29 +138,21 @@ contains
         call psb_errpush(info, name)
         return
       end if
-      allocate(a_nest%blk_present(a_nest%nrblocks, a_nest%ncblocks), stat=info)
-      if (info /= 0) then
-        info = psb_err_alloc_dealloc_
-        call psb_errpush(info, name)
-        return
-      end if
-      a_nest%blk_present = .false.
     end if
 
-    if (.not. a_nest%blk_present(blk_i, blk_j)) then
-      ! Estimate nnz: use nz + 50% buffer for future insertions
-      nnz_est = max(nz, 10) + nz / 2
-      call psb_spall(a_nest%mats(blk_i, blk_j), &
-                     desc_nest%descs(blk_i, blk_j), info, nnz=nnz_est)
+    if (.not. allocated(a_nest%mats(block_row, block_col)%a)) then
+      ! Estimate nnz: use n_entries + 50% buffer for future insertions
+      nnz_estimate = max(n_entries, 10) + n_entries / 2
+      call psb_spall(a_nest%mats(block_row, block_col), &
+                     desc_nest%descs(block_row, block_col), info, nnz=nnz_estimate)
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_spall')
         return
       end if
-      a_nest%blk_present(blk_i, blk_j) = .true.
     end if
 
-    call psb_spins(nz, ia, ja, val, a_nest%mats(blk_i, blk_j), &
-                   desc_nest%descs(blk_i, blk_j), info)
+    call psb_spins(n_entries, entry_rows, entry_cols, entry_vals, a_nest%mats(block_row, block_col), &
+                   desc_nest%descs(block_row, block_col), info)
     if (info /= psb_success_) &
       call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_spins')
 
@@ -181,32 +167,33 @@ contains
     integer(psb_ipk_),           intent(out)   :: info
     integer(psb_ipk_),           intent(in), optional :: dupl
 
-    integer(psb_ipk_) :: i, j, dupl_, linfo
+    integer(psb_ipk_) :: i_block_row, j_block_col, dupl_mode, local_info
     character(len=20) :: name
 
-    info  = psb_success_
-    name  = 'psb_spasb_nest'
-    dupl_ = psb_dupl_add_
-    if (present(dupl)) dupl_ = dupl
+    info      = psb_success_
+    name      = 'psb_spasb_nest'
+    dupl_mode = psb_dupl_add_
+    if (present(dupl)) dupl_mode = dupl
 
-    do i = 1, a_nest%nrblocks
-      do j = 1, a_nest%ncblocks
-        if (a_nest%blk_present(i, j)) then
-          linfo = psb_success_
-          if (dupl_ == psb_dupl_add_) then
-            call psb_spasb(a_nest%mats(i, j), desc_nest%descs(i, j), linfo, &
-                           dupl=psb_dupl_add_)
-          else if (dupl_ == psb_dupl_ovwrt_) then
-            call psb_spasb(a_nest%mats(i, j), desc_nest%descs(i, j), linfo, &
-                           dupl=psb_dupl_ovwrt_)
-          else if (dupl_ == psb_dupl_err_) then
-            call psb_spasb(a_nest%mats(i, j), desc_nest%descs(i, j), linfo, &
-                           dupl=psb_dupl_err_)
+    do i_block_row = 1, a_nest%nrblocks
+      do j_block_col = 1, a_nest%ncblocks
+        if (allocated(a_nest%mats(i_block_row, j_block_col)%a)) then
+          local_info = psb_success_
+          if (dupl_mode == psb_dupl_add_) then
+            call psb_spasb(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), &
+                           local_info, dupl=psb_dupl_add_)
+          else if (dupl_mode == psb_dupl_ovwrt_) then
+            call psb_spasb(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), &
+                           local_info, dupl=psb_dupl_ovwrt_)
+          else if (dupl_mode == psb_dupl_err_) then
+            call psb_spasb(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), &
+                           local_info, dupl=psb_dupl_err_)
           else
-            call psb_spasb(a_nest%mats(i, j), desc_nest%descs(i, j), linfo)
+            call psb_spasb(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), &
+                           local_info)
           end if
-          if (linfo /= psb_success_) then
-            info = linfo
+          if (local_info /= psb_success_) then
+            info = local_info
             call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_spasb')
             return
           end if
@@ -217,44 +204,34 @@ contains
   end subroutine psb_spasb_nest
 
   ! Calls psb_spfree on every present block, then deallocates the
-  ! mats and blk_present arrays and resets nrblocks/ncblocks to 0.
+  ! mats array and resets nrblocks/ncblocks to 0.
   
   subroutine psb_spfree_nest(a_nest, desc_nest, info)
     type(psb_d_nest_sparse_mat), intent(inout) :: a_nest
     type(psb_desc_nest_type),    intent(in)    :: desc_nest
     integer(psb_ipk_),           intent(out)   :: info
 
-    integer(psb_ipk_) :: i, j, linfo
+    integer(psb_ipk_) :: i_block_row, j_block_col, local_info
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_spfree_nest'
 
     if (allocated(a_nest%mats)) then
-      do i = 1, a_nest%nrblocks
-        do j = 1, a_nest%ncblocks
-          if (allocated(a_nest%blk_present)) then
-            if (a_nest%blk_present(i, j)) then
-              linfo = psb_success_
-              call psb_spfree(a_nest%mats(i, j), desc_nest%descs(i, j), linfo)
-              if (linfo /= psb_success_ .and. info == psb_success_) then
-                info = linfo
-                call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_spfree')
-              end if
+      do i_block_row = 1, a_nest%nrblocks
+        do j_block_col = 1, a_nest%ncblocks
+          if (allocated(a_nest%mats(i_block_row, j_block_col)%a)) then
+            local_info = psb_success_
+            call psb_spfree(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), local_info)
+            if (local_info /= psb_success_ .and. info == psb_success_) then
+              info = local_info
+              call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_spfree')
             end if
           end if
         end do
       end do
-      deallocate(a_nest%mats, stat=linfo)
-      if (linfo /= 0 .and. info == psb_success_) then
-        info = psb_err_alloc_dealloc_
-        call psb_errpush(info, name)
-      end if
-    end if
-
-    if (allocated(a_nest%blk_present)) then
-      deallocate(a_nest%blk_present, stat=linfo)
-      if (linfo /= 0 .and. info == psb_success_) then
+      deallocate(a_nest%mats, stat=local_info)
+      if (local_info /= 0 .and. info == psb_success_) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info, name)
       end if
@@ -274,25 +251,25 @@ contains
     integer(psb_ipk_),           intent(out)   :: info
     logical,                     intent(in), optional :: clear
 
-    integer(psb_ipk_) :: i, j, linfo
+    integer(psb_ipk_) :: i_block_row, j_block_col, local_info
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_sprn_nest'
 
-    if (.not. allocated(a_nest%mats) .or. .not. allocated(a_nest%blk_present)) return
+    if (.not. allocated(a_nest%mats)) return
 
-    do i = 1, a_nest%nrblocks
-      do j = 1, a_nest%ncblocks
-        if (a_nest%blk_present(i, j)) then
-          linfo = psb_success_
+    do i_block_row = 1, a_nest%nrblocks
+      do j_block_col = 1, a_nest%ncblocks
+        if (allocated(a_nest%mats(i_block_row, j_block_col)%a)) then
+          local_info = psb_success_
           if (present(clear)) then
-            call psb_sprn(a_nest%mats(i, j), desc_nest%descs(i, j), linfo, clear=clear)
+            call psb_sprn(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), local_info, clear=clear)
           else
-            call psb_sprn(a_nest%mats(i, j), desc_nest%descs(i, j), linfo)
+            call psb_sprn(a_nest%mats(i_block_row, j_block_col), desc_nest%descs(i_block_row, j_block_col), local_info)
           end if
-          if (linfo /= psb_success_ .and. info == psb_success_) then
-            info = linfo
+          if (local_info /= psb_success_ .and. info == psb_success_) then
+            info = local_info
             call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_sprn')
           end if
         end if
@@ -302,132 +279,78 @@ contains
   end subroutine psb_sprn_nest
 
 
-  ! Allocates one sub-vector per block-row, using descs(i, 1) as
-  ! the row descriptor for block i.  Must be called before psb_geins_nest.
-  
-  subroutine psb_geall_nest(x_nest, desc_nest, info)
-    type(psb_d_nest_vect_type), intent(out) :: x_nest
-    type(psb_desc_nest_type),   intent(in)  :: desc_nest
-    integer(psb_ipk_),          intent(out) :: info
 
-    integer(psb_ipk_) :: i, linfo
-    character(len=20) :: name
+  ! psb_d_nest_rect_block
+  !
+  ! Build a local GENERAL (possibly rectangular) block A(i,j) of a nested
+  ! operator, with rows in field i and columns in field j (field i /= field j,
+  ! |field i| /= |field j| allowed). Rows are localized against the field-i
+  ! (row) descriptor, columns against the field-j (column) descriptor — which
+  ! must already carry the union halo of column j (cdall + cdins(all column-j
+  ! blocks' columns) + cdasb). The result is a CSR block of shape
+  !   (field-i owned rows) x (field-j local cols incl. halo)
+  ! consumable directly by the nested csmv (psb_d_nest_base_mat).
+  !
+  ! A single-descriptor psb_spall/psb_spasb cannot express row-field /= col-field
+  ! (it would force rows and columns into the same index space), hence the
+  ! explicit COO build with separate row/column localization.
+  !
+  ! Arguments (this process's local contribution):
+  !   blk            (out) the assembled block (CSR)
+  !   nz             number of local entries
+  !   ia_glob(:)     GLOBAL field-i row indices (owned by this process)
+  !   ja_glob(:)     GLOBAL field-j column indices
+  !   val(:)         values
+  !   desc_row       field-i descriptor (rows)
+  !   desc_col       field-j descriptor (columns, with union halo)
+  !
+  subroutine psb_d_nest_rect_block(blk, nz, ia_glob, ja_glob, val, desc_row, desc_col, info)
+    type(psb_dspmat_type), intent(out) :: blk
+    integer(psb_ipk_),     intent(in)  :: nz
+    integer(psb_lpk_),     intent(in)  :: ia_glob(:), ja_glob(:)
+    real(psb_dpk_),        intent(in)  :: val(:)
+    type(psb_desc_type),   intent(in)  :: desc_row, desc_col
+    integer(psb_ipk_),     intent(out) :: info
+
+    type(psb_d_coo_sparse_mat) :: coo_block
+    integer(psb_ipk_)          :: k_entry, n_loc_rows, n_loc_cols, loc_row, loc_col
+    character(len=24)          :: name
 
     info = psb_success_
-    name = 'psb_geall_nest'
+    name = 'psb_d_nest_rect_block'
 
-    x_nest%nblocks = desc_nest%nrblocks
-    allocate(x_nest%vects(x_nest%nblocks), stat=info)
-    if (info /= 0) then
-      info = psb_err_alloc_dealloc_
-      call psb_errpush(info, name)
-      return
-    end if
+    n_loc_rows = desc_row%get_local_rows()    ! owned rows of field i
+    n_loc_cols = desc_col%get_local_cols()    ! field-j local cols (owned + halo)
 
-    do i = 1, x_nest%nblocks
-      linfo = psb_success_
-      call psb_geall(x_nest%vects(i), desc_nest%descs(i, 1), linfo)
-      if (linfo /= psb_success_) then
-        info = linfo
-        call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_geall')
+    call coo_block%allocate(n_loc_rows, n_loc_cols, nz)
+    do k_entry = 1, nz
+      call desc_row%g2l(ia_glob(k_entry), loc_row, info)
+      if (info /= 0 .or. loc_row < 1 .or. loc_row > n_loc_rows) then
+        info = psb_err_invalid_input_
+        call psb_errpush(info, name, a_err='row not owned / not localizable')
         return
       end if
-    end do
-
-  end subroutine psb_geall_nest
-
-  ! Inserts m entries into block blk_i of the nested vector.
-
-  subroutine psb_geins_nest(blk_i, m, irw, val, x_nest, desc_nest, info, local)
-    integer(psb_ipk_),          intent(in)    :: blk_i, m
-    integer(psb_lpk_),          intent(in)    :: irw(:)
-    real(psb_dpk_),             intent(in)    :: val(:)
-    type(psb_d_nest_vect_type), intent(inout) :: x_nest
-    type(psb_desc_nest_type),   intent(in)    :: desc_nest
-    integer(psb_ipk_),          intent(out)   :: info
-    logical,                    intent(in), optional :: local
-
-    character(len=20) :: name
-
-    info = psb_success_
-    name = 'psb_geins_nest'
-
-    if (m == 0) return
-
-    if (blk_i < 1 .or. blk_i > x_nest%nblocks) then
-      info = psb_err_invalid_input_
-      call psb_errpush(info, name, a_err='invalid block index')
-      return
-    end if
-
-    if (present(local)) then
-      call psb_geins(m, irw, val, x_nest%vects(blk_i), desc_nest%descs(blk_i, 1), info, &
-                     local=local)
-    else
-      call psb_geins(m, irw, val, x_nest%vects(blk_i), desc_nest%descs(blk_i, 1), info)
-    end if
-    if (info /= psb_success_) &
-      call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_geins')
-
-  end subroutine psb_geins_nest
-
-  ! Calls psb_geasb on every sub-vector.
-  ! Must be called after psb_cdasb_nest and all psb_geins_nest calls.
-  
-  subroutine psb_geasb_nest(x_nest, desc_nest, info)
-    type(psb_d_nest_vect_type), intent(inout) :: x_nest
-    type(psb_desc_nest_type),   intent(in)    :: desc_nest
-    integer(psb_ipk_),          intent(out)   :: info
-
-    integer(psb_ipk_) :: i, linfo
-    character(len=20) :: name
-
-    info = psb_success_
-    name = 'psb_geasb_nest'
-
-    do i = 1, x_nest%nblocks
-      linfo = psb_success_
-      call psb_geasb(x_nest%vects(i), desc_nest%descs(i, 1), linfo)
-      if (linfo /= psb_success_ .and. info == psb_success_) then
-        info = linfo
-        call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_geasb')
+      call desc_col%g2l(ja_glob(k_entry), loc_col, info)
+      if (info /= 0 .or. loc_col < 1 .or. loc_col > n_loc_cols) then
+        info = psb_err_invalid_input_
+        call psb_errpush(info, name, a_err='column not in field-j descriptor (missing from union halo)')
+        return
       end if
+      coo_block%ia(k_entry)  = loc_row
+      coo_block%ja(k_entry)  = loc_col
+      coo_block%val(k_entry) = val(k_entry)
     end do
-
-  end subroutine psb_geasb_nest
-
-  ! Calls psb_gefree on every sub-vector, then deallocates the
-  ! vects array and resets nblocks to 0.
-  
-  subroutine psb_gefree_nest(x_nest, desc_nest, info)
-    type(psb_d_nest_vect_type), intent(inout) :: x_nest
-    type(psb_desc_nest_type),   intent(in)    :: desc_nest
-    integer(psb_ipk_),          intent(out)   :: info
-
-    integer(psb_ipk_) :: i, linfo
-    character(len=20) :: name
-
-    info = psb_success_
-    name = 'psb_gefree_nest'
-
-    if (allocated(x_nest%vects)) then
-      do i = 1, x_nest%nblocks
-        linfo = psb_success_
-        call psb_gefree(x_nest%vects(i), desc_nest%descs(i, 1), linfo)
-        if (linfo /= psb_success_ .and. info == psb_success_) then
-          info = linfo
-          call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_gefree')
-        end if
-      end do
-      deallocate(x_nest%vects, stat=linfo)
-      if (linfo /= 0 .and. info == psb_success_) then
-        info = psb_err_alloc_dealloc_
-        call psb_errpush(info, name)
-      end if
+    call coo_block%set_nzeros(nz)
+    call coo_block%set_dupl(psb_dupl_add_)
+    call coo_block%fix(info)
+    if (info /= 0) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err='coo fix'); return
     end if
-
-    x_nest%nblocks = 0
-
-  end subroutine psb_gefree_nest
+    call blk%mv_from(coo_block)
+    call blk%cscnv(info, type='CSR')
+    if (info /= 0) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err='cscnv'); return
+    end if
+  end subroutine psb_d_nest_rect_block
 
 end module psb_d_nest_tools_mod

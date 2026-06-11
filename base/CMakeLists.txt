@@ -569,6 +569,7 @@ set(PSB_base_source_files
   modules/tools/psb_d_tools_mod.F90
   modules/tools/psb_cd_nest_tools_mod.F90
   modules/tools/psb_d_nest_tools_mod.F90
+  modules/tools/psb_d_nest_builder_mod.F90
   modules/tools/psb_c_tools_mod.F90
   modules/tools/psb_e_tools_a_mod.f90
   modules/tools/psb_i2_tools_a_mod.f90
@@ -641,10 +642,8 @@ set(PSB_base_source_files
   modules/desc/psb_glist_map_mod.F90
   modules/psb_base_mod.f90
   modules/desc/psb_desc_nest_mod.f90
-  modules/serial/psb_d_nest_vect_mod.f90
   modules/serial/psb_d_nest_mat_mod.f90
-  modules/comm/psb_d_nest_comm_mod.f90
-  modules/psblas/psb_d_nest_psblas_mod.f90
+  modules/serial/psb_d_nest_base_mat_mod.F90
   modules/psb_d_nest_mod.f90
 )
 foreach(file IN LISTS PSB_base_source_files)

@@ -30,13 +30,15 @@
 !
 !
 ! module: psb_d_nest_mat_mod
+! Author: Simone Staccone (Stack-1)
 !
 ! Defines psb_d_nest_sparse_mat: a block-structured distributed sparse
 ! matrix for double precision real arithmetic.
 !
 ! The matrix is stored as a 2-D array of psb_dspmat_type sub-matrices.
-! A companion logical array blk_present(i,j) flags which blocks are
-! non-null (absent blocks contribute zero to any product).
+! Block presence is determined directly from the sub-matrix storage: a block
+! (i,j) is present iff mats(i,j)%a is allocated (absent blocks contribute zero
+! to any product). There is no separate presence flag array.
 !
 ! Descriptor convention (current nested design)
 ! ---------------------------------------------
@@ -46,7 +48,7 @@
 ! descs(i,j) together with mats(i,j).
 !
 ! A block may be structurally absent (NULL/zero): this is represented by
-! blk_present(i,j)=.false. and mats(i,j) left unbuilt. In that case the
+! mats(i,j) left unbuilt (mats(i,j)%a not allocated). In that case the
 ! block contributes zero and is skipped by nested kernels.
 !
 ! Descriptor storage is distinct from matrix presence: descriptors are
@@ -54,7 +56,7 @@
 ! matrix blocks may be present only on a subset.
 !
 ! Reference examples in test/pdegen:
-!   * psb_d_pde_nest.full.F90  (A(2,2) left NULL, blk_present(2,2)=.false.)
+!   * psb_d_pde_nest.full.F90  (A(2,2) left NULL, mats(2,2)%a not allocated)
 !   * psb_d_nest_tools.F90 and psb_d_pde_nest_full_tools.F90
 !     (2-D desc_nest%descs(i,j) used in nested allocation/assembly).
 !
@@ -66,7 +68,6 @@ module psb_d_nest_mat_mod
     integer(psb_ipk_)                         :: nrblocks = 0
     integer(psb_ipk_)                         :: ncblocks = 0
     type(psb_dspmat_type), allocatable        :: mats(:,:)
-    logical,               allocatable        :: blk_present(:,:)
   contains
     procedure :: get_nrblocks  => psb_d_nest_mat_get_nrb
     procedure :: get_ncblocks  => psb_d_nest_mat_get_ncb
@@ -91,29 +92,32 @@ contains
   end function psb_d_nest_mat_get_ncb
 
   !  has_block: return .true. if block (i,j) is non-null
-  function psb_d_nest_mat_has_block(a, i, j) result(hp)
+  function psb_d_nest_mat_has_block(a, i_block_row, j_block_col) result(has)
     class(psb_d_nest_sparse_mat), intent(in) :: a
-    integer(psb_ipk_),            intent(in) :: i, j
-    logical :: hp
+    integer(psb_ipk_),            intent(in) :: i_block_row, j_block_col
+    logical :: has
 
-    hp = .false.
-    if (i < 1 .or. i > a%nrblocks) return
-    if (j < 1 .or. j > a%ncblocks) return
-    if (.not. allocated(a%blk_present)) return
-    hp = a%blk_present(i, j)
+    has = .false.
+    if (i_block_row < 1 .or. i_block_row > a%nrblocks) return
+    if (j_block_col < 1 .or. j_block_col > a%ncblocks) return
+    if (.not. allocated(a%mats)) return
+    ! P3: presence is determined solely by whether the sub-matrix has been
+    ! built (its polymorphic storage %a is allocated). No parallel flag array.
+    has = allocated(a%mats(i_block_row, j_block_col)%a)
   end function psb_d_nest_mat_has_block
 
   !  sizeof: total storage across all allocated sub-matrices
-  function psb_d_nest_mat_sizeof(a) result(s)
+  function psb_d_nest_mat_sizeof(a) result(total_bytes)
     class(psb_d_nest_sparse_mat), intent(in) :: a
-    integer(psb_epk_) :: s
-    integer(psb_ipk_) :: i, j
+    integer(psb_epk_) :: total_bytes
+    integer(psb_ipk_) :: i_block_row, j_block_col
 
-    s = 0_psb_epk_
+    total_bytes = 0_psb_epk_
     if (allocated(a%mats)) then
-      do j = 1, a%ncblocks
-        do i = 1, a%nrblocks
-          if (a%blk_present(i, j)) s = s + a%mats(i, j)%sizeof()
+      do j_block_col = 1, a%ncblocks
+        do i_block_row = 1, a%nrblocks
+          if (allocated(a%mats(i_block_row, j_block_col)%a)) &
+               & total_bytes = total_bytes + a%mats(i_block_row, j_block_col)%sizeof()
         end do
       end do
     end if
@@ -124,23 +128,19 @@ contains
     class(psb_d_nest_sparse_mat), intent(inout) :: a
     integer(psb_ipk_),            intent(out)   :: info
 
-    integer(psb_ipk_) :: i, j, linfo
+    integer(psb_ipk_) :: i_block_row, j_block_col, local_info
 
     info = 0
     if (allocated(a%mats)) then
-      do j = 1, a%ncblocks
-        do i = 1, a%nrblocks
-          if (a%blk_present(i, j)) then
-            call a%mats(i, j)%free()
+      do j_block_col = 1, a%ncblocks
+        do i_block_row = 1, a%nrblocks
+          if (allocated(a%mats(i_block_row, j_block_col)%a)) then
+            call a%mats(i_block_row, j_block_col)%free()
           end if
         end do
       end do
-      deallocate(a%mats, stat=linfo)
-      if (linfo /= 0 .and. info == 0) info = linfo
-    end if
-    if (allocated(a%blk_present)) then
-      deallocate(a%blk_present, stat=linfo)
-      if (linfo /= 0 .and. info == 0) info = linfo
+      deallocate(a%mats, stat=local_info)
+      if (local_info /= 0 .and. info == 0) info = local_info
     end if
     a%nrblocks = 0
     a%ncblocks = 0

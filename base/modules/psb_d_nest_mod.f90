@@ -30,6 +30,7 @@
 !
 !
 ! module: psb_d_nest_mod
+! Author: Simone Staccone (Stack-1)
 !
 ! Umbrella module for the nested (block-structured) double precision
 ! real types.  Users need only:
@@ -39,8 +40,10 @@
 ! to access all three container types and their parallel operations.
 !
 module psb_d_nest_mod
-  use psb_desc_nest_mod
-  use psb_d_nest_vect_mod
-  use psb_d_nest_mat_mod
-  use psb_d_nest_psblas_mod
+  use psb_desc_nest_mod        ! grid descriptor (per-field, input to compose)
+  use psb_d_nest_mat_mod       ! block storage (psb_d_nest_sparse_mat)
+  use psb_d_nest_base_mat_mod  ! MATNEST operator + field-split interface
+  use psb_cd_nest_tools_mod    ! psb_cd_nest_compose (global descriptor)
+  use psb_d_nest_tools_mod     ! block assembly + psb_d_nest_rect_block
+  use psb_d_nest_builder_mod   ! psb_d_nest_matrix: init/ins/asb frontend
 end module psb_d_nest_mod

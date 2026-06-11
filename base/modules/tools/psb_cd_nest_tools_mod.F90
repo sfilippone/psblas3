@@ -29,6 +29,9 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
+! Module: psb_cd_nest_tools_mod
+! Author: Simone Staccone (Stack-1)
+!
 !  Nested-specific assembly wrappers for PSBLAS3 — descriptor routines
 !
 
@@ -39,12 +42,14 @@ module psb_cd_nest_tools_mod
   use psb_error_mod, only : psb_errpush
   use psb_cd_tools_mod, only : psb_cdall, psb_cdasb, psb_cdins, psb_cdcpy, psb_cdprt
   use psb_desc_nest_mod, only : psb_desc_nest_type
+  use psb_desc_mod, only : psb_desc_type
   implicit none
 
   private
 
   public :: psb_cdall_nest, psb_cdins_nest, psb_cdins_nest_rc, &
-            psb_cdasb_nest, psb_cdfree_nest, psb_cdcpy_nest, psb_cdprt_nest
+            psb_cdasb_nest, psb_cdfree_nest, psb_cdcpy_nest, psb_cdprt_nest, &
+            psb_cd_nest_compose
 
   ! Column-only form: (blk_j, nz, ja, desc_nest, info [,mask, lidx])
   ! Row+column form: (blk_i, blk_j, nz, ia, ja, desc_nest, info)
@@ -86,29 +91,29 @@ contains
     integer(psb_ipk_), intent(out) :: info
     integer(psb_ipk_), intent(in), optional :: nrblocks, ncblocks, nl
 
-    integer(psb_ipk_) :: i, j, nr, nc, nl_
+    integer(psb_ipk_) :: i_block_row, j_block_col, n_block_rows, n_block_cols, local_rows
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_cdall_nest'
 
     ! Set default dimensions
-    nr = 2
-    nc = 2
-    if (present(nrblocks)) nr = nrblocks
-    if (present(ncblocks)) nc = ncblocks
+    n_block_rows = 2
+    n_block_cols = 2
+    if (present(nrblocks)) n_block_rows = nrblocks
+    if (present(ncblocks)) n_block_cols = ncblocks
 
     if (.not. present(nl)) then
       info = psb_err_no_optional_arg_
       call psb_errpush(info, name, a_err='nl (local row count)')
       return
     end if
-    nl_ = nl
+    local_rows = nl
 
     ! Allocate nested descriptor structure
-    desc_nest%nrblocks = nr
-    desc_nest%ncblocks = nc
-    allocate(desc_nest%descs(nr, nc), stat=info)
+    desc_nest%nrblocks = n_block_rows
+    desc_nest%ncblocks = n_block_cols
+    allocate(desc_nest%descs(n_block_rows, n_block_cols), stat=info)
     if (info /= 0) then
       info = psb_err_alloc_dealloc_
       call psb_errpush(info, name)
@@ -120,9 +125,9 @@ contains
     ! psb_cdasb_nest assembles both the original and the clone the shared
     ! base_desc is rebuilt twice, corrupting the global-to-local mapping of
     ! every block in that row.  Independent allocations avoid this entirely.
-    do i = 1, nr
-      do j = 1, nc
-        call psb_cdall(ctxt, desc_nest%descs(i, j), info, nl=nl_)
+    do i_block_row = 1, n_block_rows
+      do j_block_col = 1, n_block_cols
+        call psb_cdall(ctxt, desc_nest%descs(i_block_row, j_block_col), info, nl=local_rows)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_from_subroutine_, name)
           return
@@ -135,9 +140,9 @@ contains
 
 #if defined(PSB_IPK4) && defined(PSB_LPK8)
   ! psb_cdins_nest_rc_sub: row+col form, ipk_ nz — only when ipk_ /= lpk_
-  subroutine psb_cdins_nest_rc_sub(blk_i, blk_j, nz, ia, ja, desc_nest, info)
-    integer(psb_ipk_), intent(in)    :: blk_i, blk_j, nz
-    integer(psb_lpk_), intent(in)    :: ia(:), ja(:)
+  subroutine psb_cdins_nest_rc_sub(block_row, block_col, n_entries, entry_rows, entry_cols, desc_nest, info)
+    integer(psb_ipk_), intent(in)    :: block_row, block_col, n_entries
+    integer(psb_lpk_), intent(in)    :: entry_rows(:), entry_cols(:)
     type(psb_desc_nest_type), intent(inout) :: desc_nest
     integer(psb_ipk_), intent(out)   :: info
 
@@ -146,16 +151,16 @@ contains
     info = psb_success_
     name = 'psb_cdins_nest'
 
-    if (nz == 0) return
+    if (n_entries == 0) return
 
-    if (blk_i < 1 .or. blk_i > desc_nest%nrblocks .or. &
-        blk_j < 1 .or. blk_j > desc_nest%ncblocks) then
+    if (block_row < 1 .or. block_row > desc_nest%nrblocks .or. &
+        block_col < 1 .or. block_col > desc_nest%ncblocks) then
       info = psb_err_invalid_input_
       call psb_errpush(info, name, a_err='invalid block indices')
       return
     end if
 
-    call psb_cdins(nz, ia, ja, desc_nest%descs(blk_i, blk_j), info)
+    call psb_cdins(n_entries, entry_rows, entry_cols, desc_nest%descs(block_row, block_col), info)
     if (info /= psb_success_) &
       call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdins')
 
@@ -163,45 +168,45 @@ contains
 
 
   ! psb_cdins_nest_c: col-only form, ipk_ nz — only when ipk_ /= lpk_
-  subroutine psb_cdins_nest_c(blk_j, nz, ja, desc_nest, info, mask, lidx)
-    integer(psb_ipk_), intent(in)    :: blk_j, nz
-    integer(psb_lpk_), intent(in)    :: ja(:)
+  subroutine psb_cdins_nest_c(block_col, n_entries, entry_cols, desc_nest, info, mask, lidx)
+    integer(psb_ipk_), intent(in)    :: block_col, n_entries
+    integer(psb_lpk_), intent(in)    :: entry_cols(:)
     type(psb_desc_nest_type), intent(inout) :: desc_nest
     integer(psb_ipk_), intent(out)   :: info
     logical,           intent(in), optional, target :: mask(:)
     integer(psb_ipk_), intent(in), optional         :: lidx(:)
 
-    integer(psb_ipk_) :: i, linfo
+    integer(psb_ipk_) :: i_block_row, local_info
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_cdins_nest'
 
-    if (nz == 0) return
+    if (n_entries == 0) return
 
-    if (blk_j < 1 .or. blk_j > desc_nest%ncblocks) then
+    if (block_col < 1 .or. block_col > desc_nest%ncblocks) then
       info = psb_err_invalid_input_
       call psb_errpush(info, name, a_err='invalid block column index')
       return
     end if
 
-    do i = 1, desc_nest%nrblocks
-      linfo = psb_success_
+    do i_block_row = 1, desc_nest%nrblocks
+      local_info = psb_success_
       if (present(mask)) then
         if (present(lidx)) then
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo, mask=mask, lidx=lidx)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info, mask=mask, lidx=lidx)
         else
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo, mask=mask)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info, mask=mask)
         end if
       else
         if (present(lidx)) then
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo, lidx=lidx)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info, lidx=lidx)
         else
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info)
         end if
       end if
-      if (linfo /= psb_success_ .and. info == psb_success_) then
-        info = linfo
+      if (local_info /= psb_success_ .and. info == psb_success_) then
+        info = local_info
         call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdins')
       end if
     end do
@@ -215,9 +220,9 @@ contains
   ! When entries in block (blk_i, blk_j) reference columns owned by other
   ! processes, use the col-only form afterwards to broadcast those column
   ! indices across all row-blocks in block-col blk_j.
-  subroutine psb_lcdins_nest_rc(blk_i, blk_j, nz, ia, ja, desc_nest, info)
-    integer(psb_ipk_), intent(in)    :: blk_i, blk_j
-    integer(psb_lpk_), intent(in)    :: nz, ia(:), ja(:)
+  subroutine psb_lcdins_nest_rc(block_row, block_col, n_entries, entry_rows, entry_cols, desc_nest, info)
+    integer(psb_ipk_), intent(in)    :: block_row, block_col
+    integer(psb_lpk_), intent(in)    :: n_entries, entry_rows(:), entry_cols(:)
     type(psb_desc_nest_type), intent(inout) :: desc_nest
     integer(psb_ipk_), intent(out)   :: info
 
@@ -226,16 +231,16 @@ contains
     info = psb_success_
     name = 'psb_cdins_nest'
 
-    if (nz == 0) return
+    if (n_entries == 0) return
 
-    if (blk_i < 1 .or. blk_i > desc_nest%nrblocks .or. &
-        blk_j < 1 .or. blk_j > desc_nest%ncblocks) then
+    if (block_row < 1 .or. block_row > desc_nest%nrblocks .or. &
+        block_col < 1 .or. block_col > desc_nest%ncblocks) then
       info = psb_err_invalid_input_
       call psb_errpush(info, name, a_err='invalid block indices')
       return
     end if
 
-    call psb_cdins(nz, ia, ja, desc_nest%descs(blk_i, blk_j), info)
+    call psb_cdins(n_entries, entry_rows, entry_cols, desc_nest%descs(block_row, block_col), info)
     if (info /= psb_success_) &
       call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdins')
 
@@ -247,45 +252,45 @@ contains
   ! Registers nz global column indices ja into the descriptor for
   ! block column blk_j across all row-blocks (descs(i, blk_j) for
   ! i = 1..nrblocks).  mask and lidx are forwarded to psb_cdins.
-  subroutine psb_lcdins_nest_c(blk_j, nz, ja, desc_nest, info, mask, lidx)
-    integer(psb_ipk_), intent(in)    :: blk_j
-    integer(psb_lpk_), intent(in)    :: nz, ja(:)
+  subroutine psb_lcdins_nest_c(block_col, n_entries, entry_cols, desc_nest, info, mask, lidx)
+    integer(psb_ipk_), intent(in)    :: block_col
+    integer(psb_lpk_), intent(in)    :: n_entries, entry_cols(:)
     type(psb_desc_nest_type), intent(inout) :: desc_nest
     integer(psb_ipk_), intent(out)   :: info
     logical,           intent(in), optional, target :: mask(:)
     integer(psb_ipk_), intent(in), optional         :: lidx(:)
 
-    integer(psb_ipk_) :: i, linfo
+    integer(psb_ipk_) :: i_block_row, local_info
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_cdins_nest'
 
-    if (nz == 0) return
+    if (n_entries == 0) return
 
-    if (blk_j < 1 .or. blk_j > desc_nest%ncblocks) then
+    if (block_col < 1 .or. block_col > desc_nest%ncblocks) then
       info = psb_err_invalid_input_
       call psb_errpush(info, name, a_err='invalid block column index')
       return
     end if
 
-    do i = 1, desc_nest%nrblocks
-      linfo = psb_success_
+    do i_block_row = 1, desc_nest%nrblocks
+      local_info = psb_success_
       if (present(mask)) then
         if (present(lidx)) then
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo, mask=mask, lidx=lidx)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info, mask=mask, lidx=lidx)
         else
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo, mask=mask)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info, mask=mask)
         end if
       else
         if (present(lidx)) then
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo, lidx=lidx)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info, lidx=lidx)
         else
-          call psb_cdins(nz, ja, desc_nest%descs(i, blk_j), linfo)
+          call psb_cdins(n_entries, entry_cols, desc_nest%descs(i_block_row, block_col), local_info)
         end if
       end if
-      if (linfo /= psb_success_ .and. info == psb_success_) then
-        info = linfo
+      if (local_info /= psb_success_ .and. info == psb_success_) then
+        info = local_info
         call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdins')
       end if
     end do
@@ -307,15 +312,15 @@ contains
     type(psb_desc_nest_type), intent(inout) :: desc_nest
     integer(psb_ipk_), intent(out) :: info
 
-    integer(psb_ipk_) :: i, j
+    integer(psb_ipk_) :: i_block_row, j_block_col
     character(len=20) :: name
 
     info = psb_success_
     name = 'psb_cdasb_nest'
 
-    do i = 1, desc_nest%nrblocks
-      do j = 1, desc_nest%ncblocks
-        call psb_cdasb(desc_nest%descs(i, j), info)
+    do i_block_row = 1, desc_nest%nrblocks
+      do j_block_col = 1, desc_nest%ncblocks
+        call psb_cdasb(desc_nest%descs(i_block_row, j_block_col), info)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdasb')
           return
@@ -368,7 +373,7 @@ contains
     type(psb_desc_nest_type), intent(out)   :: desc_out
     integer(psb_ipk_), intent(out) :: info
 
-    integer(psb_ipk_) :: i, j
+    integer(psb_ipk_) :: i_block_row, j_block_col
     character(len=20) :: name
 
     info = psb_success_
@@ -383,9 +388,9 @@ contains
       return
     end if
 
-    do i = 1, desc_in%nrblocks
-      do j = 1, desc_in%ncblocks
-        call psb_cdcpy(desc_in%descs(i, j), desc_out%descs(i, j), info)
+    do i_block_row = 1, desc_in%nrblocks
+      do j_block_col = 1, desc_in%ncblocks
+        call psb_cdcpy(desc_in%descs(i_block_row, j_block_col), desc_out%descs(i_block_row, j_block_col), info)
         if (info /= psb_success_) then
           call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdcpy')
           return
@@ -415,37 +420,37 @@ contains
     logical,           intent(in), optional  :: glob, short
     integer(psb_ipk_), intent(in), optional  :: verbosity
 
-    integer(psb_ipk_) :: i, j
+    integer(psb_ipk_) :: i_block_row, j_block_col
 
-    do i = 1, desc_nest%nrblocks
-      do j = 1, desc_nest%ncblocks
-        write(iout, '(a,i0,a,i0,a)') 'Block (', i, ',', j, '):'
+    do i_block_row = 1, desc_nest%nrblocks
+      do j_block_col = 1, desc_nest%ncblocks
+        write(iout, '(a,i0,a,i0,a)') 'Block (', i_block_row, ',', j_block_col, '):'
         if (present(glob)) then
           if (present(short)) then
             if (present(verbosity)) then
-              call psb_cdprt(iout, desc_nest%descs(i,j), glob=glob, short=short, verbosity=verbosity)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), glob=glob, short=short, verbosity=verbosity)
             else
-              call psb_cdprt(iout, desc_nest%descs(i,j), glob=glob, short=short)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), glob=glob, short=short)
             end if
           else
             if (present(verbosity)) then
-              call psb_cdprt(iout, desc_nest%descs(i,j), glob=glob, verbosity=verbosity)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), glob=glob, verbosity=verbosity)
             else
-              call psb_cdprt(iout, desc_nest%descs(i,j), glob=glob)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), glob=glob)
             end if
           end if
         else
           if (present(short)) then
             if (present(verbosity)) then
-              call psb_cdprt(iout, desc_nest%descs(i,j), short=short, verbosity=verbosity)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), short=short, verbosity=verbosity)
             else
-              call psb_cdprt(iout, desc_nest%descs(i,j), short=short)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), short=short)
             end if
           else
             if (present(verbosity)) then
-              call psb_cdprt(iout, desc_nest%descs(i,j), verbosity=verbosity)
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col), verbosity=verbosity)
             else
-              call psb_cdprt(iout, desc_nest%descs(i,j))
+              call psb_cdprt(iout, desc_nest%descs(i_block_row,j_block_col))
             end if
           end if
         end if
@@ -453,5 +458,127 @@ contains
     end do
 
   end subroutine psb_cdprt_nest
+
+  ! psb_cd_nest_compose  (P1 / step 6a)
+  !
+  ! Compose the per-field block descriptors into a SINGLE global psb_desc_type
+  ! describing the whole nested operator. The global index space is the
+  ! concatenation of the field spaces:
+  !
+  !     global index = offset_k + (field-k global index),   offset_k = sum_{m<k} n_m
+  !
+  ! Each process owns its slice of every field; the global halo is the union of
+  ! the per-field halos, each remapped by its field offset. Once composed, the
+  ! nested operator can be presented to Krylov/AMG4PSBLAS as a standard
+  ! distributed matrix/vector (MATNEST-style).
+  !
+  ! Assumes a square block structure (nrblocks == ncblocks); field k is taken to
+  ! be column k, whose distribution and halo are read from descs(1,k) (all
+  ! descs(i,k) for fixed k share the same column space).
+  !
+  subroutine psb_cd_nest_compose(desc_grid, desc_global, info)
+    type(psb_desc_nest_type), intent(in)  :: desc_grid
+    type(psb_desc_type),      intent(out) :: desc_global
+    integer(psb_ipk_),        intent(out) :: info
+
+    type(psb_ctxt_type)            :: ctxt
+    integer(psb_ipk_)              :: n_fields, i_field, i_loc, n_owned, n_local, owned_count, halo_count
+    integer(psb_lpk_)              :: global_idx
+    integer(psb_lpk_), allocatable :: field_offset(:), owned_global(:), halo_global(:)
+    character(len=24)              :: name
+
+    info = psb_success_
+    name = 'psb_cd_nest_compose'
+
+    if (.not. allocated(desc_grid%descs)) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, name, a_err='nested descriptor not allocated')
+      return
+    end if
+    if (desc_grid%nrblocks /= desc_grid%ncblocks) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, name, a_err='nested block structure must be square')
+      return
+    end if
+
+    n_fields   = desc_grid%ncblocks
+    ctxt = desc_grid%descs(1,1)%get_context()
+
+    ! 1. field offsets in the global numbering
+    allocate(field_offset(n_fields+1), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_; call psb_errpush(info, name); return
+    end if
+    field_offset(1) = 0
+    do i_field = 1, n_fields
+      field_offset(i_field+1) = field_offset(i_field) + desc_grid%descs(1,i_field)%get_global_rows()
+    end do
+
+    ! 2. local owned global indices: U_k { offset_k + l2g(owned of field i_field) }
+    owned_count = 0
+    do i_field = 1, n_fields
+      owned_count = owned_count + desc_grid%descs(1,i_field)%get_local_rows()
+    end do
+    allocate(owned_global(owned_count), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_; call psb_errpush(info, name); return
+    end if
+    owned_count = 0
+    do i_field = 1, n_fields
+      n_owned = desc_grid%descs(1,i_field)%get_local_rows()
+      do i_loc = 1, n_owned
+        call desc_grid%descs(1,i_field)%l2g(i_loc, global_idx, info)
+        if (info /= 0) then
+          call psb_errpush(psb_err_from_subroutine_, name, a_err='l2g'); return
+        end if
+        owned_count     = owned_count + 1
+        owned_global(owned_count) = field_offset(i_field) + global_idx
+      end do
+    end do
+
+    ! 3. allocate the global descriptor with the concatenated ownership
+    call psb_cdall(ctxt, desc_global, info, vl=owned_global)
+    if (info /= 0) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdall'); return
+    end if
+
+    ! 4. global halo: U_k { offset_k + l2g(halo of field i_field) }
+    !    field-i_field halo local indices are local_rows+1 .. local_cols
+    halo_count = 0
+    do i_field = 1, n_fields
+      halo_count = halo_count + (desc_grid%descs(1,i_field)%get_local_cols() &
+           &       - desc_grid%descs(1,i_field)%get_local_rows())
+    end do
+    if (halo_count > 0) then
+      allocate(halo_global(halo_count), stat=info)
+      if (info /= 0) then
+        info = psb_err_alloc_dealloc_; call psb_errpush(info, name); return
+      end if
+      halo_count = 0
+      do i_field = 1, n_fields
+        n_owned = desc_grid%descs(1,i_field)%get_local_rows()
+        n_local = desc_grid%descs(1,i_field)%get_local_cols()
+        do i_loc = n_owned + 1, n_local
+          call desc_grid%descs(1,i_field)%l2g(i_loc, global_idx, info)
+          if (info /= 0) then
+            call psb_errpush(psb_err_from_subroutine_, name, a_err='l2g halo'); return
+          end if
+          halo_count     = halo_count + 1
+          halo_global(halo_count) = field_offset(i_field) + global_idx
+        end do
+      end do
+      call psb_cdins(halo_count, halo_global, desc_global, info)
+      if (info /= 0) then
+        call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdins'); return
+      end if
+    end if
+
+    ! 5. assemble: build the global halo communication schedule (union halo)
+    call psb_cdasb(desc_global, info)
+    if (info /= 0) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdasb'); return
+    end if
+
+  end subroutine psb_cd_nest_compose
 
 end module psb_cd_nest_tools_mod
