@@ -1552,7 +1552,7 @@ module psb_d_multivect_mod
     class(psb_d_base_multivect_type), allocatable :: v
     integer(psb_ipk_) :: nrmv = 0
     integer(psb_ipk_) :: remote_build = psb_matbld_noremote_
-    real(psb_dpk_), allocatable :: rmtv(:,:)
+    real(psb_dpk_), allocatable :: rmtv(:, :)
   contains
     procedure, pass(x) :: get_nrows => d_mvect_get_nrows
     procedure, pass(x) :: get_ncols => d_mvect_get_ncols
@@ -1567,7 +1567,7 @@ module psb_d_multivect_mod
     procedure, pass(x) :: asb      => d_mvect_asb
     procedure, pass(x) :: sync     => d_mvect_sync
     procedure, pass(x) :: free     => d_mvect_free
-    procedure, pass(x) :: reinit      => d_mvect_reinit
+    procedure, pass(x) :: reinit   => d_mvect_reinit
     procedure, pass(x) :: set_ncfs => d_mvect_set_ncfs 
     procedure, pass(x) :: get_ncfs => d_mvect_get_ncfs
     procedure, pass(x) :: set_dupl => d_mvect_set_dupl 
@@ -1582,7 +1582,7 @@ module psb_d_multivect_mod
     procedure, pass(x) :: is_bld    => d_mvect_is_bld
     procedure, pass(x) :: is_upd    => d_mvect_is_upd
     procedure, pass(x) :: is_asb    => d_mvect_is_asb
-!!$    procedure, pass(x) :: base_cpy  => d_mvect_cpy
+    !!$ procedure, pass(x) :: base_cpy  => d_mvect_cpy
 
     procedure, pass(x) :: ins      => d_mvect_ins
     procedure, pass(x) :: bld_x    => d_mvect_bld_x
@@ -1658,7 +1658,10 @@ module psb_d_multivect_mod
                                           mlt_vm_f_o, mlt_vm_i_o, &
                                           mlt_mm_f_o, mlt_mm_i_o, &
                                           mlt_vm_e, mlt_mm_e
-
+    
+    !
+    ! OLD routines -> Remove after wecheck there are really not used  
+    !                                  
     !!$    procedure, pass(x) :: dot_v    => d_mvect_dot_v
     !!$    procedure, pass(x) :: dot_a    => d_mvect_dot_a
     !!$    generic, public    :: dot      => dot_v, dot_a
@@ -1673,8 +1676,15 @@ module psb_d_multivect_mod
     !!$    procedure, pass(z) :: mlt_av   => d_mvect_mlt_av
     !!$    generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
     !!$         & mlt_v_2, mlt_av, mlt_va
+
+    !
+    ! Scaling and norms
+    !
+    procedure, pass(x)  :: nrm2_f => d_mvect_nrm2_full
+    procedure, pass(x)  :: nrm2_i => d_mvect_nrm2_idxs
+    generic, public     :: nrm2   => nrm2_f, nrm2_i
+    
     !!$    procedure, pass(x) :: scal     => d_mvect_scal
-    !!$    procedure, pass(x) :: nrm2     => d_mvect_nrm2
     !!$    procedure, pass(x) :: amax     => d_mvect_amax
     !!$    procedure, pass(x) :: asum     => d_mvect_asum
   end type psb_d_multivect_type
@@ -3062,6 +3072,36 @@ contains
   !!$         & call z%v%mlt(alpha,x%v,y,beta,info)
   !!$
   !!$  end subroutine d_mvect_mlt_va
+
+  function d_mvect_nrm2_full(m, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_multivect_type), intent(inout)  :: x
+    real(psb_dpk_), allocatable :: res(:)
+
+    if (.not. allocated(x%v)) then
+      res = dzero
+      return
+    end if
+    
+    res = x%v%nrm2(m)
+  end function d_mvect_nrm2_full
+  
+  function d_mvect_nrm2_idxs(m, x, idx) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_d_multivect_type), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: idx
+    real(psb_dpk_)  :: res
+
+    if (.not. allocated(x%v)) then
+      res = dzero
+      return
+    end if
+    
+    res = x%v%nrm2(m, idx)
+  end function d_mvect_nrm2_idxs
+
   !!$
   !!$  subroutine d_mvect_scal(alpha, x)
   !!$    use psi_serial_mod
@@ -3072,21 +3112,6 @@ contains
   !!$    if (allocated(x%v)) call x%v%scal(alpha)
   !!$
   !!$  end subroutine d_mvect_scal
-  !!$
-  !!$
-  !!$  function d_mvect_nrm2(n,x) result(res)
-  !!$    implicit none
-  !!$    class(psb_d_multivect_type), intent(inout) :: x
-  !!$    integer(psb_ipk_), intent(in)           :: n
-  !!$    real(psb_dpk_)                :: res
-  !!$
-  !!$    if (allocated(x%v)) then
-  !!$      res = x%v%nrm2(n)
-  !!$    else
-  !!$      res = dzero
-  !!$    end if
-  !!$
-  !!$  end function d_mvect_nrm2
   !!$
   !!$  function d_mvect_amax(n,x) result(res)
   !!$    implicit none

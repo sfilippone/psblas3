@@ -2815,8 +2815,13 @@ module psb_d_base_multivect_mod
     !
     ! Scaling and norms
     !
+    procedure, pass(x)  :: nrm2_f => d_base_mvect_nrm2_full
+    procedure, pass(x)  :: nrm2_i => d_base_mvect_nrm2_idxs
+    generic, public     :: nrm2   => nrm2_f, nrm2_i
+
+    ! OLD ones
     procedure, pass(x) :: scal     => d_base_mlv_scal
-    procedure, pass(x) :: nrm2     => d_base_mlv_nrm2
+    ! procedure, pass(x) :: nrm2     => d_base_mlv_nrm2
     procedure, pass(x) :: amax     => d_base_mlv_amax
     procedure, pass(x) :: asum     => d_base_mlv_asum
     procedure, pass(x) :: absval1  => d_base_mlv_absval1
@@ -4573,6 +4578,44 @@ contains
   ! !!$
   ! !!$
 
+  function d_base_mvect_nrm2_full(m, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    real(psb_dpk_), allocatable :: res(:)
+
+    real(psb_dpk_), external  :: dnrm2
+    integer(psb_ipk_) :: j, nc
+
+    if (x%is_dev()) call x%sync()
+
+    nc = psb_size(x%v, itwo)
+    allocate(res(nc))
+
+    do j = 1, nc
+      res(j) = dnrm2(m, x%v(:, j), 1)
+    end do
+  end function d_base_mvect_nrm2_full
+  
+  function d_base_mvect_nrm2_idxs(m, x, idx) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_d_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)                   :: idx
+    real(psb_dpk_)  :: res
+
+    real(psb_dpk_), external  :: dnrm2
+    integer(psb_ipk_) :: nc
+
+    if (x%is_dev()) call x%sync()
+
+    nc = psb_size(x%v, itwo)
+    if(idx > nc) return   ! Improve error handling?
+        
+    res = dnrm2(m, x%v(:, idx), 1)
+  end function d_base_mvect_nrm2_idxs
+
+
 
   !
   ! Simple scaling
@@ -4600,22 +4643,22 @@ contains
   !! \memberof  psb_d_base_multivect_type
   !! \brief 2-norm |x(1:n)|_2
   !! \param n  how many entries to consider
-  function d_base_mlv_nrm2(n,x) result(res)
-    implicit none
-    class(psb_d_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
-    real(psb_dpk_), external      :: dnrm2
-    integer(psb_ipk_) :: j, nc
+  ! function d_base_mlv_nrm2(n,x) result(res)
+  !   implicit none
+  !   class(psb_d_base_multivect_type), intent(inout) :: x
+  !   integer(psb_ipk_), intent(in)           :: n
+  !   real(psb_dpk_), allocatable    :: res(:)
+  !   real(psb_dpk_), external      :: dnrm2
+  !   integer(psb_ipk_) :: j, nc
 
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  dnrm2(n,x%v(:,j),1)
-    end do
+  !   if (x%is_dev()) call x%sync()
+  !   nc = psb_size(x%v,2_psb_ipk_)
+  !   allocate(res(nc))
+  !   do j=1,nc
+  !     res(j) =  dnrm2(n,x%v(:,j),1)
+  !   end do
 
-  end function d_base_mlv_nrm2
+  ! end function d_base_mlv_nrm2
 
   !
   !> Function  base_mlv_amax

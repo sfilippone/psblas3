@@ -440,56 +440,79 @@ module psb_d_psblas_mod
 #endif
 
   interface psb_genrm2
-    function psb_dnrm2(x, desc_a, info, jx,global)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_vect_type, psb_dspmat_type
-      real(psb_dpk_)   psb_dnrm2
-      real(psb_dpk_), intent(in)       :: x(:,:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), optional, intent(in)      :: jx
-      integer(psb_ipk_), intent(out)       :: info
-      logical, intent(in), optional        :: global
+    function psb_dnrm2(x, desc_a, info, jx, global) result(res)
+      import :: psb_dpk_, psb_ipk_, psb_desc_type
+      real(psb_dpk_), intent(in)      :: x(:,:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)  :: info
+      integer(psb_ipk_), optional, intent(in) :: jx
+      logical, intent(in), optional           :: global
+      real(psb_dpk_)  :: res
     end function psb_dnrm2
-    function psb_dnrm2v(x, desc_a, info,global)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_vect_type, psb_dspmat_type
-      real(psb_dpk_) psb_dnrm2v
-      real(psb_dpk_), intent(in)       :: x(:)
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)                :: info
-      logical, intent(in), optional        :: global
+
+    function psb_dnrm2v(x, desc_a, info, global) result(res)
+      import :: psb_dpk_, psb_ipk_, psb_desc_type
+      real(psb_dpk_), intent(in)      :: x(:)
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(out)  :: info
+      logical, intent(in), optional :: global
+      real(psb_dpk_)  :: res
     end function psb_dnrm2v
-    function psb_dnrm2_vect(x, desc_a, info,global) result(res)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_vect_type, psb_dspmat_type
-      real(psb_dpk_)                      :: res
-      type(psb_d_vect_type), intent(inout)   :: x
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)      :: info
-      logical, intent(in), optional       :: global
+
+    function psb_dnrm2_vect(x, desc_a, info, global) result(res)
+      import :: psb_d_vect_type, psb_desc_type, &
+                & psb_ipk_, psb_dpk_
+      type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_desc_type), intent(in)       :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in), optional :: global
+      real(psb_dpk_)  :: res
     end function psb_dnrm2_vect
-    function psb_dnrm2_weight_vect(x,w, desc_a, info, global, aux) result(res)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_vect_type, psb_dspmat_type
-      real(psb_dpk_)                      :: res
-      type(psb_d_vect_type), intent(inout)   :: x
-      type(psb_d_vect_type), intent(inout)   :: w
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)      :: info
-      logical, intent(in), optional       :: global
-      type(psb_d_vect_type), intent(inout), optional :: aux
+
+    function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
+      import :: psb_d_multivect_type, psb_desc_type, &
+                & psb_ipk_, psb_dpk_
+      type(psb_d_multivect_type), intent(inout) :: x
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional :: global
+      real(psb_dpk_), allocatable :: res(:)
+    end function psb_dnrm2_mvect_full
+
+    function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
+      import :: psb_d_multivect_type, psb_desc_type, &
+                & psb_ipk_, psb_dpk_
+      type(psb_d_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)             :: idx_x
+      type(psb_desc_type), intent(in)           :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      logical, intent(in), optional :: global
+      real(psb_dpk_)  :: res
+    end function psb_dnrm2_mvect_idxs
+
+    function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
+      import :: psb_d_vect_type, psb_desc_type, &
+                & psb_ipk_, psb_dpk_
+      type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_d_vect_type), intent(inout)  :: w
+      type(psb_desc_type), intent(in)       :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in), optional                   :: global
+      type(psb_d_vect_type), intent(inout), optional  :: aux
+      real(psb_dpk_)  :: res
     end function psb_dnrm2_weight_vect
-    function psb_dnrm2_weightmask_vect(x,w,idv, desc_a, info, global, aux) result(res)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-           & psb_d_vect_type, psb_dspmat_type
-      real(psb_dpk_)                      :: res
-      type(psb_d_vect_type), intent(inout)   :: x
-      type(psb_d_vect_type), intent(inout)   :: w
-      type(psb_d_vect_type), intent(inout)   :: idv
-      type(psb_desc_type), intent(in)    :: desc_a
-      integer(psb_ipk_), intent(out)      :: info
-      logical, intent(in), optional       :: global
-      type(psb_d_vect_type), intent(inout), optional :: aux
+
+    function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(res)
+      import :: psb_d_vect_type, psb_desc_type, &
+                & psb_ipk_, psb_dpk_
+      type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_d_vect_type), intent(inout)  :: w
+      type(psb_d_vect_type), intent(inout)  :: idv
+      type(psb_desc_type), intent(in)       :: desc_a
+      integer(psb_ipk_), intent(out)        :: info
+      logical, intent(in), optional                   :: global
+      type(psb_d_vect_type), intent(inout), optional  :: aux
+      real(psb_dpk_)  :: res
     end function psb_dnrm2_weightmask_vect
   end interface
 
