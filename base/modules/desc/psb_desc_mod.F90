@@ -685,7 +685,7 @@ contains
     integer(psb_ipk_) :: info
 
     info = 0
-    if (psb_is_asb_desc(desc)) &
+    if (desc%is_asb()) &
          & call desc%indxmap%set_state(psb_desc_ovl_asb_)
 
   end subroutine psb_cd_set_ovl_asb

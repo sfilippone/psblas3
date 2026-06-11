@@ -338,6 +338,7 @@ int getGPUMemoryClockRate()
 #endif
   return(count);
 }
+
 int getGPUWarpSize()
 { int count=0;
   if (prop!=NULL) 

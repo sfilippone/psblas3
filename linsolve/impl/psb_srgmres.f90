@@ -97,7 +97,8 @@
 !                                         iterations
 !    istop  -  integer(optional)          Input: stopping criterion, or how
 !                                         to estimate the error. 
-!                                         1: err =  |r|/(|a||x|+|b|);  here the iteration is
+!                                         1: err =  |r|/(|a||x|+|b|);  here
+!                                            the iteration is
 !                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         2: err =  |r|/|b|; here the iteration is
 !                                            stopped when  |r| <= eps * |b|
@@ -129,7 +130,7 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   type(psb_s_vect_type)              :: w, w1, xt
   real(psb_spk_) :: tmp 
   real(psb_spk_) :: scal, gm, rti, rti1
-  integer(psb_ipk_) ::litmax, it, k, itrace_,&
+  integer(psb_ipk_) ::itmax_, naux, it, k, itrace_,&
        & n_row, n_col, nl
   integer(psb_lpk_) :: mglob
   Logical, Parameter :: exchange=.True., noexchange=.False., use_srot=.true.
@@ -171,24 +172,35 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 2
+    istop_ = psb_get_istop_default()
   endif
-!
-!  ISTOP_ = 1:  Normwise backward error, infinity norm 
-!  ISTOP_ = 2:  ||r||/||b||, 2-norm 
-!
-
-  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+  
+  if (.not.psb_is_valid_istop(istop_)) then
     info=psb_err_invalid_istop_
     err=info
     call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
-  endif
+  end if
+  !
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2
+  !
+  select case(istop_)
+  case(psb_istop_ani_,psb_istop_bn2_,&
+       & psb_istop_rn2_abs_,psb_istop_rrn2_)
+    ! nothing needed
+  case default
+    ! should never get here
+    info=psb_err_internal_error_
+    err=info
+    call psb_errpush(info,name,a_err="invalid istop_")
+    goto 9999
+  end select
 
   if (present(itmax)) then 
-    litmax = itmax
+    itmax_ = itmax
   else
-    litmax = 1000
+    itmax_ = 1000
   endif
 
   if (present(itrace)) then
@@ -247,12 +259,15 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
        & w%get_nrows(),w1%get_nrows()
 
 
-  if (istop_ == 1) then 
+  select case(istop_)
+  case(psb_istop_ani_)
     ani = psb_spnrmi(a,desc_a,info)
     bni = psb_geamax(b,desc_a,info)
-  else if (istop_ == 2) then 
-    bn2 = psb_genrm2(b,desc_a,info)
-  else if (istop_ == 3) then
+  case(psb_istop_bn2_)
+    bn2 = psb_genrm2(b,desc_a,info)    
+  case(psb_istop_rn2_abs_)
+    ! do nothing
+  case(psb_istop_rrn2_)
     call psb_geaxpby(sone,b,szero,v(1),desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
@@ -267,7 +282,8 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
     r0n2 = psb_genrm2(v(1),desc_a,info)
-  endif
+  end select
+  
   errnum = szero
   errden = sone
   deps   = eps
@@ -318,27 +334,32 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
     !
     ! check convergence
     !
-    if (istop_ == 1) then 
+    select case(istop_)
+    case(psb_istop_ani_)
       rni = psb_geamax(v(1),desc_a,info)
       xni = psb_geamax(x,desc_a,info)
       errnum = rni
       errden = (ani*xni+bni)
-    else if (istop_ == 2) then 
+    case(psb_istop_bn2_)
       rni = psb_genrm2(v(1),desc_a,info)
       errnum = rni
       errden = bn2
-    else if (istop_ == 3) then 
+    case(psb_istop_rn2_abs_)
+      rni = psb_genrm2(v(1),desc_a,info)
+      errnum = rni
+      errden = sone
+    case(psb_istop_rrn2_) 
       rni = psb_genrm2(v(1),desc_a,info)
       errnum = rni
       errden = r0n2
-    endif
+    end select
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
       goto 9999
     end if
     
-    if ((errnum <= eps*errden).or.(itx >= litmax)) exit restart  
+    if ((errnum <= eps*errden).or.(itx >= itmax_)) exit restart  
 
     if (itrace_ > 0) &
          & call log_conv(methdname,me,itx,itrace_,errnum,errden,deps)
@@ -354,42 +375,18 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call prec%apply(v(i),w1,desc_a,info)
       call psb_spmm(sone,a,w1,szero,w,desc_a,info)
       !
+      call mgs(i,h,v,w,rs,c,s,desc_a,info)
 
-      do k = 1, i
-        h(k,i) = psb_gedot(v(k),w,desc_a,info)
-        call psb_geaxpby(-h(k,i),v(k),sone,w,desc_a,info)
-      end do
-      h(i+1,i) = psb_genrm2(w,desc_a,info)
-      scal=sone/h(i+1,i)
-      call psb_geaxpby(scal,w,szero,v(i+1),desc_a,info)
-      do k=2,i
-        call srot(1,h(k-1,i),1,h(k,i),1,real(c(k-1),kind=psb_spk_),s(k-1))
-      enddo
-
-
-      rti  = h(i,i)
-      rti1 = h(i+1,i) 
-      call srotg(rti,rti1,tmp,s(i))
-      c(i) = cmplx(tmp,szero)
-      call srot(1,h(i,i),1,h(i+1,i),1,real(c(i),kind=psb_spk_),s(i))
-      h(i+1,i) = szero
-      call srot(1,rs(i),1,rs(i+1),1,real(c(i),kind=psb_spk_),s(i))
       
-      if (istop_ == 1) then 
+      select case(istop_)
+      case(psb_istop_ani_)
         !
         ! build x and then compute the residual and its infinity norm
         !
         rst = rs
-        call w1%set(szero)
-        call strsm('l','u','n','n',i,1,sone,h,size(h,1),rst,size(rst,1))
-        if (debug_level >= psb_debug_ext_) &
-             & write(debug_unit,*) me,' ',trim(name),&
-             & ' Rebuild x-> RS:',rst(1:i)
-        do k=1, i
-          call psb_geaxpby(rst(k),v(k),sone,xt,desc_a,info)
-        end do
-        call prec%apply(xt,desc_a,info)
-        call psb_geaxpby(sone,x,sone,xt,desc_a,info)
+        call psb_geaxpby(sone,x,szero,xt,desc_a,info)
+        call rebuildx(i,h,v,w,w1,xt,rst,c,s,prec,desc_a,info)
+
         call psb_geaxpby(sone,b,szero,w1,desc_a,info)
         call psb_spmm(-sone,a,xt,sone,w1,desc_a,info)
         rni = psb_geamax(w1,desc_a,info)
@@ -397,8 +394,7 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
         errnum = rni
         errden = (ani*xni+bni)
         !
-
-      else if (istop_ == 2) then 
+      case(psb_istop_bn2_)
         !
         ! compute the residual 2-norm as byproduct of the solution
         ! procedure of the least-squares problem
@@ -406,7 +402,14 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
         rni = abs(rs(i+1))
         errnum = rni
         errden = bn2
-      else if (istop_ == 3) then 
+        
+      case(psb_istop_rn2_abs_)
+        rni = abs(rs(i+1))
+        errnum = rni
+        errden = sone
+
+      case(psb_istop_rrn2_)
+        
         !
         ! compute the residual 2-norm as byproduct of the solution
         ! procedure of the least-squares problem
@@ -414,28 +417,18 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
         rni = abs(rs(i+1))
         errnum = rni
         errden = r0n2
-      endif
+      end select
 
       if (errnum <= eps*errden) then 
 
-        if (istop_ == 1) then 
+        select case(istop_)
+        case(psb_istop_ani_)
           call psb_geaxpby(sone,xt,szero,x,desc_a,info)
 ! =          x = xt 
-        else if (istop_ == 2) then
-          !
-          ! build x
-          !
-          call strsm('l','u','n','n',i,1,sone,h,size(h,1),rs,size(rs,1))
-          if (debug_level >= psb_debug_ext_) &
-               & write(debug_unit,*) me,' ',trim(name),&
-               & ' Rebuild x-> RS:',rs(1:i)
-          call w1%set(szero)
-          do k=1, i
-            call psb_geaxpby(rs(k),v(k),sone,w1,desc_a,info)
-          end do
-          call prec%apply(w1,w,desc_a,info)
-          call psb_geaxpby(sone,w,sone,x,desc_a,info)
-        end if
+        case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
+          call  rebuildx(i,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
+
+        end select
 
         if (itrace_ > 0) &
              & call log_conv(methdname,me,itx,ione,errnum,errden,deps)
@@ -448,25 +441,15 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
     end do inner
 
-    if (istop_ == 1) then 
+    select case(istop_)
+    case(psb_istop_ani_)
       call psb_geaxpby(sone,xt,szero,x,desc_a,info)!      x = xt 
-    else if (istop_ == 2) then
-      !
-      ! build x
-      !
-      call strsm('l','u','n','n',nl,1,sone,h,size(h,1),rs,size(rs,1))
-      if (debug_level >= psb_debug_ext_) &
-           & write(debug_unit,*) me,' ',trim(name),&
-           & ' Rebuild x-> RS:',rs(1:nl)
-      call w1%set(szero)
-      do k=1, nl
-        call psb_geaxpby(rs(k),v(k),sone,w1,desc_a,info)
-      end do
-      call prec%apply(w1,w,desc_a,info)
-      call psb_geaxpby(sone,w,sone,x,desc_a,info)
-    end if
+
+    case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
+      call  rebuildx(nl,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
+    end select
     
-    if (itx >= litmax) then 
+    if (itx >= itmax_) then 
       if (itrace_ > 0) then 
         if (mod(itx,itrace_)/=0) &
              &  call log_conv(methdname,me,itx,ione,errnum,errden,deps)
@@ -496,6 +479,67 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
 
 9999 call psb_error_handler(err_act)
   return
+contains
+  !
+  ! Advance one step the Gram-Schmidt process, and apply
+  ! Givens rotations to keep H triangular
+  !
+  subroutine mgs(n,h,v,w,rs,c,s,desc_a,info)
+    real(psb_spk_)   :: c(:), s(:), h(:,:), rs(:)
+    type(psb_s_vect_type) :: v(:), w
+    type(psb_desc_type) :: desc_a
+    real(psb_spk_) :: scal, gm, rti, rti1
+    real(psb_spk_) :: tmp
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: k,n
+    !
+    
+    do k = 1, n
+      h(k,n) = psb_gedot(v(k),w,desc_a,info)
+      call psb_geaxpby(-h(k,n),v(k),sone,w,desc_a,info)
+    end do
+    h(n+1,n) = psb_genrm2(w,desc_a,info)
+    scal=sone/h(n+1,n)
+    call psb_geaxpby(scal,w,szero,v(n+1),desc_a,info)
+    do k=2,n
+      call srot(1,h(k-1:k-1,n),1,h(k:k,n),1,real(c(k-1),kind=psb_spk_),s(k-1))
+    enddo
+    
+    rti  = h(n,n)
+    rti1 = h(n+1,n) 
+    call srotg(rti,rti1,tmp,s(n))
+    c(n) = cmplx(tmp,szero)
+    call srot(1,h(n:n,n),1,h(n+1:n+1,n),1,real(c(n),kind=psb_spk_),s(n))
+    call srot(1,rs(n:n),1,rs(n+1:n+1),1,real(c(n),kind=psb_spk_),s(n))
+  end subroutine mgs
+
+  !
+  ! Rebuild solution X from the space V using the factor
+  ! stored in R
+  !
+  subroutine rebuildx(n,h,v,w,w1,x,rs,c,s,prec,desc_a,info)
+    real(psb_spk_)   :: c(:), s(:), rs(:), h(:,:)
+    type(psb_s_vect_type) :: v(:), w, w1, x
+    type(psb_desc_type) :: desc_a
+    class(psb_sprec_type) :: prec
+    integer(psb_ipk_) :: info
+    integer(psb_ipk_) :: k,n
+
+    !
+    !
+    ! build x
+    !
+    call strsm('l','u','n','n',n,1,sone,h,size(h,1),rs,size(rs,1))
+    if (debug_level >= psb_debug_ext_) &
+         & write(debug_unit,*) me,' ',trim(name),&
+         & ' Rebuild x-> RS:',rs(1:n)
+    call w1%zero()
+    do k=1, n
+      call psb_geaxpby(rs(k),v(k),sone,w1,desc_a,info)
+    end do
+    call prec%apply(w1,w,desc_a,info)
+    call psb_geaxpby(sone,w,sone,x,desc_a,info)
+  end subroutine rebuildx
 
 end subroutine psb_srgmres_vect
 

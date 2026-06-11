@@ -563,14 +563,14 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
-PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    AC_MSG_NOTICE([[Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. ]]);
    AC_MSG_NOTICE([[Forcing equal values]])	
    pac_cv_lpk_size=$pac_cv_ipk_size;	
 fi				
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";	
 dnl CDEFINES="-DPSB_IPK${pac_cv_ipk_size} -DPSB_LPK${pac_cv_lpk_size} $CDEFINES"
@@ -955,11 +955,11 @@ if test x"$pac_cv_openacc" == x"yes" ; then
     dnl CXXOPENACC="$ax_cv_prog_cxx_openacc";	
     dnl FCOPENACC="$ax_cv_prog_fc_openacc";   
    dnl else   
-dnl   AC_MSG_NOTICE([OpenACC 1 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	   
+dnl   AC_MSG_NOTICE([OpenACC 1 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])   
    PAC_ARG_WITH_FLAGS(ccopenacc,CCOPENACC)	
    PAC_ARG_WITH_FLAGS(cxxopenacc,CXXOPENACC)
    PAC_ARG_WITH_FLAGS(fcopenacc,FCOPENACC)
-dnl   AC_MSG_NOTICE([OpenACC 2 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])		
+dnl   AC_MSG_NOTICE([OpenACC 2 flags CC $CCOPENACC CXX $CXXOPENACC FC $FCOPENACC])	
 dnl   CCOPENACC="$ax_cv_prog_c_openacc";
 dnl   CXXOPENACC="$ax_cv_prog_cxx_openacc";	
 dnl   FCOPENACC="$ax_cv_prog_fc_openacc";   
@@ -1193,7 +1193,7 @@ AC_MSG_NOTICE([
 
         EXTRA_OPT             : ${EXTRA_OPT}
 
-	CUDA 		      : ${PSB_HAVE_CUDA}
+	CUDA 		      : ${pac_cv_cuda}
 	CUDA_CC               : ${pac_cv_cudacc}
 
 	OPENACC		      : ${pac_cv_openacc}

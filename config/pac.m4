@@ -2223,6 +2223,7 @@ AS_HELP_STRING([--enable-cuda],
 pac_cv_cuda="$enableval";
 ]
 )
+AC_MSG_RESULT($pac_cv_cuda)
 ]
 )
 
@@ -2374,28 +2375,9 @@ AS_HELP_STRING([--enable-openacc],
 [Specify whether to enable openacc. ]),
 [
 pac_cv_openacc="$enableval";
+AC_MSG_RESULT([$enableval.])
 ]
-dnl ,
-dnl [pac_cv_openacc="no";]
 	     )
-if test x"$pac_cv_openacc" == x"yes" ; then
-   AC_MSG_RESULT([yes.])
-#   AC_LANG_PUSH([Fortran])
-#   AC_OPENACC() 
-#   pac_cv_openacc_fcopt="$OPENACC_FCFLAGS";
-#   AC_LANG_POP()
-#   AC_LANG_PUSH([C])
-#   AC_OPENACC() 
-#   pac_cv_openacc_ccopt="$OPENACC_CFLAGS";
-#   AC_LANG_POP()
-#   AC_LANG_PUSH([C++])
-#   AC_OPENACC() 
-#   pac_cv_openacc_cxxopt="$OPENACC_CXXFLAGS";
-#   AC_LANG_POP()
-else
- pac_cv_openacc="no";
- AC_MSG_RESULT([no.])
-fi
 ]
 )
 
