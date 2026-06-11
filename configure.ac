@@ -563,14 +563,14 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
-PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    AC_MSG_NOTICE([[Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. ]]);
    AC_MSG_NOTICE([[Forcing equal values]])	
    pac_cv_lpk_size=$pac_cv_ipk_size;	
 fi				
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";	
 dnl CDEFINES="-DPSB_IPK${pac_cv_ipk_size} -DPSB_LPK${pac_cv_lpk_size} $CDEFINES"

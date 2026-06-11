@@ -7871,8 +7871,6 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
-PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. " >&5
@@ -7881,6 +7879,8 @@ printf "%s\n" "$as_me: Invalid combination of size specs PSB_IPK ${pac_cv_ipk_si
 printf "%s\n" "$as_me: Forcing equal values" >&6;}
    pac_cv_lpk_size=$pac_cv_ipk_size;
 fi
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";
 
