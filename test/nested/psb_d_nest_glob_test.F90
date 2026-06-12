@@ -53,8 +53,11 @@
 program psb_d_nest_glob_test
   use psb_base_mod
   use psb_util_mod
-  use psb_d_nest_mod      
+  use psb_d_nest_mod
+  use psb_d_hll_mat_mod, only : psb_d_hll_sparse_mat   ! psb_ext format for the blocks
   implicit none
+
+  type(psb_d_hll_sparse_mat) :: hll_mold
 
   type(psb_ctxt_type)             :: context
   integer(psb_ipk_)               :: my_rank, num_procs, info, i_local_row
@@ -141,7 +144,9 @@ program psb_d_nest_glob_test
   call nested_matrix%ins(2, 1, entry_idx, entry_rows, entry_cols, entry_vals, info)
   deallocate(entry_rows, entry_cols, entry_vals)
 
-  call nested_matrix%asb(info)
+  ! assemble with the blocks stored in HLL (psb_ext format): exercises the
+  ! configurable block storage and the format-agnostic nested matvec
+  call nested_matrix%asb(info, mold=hll_mold)
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%asb info=', info; goto 9999
   end if

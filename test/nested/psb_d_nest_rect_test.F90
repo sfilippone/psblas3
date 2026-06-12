@@ -143,7 +143,9 @@ program psb_d_nest_rect_test
   call nested_matrix%ins(2, 1, entry_idx, entry_rows, entry_cols, entry_vals, info)
   deallocate(entry_rows, entry_cols, entry_vals)
 
-  call nested_matrix%asb(info)
+  ! assemble with the blocks stored in CSC instead of the CSR default:
+  ! exercises the configurable block storage on a base format
+  call nested_matrix%asb(info, type='CSC')
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%asb info=', info; goto 9999
   end if

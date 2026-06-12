@@ -461,7 +461,8 @@ psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o ps
 # --- nested mat/desc dependencies (MATNEST) ---
 desc/psb_desc_nest_mod.o: desc/psb_desc_mod.o
 serial/psb_d_nest_mat_mod.o: serial/psb_d_mat_mod.o
-serial/psb_d_nest_base_mat_mod.o: serial/psb_d_nest_mat_mod.o desc/psb_desc_nest_mod.o serial/psb_d_base_mat_mod.o serial/psb_d_mat_mod.o desc/psb_desc_mod.o
+serial/psb_d_nest_base_mat_mod.o: serial/psb_d_nest_mat_mod.o desc/psb_desc_nest_mod.o serial/psb_d_base_mat_mod.o serial/psb_d_mat_mod.o desc/psb_desc_mod.o \
+	serial/psb_i_vect_mod.o serial/psb_d_base_vect_mod.o
 psb_d_nest_mod.o: \
 	desc/psb_desc_nest_mod.o \
 	serial/psb_d_nest_mat_mod.o \

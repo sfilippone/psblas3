@@ -67,6 +67,7 @@ module psb_d_nest_builder_mod
   use psb_penv_mod,            only : psb_ctxt_type, psb_info
   use psb_desc_mod,            only : psb_desc_type
   use psb_d_mat_mod,           only : psb_dspmat_type
+  use psb_d_base_mat_mod,      only : psb_d_base_sparse_mat
   use psb_cd_tools_mod,        only : psb_cdall, psb_cdins, psb_cdasb
   use psb_desc_nest_mod,       only : psb_desc_nest_type
   use psb_d_nest_mat_mod,      only : psb_d_nest_sparse_mat
@@ -184,10 +185,15 @@ contains
   end subroutine psb_d_nest_op_ins
 
   ! asb: assemble the descriptors, build the blocks, compose the global
-  !      descriptor, set up the operator and wrap it into a_glob
-  subroutine psb_d_nest_op_asb(op, info)
+  !      descriptor, set up the operator and wrap it into a_glob.
+  !      The optional type ('CSR'/'CSC'/'COO', default 'CSR') or mold (any
+  !      class extending psb_d_base_sparse_mat, e.g. the psb_ext ELL/HLL or
+  !      the psb_cuda device formats) selects the storage format of the blocks.
+  subroutine psb_d_nest_op_asb(op, info, type, mold)
     class(psb_d_nest_matrix), intent(inout), target :: op
     integer(psb_ipk_),          intent(out)           :: info
+    character(len=*),           intent(in), optional  :: type
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold
 
     type(psb_d_nest_base_mat) :: nest_operator
     integer(psb_ipk_)         :: n_fields, i_field, j_field
@@ -220,7 +226,8 @@ contains
                & op%block_buffer(i_field,j_field)%entry_rows,                        &
                & op%block_buffer(i_field,j_field)%entry_cols,                        &
                & op%block_buffer(i_field,j_field)%entry_vals,                        &
-               & op%field_desc(i_field), op%field_desc(j_field), info)
+               & op%field_desc(i_field), op%field_desc(j_field), info,               &
+               & type=type, mold=mold)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_from_subroutine_, name, a_err='rect_block'); return
           end if

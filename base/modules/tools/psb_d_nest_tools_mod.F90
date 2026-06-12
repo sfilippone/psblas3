@@ -45,7 +45,7 @@ module psb_d_nest_tools_mod
   use psb_desc_nest_mod, only : psb_desc_nest_type
   use psb_d_nest_mat_mod, only : psb_d_nest_sparse_mat
   use psb_d_mat_mod,      only : psb_dspmat_type
-  use psb_d_base_mat_mod, only : psb_d_coo_sparse_mat
+  use psb_d_base_mat_mod, only : psb_d_coo_sparse_mat, psb_d_base_sparse_mat
   use psb_desc_mod,       only : psb_desc_type
   implicit none
 
@@ -304,13 +304,15 @@ contains
   !   desc_row       field-i descriptor (rows)
   !   desc_col       field-j descriptor (columns, with union halo)
   !
-  subroutine psb_d_nest_rect_block(blk, nz, ia_glob, ja_glob, val, desc_row, desc_col, info)
+  subroutine psb_d_nest_rect_block(blk, nz, ia_glob, ja_glob, val, desc_row, desc_col, info, type, mold)
     type(psb_dspmat_type), intent(out) :: blk
     integer(psb_ipk_),     intent(in)  :: nz
     integer(psb_lpk_),     intent(in)  :: ia_glob(:), ja_glob(:)
     real(psb_dpk_),        intent(in)  :: val(:)
     type(psb_desc_type),   intent(in)  :: desc_row, desc_col
     integer(psb_ipk_),     intent(out) :: info
+    character(len=*),      intent(in), optional :: type   ! base storage format (default 'CSR')
+    class(psb_d_base_sparse_mat), intent(in), optional :: mold  ! any format, e.g. psb_ext ELL/HLL
 
     type(psb_d_coo_sparse_mat) :: coo_block
     integer(psb_ipk_)          :: k_entry, n_loc_rows, n_loc_cols, loc_row, loc_col
@@ -347,7 +349,13 @@ contains
       call psb_errpush(psb_err_from_subroutine_, name, a_err='coo fix'); return
     end if
     call blk%mv_from(coo_block)
-    call blk%cscnv(info, type='CSR')
+    if (present(mold)) then
+      call blk%cscnv(info, mold=mold)
+    else if (present(type)) then
+      call blk%cscnv(info, type=type)
+    else
+      call blk%cscnv(info, type='CSR')
+    end if
     if (info /= 0) then
       call psb_errpush(psb_err_from_subroutine_, name, a_err='cscnv'); return
     end if

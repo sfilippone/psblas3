@@ -54,6 +54,13 @@
 ! Laplacian up to a permutation: SPD but with lambda_min ~ (pi/m)^2 => cond ~
 ! N^2 => CG performs O(N) iterations that GROW with N.
 !
+! The system is solved under every stock PSBLAS preconditioner: NONE (operator
+! only), DIAG (exercises the nested get_diag) and BJAC/ILU(0) (exercises the
+! nested csgetrow through the ILU factorization).  The test passes if every
+! solve converges to the exact solution and DIAG reproduces the NONE iteration
+! count exactly (with the constant diagonal 2I, Jacobi is a pure rescaling, so
+! any mismatch would expose a wrong nested get_diag).
+!
 ! Run: ./psb_d_nest_cg_test ; mpirun -np 4 ./psb_d_nest_cg_test
 !
 program psb_d_nest_cg_test
@@ -92,6 +99,12 @@ program psb_d_nest_cg_test
   real(psb_dpk_)                  :: diag_value, stop_tol, final_residual, norm_x_exact, solution_error
   integer(psb_ipk_)               :: max_iter, trace_level, n_iter, stop_criterion
   real(psb_dpk_), parameter       :: solution_tol = 1.0e-6_psb_dpk_
+
+  ! stock preconditioners to exercise on the nested operator
+  integer(psb_ipk_), parameter    :: n_precs = 3
+  character(len=6),  parameter    :: prec_names(n_precs) = ['NONE  ', 'DIAG  ', 'BJAC  ']
+  integer(psb_ipk_)               :: i_prec, iter_none, iter_diag
+  logical                         :: all_passed
 
   call psb_init(context)
   call psb_info(context, my_rank, num_procs)
@@ -257,41 +270,61 @@ program psb_d_nest_cg_test
   norm_x_exact = psb_genrm2(x_exact, desc_global, info)
 
   !---------------------------------------------------------------
-  ! 9) identity preconditioner (NONE): CG exercises only the operator
+  ! 9) solve with the standard PSBLAS CG under every stock preconditioner:
+  !    NONE (operator only), DIAG (exercises the nested get_diag),
+  !    BJAC/ILU(0) (exercises the nested csgetrow through the ILU build)
   !---------------------------------------------------------------
-  call preconditioner%init(context, 'NONE', info)
-  call preconditioner%build(global_operator, desc_global, info)
-  if (info /= psb_success_) then
-    if (my_rank == 0) write(*,*) 'FAIL: preconditioner%build info=', info
-    goto 9999
-  end if
+  if (my_rank == 0) write(*,'(a,i0,a,i0)') ' np=', num_procs, '  N(global)=', 2*field_size
+  all_passed = .true.
+  iter_none  = 0
+  iter_diag  = -1
+  do i_prec = 1, n_precs
+    call preconditioner%init(context, trim(prec_names(i_prec)), info)
+    call preconditioner%build(global_operator, desc_global, info)
+    if (info /= psb_success_) then
+      if (my_rank == 0) write(*,*) 'FAIL: prec%build (', trim(prec_names(i_prec)), ') info=', info
+      all_passed = .false.; exit
+    end if
+
+    call psb_geall(x_solution, desc_global, info); call psb_geasb(x_solution, desc_global, info)
+    call psb_krylov('CG', global_operator, preconditioner, rhs, x_solution, stop_tol, desc_global, info, &
+         & itmax=max_iter, iter=n_iter, err=final_residual, itrace=trace_level, istop=stop_criterion)
+    if (info /= psb_success_) then
+      if (my_rank == 0) write(*,*) 'FAIL: psb_krylov(CG,', trim(prec_names(i_prec)), ') info=', info
+      all_passed = .false.; exit
+    end if
+
+    ! solution error: || x_solution - x_exact || / || x_exact ||
+    call psb_geaxpby(-done, x_exact, done, x_solution, desc_global, info)
+    solution_error = psb_genrm2(x_solution, desc_global, info) / norm_x_exact
+
+    if (my_rank == 0) then
+      write(*,'(a,a6,a,i6,a,es12.4,a,es12.4)') ' prec=', prec_names(i_prec), &
+           & '  CG iterations=', n_iter, '  residual=', final_residual, &
+           & '  ||x-x_ex||/||x_ex||=', solution_error
+    end if
+    if ((n_iter >= max_iter) .or. (solution_error > solution_tol)) all_passed = .false.
+    if (trim(prec_names(i_prec)) == 'NONE') iter_none = n_iter
+    if (trim(prec_names(i_prec)) == 'DIAG') iter_diag = n_iter
+
+    call psb_gefree(x_solution, desc_global, info)
+    call preconditioner%free(info)
+  end do
 
   !---------------------------------------------------------------
-  ! 10) solve with the standard PSBLAS CG
+  ! 10) verdict: every preconditioner converges to the right solution.
+  !     With the constant diagonal 2I, Jacobi is a pure rescaling, so DIAG
+  !     must reproduce the unpreconditioned iteration count EXACTLY: this is
+  !     a bit-precise check that the nested get_diag returns exact values.
+  !     (BJAC/ILU(0) on a red-black ordering drops all fill, so it cannot
+  !     reduce the iteration count of this exact-convergence regime; its
+  !     much smaller final residual shows the ILU factors are consistent.)
   !---------------------------------------------------------------
-  call psb_geall(x_solution, desc_global, info); call psb_geasb(x_solution, desc_global, info)
-  call psb_krylov('CG', global_operator, preconditioner, rhs, x_solution, stop_tol, desc_global, info, &
-       & itmax=max_iter, iter=n_iter, err=final_residual, itrace=trace_level, istop=stop_criterion)
-  if (info /= psb_success_) then
-    if (my_rank == 0) write(*,*) 'FAIL: psb_krylov(CG) info=', info
-    goto 9999
-  end if
-
-  !---------------------------------------------------------------
-  ! 11) solution error: || x_solution - x_exact || / || x_exact ||
-  !---------------------------------------------------------------
-  call psb_geaxpby(-done, x_exact, done, x_solution, desc_global, info)   ! x_solution <- x_solution - x_exact
-  solution_error = psb_genrm2(x_solution, desc_global, info) / norm_x_exact
-
   if (my_rank == 0) then
-    write(*,'(a,i0,a,i0)')  ' np=', num_procs, '  N(global)=', 2*field_size
-    write(*,'(a,i0)')       ' CG iterations            = ', n_iter
-    write(*,'(a,es12.4)')   ' CG relative residual     = ', final_residual
-    write(*,'(a,es12.4)')   ' ||x - x_exact||/||x_ex|| = ', solution_error
-    if ((n_iter < max_iter) .and. (solution_error <= solution_tol)) then
-      write(*,*) '[PASS] CG converges on the global nested operator'
+    if (all_passed .and. (iter_diag == iter_none)) then
+      write(*,*) '[PASS] CG converges on the global nested operator with NONE/DIAG/BJAC'
     else
-      write(*,*) '[FAIL] CG does not converge / wrong solution (tol ', solution_tol, ')'
+      write(*,*) '[FAIL] preconditioned CG on the nested operator (tol ', solution_tol, ')'
     end if
   end if
 
