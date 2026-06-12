@@ -273,4 +273,232 @@ contains
     res = xp%get_entry((index+(1-ixb)))
   end function psb_c_zvect_get_entry
 
+    function psb_c_znnz(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_) :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+    integer(psb_c_ipk_)               :: info
+
+    res = 0
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    res = psb_nnz(ap,descp,info)
+
+  end function psb_c_znnz
+
+  function psb_c_zis_matupd(ah,cdh) bind(c) result(res)
+    implicit none
+    logical(c_bool) :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+    integer(psb_c_ipk_)               :: info
+
+    res = .false.
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    res = ap%is_upd()
+  end function
+
+  function psb_c_zis_matasb(ah,cdh) bind(c) result(res)
+    implicit none
+    logical(c_bool) :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+    integer(psb_c_ipk_)               :: info
+
+    res = .false.
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    res = ap%is_asb()
+  end function
+
+  function psb_c_zis_matbld(ah,cdh) bind(c) result(res)
+    implicit none
+    logical(c_bool) :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+    integer(psb_c_ipk_)               :: info
+
+    res = .false.
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    res = ap%is_bld()
+  end function
+
+  function psb_c_zset_matupd(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_) :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%set_upd()
+
+    res = psb_success_
+  end function
+
+  function psb_c_zset_matasb(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)    :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+
+    res = -1;
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%set_asb()
+
+    res = psb_success_
+
+  end function
+
+  function psb_c_zset_matbld(ah,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)    :: res
+
+    type(psb_c_zspmat)   :: ah
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+
+    call ap%set_bld()
+
+    res = psb_success_
+  end function
+
+  function psb_c_zcopy_mat(ah,bh,cdh) bind(c) result(res)
+    implicit none
+    integer(psb_c_ipk_)    :: res
+
+    type(psb_c_zspmat)   :: ah,bh
+    type(psb_c_descriptor) :: cdh
+
+    type(psb_desc_type), pointer      :: descp
+    type(psb_zspmat_type), pointer  :: ap,bp
+    integer(psb_c_ipk_)               :: info
+
+    res = -1
+
+    if (c_associated(cdh%item)) then
+      call c_f_pointer(cdh%item,descp)
+    else
+      return
+    end if
+    if (c_associated(ah%item)) then
+      call c_f_pointer(ah%item,ap)
+    else
+      return
+    end if
+    if (c_associated(bh%item)) then
+      call c_f_pointer(bh%item,bp)
+    else
+      return
+    end if
+
+    call ap%clone(bp,info)
+
+    res = info
+  end function
+  
 end module psb_z_serial_cbind_mod
