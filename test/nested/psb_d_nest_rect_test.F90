@@ -65,6 +65,7 @@ program psb_d_nest_rect_test
   real(psb_dpk_)                  :: insert_value(1)
 
   integer(psb_lpk_), allocatable  :: entry_rows(:), entry_cols(:)
+  integer(psb_lpk_), allocatable  :: v_rows(:), q_rows(:)
   real(psb_dpk_),    allocatable  :: entry_vals(:)
   real(psb_dpk_)                  :: mismatch_norm
   real(psb_dpk_), parameter       :: tolerance = 1.0e-10_psb_dpk_
@@ -82,8 +83,10 @@ program psb_d_nest_rect_test
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%init info=', info; goto 9999
   end if
-  v_local_rows = nested_matrix%field_desc(1)%get_local_rows()
-  q_local_rows = nested_matrix%field_desc(2)%get_local_rows()
+  v_rows = nested_matrix%get_owned_rows(1)
+  q_rows = nested_matrix%get_owned_rows(2)
+  v_local_rows = size(v_rows)
+  q_local_rows = size(q_rows)
 
   !---------------------------------------------------------------
   ! 2) insert the blocks (owned rows only)
@@ -92,7 +95,7 @@ program psb_d_nest_rect_test
   allocate(entry_rows(3*v_local_rows), entry_cols(3*v_local_rows), entry_vals(3*v_local_rows))
   entry_idx = 0
   do i_local_row = 1, v_local_rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, v_global_row, info)
+    v_global_row = v_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = v_global_row
     entry_cols(entry_idx) = v_global_row
@@ -117,7 +120,7 @@ program psb_d_nest_rect_test
   allocate(entry_rows(v_local_rows), entry_cols(v_local_rows), entry_vals(v_local_rows))
   entry_idx = 0
   do i_local_row = 1, v_local_rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, v_global_row, info)
+    v_global_row = v_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = v_global_row
     entry_cols(entry_idx) = mod(v_global_row-1_psb_lpk_, q_size)+1
@@ -130,7 +133,7 @@ program psb_d_nest_rect_test
   allocate(entry_rows(2*q_local_rows), entry_cols(2*q_local_rows), entry_vals(2*q_local_rows))
   entry_idx = 0
   do i_local_row = 1, q_local_rows
-    call nested_matrix%field_desc(2)%l2g(i_local_row, q_global_row, info)
+    q_global_row = q_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = q_global_row
     entry_cols(entry_idx) = q_global_row
@@ -156,7 +159,7 @@ program psb_d_nest_rect_test
   call psb_spall(monolithic_ref, nested_matrix%desc_glob, info, &
        &         nnz=6*nested_matrix%desc_glob%get_local_rows())
   do i_local_row = 1, v_local_rows                     ! V rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, v_global_row, info)
+    v_global_row = v_rows(i_local_row)
     insert_value(1)=2.0_psb_dpk_
     call psb_spins(1,[v_global_row],[v_global_row],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
     if (v_global_row>1) then
@@ -172,7 +175,7 @@ program psb_d_nest_rect_test
     call psb_spins(1,[v_global_row],[q_col],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
   end do
   do i_local_row = 1, q_local_rows                     ! Q rows
-    call nested_matrix%field_desc(2)%l2g(i_local_row, q_global_row, info)
+    q_global_row = q_rows(i_local_row)
     insert_value(1)=0.3_psb_dpk_
     call psb_spins(1,[v_size+q_global_row],[q_global_row],       insert_value,monolithic_ref,nested_matrix%desc_glob,info)  ! col q
     call psb_spins(1,[v_size+q_global_row],[q_global_row+q_size],insert_value,monolithic_ref,nested_matrix%desc_glob,info)  ! col q+nQ

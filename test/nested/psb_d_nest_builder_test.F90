@@ -64,6 +64,7 @@ program psb_d_nest_builder_test
   real(psb_dpk_)             :: insert_value(1)
 
   integer(psb_lpk_), allocatable :: entry_rows(:), entry_cols(:)
+  integer(psb_lpk_), allocatable :: field1_rows(:), field2_rows(:)
   real(psb_dpk_),    allocatable :: entry_vals(:)
 
   real(psb_dpk_)             :: stop_tol, final_residual, norm_x_exact, solution_error
@@ -87,8 +88,10 @@ program psb_d_nest_builder_test
   end if
 
   ! rows owned by this process in each field
-  field1_local_rows = nested_matrix%field_desc(1)%get_local_rows()
-  field2_local_rows = nested_matrix%field_desc(2)%get_local_rows()
+  field1_rows = nested_matrix%get_owned_rows(1)
+  field2_rows = nested_matrix%get_owned_rows(2)
+  field1_local_rows = size(field1_rows)
+  field2_local_rows = size(field2_rows)
 
   !---------------------------------------------------------------
   ! 2) insert the values, one block at a time (owned rows only)
@@ -96,7 +99,7 @@ program psb_d_nest_builder_test
   ! block (1,1) = 2I
   allocate(entry_rows(field1_local_rows), entry_cols(field1_local_rows), entry_vals(field1_local_rows))
   do i_local_row = 1, field1_local_rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, field1_global_row, info)
+    field1_global_row = field1_rows(i_local_row)
     entry_rows(i_local_row)=field1_global_row; entry_cols(i_local_row)=field1_global_row
     entry_vals(i_local_row)=2.0_psb_dpk_
   end do
@@ -106,7 +109,7 @@ program psb_d_nest_builder_test
   ! block (2,2) = 2I
   allocate(entry_rows(field2_local_rows), entry_cols(field2_local_rows), entry_vals(field2_local_rows))
   do i_local_row = 1, field2_local_rows
-    call nested_matrix%field_desc(2)%l2g(i_local_row, field2_global_row, info)
+    field2_global_row = field2_rows(i_local_row)
     entry_rows(i_local_row)=field2_global_row; entry_cols(i_local_row)=field2_global_row
     entry_vals(i_local_row)=2.0_psb_dpk_
   end do
@@ -117,7 +120,7 @@ program psb_d_nest_builder_test
   allocate(entry_rows(2*field1_local_rows), entry_cols(2*field1_local_rows), entry_vals(2*field1_local_rows))
   entry_idx = 0
   do i_local_row = 1, field1_local_rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, field1_global_row, info)
+    field1_global_row = field1_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = field1_global_row
     entry_cols(entry_idx) = field1_global_row
@@ -136,7 +139,7 @@ program psb_d_nest_builder_test
   allocate(entry_rows(2*field2_local_rows), entry_cols(2*field2_local_rows), entry_vals(2*field2_local_rows))
   entry_idx = 0
   do i_local_row = 1, field2_local_rows
-    call nested_matrix%field_desc(2)%l2g(i_local_row, field2_global_row, info)
+    field2_global_row = field2_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = field2_global_row
     entry_cols(entry_idx) = field2_global_row

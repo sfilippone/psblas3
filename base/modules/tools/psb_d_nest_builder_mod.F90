@@ -100,6 +100,10 @@ module psb_d_nest_builder_mod
     procedure, pass(op) :: ins  => psb_d_nest_op_ins
     procedure, pass(op) :: asb  => psb_d_nest_op_asb
     procedure, pass(op) :: free => psb_d_nest_op_free
+    ! user-friendly queries on the field row distribution (no descriptor
+    ! jargon needed: these replace field_desc(i)%get_local_rows() / %l2g(...))
+    procedure, pass(op) :: get_owned_rows      => psb_d_nest_op_get_owned_rows
+    procedure, pass(op) :: get_owned_row_count => psb_d_nest_op_get_owned_row_count
   end type psb_d_nest_matrix
 
   private
@@ -305,6 +309,41 @@ contains
     op%n_fields  = 0
     op%assembled = .false.
   end subroutine psb_d_nest_op_free
+
+  ! get_owned_rows: GLOBAL indices (in the field index space, 1..field size)
+  ! of the rows of field i_field owned by this process.  This is the list of
+  ! rows the process is expected to insert through ins:
+  !
+  !   my_rows = nested_matrix%get_owned_rows(1)
+  !   do k = 1, size(my_rows)
+  !     global_row = my_rows(k)
+  !     ...
+  !
+  ! An empty array is returned for an out-of-range field index.
+  function psb_d_nest_op_get_owned_rows(op, i_field) result(owned_global_rows)
+    class(psb_d_nest_matrix), intent(in) :: op
+    integer(psb_ipk_),        intent(in) :: i_field
+    integer(psb_lpk_), allocatable       :: owned_global_rows(:)
+
+    if ((i_field < 1) .or. (i_field > op%n_fields) .or. &
+      & (.not. allocated(op%field_desc))) then
+      allocate(owned_global_rows(0))
+      return
+    end if
+    owned_global_rows = op%field_desc(i_field)%get_global_indices(owned=.true.)
+  end function psb_d_nest_op_get_owned_rows
+
+  ! get_owned_row_count: how many rows of field i_field this process owns
+  function psb_d_nest_op_get_owned_row_count(op, i_field) result(owned_row_count)
+    class(psb_d_nest_matrix), intent(in) :: op
+    integer(psb_ipk_),        intent(in) :: i_field
+    integer(psb_ipk_)                    :: owned_row_count
+
+    owned_row_count = 0
+    if ((i_field < 1) .or. (i_field > op%n_fields) .or. &
+      & (.not. allocated(op%field_desc))) return
+    owned_row_count = op%field_desc(i_field)%get_local_rows()
+  end function psb_d_nest_op_get_owned_row_count
 
   !-----------------------------------------------------------------
   ! private helpers: growing triplet buffer

@@ -82,8 +82,26 @@ use psb_d_nest_mod
 |--------|---------|
 | `a_glob` | `type(psb_dspmat_type)` — the assembled global operator; pass it to `psb_spmm`, `psb_krylov`, `prec%build` |
 | `desc_glob` | `type(psb_desc_type)` — the composed global descriptor; pass it wherever a descriptor is expected |
-| `field_desc(i)` | `type(psb_desc_type)` — the descriptor of field `i` (query `%get_local_rows()`, `%l2g(...)` to find the rows owned by this process) |
+| `field_desc(i)` | `type(psb_desc_type)` — the descriptor of field `i` (advanced use; for the common queries see `get_owned_rows` below) |
 | `n_fields` | number of fields |
+
+To know which rows it must insert, a process asks the matrix directly — no
+descriptor jargon needed:
+
+```fortran
+integer(psb_lpk_), allocatable :: my_rows(:)
+
+my_rows = nested_matrix%get_owned_rows(1)     ! global rows of field 1 owned here
+do k = 1, size(my_rows)
+   global_row = my_rows(k)
+   ...                                        ! build the entries of this row
+end do
+```
+
+| Query | Result |
+|-------|--------|
+| `nested_matrix%get_owned_rows(i_field)` | `integer(psb_lpk_), allocatable (:)` — the GLOBAL indices (in the field index space, 1..field size) of the rows of field `i_field` owned by this process |
+| `nested_matrix%get_owned_row_count(i_field)` | `integer(psb_ipk_)` — how many rows of field `i_field` this process owns |
 
 Methods (collective over the communicator unless noted):
 

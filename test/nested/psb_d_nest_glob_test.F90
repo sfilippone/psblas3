@@ -69,6 +69,7 @@ program psb_d_nest_glob_test
   type(psb_d_vect_type)           :: x_vec, y_nested, y_monolithic
 
   integer(psb_lpk_), allocatable  :: entry_rows(:), entry_cols(:)
+  integer(psb_lpk_), allocatable  :: field1_rows(:), field2_rows(:)
   real(psb_dpk_),    allocatable  :: entry_vals(:)
   real(psb_dpk_)                  :: insert_value(1)
   real(psb_dpk_)                  :: mismatch_norm
@@ -86,8 +87,10 @@ program psb_d_nest_glob_test
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%init info=', info; goto 9999
   end if
-  field1_local_rows = nested_matrix%field_desc(1)%get_local_rows()
-  field2_local_rows = nested_matrix%field_desc(2)%get_local_rows()
+  field1_rows = nested_matrix%get_owned_rows(1)
+  field2_rows = nested_matrix%get_owned_rows(2)
+  field1_local_rows = size(field1_rows)
+  field2_local_rows = size(field2_rows)
 
   !---------------------------------------------------------------
   ! 2) insert the block values (owned rows only)
@@ -97,7 +100,7 @@ program psb_d_nest_glob_test
        &   entry_vals(3*field1_local_rows))
   entry_idx = 0
   do i_local_row = 1, field1_local_rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, global_row, info)
+    global_row = field1_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = global_row
     entry_cols(entry_idx) = global_row
@@ -122,7 +125,7 @@ program psb_d_nest_glob_test
   allocate(entry_rows(field1_local_rows), entry_cols(field1_local_rows), entry_vals(field1_local_rows))
   entry_idx = 0
   do i_local_row = 1, field1_local_rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, global_row, info)
+    global_row = field1_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = global_row
     entry_cols(entry_idx) = global_row
@@ -135,7 +138,7 @@ program psb_d_nest_glob_test
   allocate(entry_rows(field2_local_rows), entry_cols(field2_local_rows), entry_vals(field2_local_rows))
   entry_idx = 0
   do i_local_row = 1, field2_local_rows
-    call nested_matrix%field_desc(2)%l2g(i_local_row, global_row, info)
+    global_row = field2_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = global_row
     entry_cols(entry_idx) = global_row
@@ -158,7 +161,7 @@ program psb_d_nest_glob_test
   call psb_spall(monolithic_ref, nested_matrix%desc_glob, info, &
        &         nnz=5*nested_matrix%desc_glob%get_local_rows())
   do i_local_row = 1, field1_local_rows                ! field-1 rows
-    call nested_matrix%field_desc(1)%l2g(i_local_row, global_row, info)
+    global_row = field1_rows(i_local_row)
     insert_value(1) = 2.0_psb_dpk_
     call psb_spins(1,[global_row],[global_row],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
     if (global_row > 1) then
@@ -174,7 +177,7 @@ program psb_d_nest_glob_test
     call psb_spins(1,[global_row],[global_col],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
   end do
   do i_local_row = 1, field2_local_rows                ! field-2 rows
-    call nested_matrix%field_desc(2)%l2g(i_local_row, global_row, info)
+    global_row = field2_rows(i_local_row)
     global_col = global_row
     insert_value(1) = 0.3_psb_dpk_                                                  ! B
     call psb_spins(1,[field_size+global_row],[global_col],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
