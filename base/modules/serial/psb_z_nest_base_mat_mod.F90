@@ -29,15 +29,15 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: psb_d_nest_base_mat_mod.F90
+! File: psb_z_nest_base_mat_mod.F90
 !
-! Module: psb_d_nest_base_mat_mod
+! Module: psb_z_nest_base_mat_mod
 ! Author: Simone Staccone (Stack-1)
 !
 ! Adapter that makes a block-structured (nested) operator look like a standard
-! local sparse matrix to PSBLAS: psb_d_nest_base_mat EXTENDS
-! psb_d_base_sparse_mat and implements csmv (the local matrix-vector product).
-! Wrapped in a psb_dspmat_type and paired with the composed global descriptor
+! local sparse matrix to PSBLAS: psb_z_nest_base_mat EXTENDS
+! psb_z_base_sparse_mat and implements csmv (the local matrix-vector product).
+! Wrapped in a psb_zspmat_type and paired with the composed global descriptor
 ! (see psb_cd_nest_compose), the nested operator can then be fed to psb_spmm,
 ! psb_krylov and the AMG4PSBLAS preconditioners unchanged (MATNEST-style).
 !
@@ -49,91 +49,91 @@
 ! input sub-vector and scatter the field output sub-vector without further
 ! communication (the halo exchange is done once by psb_spmm on the global desc).
 !
-module psb_d_nest_base_mat_mod
+module psb_z_nest_base_mat_mod
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod,    only : psb_ensure_size
-  use psb_d_base_mat_mod, only : psb_d_base_sparse_mat
-  use psb_d_base_vect_mod, only : psb_d_base_vect_type
+  use psb_z_base_mat_mod, only : psb_z_base_sparse_mat
+  use psb_z_base_vect_mod, only : psb_z_base_vect_type
   use psb_i_vect_mod,     only : psb_i_vect_type
   use psb_desc_mod,       only : psb_desc_type
   use psb_desc_nest_mod,  only : psb_desc_nest_type
-  use psb_d_nest_mat_mod, only : psb_d_nest_sparse_mat
-  use psb_d_mat_mod,      only : psb_dspmat_type
+  use psb_z_nest_mat_mod, only : psb_z_nest_sparse_mat
+  use psb_z_mat_mod,      only : psb_zspmat_type
   implicit none
 
   ! Per-field gather/scatter map into the global local vector.
   ! global_local_pos(1 : n_owned)        -> the field's owned entries
   ! global_local_pos(n_owned+1 : size)   -> the field's ghost (halo) entries
-  type :: psb_d_nest_field_map
+  type :: psb_z_nest_field_map
     integer(psb_ipk_)              :: n_owned = 0
     integer(psb_ipk_), allocatable :: global_local_pos(:)
     ! same positions as an encapsulated index vector, for the device-capable
     ! gather/scatter (gth/sct) used by vect_mv; pointer so that its target can
     ! be synced even when the operator dummy argument is intent(in)
     type(psb_i_vect_type), pointer :: gather_pos => null()
-  end type psb_d_nest_field_map
+  end type psb_z_nest_field_map
 
-  type, extends(psb_d_base_sparse_mat) :: psb_d_nest_base_mat
+  type, extends(psb_z_base_sparse_mat) :: psb_z_nest_base_mat
     integer(psb_ipk_)                          :: n_fields = 0
-    type(psb_d_nest_sparse_mat), pointer       :: block_storage => null()  ! blocks (not owned)
+    type(psb_z_nest_sparse_mat), pointer       :: block_storage => null()  ! blocks (not owned)
     type(psb_desc_nest_type),    pointer       :: grid_desc     => null()  ! per-field descriptors (not owned)
-    type(psb_d_nest_field_map), allocatable    :: field_map(:)
+    type(psb_z_nest_field_map), allocatable    :: field_map(:)
   contains
-    procedure, pass(a) :: csmv       => psb_d_nest_base_csmv
-    procedure, pass(a) :: get_nzeros => psb_d_nest_base_get_nzeros
-    procedure, nopass  :: get_fmt    => psb_d_nest_base_get_fmt
-    procedure, pass(a) :: free       => psb_d_nest_base_free
+    procedure, pass(a) :: csmv       => psb_z_nest_base_csmv
+    procedure, pass(a) :: get_nzeros => psb_z_nest_base_get_nzeros
+    procedure, nopass  :: get_fmt    => psb_z_nest_base_get_fmt
+    procedure, pass(a) :: free       => psb_z_nest_base_free
     ! enable the stock PSBLAS preconditioners on the nested operator:
     ! get_diag is used by DIAG/JACOBI, csgetrow by BJAC (ILU factorizations
     ! go through the format-agnostic csget path)
-    procedure, pass(a) :: get_diag   => psb_d_nest_base_get_diag
-    procedure, pass(a) :: csgetrow   => psb_d_nest_base_csgetrow
+    procedure, pass(a) :: get_diag   => psb_z_nest_base_get_diag
+    procedure, pass(a) :: csgetrow   => psb_z_nest_base_csgetrow
     ! device-capable matvec on encapsulated vectors: gathers/scatters through
     ! the vectors' own gth/sct and runs each block through its vect_mv, so
     ! device block formats execute their device kernels
-    procedure, pass(a) :: vect_mv    => psb_d_nest_base_vect_mv
+    procedure, pass(a) :: vect_mv    => psb_z_nest_base_vect_mv
     ! full base-class contract (delegating to the blocks):
-    procedure, pass(a) :: csmm       => psb_d_nest_base_csmm
-    procedure, pass(a) :: cp_to_coo  => psb_d_nest_base_cp_to_coo
-    procedure, pass(a) :: mv_to_coo  => psb_d_nest_base_mv_to_coo
-    procedure, pass(a) :: rowsum     => psb_d_nest_base_rowsum
-    procedure, pass(a) :: arwsum     => psb_d_nest_base_arwsum
-    procedure, pass(a) :: colsum     => psb_d_nest_base_colsum
-    procedure, pass(a) :: aclsum     => psb_d_nest_base_aclsum
-    procedure, pass(a) :: maxval     => psb_d_nest_base_maxval
-    procedure, pass(a) :: spnmi      => psb_d_nest_base_csnmi
-    procedure, pass(a) :: spnm1      => psb_d_nest_base_csnm1
-    procedure, pass(a) :: scals      => psb_d_nest_base_scals
-    procedure, pass(a) :: scalv      => psb_d_nest_base_scal
-    procedure, pass(a) :: clone      => psb_d_nest_base_clone
-    procedure, pass(a) :: mold       => psb_d_nest_base_mold
-    procedure, pass(a) :: sizeof     => psb_d_nest_base_sizeof
+    procedure, pass(a) :: csmm       => psb_z_nest_base_csmm
+    procedure, pass(a) :: cp_to_coo  => psb_z_nest_base_cp_to_coo
+    procedure, pass(a) :: mv_to_coo  => psb_z_nest_base_mv_to_coo
+    procedure, pass(a) :: rowsum     => psb_z_nest_base_rowsum
+    procedure, pass(a) :: arwsum     => psb_z_nest_base_arwsum
+    procedure, pass(a) :: colsum     => psb_z_nest_base_colsum
+    procedure, pass(a) :: aclsum     => psb_z_nest_base_aclsum
+    procedure, pass(a) :: maxval     => psb_z_nest_base_maxval
+    procedure, pass(a) :: spnmi      => psb_z_nest_base_csnmi
+    procedure, pass(a) :: spnm1      => psb_z_nest_base_csnm1
+    procedure, pass(a) :: scals      => psb_z_nest_base_scals
+    procedure, pass(a) :: scalv      => psb_z_nest_base_scal
+    procedure, pass(a) :: clone      => psb_z_nest_base_clone
+    procedure, pass(a) :: mold       => psb_z_nest_base_mold
+    procedure, pass(a) :: sizeof     => psb_z_nest_base_sizeof
     ! NOT implemented on purpose (base error 700 is the intended behaviour):
     ! cp_from_coo / mv_from_coo (a nested operator cannot be built from a flat
     ! matrix without the field structure), csput (insertions go to the blocks
     ! before assembly), cssv/cssm (triangular solve is undefined for a block
     ! operator)
-  end type psb_d_nest_base_mat
+  end type psb_z_nest_base_mat
 
   private
-  public :: psb_d_nest_base_mat, psb_d_nest_base_setup, psb_d_nest_apply_block
+  public :: psb_z_nest_base_mat, psb_z_nest_base_setup, psb_z_nest_apply_block
   ! field-split interface (for the block preconditioner)
-  public :: psb_d_nest_get_n_fields, psb_d_nest_get_field_owned, &
-       &    psb_d_nest_get_block, psb_d_nest_get_field_desc,      &
-       &    psb_d_nest_restrict_field, psb_d_nest_prolong_field
+  public :: psb_z_nest_get_n_fields, psb_z_nest_get_field_owned, &
+       &    psb_z_nest_get_block, psb_z_nest_get_field_desc,      &
+       &    psb_z_nest_restrict_field, psb_z_nest_prolong_field
 
 contains
 
-  function psb_d_nest_base_get_fmt() result(format_name)
+  function psb_z_nest_base_get_fmt() result(format_name)
     character(len=5) :: format_name
     format_name = 'NEST'
-  end function psb_d_nest_base_get_fmt
+  end function psb_z_nest_base_get_fmt
 
   ! free: the nested operator does NOT own block_storage / grid_desc (they are
   ! pointers into the caller), so we only detach them and release the field maps.
-  subroutine psb_d_nest_base_free(a)
-    class(psb_d_nest_base_mat), intent(inout) :: a
+  subroutine psb_z_nest_base_free(a)
+    class(psb_z_nest_base_mat), intent(inout) :: a
     integer(psb_ipk_) :: i_field, local_info
     if (allocated(a%field_map)) then
       do i_field = 1, size(a%field_map)
@@ -149,10 +149,10 @@ contains
     a%grid_desc     => null()
     a%n_fields = 0
     call a%set_null()
-  end subroutine psb_d_nest_base_free
+  end subroutine psb_z_nest_base_free
 
-  function psb_d_nest_base_get_nzeros(a) result(total_nzeros)
-    class(psb_d_nest_base_mat), intent(in) :: a
+  function psb_z_nest_base_get_nzeros(a) result(total_nzeros)
+    class(psb_z_nest_base_mat), intent(in) :: a
     integer(psb_ipk_) :: total_nzeros
     integer(psb_ipk_) :: i_block_row, j_block_col
     total_nzeros = 0
@@ -165,7 +165,7 @@ contains
         end do
       end do
     end if
-  end function psb_d_nest_base_get_nzeros
+  end function psb_z_nest_base_get_nzeros
 
   ! get_diag: diagonal of the global operator.  In the global-local layout the
   ! owned entries of field i occupy positions owned_offset+1..owned_offset+n_owned,
@@ -173,17 +173,17 @@ contains
   ! position as row k, so the global diagonal is the concatenation of the
   ! diagonals of the diagonal blocks (i,i); absent blocks contribute zeros
   ! (e.g. the (2,2) block of a saddle-point operator).
-  subroutine psb_d_nest_base_get_diag(a, d, info)
-    class(psb_d_nest_base_mat), intent(in) :: a
-    real(psb_dpk_),             intent(out) :: d(:)
+  subroutine psb_z_nest_base_get_diag(a, d, info)
+    class(psb_z_nest_base_mat), intent(in) :: a
+    complex(psb_dpk_),             intent(out) :: d(:)
     integer(psb_ipk_),          intent(out) :: info
 
-    real(psb_dpk_), allocatable :: block_diag(:)
+    complex(psb_dpk_), allocatable :: block_diag(:)
     integer(psb_ipk_)           :: i_field, n_owned, owned_offset
     character(len=24)           :: name
 
     info = psb_success_
-    name = 'psb_d_nest_get_diag'
+    name = 'psb_z_nest_get_diag'
 
     if (.not. (associated(a%block_storage) .and. allocated(a%field_map))) then
       info = psb_err_invalid_mat_state_
@@ -196,7 +196,7 @@ contains
       return
     end if
 
-    d(1:a%get_nrows()) = dzero
+    d(1:a%get_nrows()) = zzero
     owned_offset = 0
     do i_field = 1, a%n_fields
       n_owned = a%field_map(i_field)%n_owned
@@ -215,7 +215,7 @@ contains
       end if
       owned_offset = owned_offset + n_owned
     end do
-  end subroutine psb_d_nest_base_get_diag
+  end subroutine psb_z_nest_base_get_diag
 
   ! csgetrow: extract local rows imin..imax of the global operator as COO
   ! triplets, with columns in the global-local layout (the operator's column
@@ -224,13 +224,13 @@ contains
   ! block-local column c remapped through field_map(j)%global_local_pos(c).
   ! This is the format-agnostic access path used by the ILU factorizations of
   ! the BJAC preconditioner (via csget/csgetblk).
-  subroutine psb_d_nest_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
+  subroutine psb_z_nest_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
        & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
-    class(psb_d_nest_base_mat), intent(in) :: a
+    class(psb_z_nest_base_mat), intent(in) :: a
     integer(psb_ipk_), intent(in)                  :: imin,imax
     integer(psb_ipk_), intent(out)                 :: nz
     integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-    real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
+    complex(psb_dpk_), allocatable,  intent(inout)    :: val(:)
     integer(psb_ipk_),intent(out)                  :: info
     logical, intent(in), optional        :: append
     integer(psb_ipk_), intent(in), optional        :: iren(:)
@@ -238,7 +238,7 @@ contains
     logical, intent(in), optional        :: rscale,cscale,chksz
 
     integer(psb_ipk_), allocatable :: block_row_ia(:), block_row_ja(:)
-    real(psb_dpk_),    allocatable :: block_row_val(:)
+    complex(psb_dpk_),    allocatable :: block_row_val(:)
     integer(psb_ipk_) :: jmin_, jmax_, nzin_, out_pos
     integer(psb_ipk_) :: r_row, i_field, j_field, k_in_field, owned_offset
     integer(psb_ipk_) :: block_nz, t_entry, global_local_col
@@ -246,7 +246,7 @@ contains
     character(len=24) :: name
 
     info = psb_success_
-    name = 'psb_d_nest_csgetrow'
+    name = 'psb_z_nest_csgetrow'
 
     if (.not. (associated(a%block_storage) .and. allocated(a%field_map))) then
       info = psb_err_invalid_mat_state_
@@ -318,10 +318,10 @@ contains
         end do
       end do
     end do
-  end subroutine psb_d_nest_base_csgetrow
+  end subroutine psb_z_nest_base_csgetrow
 
   ! vect_mv: matvec on encapsulated vectors (the path taken by psb_spmm with
-  ! psb_d_vect_type).  Instead of falling back to the host-array csmv, it
+  ! psb_z_vect_type).  Instead of falling back to the host-array csmv, it
   ! (1) gathers each column-field sub-vector through the vector's own gth with
   !     an encapsulated index vector (a device kernel on device vectors),
   ! (2) runs each block through its vect_mv (device formats execute their own
@@ -330,24 +330,24 @@ contains
   ! (3) scatters each row-field result back through the vector's own sct.
   ! Host/device traffic is limited to the compact field buffers; on plain host
   ! vectors this is exactly equivalent to the array csmv.
-  subroutine psb_d_nest_base_vect_mv(alpha, a, x, beta, y, info, trans)
-    class(psb_d_nest_base_mat), intent(in)     :: a
-    real(psb_dpk_),             intent(in)     :: alpha, beta
-    class(psb_d_base_vect_type), intent(inout) :: x
-    class(psb_d_base_vect_type), intent(inout) :: y
+  subroutine psb_z_nest_base_vect_mv(alpha, a, x, beta, y, info, trans)
+    class(psb_z_nest_base_mat), intent(in)     :: a
+    complex(psb_dpk_),             intent(in)     :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout) :: x
+    class(psb_z_base_vect_type), intent(inout) :: y
     integer(psb_ipk_),          intent(out)    :: info
     character, optional,        intent(in)     :: trans
 
-    class(psb_d_base_vect_type), allocatable :: x_field_vec, y_field_vec
-    real(psb_dpk_), allocatable :: x_field_buf(:), y_field_buf(:)
-    real(psb_dpk_)    :: block_beta
+    class(psb_z_base_vect_type), allocatable :: x_field_vec, y_field_vec
+    complex(psb_dpk_), allocatable :: x_field_buf(:), y_field_buf(:)
+    complex(psb_dpk_)    :: block_beta
     integer(psb_ipk_) :: i_field, j_field, n_owned, n_local, local_info
     logical           :: row_has_blocks
     character         :: trans_
     character(len=24) :: name
 
     info = psb_success_
-    name = 'psb_d_nest_vect_mv'
+    name = 'psb_z_nest_vect_mv'
 
     trans_ = 'N'
     if (present(trans)) trans_ = trans
@@ -359,10 +359,10 @@ contains
     if (trans_ /= 'N' .and. trans_ /= 'n') then
       ! transposed product: fall back to host arrays (rare path)
       block
-        real(psb_dpk_), allocatable :: x_host(:), y_host(:)
+        complex(psb_dpk_), allocatable :: x_host(:), y_host(:)
         x_host = x%get_vect()
         y_host = y%get_vect()
-        call psb_d_nest_base_csmv_t(alpha, a, x_host, beta, y_host, info, trans_)
+        call psb_z_nest_base_csmv_t(alpha, a, x_host, beta, y_host, info, trans_)
         call y%bld(y_host)
       end block
       return
@@ -383,7 +383,7 @@ contains
       end if
 
       row_has_blocks = .false.
-      block_beta     = dzero
+      block_beta     = zzero
       do j_field = 1, a%n_fields
         if (.not. a%block_storage%has_block(i_field, j_field)) cycle
 
@@ -401,7 +401,7 @@ contains
         if (.not. row_has_blocks) then
           ! first block of this row field: (re)build the accumulator at the
           ! right size, zeroed
-          y_field_buf(1:n_owned) = dzero
+          y_field_buf(1:n_owned) = zzero
           call y_field_vec%free(local_info)
           call y_field_vec%bld(y_field_buf(1:n_owned))
           row_has_blocks = .true.
@@ -414,7 +414,7 @@ contains
           call psb_errpush(psb_err_from_subroutine_, name, a_err='block vect_mv')
           return
         end if
-        block_beta = done
+        block_beta = zone
       end do
 
       ! scatter the row-field result into y (beta applied on the owned rows);
@@ -422,7 +422,7 @@ contains
       if (row_has_blocks) then
         y_field_buf(1:n_owned) = y_field_vec%get_vect()
       else
-        y_field_buf(1:n_owned) = dzero
+        y_field_buf(1:n_owned) = zzero
       end if
       call y%sct(ione, int(n_owned, psb_mpk_), &
            &     a%field_map(i_field)%gather_pos%v, y_field_buf, beta)
@@ -430,14 +430,14 @@ contains
 
     call x_field_vec%free(local_info)
     call y_field_vec%free(local_info)
-  end subroutine psb_d_nest_base_vect_mv
+  end subroutine psb_z_nest_base_vect_mv
 
   ! Build the per-field gather maps and set the local dimensions, from the nested
   ! grid descriptor (per-field distribution desc_grid%descs(1,field)) and the
   ! composed global descriptor desc_global (produced by psb_cd_nest_compose).
-  subroutine psb_d_nest_base_setup(nest_op, block_storage, desc_grid, desc_global, info)
-    type(psb_d_nest_base_mat),           intent(inout) :: nest_op
-    type(psb_d_nest_sparse_mat), target, intent(in)    :: block_storage
+  subroutine psb_z_nest_base_setup(nest_op, block_storage, desc_grid, desc_global, info)
+    type(psb_z_nest_base_mat),           intent(inout) :: nest_op
+    type(psb_z_nest_sparse_mat), target, intent(in)    :: block_storage
     type(psb_desc_nest_type),    target, intent(in)    :: desc_grid
     type(psb_desc_type),                 intent(in)    :: desc_global
     integer(psb_ipk_),                   intent(out)   :: info
@@ -449,7 +449,7 @@ contains
     character(len=24)              :: name
 
     info = psb_success_
-    name = 'psb_d_nest_base_setup'
+    name = 'psb_z_nest_base_setup'
 
     if (desc_grid%nrblocks /= desc_grid%ncblocks) then
       info = psb_err_invalid_input_
@@ -512,32 +512,32 @@ contains
     call nest_op%set_ncols(desc_global%get_local_cols())
     call nest_op%set_asb()
 
-  end subroutine psb_d_nest_base_setup
+  end subroutine psb_z_nest_base_setup
 
   ! Local block matrix-vector product: y = alpha * A_nest * x + beta * y.
   ! x is in the global local layout (owned fields concatenated + global halo);
   ! y holds the owned entries (global local rows).
-  subroutine psb_d_nest_base_csmv(alpha, a, x, beta, y, info, trans)
-    real(psb_dpk_),             intent(in)    :: alpha, beta, x(:)
-    class(psb_d_nest_base_mat), intent(in)    :: a
-    real(psb_dpk_),             intent(inout) :: y(:)
+  subroutine psb_z_nest_base_csmv(alpha, a, x, beta, y, info, trans)
+    complex(psb_dpk_),             intent(in)    :: alpha, beta, x(:)
+    class(psb_z_nest_base_mat), intent(in)    :: a
+    complex(psb_dpk_),             intent(inout) :: y(:)
     integer(psb_ipk_),          intent(out)   :: info
     character, optional,        intent(in)    :: trans
 
-    real(psb_dpk_), allocatable :: x_field(:), y_field(:)
+    complex(psb_dpk_), allocatable :: x_field(:), y_field(:)
     integer(psb_ipk_)           :: i_block_row, j_block_col, i_entry
     integer(psb_ipk_)           :: n_local_col_field, n_owned_row_field
     character                   :: trans_op
     character(len=24)           :: name
 
     info = psb_success_
-    name = 'psb_d_nest_base_csmv'
+    name = 'psb_z_nest_base_csmv'
     trans_op = 'N'
     if (present(trans)) trans_op = trans
     if (trans_op /= 'N' .and. trans_op /= 'n') then
       ! transposed product: the block structure of A^T is the transpose of the
       ! block grid, handled by the dedicated kernel below ('T' or 'C')
-      call psb_d_nest_base_csmv_t(alpha, a, x, beta, y, info, trans_op)
+      call psb_z_nest_base_csmv_t(alpha, a, x, beta, y, info, trans_op)
       return
     end if
     if (.not. associated(a%block_storage)) then
@@ -547,9 +547,9 @@ contains
     end if
 
     ! y <- beta * y
-    if (beta == dzero) then
-      y(:) = dzero
-    else if (beta /= done) then
+    if (beta == zzero) then
+      y(:) = zzero
+    else if (beta /= zone) then
       y(:) = beta * y(:)
     end if
 
@@ -577,7 +577,7 @@ contains
           end do
           ! y_field <- alpha * A(i_block_row, j_block_col) * x_field + y_field
           call a%block_storage%mats(i_block_row, j_block_col)%a%csmv( &
-               & alpha, x_field, done, y_field, info, trans_op)
+               & alpha, x_field, zone, y_field, info, trans_op)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_from_subroutine_, name, a_err='block csmv')
             return
@@ -592,7 +592,7 @@ contains
       deallocate(x_field)
     end do
 
-  end subroutine psb_d_nest_base_csmv
+  end subroutine psb_z_nest_base_csmv
 
   ! Transposed matvec kernel: y = alpha * A^T * x + beta * y.
   ! The block structure of A^T is the transpose of the block grid:
@@ -601,20 +601,20 @@ contains
   ! local columns of each column field (owned + ghosts); the distributed caller
   ! (psb_spmm with trans='T') then accumulates the ghost contributions to their
   ! owners through the transposed halo exchange.
-  subroutine psb_d_nest_base_csmv_t(alpha, a, x, beta, y, info, trans)
-    real(psb_dpk_),             intent(in)    :: alpha, beta, x(:)
-    class(psb_d_nest_base_mat), intent(in)    :: a
-    real(psb_dpk_),             intent(inout) :: y(:)
+  subroutine psb_z_nest_base_csmv_t(alpha, a, x, beta, y, info, trans)
+    complex(psb_dpk_),             intent(in)    :: alpha, beta, x(:)
+    class(psb_z_nest_base_mat), intent(in)    :: a
+    complex(psb_dpk_),             intent(inout) :: y(:)
     integer(psb_ipk_),          intent(out)   :: info
     character,                  intent(in)    :: trans
 
-    real(psb_dpk_), allocatable :: x_field(:), y_field(:)
+    complex(psb_dpk_), allocatable :: x_field(:), y_field(:)
     integer(psb_ipk_)           :: i_block_row, j_block_col, i_entry
     integer(psb_ipk_)           :: n_local_col_field, n_owned_row_field
     character(len=24)           :: name
 
     info = psb_success_
-    name = 'psb_d_nest_base_csmv_t'
+    name = 'psb_z_nest_base_csmv_t'
 
     if (.not. associated(a%block_storage)) then
       info = psb_err_invalid_input_
@@ -623,9 +623,9 @@ contains
     end if
 
     ! y <- beta * y  (on the whole column space)
-    if (beta == dzero) then
-      y(:) = dzero
-    else if (beta /= done) then
+    if (beta == zzero) then
+      y(:) = zzero
+    else if (beta /= zone) then
       y(:) = beta * y(:)
     end if
 
@@ -653,7 +653,7 @@ contains
           end do
           ! y_field <- alpha * A(i,j)^T (or ^H) * x_field + y_field
           call a%block_storage%mats(i_block_row, j_block_col)%a%csmv( &
-               & alpha, x_field, done, y_field, info, trans)
+               & alpha, x_field, zone, y_field, info, trans)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_from_subroutine_, name, a_err='block csmv T')
             return
@@ -668,25 +668,25 @@ contains
       end do
       deallocate(y_field)
     end do
-  end subroutine psb_d_nest_base_csmv_t
+  end subroutine psb_z_nest_base_csmv_t
 
   ! csmm: multi-RHS product, the 2D analogue of csmv (same gather/scatter
   ! per field, the block product is the block's own csmm)
-  subroutine psb_d_nest_base_csmm(alpha, a, x, beta, y, info, trans)
-    class(psb_d_nest_base_mat), intent(in)    :: a
-    real(psb_dpk_),             intent(in)    :: alpha, beta, x(:,:)
-    real(psb_dpk_),             intent(inout) :: y(:,:)
+  subroutine psb_z_nest_base_csmm(alpha, a, x, beta, y, info, trans)
+    class(psb_z_nest_base_mat), intent(in)    :: a
+    complex(psb_dpk_),             intent(in)    :: alpha, beta, x(:,:)
+    complex(psb_dpk_),             intent(inout) :: y(:,:)
     integer(psb_ipk_),          intent(out)   :: info
     character, optional,        intent(in)    :: trans
 
-    real(psb_dpk_), allocatable :: x_field(:,:), y_field(:,:)
+    complex(psb_dpk_), allocatable :: x_field(:,:), y_field(:,:)
     integer(psb_ipk_)           :: i_block_row, j_block_col, i_entry
     integer(psb_ipk_)           :: n_local_col_field, n_owned_row_field, n_rhs
     character                   :: trans_op
     character(len=24)           :: name
 
     info = psb_success_
-    name = 'psb_d_nest_base_csmm'
+    name = 'psb_z_nest_base_csmm'
     trans_op = 'N'
     if (present(trans)) trans_op = trans
     if (trans_op /= 'N' .and. trans_op /= 'n') then
@@ -700,9 +700,9 @@ contains
     end if
     n_rhs = min(size(x,2), size(y,2))
 
-    if (beta == dzero) then
-      y(:,:) = dzero
-    else if (beta /= done) then
+    if (beta == zzero) then
+      y(:,:) = zzero
+    else if (beta /= zone) then
       y(:,:) = beta * y(:,:)
     end if
 
@@ -727,7 +727,7 @@ contains
             y_field(i_entry, 1:n_rhs) = y(a%field_map(i_block_row)%global_local_pos(i_entry), 1:n_rhs)
           end do
           call a%block_storage%mats(i_block_row, j_block_col)%a%csmm( &
-               & alpha, x_field, done, y_field, info, trans_op)
+               & alpha, x_field, zone, y_field, info, trans_op)
           if (info /= psb_success_) then
             call psb_errpush(psb_err_from_subroutine_, name, a_err='block csmm')
             return
@@ -740,24 +740,24 @@ contains
       end do
       deallocate(x_field)
     end do
-  end subroutine psb_d_nest_base_csmm
+  end subroutine psb_z_nest_base_csmm
 
   ! cp_to_coo: assemble all the blocks into a single local COO in the
   ! global-local layout (rows = concatenated owned rows, columns = the
   ! operator's column space).  This is the core conversion hook: the generic
   ! base-class machinery builds cscnv, csclip, tril/triu, ... on top of it.
-  subroutine psb_d_nest_base_cp_to_coo(a, b, info)
-    use psb_d_base_mat_mod, only : psb_d_coo_sparse_mat
-    class(psb_d_nest_base_mat),  intent(in)    :: a
-    class(psb_d_coo_sparse_mat), intent(inout) :: b
+  subroutine psb_z_nest_base_cp_to_coo(a, b, info)
+    use psb_z_base_mat_mod, only : psb_z_coo_sparse_mat
+    class(psb_z_nest_base_mat),  intent(in)    :: a
+    class(psb_z_coo_sparse_mat), intent(inout) :: b
     integer(psb_ipk_),           intent(out)   :: info
 
-    type(psb_d_coo_sparse_mat) :: block_coo
+    type(psb_z_coo_sparse_mat) :: block_coo
     integer(psb_ipk_) :: i_field, j_field, k_entry, n_entries, out_pos, owned_offset
     character(len=24) :: name
 
     info = psb_success_
-    name = 'psb_d_nest_cp_to_coo'
+    name = 'psb_z_nest_cp_to_coo'
 
     if (.not. (associated(a%block_storage) .and. allocated(a%field_map))) then
       info = psb_err_invalid_mat_state_
@@ -792,30 +792,30 @@ contains
     call b%fix(info)
     if (info /= psb_success_) &
          & call psb_errpush(psb_err_from_subroutine_, name, a_err='coo fix')
-  end subroutine psb_d_nest_base_cp_to_coo
+  end subroutine psb_z_nest_base_cp_to_coo
 
   ! mv_to_coo: the adapter does not own the blocks, so "move" degenerates to
   ! copy + detach of the adapter
-  subroutine psb_d_nest_base_mv_to_coo(a, b, info)
-    use psb_d_base_mat_mod, only : psb_d_coo_sparse_mat
-    class(psb_d_nest_base_mat),  intent(inout) :: a
-    class(psb_d_coo_sparse_mat), intent(inout) :: b
+  subroutine psb_z_nest_base_mv_to_coo(a, b, info)
+    use psb_z_base_mat_mod, only : psb_z_coo_sparse_mat
+    class(psb_z_nest_base_mat),  intent(inout) :: a
+    class(psb_z_coo_sparse_mat), intent(inout) :: b
     integer(psb_ipk_),           intent(out)   :: info
 
     call a%cp_to_coo(b, info)
     if (info == psb_success_) call a%free()
-  end subroutine psb_d_nest_base_mv_to_coo
+  end subroutine psb_z_nest_base_mv_to_coo
 
   ! rowsum: row sums (matrix-valued type), accumulated across the blocks of
   ! each row field; d is in the global-local row layout
-  subroutine psb_d_nest_base_rowsum(d, a)
-    class(psb_d_nest_base_mat), intent(in)  :: a
-    real(psb_dpk_),             intent(out) :: d(:)
+  subroutine psb_z_nest_base_rowsum(d, a)
+    class(psb_z_nest_base_mat), intent(in)  :: a
+    complex(psb_dpk_),             intent(out) :: d(:)
 
-    real(psb_dpk_), allocatable :: block_sums(:)
+    complex(psb_dpk_), allocatable :: block_sums(:)
     integer(psb_ipk_) :: i_field, j_field, k_entry, n_owned, owned_offset
 
-    d(:) = dzero
+    d(:) = zzero
     if (.not. associated(a%block_storage)) return
     owned_offset = 0
     do i_field = 1, a%n_fields
@@ -831,11 +831,11 @@ contains
       deallocate(block_sums)
       owned_offset = owned_offset + n_owned
     end do
-  end subroutine psb_d_nest_base_rowsum
+  end subroutine psb_z_nest_base_rowsum
 
   ! arwsum: absolute row sums (always real-valued)
-  subroutine psb_d_nest_base_arwsum(d, a)
-    class(psb_d_nest_base_mat), intent(in)  :: a
+  subroutine psb_z_nest_base_arwsum(d, a)
+    class(psb_z_nest_base_mat), intent(in)  :: a
     real(psb_dpk_),             intent(out) :: d(:)
 
     real(psb_dpk_), allocatable :: block_sums(:)
@@ -857,23 +857,23 @@ contains
       deallocate(block_sums)
       owned_offset = owned_offset + n_owned
     end do
-  end subroutine psb_d_nest_base_arwsum
+  end subroutine psb_z_nest_base_arwsum
 
   ! colsum: column sums (matrix-valued type) in the operator's column space,
   ! accumulated across the blocks of each column field
-  subroutine psb_d_nest_base_colsum(d, a)
-    class(psb_d_nest_base_mat), intent(in)  :: a
-    real(psb_dpk_),             intent(out) :: d(:)
+  subroutine psb_z_nest_base_colsum(d, a)
+    class(psb_z_nest_base_mat), intent(in)  :: a
+    complex(psb_dpk_),             intent(out) :: d(:)
 
-    real(psb_dpk_), allocatable :: field_sums(:), block_sums(:)
+    complex(psb_dpk_), allocatable :: field_sums(:), block_sums(:)
     integer(psb_ipk_) :: i_field, j_field, k_entry, n_local
 
-    d(:) = dzero
+    d(:) = zzero
     if (.not. associated(a%block_storage)) return
     do j_field = 1, a%n_fields
       n_local = size(a%field_map(j_field)%global_local_pos)
       allocate(field_sums(n_local), block_sums(n_local))
-      field_sums(:) = dzero
+      field_sums(:) = zzero
       do i_field = 1, a%n_fields
         if (.not. a%block_storage%has_block(i_field, j_field)) cycle
         call a%block_storage%mats(i_field,j_field)%a%colsum(block_sums)
@@ -884,11 +884,11 @@ contains
       end do
       deallocate(field_sums, block_sums)
     end do
-  end subroutine psb_d_nest_base_colsum
+  end subroutine psb_z_nest_base_colsum
 
   ! aclsum: absolute column sums (always real-valued)
-  subroutine psb_d_nest_base_aclsum(d, a)
-    class(psb_d_nest_base_mat), intent(in)  :: a
+  subroutine psb_z_nest_base_aclsum(d, a)
+    class(psb_z_nest_base_mat), intent(in)  :: a
     real(psb_dpk_),             intent(out) :: d(:)
 
     real(psb_dpk_), allocatable :: field_sums(:), block_sums(:)
@@ -910,11 +910,11 @@ contains
       end do
       deallocate(field_sums, block_sums)
     end do
-  end subroutine psb_d_nest_base_aclsum
+  end subroutine psb_z_nest_base_aclsum
 
   ! maxval / infinity norm / 1-norm, by delegation/accumulation over blocks
-  function psb_d_nest_base_maxval(a) result(res)
-    class(psb_d_nest_base_mat), intent(in) :: a
+  function psb_z_nest_base_maxval(a) result(res)
+    class(psb_z_nest_base_mat), intent(in) :: a
     real(psb_dpk_) :: res
     integer(psb_ipk_) :: i_field, j_field
     res = dzero
@@ -925,39 +925,39 @@ contains
              & res = max(res, a%block_storage%mats(i_field,j_field)%a%maxval())
       end do
     end do
-  end function psb_d_nest_base_maxval
+  end function psb_z_nest_base_maxval
 
-  function psb_d_nest_base_csnmi(a) result(res)
-    class(psb_d_nest_base_mat), intent(in) :: a
+  function psb_z_nest_base_csnmi(a) result(res)
+    class(psb_z_nest_base_mat), intent(in) :: a
     real(psb_dpk_) :: res
     real(psb_dpk_), allocatable :: row_sums(:)
     res = dzero
     if (a%get_nrows() <= 0) return
     allocate(row_sums(a%get_nrows()))
-    call psb_d_nest_base_arwsum(row_sums, a)
+    call psb_z_nest_base_arwsum(row_sums, a)
     res = maxval(row_sums)
-  end function psb_d_nest_base_csnmi
+  end function psb_z_nest_base_csnmi
 
-  function psb_d_nest_base_csnm1(a) result(res)
-    class(psb_d_nest_base_mat), intent(in) :: a
+  function psb_z_nest_base_csnm1(a) result(res)
+    class(psb_z_nest_base_mat), intent(in) :: a
     real(psb_dpk_) :: res
     real(psb_dpk_), allocatable :: col_sums(:)
     res = dzero
     if (a%get_ncols() <= 0) return
     allocate(col_sums(a%get_ncols()))
-    call psb_d_nest_base_aclsum(col_sums, a)
+    call psb_z_nest_base_aclsum(col_sums, a)
     res = maxval(col_sums)
-  end function psb_d_nest_base_csnm1
+  end function psb_z_nest_base_csnm1
 
   ! scals/scal: scaling acts on the underlying blocks (the operator is a view)
-  subroutine psb_d_nest_base_scals(d, a, info)
-    class(psb_d_nest_base_mat), intent(inout) :: a
-    real(psb_dpk_),             intent(in)    :: d
+  subroutine psb_z_nest_base_scals(d, a, info)
+    class(psb_z_nest_base_mat), intent(inout) :: a
+    complex(psb_dpk_),             intent(in)    :: d
     integer(psb_ipk_),          intent(out)   :: info
     integer(psb_ipk_) :: i_field, j_field
     character(len=24) :: name
     info = psb_success_
-    name = 'psb_d_nest_scals'
+    name = 'psb_z_nest_scals'
     if (.not. associated(a%block_storage)) then
       info = psb_err_invalid_mat_state_; call psb_errpush(info, name); return
     end if
@@ -970,21 +970,21 @@ contains
         end if
       end do
     end do
-  end subroutine psb_d_nest_base_scals
+  end subroutine psb_z_nest_base_scals
 
-  subroutine psb_d_nest_base_scal(d, a, info, side)
-    class(psb_d_nest_base_mat), intent(inout) :: a
-    real(psb_dpk_),             intent(in)    :: d(:)
+  subroutine psb_z_nest_base_scal(d, a, info, side)
+    class(psb_z_nest_base_mat), intent(inout) :: a
+    complex(psb_dpk_),             intent(in)    :: d(:)
     integer(psb_ipk_),          intent(out)   :: info
     character, intent(in), optional           :: side
 
-    real(psb_dpk_), allocatable :: d_field(:)
+    complex(psb_dpk_), allocatable :: d_field(:)
     integer(psb_ipk_) :: i_field, j_field, k_entry, n_owned, n_local, owned_offset
     character          :: side_
     character(len=24)  :: name
 
     info  = psb_success_
-    name  = 'psb_d_nest_scal'
+    name  = 'psb_z_nest_scal'
     side_ = 'L'
     if (present(side)) side_ = side
     if (.not. associated(a%block_storage)) then
@@ -1024,13 +1024,13 @@ contains
         deallocate(d_field)
       end do
     end if
-  end subroutine psb_d_nest_base_scal
+  end subroutine psb_z_nest_base_scal
 
   ! clone: the adapter is a view, so the clone shares the blocks and the grid
   ! descriptor (pointers) while re-owning its private gather index vectors
-  subroutine psb_d_nest_base_clone(a, b, info)
-    class(psb_d_nest_base_mat),                intent(inout) :: a
-    class(psb_d_base_sparse_mat), allocatable, intent(inout) :: b
+  subroutine psb_z_nest_base_clone(a, b, info)
+    class(psb_z_nest_base_mat),                intent(inout) :: a
+    class(psb_z_base_sparse_mat), allocatable, intent(inout) :: b
     integer(psb_ipk_),                         intent(out)   :: info
     integer(psb_ipk_) :: i_field
 
@@ -1038,40 +1038,40 @@ contains
     if (allocated(b)) deallocate(b)
     allocate(b, source=a, stat=info)
     if (info /= 0) then
-      info = psb_err_alloc_dealloc_; call psb_errpush(info, 'psb_d_nest_clone'); return
+      info = psb_err_alloc_dealloc_; call psb_errpush(info, 'psb_z_nest_clone'); return
     end if
     select type (b_nest => b)
-    type is (psb_d_nest_base_mat)
+    type is (psb_z_nest_base_mat)
       if (allocated(b_nest%field_map)) then
         do i_field = 1, size(b_nest%field_map)
           ! the sourced copy shares a's gather_pos targets: re-own fresh copies
           b_nest%field_map(i_field)%gather_pos => null()
           allocate(b_nest%field_map(i_field)%gather_pos, stat=info)
           if (info /= 0) then
-            info = psb_err_alloc_dealloc_; call psb_errpush(info, 'psb_d_nest_clone'); return
+            info = psb_err_alloc_dealloc_; call psb_errpush(info, 'psb_z_nest_clone'); return
           end if
           call b_nest%field_map(i_field)%gather_pos%bld( &
                & b_nest%field_map(i_field)%global_local_pos)
         end do
       end if
     end select
-  end subroutine psb_d_nest_base_clone
+  end subroutine psb_z_nest_base_clone
 
-  subroutine psb_d_nest_base_mold(a, b, info)
-    class(psb_d_nest_base_mat),                intent(in)    :: a
-    class(psb_d_base_sparse_mat), allocatable, intent(inout) :: b
+  subroutine psb_z_nest_base_mold(a, b, info)
+    class(psb_z_nest_base_mat),                intent(in)    :: a
+    class(psb_z_base_sparse_mat), allocatable, intent(inout) :: b
     integer(psb_ipk_),                         intent(out)   :: info
     info = psb_success_
     if (allocated(b)) deallocate(b)
     allocate(b, mold=a, stat=info)
     if (info /= 0) then
-      info = psb_err_alloc_dealloc_; call psb_errpush(info, 'psb_d_nest_mold')
+      info = psb_err_alloc_dealloc_; call psb_errpush(info, 'psb_z_nest_mold')
     end if
-  end subroutine psb_d_nest_base_mold
+  end subroutine psb_z_nest_base_mold
 
   ! sizeof: blocks + gather maps (the adapter does not own the descriptors)
-  function psb_d_nest_base_sizeof(a) result(res)
-    class(psb_d_nest_base_mat), intent(in) :: a
+  function psb_z_nest_base_sizeof(a) result(res)
+    class(psb_z_nest_base_mat), intent(in) :: a
     integer(psb_epk_) :: res
     integer(psb_ipk_) :: i_field
     res = 8
@@ -1082,7 +1082,7 @@ contains
              & res = res + psb_sizeof_ip * size(a%field_map(i_field)%global_local_pos)
       end do
     end if
-  end function psb_d_nest_base_sizeof
+  end function psb_z_nest_base_sizeof
 
   ! Selective (regime 2) application of a SINGLE block:
   !   y_field = alpha * A(i_block_row, j_block_col) * x_field + beta * y_field
@@ -1091,17 +1091,17 @@ contains
   ! the exchange regime (the union halo, or just this block's halo), so this
   ! routine is purely local. It is FORMAT-AGNOSTIC: it dispatches to the block's
   ! own polymorphic csmv, so the block may be CSR, COO, ... independently of the
-  ! other blocks. (The full-operator matvec, regime 1, is psb_d_nest_base_csmv.)
-  subroutine psb_d_nest_apply_block(nest_op, i_block_row, j_block_col, alpha, x_field, beta, y_field, info)
-    type(psb_d_nest_base_mat), intent(in)    :: nest_op
+  ! other blocks. (The full-operator matvec, regime 1, is psb_z_nest_base_csmv.)
+  subroutine psb_z_nest_apply_block(nest_op, i_block_row, j_block_col, alpha, x_field, beta, y_field, info)
+    type(psb_z_nest_base_mat), intent(in)    :: nest_op
     integer(psb_ipk_),         intent(in)    :: i_block_row, j_block_col
-    real(psb_dpk_),            intent(in)    :: alpha, beta, x_field(:)
-    real(psb_dpk_),            intent(inout) :: y_field(:)
+    complex(psb_dpk_),            intent(in)    :: alpha, beta, x_field(:)
+    complex(psb_dpk_),            intent(inout) :: y_field(:)
     integer(psb_ipk_),         intent(out)   :: info
     character(len=24) :: name
 
     info = psb_success_
-    name = 'psb_d_nest_apply_block'
+    name = 'psb_z_nest_apply_block'
 
     if (.not. associated(nest_op%block_storage)) then
       info = psb_err_invalid_input_
@@ -1110,9 +1110,9 @@ contains
     end if
     if (.not. nest_op%block_storage%has_block(i_block_row, j_block_col)) then
       ! absent block contributes zero: y_field <- beta * y_field
-      if (beta == dzero) then
-        y_field(:) = dzero
-      else if (beta /= done) then
+      if (beta == zzero) then
+        y_field(:) = zzero
+      else if (beta /= zone) then
         y_field(:) = beta * y_field(:)
       end if
       return
@@ -1124,61 +1124,61 @@ contains
     if (info /= psb_success_) &
          & call psb_errpush(psb_err_from_subroutine_, name, a_err='block csmv')
 
-  end subroutine psb_d_nest_apply_block
+  end subroutine psb_z_nest_apply_block
 
   ! ====================================================================
   !  Field-split interface (for the block preconditioner).
   !  Exposes the field structure so a fieldsplit/Schur preconditioner can:
   !   - know how many fields there are and their owned sizes;
-  !   - get a block as a standard psb_dspmat_type (sub-preconditioner on A,
+  !   - get a block as a standard psb_zspmat_type (sub-preconditioner on A,
   !     Schur-complement matvecs with B / B^T);
   !   - get a field descriptor (run a field-level Krylov / halo exchange);
   !   - restrict the global vector to a field sub-vector and prolong it back.
   ! ====================================================================
 
-  function psb_d_nest_get_n_fields(nest_op) result(n_fields)
-    type(psb_d_nest_base_mat), intent(in) :: nest_op
+  function psb_z_nest_get_n_fields(nest_op) result(n_fields)
+    type(psb_z_nest_base_mat), intent(in) :: nest_op
     integer(psb_ipk_) :: n_fields
     n_fields = nest_op%n_fields
-  end function psb_d_nest_get_n_fields
+  end function psb_z_nest_get_n_fields
 
-  function psb_d_nest_get_field_owned(nest_op, field) result(n_owned)
-    type(psb_d_nest_base_mat), intent(in) :: nest_op
+  function psb_z_nest_get_field_owned(nest_op, field) result(n_owned)
+    type(psb_z_nest_base_mat), intent(in) :: nest_op
     integer(psb_ipk_),         intent(in) :: field
     integer(psb_ipk_) :: n_owned
     n_owned = 0
     if (allocated(nest_op%field_map) .and. field >= 1 .and. field <= nest_op%n_fields) &
          & n_owned = nest_op%field_map(field)%n_owned
-  end function psb_d_nest_get_field_owned
+  end function psb_z_nest_get_field_owned
 
-  ! Pointer to block (i,j) as a standard psb_dspmat_type (null if absent).
-  function psb_d_nest_get_block(nest_op, i_block_row, j_block_col) result(block_ptr)
-    type(psb_d_nest_base_mat), target, intent(in) :: nest_op
+  ! Pointer to block (i,j) as a standard psb_zspmat_type (null if absent).
+  function psb_z_nest_get_block(nest_op, i_block_row, j_block_col) result(block_ptr)
+    type(psb_z_nest_base_mat), target, intent(in) :: nest_op
     integer(psb_ipk_),                 intent(in) :: i_block_row, j_block_col
-    type(psb_dspmat_type), pointer :: block_ptr
+    type(psb_zspmat_type), pointer :: block_ptr
     block_ptr => null()
     if (associated(nest_op%block_storage)) then
       if (nest_op%block_storage%has_block(i_block_row, j_block_col)) &
            & block_ptr => nest_op%block_storage%mats(i_block_row, j_block_col)
     end if
-  end function psb_d_nest_get_block
+  end function psb_z_nest_get_block
 
   ! Pointer to field k's descriptor (null if not set up).
-  function psb_d_nest_get_field_desc(nest_op, field) result(desc_ptr)
-    type(psb_d_nest_base_mat), target, intent(in) :: nest_op
+  function psb_z_nest_get_field_desc(nest_op, field) result(desc_ptr)
+    type(psb_z_nest_base_mat), target, intent(in) :: nest_op
     integer(psb_ipk_),                 intent(in) :: field
     type(psb_desc_type), pointer :: desc_ptr
     desc_ptr => null()
     if (associated(nest_op%grid_desc) .and. field >= 1 .and. field <= nest_op%n_fields) &
          & desc_ptr => nest_op%grid_desc%descs(1, field)
-  end function psb_d_nest_get_field_desc
+  end function psb_z_nest_get_field_desc
 
   ! Restrict: extract field k's OWNED sub-vector from the global local vector.
-  subroutine psb_d_nest_restrict_field(nest_op, field, x_global, x_field, info)
-    type(psb_d_nest_base_mat), intent(in)  :: nest_op
+  subroutine psb_z_nest_restrict_field(nest_op, field, x_global, x_field, info)
+    type(psb_z_nest_base_mat), intent(in)  :: nest_op
     integer(psb_ipk_),         intent(in)  :: field
-    real(psb_dpk_),            intent(in)  :: x_global(:)
-    real(psb_dpk_),            intent(out) :: x_field(:)
+    complex(psb_dpk_),            intent(in)  :: x_global(:)
+    complex(psb_dpk_),            intent(out) :: x_field(:)
     integer(psb_ipk_),         intent(out) :: info
     integer(psb_ipk_) :: i_entry, n_owned
     info = psb_success_
@@ -1189,14 +1189,14 @@ contains
     do i_entry = 1, n_owned
       x_field(i_entry) = x_global(nest_op%field_map(field)%global_local_pos(i_entry))
     end do
-  end subroutine psb_d_nest_restrict_field
+  end subroutine psb_z_nest_restrict_field
 
   ! Prolong: insert field k's OWNED sub-vector into the global local vector.
-  subroutine psb_d_nest_prolong_field(nest_op, field, x_field, x_global, info)
-    type(psb_d_nest_base_mat), intent(in)    :: nest_op
+  subroutine psb_z_nest_prolong_field(nest_op, field, x_field, x_global, info)
+    type(psb_z_nest_base_mat), intent(in)    :: nest_op
     integer(psb_ipk_),         intent(in)    :: field
-    real(psb_dpk_),            intent(in)    :: x_field(:)
-    real(psb_dpk_),            intent(inout) :: x_global(:)
+    complex(psb_dpk_),            intent(in)    :: x_field(:)
+    complex(psb_dpk_),            intent(inout) :: x_global(:)
     integer(psb_ipk_),         intent(out)   :: info
     integer(psb_ipk_) :: i_entry, n_owned
     info = psb_success_
@@ -1207,6 +1207,6 @@ contains
     do i_entry = 1, n_owned
       x_global(nest_op%field_map(field)%global_local_pos(i_entry)) = x_field(i_entry)
     end do
-  end subroutine psb_d_nest_prolong_field
+  end subroutine psb_z_nest_prolong_field
 
-end module psb_d_nest_base_mat_mod
+end module psb_z_nest_base_mat_mod

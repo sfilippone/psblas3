@@ -29,18 +29,18 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-! File: psb_d_nest_builder_mod.F90
+! File: psb_z_nest_builder_mod.F90
 !
-! Module: psb_d_nest_builder_mod
+! Module: psb_z_nest_builder_mod
 ! Author: Simone Staccone (Stack-1)
 !
 ! User-friendly frontend to build a nested (MATNEST) operator without manually
 ! managing per-field descriptors, the union halo, composition and setup.
 !
 ! All the boilerplate (identical for every nested operator) is hidden behind a
-! single type, psb_d_nest_matrix, with the usual PSBLAS init/ins/asb pattern:
+! single type, psb_z_nest_matrix, with the usual PSBLAS init/ins/asb pattern:
 !
-!   type(psb_d_nest_matrix) :: nested_matrix
+!   type(psb_z_nest_matrix) :: nested_matrix
 !   call nested_matrix%init(ctxt, [n1, n2], info)          ! 2 fields of global size n1, n2
 !   call nested_matrix%ins(1,1, n, rows, cols, vals, info) ! values of block (1,1) = A
 !   call nested_matrix%ins(1,2, n, rows, cols, vals, info) ! values of block (1,2) = B^T
@@ -61,59 +61,59 @@
 ! NOTE: after asb the object holds consistent internal pointers (a_glob%a points
 ! to block_storage / grid_desc): do not copy/move the object after assembly.
 !
-module psb_d_nest_builder_mod
+module psb_z_nest_builder_mod
   use psb_const_mod
   use psb_error_mod,           only : psb_errpush
   use psb_penv_mod,            only : psb_ctxt_type, psb_info
   use psb_desc_mod,            only : psb_desc_type
-  use psb_d_mat_mod,           only : psb_dspmat_type
-  use psb_d_base_mat_mod,      only : psb_d_base_sparse_mat
+  use psb_z_mat_mod,           only : psb_zspmat_type
+  use psb_z_base_mat_mod,      only : psb_z_base_sparse_mat
   use psb_cd_tools_mod,        only : psb_cdall, psb_cdins, psb_cdasb
   use psb_desc_nest_mod,       only : psb_desc_nest_type
-  use psb_d_nest_mat_mod,      only : psb_d_nest_sparse_mat
-  use psb_d_nest_base_mat_mod, only : psb_d_nest_base_mat, psb_d_nest_base_setup
+  use psb_z_nest_mat_mod,      only : psb_z_nest_sparse_mat
+  use psb_z_nest_base_mat_mod, only : psb_z_nest_base_mat, psb_z_nest_base_setup
   use psb_cd_nest_tools_mod,   only : psb_cd_nest_compose
-  use psb_d_nest_tools_mod,    only : psb_d_nest_rect_block
+  use psb_z_nest_tools_mod,    only : psb_z_nest_rect_block
   implicit none
 
   ! growing triplet buffer for a single block
-  type :: psb_d_nest_block_buffer
+  type :: psb_z_nest_block_buffer
     integer(psb_ipk_)              :: n_entries = 0
     integer(psb_lpk_), allocatable :: entry_rows(:), entry_cols(:)
-    real(psb_dpk_),    allocatable :: entry_vals(:)
-  end type psb_d_nest_block_buffer
+    complex(psb_dpk_),    allocatable :: entry_vals(:)
+  end type psb_z_nest_block_buffer
 
-  type :: psb_d_nest_matrix
+  type :: psb_z_nest_matrix
     type(psb_ctxt_type)                          :: context
     integer(psb_ipk_)                            :: n_fields  = 0
     logical                                      :: assembled = .false.
     ! construction state
     type(psb_desc_type),           allocatable   :: field_desc(:)        ! one descriptor per field
-    type(psb_d_nest_block_buffer), allocatable   :: block_buffer(:,:)    ! triplets per block (i,j)
+    type(psb_z_nest_block_buffer), allocatable   :: block_buffer(:,:)    ! triplets per block (i,j)
     ! products (owned; the pointers in a_glob%a point in here)
-    type(psb_d_nest_sparse_mat)                  :: block_storage
+    type(psb_z_nest_sparse_mat)                  :: block_storage
     type(psb_desc_nest_type)                     :: grid_desc
-    type(psb_dspmat_type)                        :: a_glob               ! the matrix to hand to Krylov
+    type(psb_zspmat_type)                        :: a_glob               ! the matrix to hand to Krylov
     type(psb_desc_type)                          :: desc_glob            ! the global descriptor
   contains
-    procedure, pass(op) :: init => psb_d_nest_op_init
-    procedure, pass(op) :: ins  => psb_d_nest_op_ins
-    procedure, pass(op) :: asb  => psb_d_nest_op_asb
-    procedure, pass(op) :: free => psb_d_nest_op_free
+    procedure, pass(op) :: init => psb_z_nest_op_init
+    procedure, pass(op) :: ins  => psb_z_nest_op_ins
+    procedure, pass(op) :: asb  => psb_z_nest_op_asb
+    procedure, pass(op) :: free => psb_z_nest_op_free
     ! user-friendly queries on the field row distribution (no descriptor
     ! jargon needed: these replace field_desc(i)%get_local_rows() / %l2g(...))
-    procedure, pass(op) :: get_owned_rows      => psb_d_nest_op_get_owned_rows
-    procedure, pass(op) :: get_owned_row_count => psb_d_nest_op_get_owned_row_count
-  end type psb_d_nest_matrix
+    procedure, pass(op) :: get_owned_rows      => psb_z_nest_op_get_owned_rows
+    procedure, pass(op) :: get_owned_row_count => psb_z_nest_op_get_owned_row_count
+  end type psb_z_nest_matrix
 
   private
-  public :: psb_d_nest_matrix
+  public :: psb_z_nest_matrix
 
 contains
 
   ! init: create one descriptor per field (block distribution from the global sizes)
-  subroutine psb_d_nest_op_init(op, context, field_sizes, info)
-    class(psb_d_nest_matrix), intent(inout) :: op
+  subroutine psb_z_nest_op_init(op, context, field_sizes, info)
+    class(psb_z_nest_matrix), intent(inout) :: op
     type(psb_ctxt_type),        intent(in)    :: context
     integer(psb_lpk_),          intent(in)    :: field_sizes(:)
     integer(psb_ipk_),          intent(out)   :: info
@@ -123,7 +123,7 @@ contains
     character(len=24)  :: name
 
     info = psb_success_
-    name = 'psb_d_nest_op_init'
+    name = 'psb_z_nest_op_init'
 
     call psb_info(context, my_rank, num_procs)
     n_fields     = size(field_sizes)
@@ -147,20 +147,20 @@ contains
         call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdall'); return
       end if
     end do
-  end subroutine psb_d_nest_op_init
+  end subroutine psb_z_nest_op_init
 
   ! ins: accumulate the triplets into block (block_row,block_col) and register the
   !      columns (field block_col index space) into that descriptor's union halo
-  subroutine psb_d_nest_op_ins(op, block_row, block_col, n_entries, entry_rows, entry_cols, entry_vals, info)
-    class(psb_d_nest_matrix), intent(inout) :: op
+  subroutine psb_z_nest_op_ins(op, block_row, block_col, n_entries, entry_rows, entry_cols, entry_vals, info)
+    class(psb_z_nest_matrix), intent(inout) :: op
     integer(psb_ipk_),          intent(in)    :: block_row, block_col, n_entries
     integer(psb_lpk_),          intent(in)    :: entry_rows(:), entry_cols(:)
-    real(psb_dpk_),             intent(in)    :: entry_vals(:)
+    complex(psb_dpk_),             intent(in)    :: entry_vals(:)
     integer(psb_ipk_),          intent(out)   :: info
     character(len=24) :: name
 
     info = psb_success_
-    name = 'psb_d_nest_op_ins'
+    name = 'psb_z_nest_op_ins'
 
     if (op%assembled) then
       info = psb_err_invalid_input_
@@ -186,25 +186,25 @@ contains
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdins'); return
     end if
-  end subroutine psb_d_nest_op_ins
+  end subroutine psb_z_nest_op_ins
 
   ! asb: assemble the descriptors, build the blocks, compose the global
   !      descriptor, set up the operator and wrap it into a_glob.
   !      The optional type ('CSR'/'CSC'/'COO', default 'CSR') or mold (any
-  !      class extending psb_d_base_sparse_mat, e.g. the psb_ext ELL/HLL or
+  !      class extending psb_z_base_sparse_mat, e.g. the psb_ext ELL/HLL or
   !      the psb_cuda device formats) selects the storage format of the blocks.
-  subroutine psb_d_nest_op_asb(op, info, type, mold)
-    class(psb_d_nest_matrix), intent(inout), target :: op
+  subroutine psb_z_nest_op_asb(op, info, type, mold)
+    class(psb_z_nest_matrix), intent(inout), target :: op
     integer(psb_ipk_),          intent(out)           :: info
     character(len=*),           intent(in), optional  :: type
-    class(psb_d_base_sparse_mat), intent(in), optional :: mold
+    class(psb_z_base_sparse_mat), intent(in), optional :: mold
 
-    type(psb_d_nest_base_mat) :: nest_operator
+    type(psb_z_nest_base_mat) :: nest_operator
     integer(psb_ipk_)         :: n_fields, i_field, j_field
     character(len=24)         :: name
 
     info = psb_success_
-    name = 'psb_d_nest_op_asb'
+    name = 'psb_z_nest_op_asb'
     n_fields = op%n_fields
 
     ! 1) assemble the per-field descriptors (with the union halo accumulated in ins)
@@ -225,7 +225,7 @@ contains
     do j_field = 1, n_fields
       do i_field = 1, n_fields
         if (op%block_buffer(i_field,j_field)%n_entries > 0) then
-          call psb_d_nest_rect_block(op%block_storage%mats(i_field,j_field),         &
+          call psb_z_nest_rect_block(op%block_storage%mats(i_field,j_field),         &
                & op%block_buffer(i_field,j_field)%n_entries,                         &
                & op%block_buffer(i_field,j_field)%entry_rows,                        &
                & op%block_buffer(i_field,j_field)%entry_cols,                        &
@@ -257,7 +257,7 @@ contains
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_, name, a_err='cd_nest_compose'); return
     end if
-    call psb_d_nest_base_setup(nest_operator, op%block_storage, op%grid_desc, op%desc_glob, info)
+    call psb_z_nest_base_setup(nest_operator, op%block_storage, op%grid_desc, op%desc_glob, info)
     if (info /= psb_success_) then
       call psb_errpush(psb_err_from_subroutine_, name, a_err='nest_base_setup'); return
     end if
@@ -278,11 +278,11 @@ contains
       end do
     end do
     op%assembled = .true.
-  end subroutine psb_d_nest_op_asb
+  end subroutine psb_z_nest_op_asb
 
   ! free: release everything
-  subroutine psb_d_nest_op_free(op, info)
-    class(psb_d_nest_matrix), intent(inout) :: op
+  subroutine psb_z_nest_op_free(op, info)
+    class(psb_z_nest_matrix), intent(inout) :: op
     integer(psb_ipk_),          intent(out)   :: info
     integer(psb_ipk_) :: i_field, j_field, local_info
 
@@ -308,7 +308,7 @@ contains
     end if
     op%n_fields  = 0
     op%assembled = .false.
-  end subroutine psb_d_nest_op_free
+  end subroutine psb_z_nest_op_free
 
   ! get_owned_rows: GLOBAL indices (in the field index space, 1..field size)
   ! of the rows of field i_field owned by this process.  This is the list of
@@ -320,8 +320,8 @@ contains
   !     ...
   !
   ! An empty array is returned for an out-of-range field index.
-  function psb_d_nest_op_get_owned_rows(op, i_field) result(owned_global_rows)
-    class(psb_d_nest_matrix), intent(in) :: op
+  function psb_z_nest_op_get_owned_rows(op, i_field) result(owned_global_rows)
+    class(psb_z_nest_matrix), intent(in) :: op
     integer(psb_ipk_),        intent(in) :: i_field
     integer(psb_lpk_), allocatable       :: owned_global_rows(:)
 
@@ -331,11 +331,11 @@ contains
       return
     end if
     owned_global_rows = op%field_desc(i_field)%get_global_indices(owned=.true.)
-  end function psb_d_nest_op_get_owned_rows
+  end function psb_z_nest_op_get_owned_rows
 
   ! get_owned_row_count: how many rows of field i_field this process owns
-  function psb_d_nest_op_get_owned_row_count(op, i_field) result(owned_row_count)
-    class(psb_d_nest_matrix), intent(in) :: op
+  function psb_z_nest_op_get_owned_row_count(op, i_field) result(owned_row_count)
+    class(psb_z_nest_matrix), intent(in) :: op
     integer(psb_ipk_),        intent(in) :: i_field
     integer(psb_ipk_)                    :: owned_row_count
 
@@ -343,16 +343,16 @@ contains
     if ((i_field < 1) .or. (i_field > op%n_fields) .or. &
       & (.not. allocated(op%field_desc))) return
     owned_row_count = op%field_desc(i_field)%get_local_rows()
-  end function psb_d_nest_op_get_owned_row_count
+  end function psb_z_nest_op_get_owned_row_count
 
   !-----------------------------------------------------------------
   ! private helpers: growing triplet buffer
   !-----------------------------------------------------------------
   subroutine block_buffer_append(buffer, n_entries, entry_rows, entry_cols, entry_vals, info)
-    type(psb_d_nest_block_buffer), intent(inout) :: buffer
+    type(psb_z_nest_block_buffer), intent(inout) :: buffer
     integer(psb_ipk_),             intent(in)    :: n_entries
     integer(psb_lpk_),             intent(in)    :: entry_rows(:), entry_cols(:)
-    real(psb_dpk_),                intent(in)    :: entry_vals(:)
+    complex(psb_dpk_),                intent(in)    :: entry_vals(:)
     integer(psb_ipk_),             intent(out)   :: info
     integer(psb_ipk_) :: required_size
 
@@ -386,10 +386,10 @@ contains
   end subroutine ensure_capacity_lpk
 
   subroutine ensure_capacity_val(array, required_size, info)
-    real(psb_dpk_), allocatable, intent(inout) :: array(:)
+    complex(psb_dpk_), allocatable, intent(inout) :: array(:)
     integer(psb_ipk_),           intent(in)    :: required_size
     integer(psb_ipk_),           intent(out)   :: info
-    real(psb_dpk_), allocatable :: grown(:)
+    complex(psb_dpk_), allocatable :: grown(:)
     integer(psb_ipk_) :: capacity
 
     info = 0
@@ -404,11 +404,11 @@ contains
   end subroutine ensure_capacity_val
 
   subroutine block_buffer_free(buffer)
-    type(psb_d_nest_block_buffer), intent(inout) :: buffer
+    type(psb_z_nest_block_buffer), intent(inout) :: buffer
     if (allocated(buffer%entry_rows)) deallocate(buffer%entry_rows)
     if (allocated(buffer%entry_cols)) deallocate(buffer%entry_cols)
     if (allocated(buffer%entry_vals)) deallocate(buffer%entry_vals)
     buffer%n_entries = 0
   end subroutine block_buffer_free
 
-end module psb_d_nest_builder_mod
+end module psb_z_nest_builder_mod
