@@ -747,6 +747,149 @@ module psb_d_psblas_mod
       integer(psb_ipk_), intent(out)        :: info
       character(len=1), intent(in), optional  :: conjgx, conjgy
     end subroutine psb_dmlt_vect2
+    
+    subroutine psb_dmlt_mvect_v_full(alpha, x, y, beta, desc_a, info, &
+                                    & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x
+      class(psb_d_multivect_type), intent(inout)  :: y
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_v_full
+
+    subroutine psb_dmlt_mvect_v_idxs(alpha, x, y, idx_y, beta, desc_a, info, &
+                                    & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x
+      class(psb_d_multivect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(in)               :: idx_y
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_v_idxs
+    
+    subroutine psb_dmlt_mvect_m_full(alpha, x, y, beta, desc_a, info, &
+                                    & conjgx, conjgy)
+      import :: psb_d_multivect_type, psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_multivect_type), intent(inout)  :: x, y
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_m_full
+
+    subroutine psb_dmlt_mvect_m_idxs(alpha, x, idx_x, y, idx_y, beta, desc_a, info, &
+                                    & conjgx, conjgy)
+      import :: psb_d_multivect_type, psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_multivect_type), intent(inout)  :: x, y
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_m_idxs
+    
+    subroutine psb_dmlt_mvect_vv_full_out(alpha, x, y, beta, z, desc_a, info, &
+                                        & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x, y
+      class(psb_d_multivect_type), intent(inout)  :: z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_vv_full_out
+
+    subroutine psb_dmlt_mvect_vv_idxs_out(alpha, x, y, beta, z, idx_z, desc_a, info, &
+                                        & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x, y
+      class(psb_d_multivect_type), intent(inout)  :: z
+      integer(psb_ipk_), intent(in)               :: idx_z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_vv_idxs_out
+
+    subroutine psb_dmlt_mvect_vm_full_out(alpha, x, y, beta, z, desc_a, info, &
+                                        & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x
+      class(psb_d_multivect_type), intent(inout)  :: y, z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_vm_full_out
+
+    subroutine psb_dmlt_mvect_vm_idxs_out(alpha, x, y, idx_y, beta, z, idx_z, desc_a, info, &
+                                        & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x
+      class(psb_d_multivect_type), intent(inout)  :: y, z
+      integer(psb_ipk_), intent(in)               :: idx_y, idx_z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_vm_idxs_out
+
+    subroutine psb_dmlt_mvect_mm_full_out(alpha, x, y, beta, z, desc_a, info, &
+                                        & conjgx, conjgy)
+      import :: psb_d_multivect_type, psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_multivect_type), intent(inout)  :: x, y, z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_mm_full_out
+
+    subroutine psb_dmlt_mvect_mm_idxs_out(alpha, x, idx_x, y, idx_y, beta, z, idx_z, desc_a, info, &
+                                        & conjgx, conjgy)
+      import :: psb_d_multivect_type, psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_multivect_type), intent(inout)  :: x, y, z
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y, idx_z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_mm_idxs_out
+
+    subroutine psb_dmlt_mvect_vm_ext(alpha, x, y, idx_y, beta, z, desc_a, info, &
+                                    & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_vect_type), intent(inout)       :: x, z
+      class(psb_d_multivect_type), intent(inout)  :: y
+      integer(psb_ipk_), intent(in)               :: idx_y
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_vm_ext
+
+    subroutine psb_dmlt_mvect_mm_ext(alpha, x, idx_x, y, idx_y, beta, z, desc_a, info, &
+                                    & conjgx, conjgy)
+      import :: psb_d_vect_type, psb_d_multivect_type, &
+              & psb_desc_type, psb_dpk_, psb_ipk_
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_multivect_type), intent(inout)  :: x, y
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+      class(psb_d_vect_type), intent(inout)       :: z
+      type(psb_desc_type), intent(in)             :: desc_a
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), intent(in), optional  :: conjgx, conjgy
+    end subroutine psb_dmlt_mvect_mm_ext
   end interface
 
   interface psb_gediv
