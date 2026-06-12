@@ -271,9 +271,20 @@ subroutine psb_zrgmres_vect(a,prec,b,x,eps,desc_a,info,&
   select case(istop_)
   case(psb_istop_ani_)
     ani = psb_spnrmi(a,desc_a,info)
-    bni = psb_geamax(b,desc_a,info)
+    if (present(s1)) then
+      call psb_gemlt(zone,s1,b,zzero,v(1),desc_a,info)
+      bni = psb_geamax(v(1),desc_a,info)
+    else
+      bni = psb_geamax(b,desc_a,info)
+    end if
   case(psb_istop_bn2_)
-    bn2 = psb_genrm2(b,desc_a,info)    
+    if (present(s1)) then
+      call psb_gemlt(zone,s1,b,zzero,v(1),desc_a,info)
+      bn2 = psb_genrm2(v(1),desc_a,info)
+    else
+      bn2 = psb_genrm2(b,desc_a,info)
+    end if
+      
   case(psb_istop_rn2_abs_)
     ! do nothing
   case(psb_istop_rrn2_)
