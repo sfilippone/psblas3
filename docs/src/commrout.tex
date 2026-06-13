@@ -24,7 +24,7 @@ where:
 \begin{center}
 \begin{tabular}{ll}
 \hline
-$\alpha$, $x$ & {\bf Subroutine}\\
+$x$ & {\bf Subroutine}\\
 \hline
 Integer           & psb\_halo \\
 Short Precision Real & psb\_halo \\
@@ -38,16 +38,16 @@ Long Precision Complex & psb\_halo \\
 \end{table}
 
 \noindent\fortinline|call psb_halo(x, desc_a, info)|\\
-\fortinline|call psb_halo(x, desc_a, info, work, data)|
+\fortinline|call psb_halo(x, desc_a, info, work, tran, mode, data)|
 
 \begin{description}
-\item[Type:] Synchronous.
+\item[Type:] Synchronous or split-phase, depending on \fortinline|mode|.
 \item[\bf On Entry]
 \item[x] global dense matrix $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
 Intent: {\bf inout}.\\
-Specified as:  a rank one or two array or an object of type \vdata\ 
+Specified as:  a rank one or two array or an object of type \vdata\
 containing numbers of type specified in
 Table~\ref{tab:f90halo}.
 \item[desc\_a] contains data structures for communications.\\
@@ -59,16 +59,38 @@ Specified as: a structured data of type \descdata.
 Scope: {\bf local} \\
 Type: {\bf optional}\\
 Intent: {\bf inout}.\\
-Specified as: a rank one array of the same type of $x$. 
+Specified as: a rank one array of the same type of $x$. This argument
+is only available when $x$ is a rank one or two array; it is not
+accepted when $x$ is an object of type \vdata.
+\item[tran] indicates whether to apply the transposed halo exchange.\\
+Scope: {\bf global} \\
+Type: {\bf optional} \\
+Intent: {\bf in}.\\
+Specified as: a single character. Values: \fortinline|'N'|, \fortinline|'T'|,
+\fortinline|'C'|, default: \fortinline|'N'|.
+\item[mode] communication mode.\\
+Scope: {\bf global} \\
+Type: {\bf optional} \\
+Intent: {\bf in}.\\
+Specified as: an integer. Values: \fortinline|psb_comm_status_sync_|,
+\fortinline|psb_comm_status_start_|, \fortinline|psb_comm_status_wait_|, default:
+\fortinline|psb_comm_status_sync_|. Selects whether the exchange is
+performed as a single synchronous operation
+(\fortinline|psb_comm_status_sync_|) or split into a non-blocking start
+phase (\fortinline|psb_comm_status_start_|) and a later wait phase
+(\fortinline|psb_comm_status_wait_|), so that communication may be
+overlapped with computation. When the split-phase mode is used, the
+halo entries of $x$ must not be referenced between the start and the
+matching wait call.
 \item[data] index list selector.\\
 Scope: {\bf global} \\
 Type: {\bf optional} \\
 Specified as: an integer. Values:\fortinline|psb_comm_halo_|,\fortinline|psb_comm_mov_|,
 \fortinline|psb_comm_ext_|, default: \fortinline|psb_comm_halo_|. Chooses the
-index list on which to base the data exchange. 
+index list on which to base the data exchange.
 
 
-\item[\bf On Return] 
+\item[\bf On Return]
 \item[x] global dense result matrix $x$.\\
 Scope: {\bf local} \\
 Type: {\bf required} \\
@@ -188,10 +210,10 @@ Long Precision Complex & psb\_ovrl \\
 \end{table}
 
 \noindent\fortinline|call psb_ovrl(x, desc_a, info)|\\
-\fortinline|call psb_ovrl(x, desc_a, info, update=update_type, work=work)| 
+\fortinline|call psb_ovrl(x, desc_a, info, update=update_type, mode=mode, work=work)|
 
 \begin{description}
-\item[Type:] Synchronous.
+\item[Type:] Synchronous or split-phase, depending on \fortinline|mode|.
 \item[\bf On Entry]
 \item[x] global dense matrix $x$.\\
 Scope: {\bf local} \\
@@ -208,20 +230,34 @@ Specified as: a structured data of type \descdata.
 \item[update] Update operator. \\
 \begin{description}
 \item[update = psb\_none\_] Do nothing;
-\item[update = psb\_add\_] Sum overlap entries, i.e. apply $P^T$;
+\item[update = psb\_sum\_] Sum overlap entries, i.e. apply $P^T$;
 \item[update = psb\_avg\_] Average overlap entries, i.e. apply $P_aP^T$;
 %% \item[update = psb\_square\_root\_] square root update $\sqrt{P_a}$;
 \end{description}
 Scope: {\bf global} \\
 Intent: {\bf in}.\\
-Default: $update\_type = psb\_avg\_ $\\	
+Default: $update\_type = psb\_avg\_ $\\
 Scope: {\bf global} \\
 Specified as: a integer variable.
+\item[mode] communication mode.\\
+Scope: {\bf global} \\
+Type: {\bf optional} \\
+Intent: {\bf in}.\\
+Specified as: an integer. Values: \fortinline|psb_comm_status_sync_|,
+\fortinline|psb_comm_status_start_|, \fortinline|psb_comm_status_wait_|, default:
+\fortinline|psb_comm_status_sync_|. Selects whether the overlap exchange
+is performed as a single synchronous operation or split into a
+non-blocking start phase and a later wait phase, so that communication
+may be overlapped with computation. When the split-phase mode is used,
+the overlap entries of $x$ must not be referenced between the start and
+the matching wait call.
 \item[work] the work array. \\
 Scope: {\bf local} \\
 Type: {\bf optional}\\
 Intent: {\bf inout}.\\
-Specified as: a one dimensional array of the same type of $x$.
+Specified as: a one dimensional array of the same type of $x$. This
+argument is only available when $x$ is a rank one or two array; it is
+not accepted when $x$ is an object of type \vdata.
 
 \item[\bf On Return] 
 \item[x] global dense result matrix $x$.\\
@@ -381,7 +417,6 @@ Long Precision Complex & psb\_gather \\
 \end{table}
 
 \noindent\fortinline|call psb_gather(glob_x, loc_x, desc_a, info, root)|
-\fortinline|call psb_gather(glob_x, loc_x, desc_a, info, root)|
 
 
 \begin{description}

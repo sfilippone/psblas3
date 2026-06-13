@@ -518,6 +518,12 @@ method is called by all processes.
   list;
 \item[psb\_comm\_mov\_] Exchange data based on the \fortinline|ovr_mst_idx|
   list;
+\item[psb\_comm\_status\_sync\_] Perform a data exchange as a single
+  synchronous operation (default);
+\item[psb\_comm\_status\_start\_] Begin a split-phase data exchange
+  (non-blocking start);
+\item[psb\_comm\_status\_wait\_] Complete a split-phase data exchange
+  started with \fortinline|psb_comm_status_start_|;
 
 %% \item[psb\_square\_root\_] Update with the square root of the average
 %%   of overlapped elements;
