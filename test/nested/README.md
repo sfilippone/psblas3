@@ -196,7 +196,7 @@ for a block operator).
 
 ### 3.4 Low-level API (advanced)
 
-`psb_d_nest_matrix` is built on lower-level pieces, available directly (see `psb_d_nest_cg_test.F90` for an end-to-end example):
+`psb_d_nest_matrix` is built on lower-level pieces, available directly:
 
 * `psb_cd_nest_compose(grid_desc, desc_glob, info)` — compose the per-field descriptors into the single global descriptor with the union halo.
 * `psb_d_nest_base_setup(nest_op, block_storage, grid_desc, desc_glob, info)` — set up the `psb_d_nest_base_mat` operator (implements the local `csmv`, `get_diag`, `csgetrow`).
@@ -211,8 +211,7 @@ A field-split interface (`psb_d_nest_get_block`, `psb_d_nest_get_field_desc`, `p
 |------------------------------|----------------|
 | `psb_d_nest_glob_test`       | Square 2×2 operator built with `psb_d_nest_matrix`; the nested `psb_spmm` is compared bit-for-bit against the same matrix assembled monolithically in CSR. |
 | `psb_d_nest_rect_test`       | Same, with fields of different size (`nV = 2 nQ`) and genuinely **rectangular** off-diagonal blocks. |
-| `psb_d_nest_cg_test`         | Standard PSBLAS **CG** on an SPD, ill-conditioned operator (1D Laplacian reordered red-black), built on the **low-level path**, solved under every stock preconditioner (`NONE`, `DIAG`, `BJAC`/ILU(0)); requires convergence to machine precision for all of them, and that `DIAG` reproduces the `NONE` iteration count exactly (a bit-precise check of the nested `get_diag`, since the diagonal is the constant `2I`). |
-| `psb_d_nest_builder_test`    | Same CG solve as above but built through the `psb_d_nest_matrix` utility (high-level path). |
+| `psb_d_nest_cg_test`         | Standard PSBLAS **CG** on an SPD, ill-conditioned operator (1D Laplacian reordered red-black), solved under every stock preconditioner (`NONE`, `DIAG`, `BJAC`/ILU(0)); requires convergence to machine precision for all of them, and that `DIAG` reproduces the `NONE` iteration count exactly (a bit-precise check of the nested `get_diag`, since the diagonal is the constant `2I`). |
 
 All tests run both serially and in parallel, and the result is invariant with respect to the number of MPI processes.
 
@@ -231,7 +230,6 @@ make                                   # builds the executables into ./runs
 ./runs/psb_d_nest_glob_test            # serial
 mpirun -np 4 ./runs/psb_d_nest_rect_test
 mpirun -np 4 ./runs/psb_d_nest_cg_test
-mpirun -np 4 ./runs/psb_d_nest_builder_test
 ```
 
 Each test prints a single `[PASS]` / `[FAIL]` line (printed by rank 0).

@@ -34,11 +34,12 @@
 ! Program: psb_d_nest_cg_test
 ! Author:  Simone Staccone (Stack-1)
 !
-! Solves a linear system with the GLOBAL nested operator using the standard
-! PSBLAS CG (psb_krylov('CG', ...)).  This test builds the operator on the
-! LOW-LEVEL path (per-field descriptors, blocks, compose, setup, wrap) to
-! directly validate the machinery the psb_d_nest_matrix utility relies on; the
-! same solve through the utility is in psb_d_nest_builder_test.
+! Solves a linear system with the nested operator using the standard PSBLAS CG
+! (psb_krylov('CG', ...)) under every stock one-level preconditioner, to show
+! that the nested operator plugs into the PSBLAS preconditioning infrastructure:
+!   NONE  (operator only),
+!   DIAG  (exercises the nested get_diag),
+!   BJAC  (ILU(0), exercises the nested csgetrow through the ILU build).
 !
 ! CG needs a SYMMETRIC POSITIVE DEFINITE operator and, to stress the test
 ! (hundreds of matvecs), an ILL-CONDITIONED one.  We use a real case: the 1D
@@ -54,12 +55,10 @@
 ! Laplacian up to a permutation: SPD but with lambda_min ~ (pi/m)^2 => cond ~
 ! N^2 => CG performs O(N) iterations that GROW with N.
 !
-! The system is solved under every stock PSBLAS preconditioner: NONE (operator
-! only), DIAG (exercises the nested get_diag) and BJAC/ILU(0) (exercises the
-! nested csgetrow through the ILU factorization).  The test passes if every
-! solve converges to the exact solution and DIAG reproduces the NONE iteration
-! count exactly (with the constant diagonal 2I, Jacobi is a pure rescaling, so
-! any mismatch would expose a wrong nested get_diag).
+! The operator is built with the psb_d_nest_matrix utility.  The test passes if
+! every solve converges to the exact solution and DIAG reproduces the NONE
+! iteration count exactly (with the constant diagonal 2I, Jacobi is a pure
+! rescaling, so any mismatch would expose a wrong nested get_diag).
 !
 ! Run: ./psb_d_nest_cg_test ; mpirun -np 4 ./psb_d_nest_cg_test
 !
@@ -68,43 +67,32 @@ program psb_d_nest_cg_test
   use psb_util_mod
   use psb_prec_mod
   use psb_linsolve_mod
-  use psb_d_nest_mod      
+  use psb_d_nest_mod          ! umbrella: includes psb_d_nest_matrix (builder)
   implicit none
 
-  type(psb_ctxt_type)             :: context
-  integer(psb_ipk_)               :: my_rank, num_procs, info, i_local_row, entry_idx, field_local_rows
-  integer(psb_lpk_)               :: field1_global_row, field2_global_row, field_size
+  type(psb_ctxt_type)        :: context
+  integer(psb_ipk_)          :: my_rank, num_procs, info, i_local_row, entry_idx
+  integer(psb_ipk_)          :: field1_local_rows, field2_local_rows
+  integer(psb_lpk_)          :: field1_global_row, field2_global_row, field_size
 
-  ! per-field descriptors + blocks
-  type(psb_desc_type)             :: field1_desc, field2_desc
-  type(psb_dspmat_type)           :: diag_block1, coupling_12, coupling_21, diag_block2
+  type(psb_d_nest_matrix)    :: nested_matrix
+  type(psb_dprec_type)       :: preconditioner
+  type(psb_d_vect_type)      :: x_solution, rhs, x_exact
 
-  ! nested storage + grid descriptor + composed global path
-  type(psb_d_nest_sparse_mat)     :: block_storage
-  type(psb_desc_nest_type)        :: grid_desc
-  type(psb_desc_type)             :: desc_global
-  type(psb_d_nest_base_mat)       :: nest_operator
-  type(psb_dspmat_type)           :: global_operator
-
-  ! preconditioner + vectors
-  type(psb_dprec_type)            :: preconditioner
-  type(psb_d_vect_type)           :: x_solution, rhs, x_exact
-  real(psb_dpk_)                  :: insert_value(1)
-
-  ! global triplets for the coupling blocks
-  integer(psb_lpk_), allocatable  :: entry_rows(:), entry_cols(:)
-  real(psb_dpk_),    allocatable  :: entry_vals(:)
+  integer(psb_lpk_), allocatable :: entry_rows(:), entry_cols(:)
+  integer(psb_lpk_), allocatable :: field1_rows(:), field2_rows(:)
+  real(psb_dpk_),    allocatable :: entry_vals(:)
 
   ! solver parameters
-  real(psb_dpk_)                  :: diag_value, stop_tol, final_residual, norm_x_exact, solution_error
-  integer(psb_ipk_)               :: max_iter, trace_level, n_iter, stop_criterion
-  real(psb_dpk_), parameter       :: solution_tol = 1.0e-6_psb_dpk_
+  real(psb_dpk_)             :: diag_value, stop_tol, final_residual, norm_x_exact, solution_error
+  integer(psb_ipk_)          :: max_iter, trace_level, n_iter, stop_criterion
+  real(psb_dpk_), parameter  :: solution_tol = 1.0e-6_psb_dpk_
 
   ! stock preconditioners to exercise on the nested operator
-  integer(psb_ipk_), parameter    :: n_precs = 3
-  character(len=6),  parameter    :: prec_names(n_precs) = ['NONE  ', 'DIAG  ', 'BJAC  ']
-  integer(psb_ipk_)               :: i_prec, iter_none, iter_diag
-  logical                         :: all_passed
+  integer(psb_ipk_), parameter :: n_precs = 3
+  character(len=6),  parameter :: prec_names(n_precs) = ['NONE  ', 'DIAG  ', 'BJAC  ']
+  integer(psb_ipk_)            :: i_prec, iter_none, iter_diag
+  logical                      :: all_passed
 
   call psb_init(context)
   call psb_info(context, my_rank, num_procs)
@@ -117,63 +105,47 @@ program psb_d_nest_cg_test
   stop_criterion = 2                        ! stop on the relative residual
 
   !---------------------------------------------------------------
-  ! 1) per-field descriptors: block distribution of field_size global rows
-  !    over num_procs processes (total size independent of num_procs)
+  ! 1) create the nested operator: 2 fields of global size field_size
   !---------------------------------------------------------------
-  field_local_rows = int(field_size / int(num_procs, psb_lpk_), psb_ipk_)
-  if (int(my_rank, psb_lpk_) < mod(field_size, int(num_procs, psb_lpk_))) &
-       & field_local_rows = field_local_rows + 1
-  call psb_cdall(context, field1_desc, info, nl=field_local_rows)
-  call psb_cdall(context, field2_desc, info, nl=field_local_rows)
+  call nested_matrix%init(context, [field_size, field_size], info)
+  if (info /= psb_success_) then
+    if (my_rank==0) write(*,*) 'FAIL: nested_matrix%init info=', info; goto 9999
+  end if
+  field1_rows = nested_matrix%get_owned_rows(1)
+  field2_rows = nested_matrix%get_owned_rows(2)
+  field1_local_rows = size(field1_rows)
+  field2_local_rows = size(field2_rows)
 
   !---------------------------------------------------------------
-  ! 2) diagonal blocks A = B = diag*I  (odd/even nodes of the red-black
-  !    reordered Laplacian are not adjacent to each other)
+  ! 2) insert the blocks (owned rows only)
   !---------------------------------------------------------------
-  call psb_spall(diag_block1, field1_desc, info, nnz=field1_desc%get_local_rows())
-  call psb_spall(diag_block2, field2_desc, info, nnz=field2_desc%get_local_rows())
-
-  do i_local_row = 1, field1_desc%get_local_rows()
-    call field1_desc%l2g(i_local_row, field1_global_row, info)
-    insert_value(1) = diag_value
-    call psb_spins(1,[field1_global_row],[field1_global_row],insert_value,diag_block1,field1_desc,info)
+  ! block (1,1) = diag*I
+  allocate(entry_rows(field1_local_rows), entry_cols(field1_local_rows), entry_vals(field1_local_rows))
+  do i_local_row = 1, field1_local_rows
+    field1_global_row = field1_rows(i_local_row)
+    entry_rows(i_local_row) = field1_global_row
+    entry_cols(i_local_row) = field1_global_row
+    entry_vals(i_local_row) = diag_value
   end do
-  do i_local_row = 1, field2_desc%get_local_rows()
-    call field2_desc%l2g(i_local_row, field2_global_row, info)
-    insert_value(1) = diag_value
-    call psb_spins(1,[field2_global_row],[field2_global_row],insert_value,diag_block2,field2_desc,info)
-  end do
+  call nested_matrix%ins(1, 1, field1_local_rows, entry_rows, entry_cols, entry_vals, info)
+  deallocate(entry_rows, entry_cols, entry_vals)
 
-  !---------------------------------------------------------------
-  ! 3) register, in the union halo, the cross-field columns of the coupling blocks
-  !    C   (row field1, col field2): columns {r, r-1} in field2  -> into field2_desc
-  !    C^T (row field2, col field1): columns {s, s+1} in field1  -> into field1_desc
-  !---------------------------------------------------------------
-  do i_local_row = 1, field1_desc%get_local_rows()
-    call field1_desc%l2g(i_local_row, field1_global_row, info)
-    call psb_cdins(1, [field1_global_row], field2_desc, info)
-    if (field1_global_row > 1) call psb_cdins(1, [field1_global_row-1_psb_lpk_], field2_desc, info)
+  ! block (2,2) = diag*I
+  allocate(entry_rows(field2_local_rows), entry_cols(field2_local_rows), entry_vals(field2_local_rows))
+  do i_local_row = 1, field2_local_rows
+    field2_global_row = field2_rows(i_local_row)
+    entry_rows(i_local_row) = field2_global_row
+    entry_cols(i_local_row) = field2_global_row
+    entry_vals(i_local_row) = diag_value
   end do
-  do i_local_row = 1, field2_desc%get_local_rows()
-    call field2_desc%l2g(i_local_row, field2_global_row, info)
-    call psb_cdins(1, [field2_global_row], field1_desc, info)
-    if (field2_global_row < field_size) call psb_cdins(1, [field2_global_row+1_psb_lpk_], field1_desc, info)
-  end do
+  call nested_matrix%ins(2, 2, field2_local_rows, entry_rows, entry_cols, entry_vals, info)
+  deallocate(entry_rows, entry_cols, entry_vals)
 
-  call psb_cdasb(field1_desc, info)
-  call psb_cdasb(field2_desc, info)
-  call psb_spasb(diag_block1, field1_desc, info, dupl=psb_dupl_add_)
-  call psb_spasb(diag_block2, field2_desc, info, dupl=psb_dupl_add_)
-
-  !---------------------------------------------------------------
-  ! 4) coupling C (1,2): rows field1 (field1_desc), columns field2 (field2_desc)
-  !    C(r,r) = -1 ,  C(r,r-1) = -1   (odd node 2r-1 -> even nodes 2r and 2r-2)
-  !---------------------------------------------------------------
-  allocate(entry_rows(2*field1_desc%get_local_rows()), entry_cols(2*field1_desc%get_local_rows()), &
-       &   entry_vals(2*field1_desc%get_local_rows()))
+  ! block (1,2) = C : rows field1, cols field2 ; C(r,r)=-1, C(r,r-1)=-1
+  allocate(entry_rows(2*field1_local_rows), entry_cols(2*field1_local_rows), entry_vals(2*field1_local_rows))
   entry_idx = 0
-  do i_local_row = 1, field1_desc%get_local_rows()
-    call field1_desc%l2g(i_local_row, field1_global_row, info)
+  do i_local_row = 1, field1_local_rows
+    field1_global_row = field1_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = field1_global_row
     entry_cols(entry_idx) = field1_global_row
@@ -185,19 +157,14 @@ program psb_d_nest_cg_test
       entry_vals(entry_idx) = -1.0_psb_dpk_
     end if
   end do
-  call psb_d_nest_rect_block(coupling_12, entry_idx, entry_rows, entry_cols, entry_vals, field1_desc, field2_desc, info)
+  call nested_matrix%ins(1, 2, entry_idx, entry_rows, entry_cols, entry_vals, info)
   deallocate(entry_rows, entry_cols, entry_vals)
 
-  !---------------------------------------------------------------
-  ! 5) coupling C^T (2,1) = exact transpose of C:
-  !    rows field2 (field2_desc), columns field1 (field1_desc)
-  !    C^T(s,s) = -1 ,  C^T(s,s+1) = -1   (even node 2s -> odd nodes 2s-1 and 2s+1)
-  !---------------------------------------------------------------
-  allocate(entry_rows(2*field2_desc%get_local_rows()), entry_cols(2*field2_desc%get_local_rows()), &
-       &   entry_vals(2*field2_desc%get_local_rows()))
+  ! block (2,1) = C^T : rows field2, cols field1 ; C^T(s,s)=-1, C^T(s,s+1)=-1
+  allocate(entry_rows(2*field2_local_rows), entry_cols(2*field2_local_rows), entry_vals(2*field2_local_rows))
   entry_idx = 0
-  do i_local_row = 1, field2_desc%get_local_rows()
-    call field2_desc%l2g(i_local_row, field2_global_row, info)
+  do i_local_row = 1, field2_local_rows
+    field2_global_row = field2_rows(i_local_row)
     entry_idx = entry_idx + 1
     entry_rows(entry_idx) = field2_global_row
     entry_cols(entry_idx) = field2_global_row
@@ -209,70 +176,34 @@ program psb_d_nest_cg_test
       entry_vals(entry_idx) = -1.0_psb_dpk_
     end if
   end do
-  call psb_d_nest_rect_block(coupling_21, entry_idx, entry_rows, entry_cols, entry_vals, field2_desc, field1_desc, info)
+  call nested_matrix%ins(2, 1, entry_idx, entry_rows, entry_cols, entry_vals, info)
   deallocate(entry_rows, entry_cols, entry_vals)
 
   !---------------------------------------------------------------
-  ! 6) nested grid (all four blocks present)
+  ! 3) assemble: nested_matrix%a_glob / nested_matrix%desc_glob are ready for Krylov
   !---------------------------------------------------------------
-  block_storage%nrblocks = 2
-  block_storage%ncblocks = 2
-  allocate(block_storage%mats(2,2))
-  call psb_move_alloc(diag_block1, block_storage%mats(1,1), info)
-  call psb_move_alloc(coupling_12, block_storage%mats(1,2), info)
-  call psb_move_alloc(coupling_21, block_storage%mats(2,1), info)
-  call psb_move_alloc(diag_block2, block_storage%mats(2,2), info)
-
-  grid_desc%nrblocks = 2
-  grid_desc%ncblocks = 2
-  allocate(grid_desc%descs(2,2))
-  call field1_desc%clone(grid_desc%descs(1,1), info)
-  call field2_desc%clone(grid_desc%descs(1,2), info)
-  call field1_desc%clone(grid_desc%descs(2,1), info)
-  call field2_desc%clone(grid_desc%descs(2,2), info)
-
-  !---------------------------------------------------------------
-  ! 7) composed global operator (what CG will use as its matrix)
-  !---------------------------------------------------------------
-  call psb_cd_nest_compose(grid_desc, desc_global, info)
+  call nested_matrix%asb(info)
   if (info /= psb_success_) then
-    if (my_rank == 0) write(*,*) 'FAIL: psb_cd_nest_compose info=', info
-    goto 9999
+    if (my_rank==0) write(*,*) 'FAIL: nested_matrix%asb info=', info; goto 9999
   end if
-  call psb_d_nest_base_setup(nest_operator, block_storage, grid_desc, desc_global, info)
-  if (info /= psb_success_) then
-    if (my_rank == 0) write(*,*) 'FAIL: psb_d_nest_base_setup info=', info
-    goto 9999
-  end if
-  allocate(global_operator%a, source=nest_operator)
-  call global_operator%set_nrows(desc_global%get_local_rows())
-  call global_operator%set_ncols(desc_global%get_local_cols())
-  call global_operator%set_asb()
 
   !---------------------------------------------------------------
-  ! 8) consistent RHS: x_exact = 1, rhs = M * x_exact (via the nested operator)
+  ! 4) consistent RHS: x_exact = 1, rhs = M * x_exact (via the nested operator)
   !---------------------------------------------------------------
-  call psb_geall(x_exact, desc_global, info)
-  do i_local_row = 1, desc_global%get_local_rows()
-    call desc_global%l2g(i_local_row, field1_global_row, info)
-    insert_value(1) = 1.0_psb_dpk_
-    call psb_geins(1, [field1_global_row], insert_value, x_exact, desc_global, info)
-  end do
-  call psb_geasb(x_exact, desc_global, info)
+  call psb_geall(x_exact, nested_matrix%desc_glob, info)
+  call psb_geasb(x_exact, nested_matrix%desc_glob, info)
+  call x_exact%set(done)                                   ! x_exact = 1 everywhere
 
-  call psb_geall(rhs, desc_global, info); call psb_geasb(rhs, desc_global, info)
-  call psb_spmm(done, global_operator, x_exact, dzero, rhs, desc_global, info)
+  call psb_geall(rhs, nested_matrix%desc_glob, info); call psb_geasb(rhs, nested_matrix%desc_glob, info)
+  call psb_spmm(done, nested_matrix%a_glob, x_exact, dzero, rhs, nested_matrix%desc_glob, info)
   if (info /= psb_success_) then
     if (my_rank == 0) write(*,*) 'FAIL: psb_spmm (RHS) info=', info
     goto 9999
   end if
-
-  norm_x_exact = psb_genrm2(x_exact, desc_global, info)
+  norm_x_exact = psb_genrm2(x_exact, nested_matrix%desc_glob, info)
 
   !---------------------------------------------------------------
-  ! 9) solve with the standard PSBLAS CG under every stock preconditioner:
-  !    NONE (operator only), DIAG (exercises the nested get_diag),
-  !    BJAC/ILU(0) (exercises the nested csgetrow through the ILU build)
+  ! 5) solve with the standard PSBLAS CG under every stock preconditioner
   !---------------------------------------------------------------
   if (my_rank == 0) write(*,'(a,i0,a,i0)') ' np=', num_procs, '  N(global)=', 2*field_size
   all_passed = .true.
@@ -280,14 +211,16 @@ program psb_d_nest_cg_test
   iter_diag  = -1
   do i_prec = 1, n_precs
     call preconditioner%init(context, trim(prec_names(i_prec)), info)
-    call preconditioner%build(global_operator, desc_global, info)
+    call preconditioner%build(nested_matrix%a_glob, nested_matrix%desc_glob, info)
     if (info /= psb_success_) then
       if (my_rank == 0) write(*,*) 'FAIL: prec%build (', trim(prec_names(i_prec)), ') info=', info
       all_passed = .false.; exit
     end if
 
-    call psb_geall(x_solution, desc_global, info); call psb_geasb(x_solution, desc_global, info)
-    call psb_krylov('CG', global_operator, preconditioner, rhs, x_solution, stop_tol, desc_global, info, &
+    call psb_geall(x_solution, nested_matrix%desc_glob, info)
+    call psb_geasb(x_solution, nested_matrix%desc_glob, info)
+    call psb_krylov('CG', nested_matrix%a_glob, preconditioner, rhs, x_solution, stop_tol, &
+         & nested_matrix%desc_glob, info, &
          & itmax=max_iter, iter=n_iter, err=final_residual, itrace=trace_level, istop=stop_criterion)
     if (info /= psb_success_) then
       if (my_rank == 0) write(*,*) 'FAIL: psb_krylov(CG,', trim(prec_names(i_prec)), ') info=', info
@@ -295,8 +228,8 @@ program psb_d_nest_cg_test
     end if
 
     ! solution error: || x_solution - x_exact || / || x_exact ||
-    call psb_geaxpby(-done, x_exact, done, x_solution, desc_global, info)
-    solution_error = psb_genrm2(x_solution, desc_global, info) / norm_x_exact
+    call psb_geaxpby(-done, x_exact, done, x_solution, nested_matrix%desc_glob, info)
+    solution_error = psb_genrm2(x_solution, nested_matrix%desc_glob, info) / norm_x_exact
 
     if (my_rank == 0) then
       write(*,'(a,a6,a,i6,a,es12.4,a,es12.4)') ' prec=', prec_names(i_prec), &
@@ -307,26 +240,24 @@ program psb_d_nest_cg_test
     if (trim(prec_names(i_prec)) == 'NONE') iter_none = n_iter
     if (trim(prec_names(i_prec)) == 'DIAG') iter_diag = n_iter
 
-    call psb_gefree(x_solution, desc_global, info)
+    call psb_gefree(x_solution, nested_matrix%desc_glob, info)
     call preconditioner%free(info)
   end do
 
   !---------------------------------------------------------------
-  ! 10) verdict: every preconditioner converges to the right solution.
-  !     With the constant diagonal 2I, Jacobi is a pure rescaling, so DIAG
-  !     must reproduce the unpreconditioned iteration count EXACTLY: this is
-  !     a bit-precise check that the nested get_diag returns exact values.
-  !     (BJAC/ILU(0) on a red-black ordering drops all fill, so it cannot
-  !     reduce the iteration count of this exact-convergence regime; its
-  !     much smaller final residual shows the ILU factors are consistent.)
+  ! 6) verdict: every preconditioner converges to the right solution, and DIAG
+  !     reproduces the NONE iteration count exactly (Jacobi on the constant
+  !     diagonal 2I is a pure rescaling -> exactness check of the nested get_diag)
   !---------------------------------------------------------------
   if (my_rank == 0) then
     if (all_passed .and. (iter_diag == iter_none)) then
-      write(*,*) '[PASS] CG converges on the global nested operator with NONE/DIAG/BJAC'
+      write(*,*) '[PASS] CG converges on the nested operator with NONE/DIAG/BJAC'
     else
       write(*,*) '[FAIL] preconditioned CG on the nested operator (tol ', solution_tol, ')'
     end if
   end if
+
+  call nested_matrix%free(info)
 
 9999 continue
   call psb_exit(context)
