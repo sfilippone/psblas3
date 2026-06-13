@@ -119,15 +119,17 @@ psb_comm_status_wait_      (complete a previously started exchange)
 psb_comm_status_sync_      (start + wait in one call; the default)
 ```
 
-```mermaid
-stateDiagram-v2
-    [*] --> unknown
-    unknown --> sync:  mode = sync
-    unknown --> start: mode = start
-    sync --> sync:     repeated synchronous exchanges
-    start --> wait:    mode = wait
-    wait --> start:    next split-phase exchange
-    wait --> sync:     switch back to synchronous
+```
+  synchronous (default):  unknown --> sync --> sync --> ...
+  split-phase:            unknown --> start --> wait --> start --> wait --> ...
+
+  transitions (driven by the mode argument):
+    unknown --(mode=sync)-->  sync     single-call exchange (post + complete)
+    unknown --(mode=start)--> start    post sends/recvs, then return
+    start   --(mode=wait)-->  wait     complete the started exchange
+    wait    --(mode=start)--> start    begin the next split-phase exchange
+    wait    --(mode=sync)-->  sync     switch back to synchronous
+    sync    --(mode=sync)-->  sync     repeated synchronous exchanges
 ```
 
 In the scheme implementations the two phases map onto the obvious MPI pairs, for
