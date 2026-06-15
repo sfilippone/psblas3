@@ -158,7 +158,7 @@ subroutine psb_d_apply1_vect(prec,x,desc_data,info,trans)
 
 end subroutine psb_d_apply1_vect
 
-subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans, work)
+subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans,work)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_d_apply2v
   implicit none
@@ -167,8 +167,8 @@ subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans, work)
   real(psb_dpk_),intent(inout)   :: x(:)
   real(psb_dpk_),intent(inout)   :: y(:)
   integer(psb_ipk_), intent(out)              :: info
-  real(psb_dpk_),intent(inout), optional, target :: work(:)
   character(len=1), optional        :: trans
+  real(psb_dpk_),intent(inout), optional, target :: work(:)
 
   character     :: trans_
   type(psb_ctxt_type) :: ctxt
@@ -194,7 +194,7 @@ subroutine psb_d_apply2v(prec,x,y,desc_data,info,trans, work)
     call psb_errpush(info,name,a_err="preconditioner")
     goto 9999
   end if
-  call prec%prec%apply(done,x,dzero,y,desc_data,info,trans_, work)
+  call prec%prec%apply(done,x,dzero,y,desc_data,info,trans_,work)
 
   call psb_erractionrestore(err_act)
   return
