@@ -1,4 +1,4 @@
-omodule psb_s_psblas_cbind_mod
+module psb_s_psblas_cbind_mod
   use iso_c_binding
   use psb_base_mod
   use psb_objhandle_mod
