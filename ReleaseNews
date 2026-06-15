@@ -1,4 +1,8 @@
 WHAT'S NEW
+Version 3.9.0-1
+   1. Fix licensing issues
+   2. Fix build and packaging
+   
 Version 3.9
    1. PSBLAS3-EXT has been folded into the main library
    2. Renamed GPU into CUDA.

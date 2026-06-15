@@ -863,7 +863,7 @@ contains
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function z_vect_get_entry
 
-  subroutine z_vect_set_entry(x,index,val)
+  subroutine z_vect_set_entry(x,index,val) 
     implicit none
     class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index

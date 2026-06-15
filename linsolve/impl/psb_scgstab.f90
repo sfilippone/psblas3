@@ -93,7 +93,7 @@
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !
-Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
+Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_s_linsolve_conv_mod
@@ -109,6 +109,7 @@ Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
+  type(psb_s_vect_type), intent(inout), optional   :: s1, s2
 ! =   Local data
   real(psb_spk_), allocatable, target   :: aux(:),wwrk(:,:)
   type(psb_s_vect_type) :: q, r, p, v, s, t, z, f
@@ -235,7 +236,8 @@ Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   End If
 
   itx   = 0
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,&
+       & desc_a,stopdat,info,s1=s1,s2=s2)
   if (psb_errstatus_fatal()) Then 
     call psb_errpush(psb_err_from_subroutine_non_,name)
     goto 9999
@@ -252,7 +254,7 @@ Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
     call psb_geaxpby(sone,r,szero,q,desc_a,info)
 
     ! Perhaps we already satisfy the convergence criterion...
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
 
     if (psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
@@ -372,7 +374,7 @@ Subroutine psb_scgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
       call psb_geaxpby(omega,z,sone,x,desc_a,info)
       call psb_geaxpby(sone,s,szero,r,desc_a,info)
       call psb_geaxpby(-omega,t,sone,r,desc_a,info)
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
 
       if (psb_errstatus_fatal()) Then 
         call psb_errpush(psb_err_from_subroutine_,name,a_err='X/R update ')

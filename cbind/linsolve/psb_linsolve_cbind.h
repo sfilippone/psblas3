@@ -22,11 +22,12 @@ typedef struct psb_c_solveroptions {
   int istop;      /* Stopping criterion: 1:backward error 2: ||r||_2/||b||_2 */
   double eps;     /* Stopping tolerance */ 
   double err;     /* Convergence indicator on exit */
+  void *s1;
+  void *s2;
 } psb_c_SolverOptions; 
 
 int psb_c_DefaultSolverOptions(psb_c_SolverOptions *opt);
-int psb_c_PrintSolverOptions(psb_c_SolverOptions *opt);
-  
+int psb_c_PrintSolverOptions(psb_c_SolverOptions opt);
 int psb_c_skrylov(const char *method, psb_c_sspmat *ah, psb_c_sprec *ph, 
 		  psb_c_svector *bh, psb_c_svector *xh,
 		  psb_c_descriptor *cdh, psb_c_SolverOptions *opt);

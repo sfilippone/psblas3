@@ -80,7 +80,7 @@
 !                                           estimate of) residual 
 ! 
 Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,irst,istop,cond)
+     & itmax,iter,err,itrace,irst,istop,cond,s1,s2)
 
   use psb_base_mod
   use psb_prec_mod,only : psb_dprec_type
@@ -97,11 +97,12 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err,cond
+  type(psb_d_vect_type), intent(inout), optional   :: s1, s2
 
 
   abstract interface
     subroutine psb_dkryl_vect(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop)
+         & desc_a,info,itmax,iter,err,itrace,istop,s1,s2)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       type(psb_dspmat_type), intent(in)    :: a
@@ -114,9 +115,10 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
       integer(psb_ipk_), optional, intent(out)       :: iter
       real(psb_dpk_), optional, intent(out) :: err
+      type(psb_d_vect_type), intent(inout), optional   :: s1, s2
     end subroutine psb_dkryl_vect
     Subroutine psb_dkryl_rest_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err, itrace,irst,istop)
+         &itmax,iter,err, itrace,irst,istop,s1,s2)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       Type(psb_dspmat_type), Intent(in)    :: a
@@ -129,9 +131,10 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
       integer(psb_ipk_), Optional, Intent(out)       :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err
+      type(psb_d_vect_type), intent(inout), optional   :: s1, s2
     end subroutine psb_dkryl_rest_vect
     Subroutine psb_dkryl_cond_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err, itrace,istop,cond)
+         &itmax,iter,err, itrace,istop,cond,s1,s2)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_dspmat_type, psb_dprec_type, psb_d_vect_type
       Type(psb_dspmat_type), Intent(in)    :: a
@@ -144,6 +147,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
       integer(psb_ipk_), Optional, Intent(out)       :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err, cond
+      type(psb_d_vect_type), intent(inout), optional   :: s1, s2
     end subroutine psb_dkryl_cond_vect
   end interface
 
@@ -180,37 +184,37 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   select case(psb_toupper(method))
   case('CG') 
     call  psb_dcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
+         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond,s1=s1,s2=s2)
   case('FCG') 
     call  psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
+         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond,s1=s1,s2=s2)
   case('GCR') 
     call  psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
   case('CGS') 
     call  psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
   case('BICG') 
     call  psb_dbicg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
   case('BICGSTAB') 
     call  psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
   case('RGMRES','GMRES')
     call  psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
+         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop,s1=s1,s2=s2)
   case('MINRES','PMINRES')
     call  psb_dminres_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,istop=istop)
   case('BICGSTABL')
     call  psb_dcgstabl_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
+         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop,s1=s1,s2=s2)
   case default
     if (me == 0) write(psb_err_unit,*) trim(name),&
          & ': Warning: Unknown method  ',method,&
          & ', defaulting to BiCGSTAB'
     call  psb_dcgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+         &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
   end select
 
   if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)

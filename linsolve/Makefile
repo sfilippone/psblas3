@@ -9,6 +9,8 @@ MODDIR=../modules
 MODOBJS= psb_base_linsolve_conv_mod.o \
 	psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o \
 	psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o \
+	psb_s_linsolve_mod.o psb_c_linsolve_mod.o \
+	psb_d_linsolve_mod.o psb_z_linsolve_mod.o \
 	psb_linsolve_mod.o
 
 OBJS=$(MODOBJS)
@@ -37,6 +39,9 @@ impld: $(OBJS)
 
 psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o:  psb_base_linsolve_conv_mod.o
 psb_linsolve_conv_mod.o: psb_s_linsolve_conv_mod.o psb_c_linsolve_conv_mod.o psb_d_linsolve_conv_mod.o psb_z_linsolve_conv_mod.o 
+psb_linsolve_mod.o: psb_s_linsolve_mod.o psb_c_linsolve_mod.o psb_d_linsolve_mod.o psb_z_linsolve_mod.o 
+
+
 $(F90OBJS): $(MODOBJS)
 $(OBJS): $(MODDIR)/$(PRECMODNAME)$(.mod)  $(MODDIR)/$(BASEMODNAME)$(.mod)
 

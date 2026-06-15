@@ -870,7 +870,7 @@ contains
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function d_vect_get_entry
 
-  subroutine d_vect_set_entry(x,index,val)
+  subroutine d_vect_set_entry(x,index,val) 
     implicit none
     class(psb_d_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index

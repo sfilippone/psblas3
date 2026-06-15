@@ -102,13 +102,15 @@
 !                                            stopped when  |r| <= eps * (|a||x|+|b|)
 !                                         2: err =  |r|/|b|; here the iteration is
 !                                            stopped when  |r| <= eps * |b|
+!                                         3: Same as 2 but with X and B scaled
+!                                            by s1 and s2 
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !    irst   -  integer(optional)          Input: restart parameter 
 !
 
 subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,irst,istop)
+     & itmax,iter,err,itrace,irst,istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_s_linsolve_conv_mod
@@ -124,6 +126,7 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
+  type(psb_s_vect_type), intent(inout), optional   :: s1, s2
 ! =   local data
   real(psb_spk_), allocatable   :: aux(:)
   real(psb_spk_), allocatable   :: c(:), s(:), h(:,:), rs(:), rst(:)
@@ -268,9 +271,20 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
   select case(istop_)
   case(psb_istop_ani_)
     ani = psb_spnrmi(a,desc_a,info)
-    bni = psb_geamax(b,desc_a,info)
+    if (present(s1)) then
+      call psb_gemlt(sone,s1,b,szero,v(1),desc_a,info)
+      bni = psb_geamax(v(1),desc_a,info)
+    else
+      bni = psb_geamax(b,desc_a,info)
+    end if
   case(psb_istop_bn2_)
-    bn2 = psb_genrm2(b,desc_a,info)    
+    if (present(s1)) then
+      call psb_gemlt(sone,s1,b,szero,v(1),desc_a,info)
+      bn2 = psb_genrm2(v(1),desc_a,info)
+    else
+      bn2 = psb_genrm2(b,desc_a,info)
+    end if
+      
   case(psb_istop_rn2_abs_)
     ! do nothing
   case(psb_istop_rrn2_)
@@ -282,6 +296,7 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
     end if
     
     call psb_spmm(-sone,a,x,sone,v(1),desc_a,info,work=aux)
+    if (present(s1)) call psb_gemlt(s1,v(1),desc_a,info)
     if (info /= psb_success_) then 
       info=psb_err_from_subroutine_non_ 
       call psb_errpush(info,name)
@@ -323,7 +338,8 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_errpush(info,name)
       goto 9999
     end if
-
+    if (present(s1)) call psb_gemlt(s1,v(1),desc_a,info)
+    
     rs(1) = psb_genrm2(v(1),desc_a,info)
     rs(2:) = szero
     if (info /= psb_success_) then 
@@ -378,8 +394,14 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
     inner:  Do i=1,nl
       itx  = itx + 1
 
-      call prec%apply(v(i),w1,desc_a,info)
+      if (present(s2)) then
+        call psb_gediv(v(i),s2,w,desc_a,info)
+        call prec%apply(w,w1,desc_a,info)
+      else
+        call prec%apply(v(i),w1,desc_a,info)
+      end if
       call psb_spmm(sone,a,w1,szero,w,desc_a,info,work=aux)
+      if (present(s1)) call psb_gemlt(s1,w,desc_a,info)
       !
       call mgs(i,h,v,w,rs,c,s,desc_a,info)
 
@@ -391,10 +413,11 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
         !
         rst = rs
         call psb_geaxpby(sone,x,szero,xt,desc_a,info)
-        call rebuildx(i,h,v,w,w1,xt,rst,c,s,prec,desc_a,info)
+        call rebuildx(i,h,v,w,w1,xt,rst,c,s,prec,desc_a,info,s2=s2)
 
         call psb_geaxpby(sone,b,szero,w1,desc_a,info)
         call psb_spmm(-sone,a,xt,sone,w1,desc_a,info,work=aux)
+        if (present(s1)) call psb_gemlt(s1,w,desc_a,info)
         rni = psb_geamax(w1,desc_a,info)
         xni = psb_geamax(xt,desc_a,info)
         errnum = rni
@@ -432,7 +455,8 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
           call psb_geaxpby(sone,xt,szero,x,desc_a,info)
 ! =          x = xt 
         case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
-          call  rebuildx(i,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
+          call  rebuildx(i,h,v,w,w1,x,rs,c,s,prec,desc_a,info,s2=s2)
+          !
 
         end select
 
@@ -452,7 +476,7 @@ subroutine psb_srgmres_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(sone,xt,szero,x,desc_a,info)!      x = xt 
 
     case(psb_istop_bn2_, psb_istop_rn2_abs_,psb_istop_rrn2_)
-      call  rebuildx(nl,h,v,w,w1,x,rs,c,s,prec,desc_a,info)          !
+      call  rebuildx(nl,h,v,w,w1,x,rs,c,s,prec,desc_a,info,s2=s2)          !
     end select
     
     if (itx >= itmax_) then 
@@ -523,11 +547,12 @@ contains
   ! Rebuild solution X from the space V using the factor
   ! stored in R
   !
-  subroutine rebuildx(n,h,v,w,w1,x,rs,c,s,prec,desc_a,info)
+  subroutine rebuildx(n,h,v,w,w1,x,rs,c,s,prec,desc_a,info,s2)
     real(psb_spk_)   :: c(:), s(:), rs(:), h(:,:)
     type(psb_s_vect_type) :: v(:), w, w1, x
     type(psb_desc_type) :: desc_a
     class(psb_sprec_type) :: prec
+    type(psb_s_vect_type), intent(inout), optional   :: s2
     integer(psb_ipk_) :: info
     integer(psb_ipk_) :: k,n
 
@@ -539,12 +564,13 @@ contains
     if (debug_level >= psb_debug_ext_) &
          & write(debug_unit,*) me,' ',trim(name),&
          & ' Rebuild x-> RS:',rs(1:n)
-    call w1%zero()
+    call w%zero()
     do k=1, n
-      call psb_geaxpby(rs(k),v(k),sone,w1,desc_a,info)
+      call psb_geaxpby(rs(k),v(k),sone,w,desc_a,info)
     end do
-    call prec%apply(w1,w,desc_a,info)
-    call psb_geaxpby(sone,w,sone,x,desc_a,info)
+    if (present(s2)) call psb_gediv(s2,w,desc_a,info)
+    call prec%apply(w,w1,desc_a,info)
+    call psb_geaxpby(sone,w1,sone,x,desc_a,info)
   end subroutine rebuildx
 
 end subroutine psb_srgmres_vect

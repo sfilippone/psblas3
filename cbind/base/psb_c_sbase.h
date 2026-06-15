@@ -40,7 +40,8 @@ psb_i_t    psb_c_sgefree(psb_c_svector *xh, psb_c_descriptor *cdh);
 psb_i_t    psb_c_sgereinit(psb_c_svector *xh, psb_c_descriptor *cdh, bool clear);
 psb_s_t    psb_c_sgetelem(psb_c_svector *xh,psb_l_t index,psb_c_descriptor *cd);
 psb_s_t	   psb_c_smatgetelem(psb_c_sspmat *ah,psb_l_t rowindex,psb_l_t colindex,psb_c_descriptor *cdh);	
-
+psb_i_t    psb_c_ssetelem(psb_l_t index, psb_s_t val,
+			  psb_c_svector *xh, psb_c_descriptor *cd);
 
 /* sparse matrices*/
 psb_c_sspmat* psb_c_new_sspmat();
@@ -69,7 +70,8 @@ psb_i_t	   psb_c_svect_set_scal(psb_c_svector *xh, psb_s_t val);
 psb_i_t	   psb_c_svect_set_vect(psb_c_svector *xh, psb_s_t *val, psb_i_t n);
 psb_s_t    psb_c_svect_get_entry(psb_c_svector *xh, psb_i_t index);
 psb_i_t    psb_c_svect_set_entry(psb_c_svector *xh, psb_i_t index, psb_s_t val);
-
+psb_i_t	   psb_c_svect_set_scal_bound(psb_c_svector *xh, psb_s_t val,
+				      psb_i_t ifirst, psb_i_t ilast);
 
 /* psblas computational routines */
 psb_s_t psb_c_sgedot(psb_c_svector *xh, psb_c_svector *yh, psb_c_descriptor *cdh);

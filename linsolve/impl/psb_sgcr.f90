@@ -106,7 +106,7 @@
 !
 
 subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace, irst, istop)
+     & itmax,iter,err,itrace, irst, istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_s_linsolve_conv_mod
@@ -124,6 +124,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   real(psb_spk_), Optional, Intent(out) :: err
+  type(psb_s_vect_type), intent(inout), optional   :: s1, s2
   ! =   local data
   real(psb_spk_), allocatable   :: alpha(:), h(:,:)
   type(psb_s_vect_type), allocatable :: z(:), c(:), c_scale(:)
@@ -253,7 +254,8 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
   itx = 0
   
   nrst = -1
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,&
+       & desc_a,stopdat,info,s1=s1,s2=s2)
   restart: do 
     if (itx>= itmax_) exit restart 
     h = szero
@@ -276,7 +278,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
       goto 9999
     end if
     
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
         
     nrst = nrst + 1 
     
@@ -307,7 +309,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(sone, r, szero, r, desc_a, info)   
       call psb_geaxpby(-alpha(j), c_scale(j), sone, r, desc_a, info)   
       
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
       
       if (j >= irst) exit iteration
       

@@ -1295,21 +1295,19 @@ contains
     end if
 
   end function s_base_get_entry
-
-  subroutine s_base_set_entry(x, index, val)
+  
+  subroutine  s_base_set_entry(x, index, val)
     implicit none
     class(psb_s_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
     real(psb_spk_)                           :: val
-
-
+    
     if (allocated(x%v)) then
       if (x%is_dev()) call x%sync()
-      x%v(index) =val
+      x%v(index) = val
       call x%set_host()
     end if
   end subroutine s_base_set_entry
-
   !
   ! Overwrite with absolute value
   !

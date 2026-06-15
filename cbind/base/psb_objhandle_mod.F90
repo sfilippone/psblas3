@@ -42,4 +42,15 @@ module psb_objhandle_mod
     type(c_ptr) :: item = c_null_ptr
   end type psb_c_zspmat
 
+  interface
+    subroutine psb_c_print_pointer(p) bind(c,name='psb_c_print_pointer')
+      use iso_c_binding
+      type(c_ptr), value :: p
+    end subroutine psb_c_print_pointer
+  end interface
+contains
+  function psb_c_get_new_object() result(res)
+    type(psb_c_object_type) :: res
+    res%item = c_null_ptr
+  end function psb_c_get_new_object
 end module psb_objhandle_mod
