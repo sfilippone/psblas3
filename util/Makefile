@@ -8,7 +8,9 @@ MODDIR=../modules
 HERE=.
 
 BASEOBJS= psb_blockpart_mod.o psb_metispart_mod.o psb_partidx_mod.o \
-      psb_hbio_mod.o psb_mmio_mod.o psb_mat_dist_mod.o \
+      psb_hbio_mod.o psb_mmio_mod.o \
+      psb_i_mmio_mod.o psb_s_mmio_mod.o psb_d_mmio_mod.o psb_c_mmio_mod.o psb_z_mmio_mod.o \
+      psb_mat_dist_mod.o \
       psb_s_mat_dist_mod.o psb_d_mat_dist_mod.o psb_c_mat_dist_mod.o psb_z_mat_dist_mod.o \
       psb_renum_mod.o psb_gps_mod.o \
       psb_s_renum_mod.o psb_d_renum_mod.o psb_c_renum_mod.o psb_z_renum_mod.o
@@ -46,6 +48,7 @@ psb_util_mod.o: $(BASEOBJS)
 psb_metispart_mod.o: psb_metis_int.o
 psb_mat_dist_mod.o:  psb_s_mat_dist_mod.o psb_d_mat_dist_mod.o psb_c_mat_dist_mod.o psb_z_mat_dist_mod.o 
 psb_renum_mod.o: psb_s_renum_mod.o psb_d_renum_mod.o psb_c_renum_mod.o psb_z_renum_mod.o
+psb_mmio_mod.o: psb_i_mmio_mod.o psb_s_mmio_mod.o psb_d_mmio_mod.o psb_c_mmio_mod.o psb_z_mmio_mod.o
 
 $(IMPLOBJS): $(BASEOBJS)
 
