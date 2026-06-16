@@ -211,7 +211,7 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
       outfile=6
     endif
   endif
-
+  
   write(outfile,'(a)') '%%MatrixMarket matrix array real general'
   write(outfile,'(a)') '% '//trim(header)
   write(outfile,'(a)') '% '
@@ -219,7 +219,9 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
   ncol = size(b,2) 
   write(outfile,*) nrow, ncol
 
-  write(outfile,fmt='(es26.18,1x)') ((b(i,j), i=1,nrow),j=1,ncol)
+  write(frmtv,'(a,i0,a)') '(',ncol,'(es26.18,1x))'
+
+  write(outfile,fmt=frmtv) ((b(i,j), i=1,nrow),j=1,ncol)
 
   if (opened) close(outfile)
 
