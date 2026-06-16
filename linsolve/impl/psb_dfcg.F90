@@ -104,7 +104,7 @@
 ! 
 !
 subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop,cond)
+     & itmax,iter,err,itrace,istop,cond,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_d_linsolve_conv_mod
@@ -120,6 +120,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   real(psb_dpk_), Optional, Intent(out) :: err,cond
+  type(psb_d_vect_type), intent(inout), optional   :: s1, s2
 ! =   Local data
   type(psb_d_vect_type)  :: v, w, d , q, r
   real(psb_dpk_) :: alpha, beta, delta, gamma, theta
@@ -227,7 +228,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
        & scratch=.true.,mold=x%v)
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,&
-       & a,x,b,eps,desc_a,stopdat,info)
+       & a,x,b,eps,desc_a,stopdat,info,s1=s1,s2=s2)
   itx = 0 
 
   restart: do 
@@ -246,7 +247,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
     end if
     
 
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) then
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) then
       if (debug.and.(me==0)) write(0,*) name,' Exit on  convergence from restart'
       exit restart
     end if
@@ -302,7 +303,7 @@ subroutine psb_dfcg_vect(a,prec,b,x,eps,desc_a,info,&
 
       itx = itx + 1
 
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) then
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) then
         if (debug.and.(me==0)) write(0,*) name,' Exit on  convergence from iteration'
         exit restart
       end if

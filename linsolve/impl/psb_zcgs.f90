@@ -93,7 +93,7 @@
 !                                         estimate of) residual. 
 !
 Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop)
+     & itmax,iter,err,itrace,istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_z_linsolve_conv_mod
@@ -109,6 +109,7 @@ Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err
+  type(psb_z_vect_type), intent(inout), optional   :: s1, s2
 ! =   local data
   complex(psb_dpk_), allocatable, target   :: aux(:)
   type(psb_z_vect_type), allocatable, target :: wwrk(:)
@@ -223,7 +224,8 @@ Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
 
   itx   = 0
 
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,&
+       & desc_a,stopdat,info,s1=s1,s2=s2)
   if (info /= psb_success_) Then 
      call psb_errpush(psb_err_from_subroutine_non_,name)
      goto 9999
@@ -246,7 +248,7 @@ Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
     
 
     ! Perhaps we already satisfy the convergence criterion...
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
     if (info /= psb_success_) Then 
       call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
@@ -320,7 +322,7 @@ Subroutine psb_zcgs_vect(a,prec,b,x,eps,desc_a,info,&
          goto 9999
       end if
 
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
       if (info /= psb_success_) Then 
         call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999
