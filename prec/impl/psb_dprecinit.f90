@@ -36,6 +36,7 @@ subroutine psb_dprecinit(ctxt,p,ptype,info)
   use psb_d_nullprec, only : psb_d_null_prec_type
   use psb_d_diagprec, only : psb_d_diag_prec_type
   use psb_d_bjacprec, only : psb_d_bjac_prec_type
+  use psb_d_nestedprec, only : psb_d_nested_prec_type
   implicit none
   type(psb_ctxt_type), intent(in) :: ctxt
   class(psb_dprec_type), intent(inout) :: p
@@ -62,6 +63,9 @@ subroutine psb_dprecinit(ctxt,p,ptype,info)
     
   case ('BJAC') 
     allocate(psb_d_bjac_prec_type :: p%prec, stat=info)       
+
+  case ('NEST','NESTED')
+    allocate(psb_d_nested_prec_type :: p%prec, stat=info)
     
   case default
     write(psb_err_unit,*) 'Unknown preconditioner type request "',ptype,'"'

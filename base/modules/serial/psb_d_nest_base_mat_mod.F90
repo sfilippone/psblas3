@@ -121,7 +121,8 @@ module psb_d_nest_base_mat_mod
   ! field-split interface (for the block preconditioner)
   public :: psb_d_nest_get_n_fields, psb_d_nest_get_field_owned, &
        &    psb_d_nest_get_block, psb_d_nest_get_field_desc,      &
-       &    psb_d_nest_restrict_field, psb_d_nest_prolong_field
+       &    psb_d_nest_restrict_field, psb_d_nest_restrict_field_local, &
+       &    psb_d_nest_prolong_field
 
 contains
 
@@ -1190,6 +1191,24 @@ contains
       x_field(i_entry) = x_global(nest_op%field_map(field)%global_local_pos(i_entry))
     end do
   end subroutine psb_d_nest_restrict_field
+
+  ! Restrict: extract field k's full local sub-vector (owned + ghosts).
+  subroutine psb_d_nest_restrict_field_local(nest_op, field, x_global, x_field, info)
+    type(psb_d_nest_base_mat), intent(in)  :: nest_op
+    integer(psb_ipk_),         intent(in)  :: field
+    real(psb_dpk_),            intent(in)  :: x_global(:)
+    real(psb_dpk_),            intent(out) :: x_field(:)
+    integer(psb_ipk_),         intent(out) :: info
+    integer(psb_ipk_) :: i_entry, n_local
+    info = psb_success_
+    if (field < 1 .or. field > nest_op%n_fields) then
+      info = psb_err_invalid_input_; return
+    end if
+    n_local = size(nest_op%field_map(field)%global_local_pos)
+    do i_entry = 1, n_local
+      x_field(i_entry) = x_global(nest_op%field_map(field)%global_local_pos(i_entry))
+    end do
+  end subroutine psb_d_nest_restrict_field_local
 
   ! Prolong: insert field k's OWNED sub-vector into the global local vector.
   subroutine psb_d_nest_prolong_field(nest_op, field, x_field, x_global, info)

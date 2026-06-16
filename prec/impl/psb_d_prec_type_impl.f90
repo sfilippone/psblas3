@@ -267,6 +267,10 @@ end subroutine psb_d_apply1v
 subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_dcprecseti
+  use psb_d_nestedprec, only : psb_d_nested_prec_type, &
+       & psb_d_nested_schur_maxit_, psb_d_nested_inner_maxit_, &
+       & psb_d_nested_inner_itrace_, psb_d_nested_inner_istop_, &
+       & psb_d_nested_set_field_precseti, psb_d_nested_set_field_krylov_i
   implicit none
 
   class(psb_dprec_type), intent(inout)   :: prec
@@ -280,16 +284,70 @@ subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
 
   ! Local variables
   character(len=*), parameter            :: name='psb_precseti'
+  integer(psb_ipk_) :: field
 
   info = psb_success_
 
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
+  if (.not. allocated(prec%prec)) then
+    info = psb_err_invalid_preca_
+    return
+  end if
+
   select case (psb_toupper(trim(what)))
+    case ('SCHUR_MAXIT','NEST_SCHUR_MAXIT')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        call p%precset(psb_d_nested_schur_maxit_, val, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
+    case ('INNER_MAXIT','INNER_ITMAX','KRYLOV_MAXIT','KRYLOV_ITMAX')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        field = 0
+        if (present(idx)) field = idx
+        call psb_d_nested_set_field_krylov_i(p, field, psb_d_nested_inner_maxit_, val, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
+    case ('INNER_ITRACE','KRYLOV_ITRACE')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        field = 0
+        if (present(idx)) field = idx
+        call psb_d_nested_set_field_krylov_i(p, field, psb_d_nested_inner_itrace_, val, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
+    case ('INNER_ISTOP','KRYLOV_ISTOP')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        field = 0
+        if (present(idx)) field = idx
+        call psb_d_nested_set_field_krylov_i(p, field, psb_d_nested_inner_istop_, val, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
     case ('SUB_FILLIN')
-      call prec%prec%precset(psb_ilu_fill_in_,val,info)
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        field = 0
+        if (present(idx)) field = idx
+        call psb_d_nested_set_field_precseti(p, field, psb_ilu_fill_in_, val, info)
+      class default
+        call prec%prec%precset(psb_ilu_fill_in_,val,info)
+      end select
     case ('INV_FILLIN')
-      call prec%prec%precset(psb_inv_fillin_,val,info)
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        field = 0
+        if (present(idx)) field = idx
+        call psb_d_nested_set_field_precseti(p, field, psb_inv_fillin_, val, info)
+      class default
+        call prec%prec%precset(psb_inv_fillin_,val,info)
+      end select
     case default
       info = psb_err_invalid_args_combination_
       write(psb_err_unit,*) name,&
@@ -303,6 +361,9 @@ end subroutine psb_dcprecseti
 subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_dcprecsetr
+  use psb_d_nestedprec, only : psb_d_nested_prec_type, &
+       & psb_d_nested_schur_tol_, psb_d_nested_inner_tol_, &
+       & psb_d_nested_set_field_precsetr, psb_d_nested_set_field_krylov_r
   implicit none
 
   class(psb_dprec_type), intent(inout)   :: prec
@@ -316,16 +377,52 @@ subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
 
   ! Local variables
   character(len=*), parameter            :: name='psb_precsetr'
+  integer(psb_ipk_) :: field
 
   info = psb_success_
 
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
+  if (.not. allocated(prec%prec)) then
+    info = psb_err_invalid_preca_
+    return
+  end if
+
   select case (psb_toupper(trim(what)))
+  case('SCHUR_TOL','NEST_SCHUR_TOL')
+    select type (p => prec%prec)
+    type is (psb_d_nested_prec_type)
+      call p%precset(psb_d_nested_schur_tol_, val, info)
+    class default
+      info = psb_err_invalid_preca_
+    end select
+  case('INNER_TOL','KRYLOV_TOL')
+    select type (p => prec%prec)
+    type is (psb_d_nested_prec_type)
+      field = 0
+      if (present(idx)) field = idx
+      call psb_d_nested_set_field_krylov_r(p, field, psb_d_nested_inner_tol_, val, info)
+    class default
+      info = psb_err_invalid_preca_
+    end select
   case('SUB_ILUTHRS')
-    call prec%prec%precset(psb_fact_eps_,val,info)
+    select type (p => prec%prec)
+    type is (psb_d_nested_prec_type)
+      field = 0
+      if (present(idx)) field = idx
+      call psb_d_nested_set_field_precsetr(p, field, psb_fact_eps_, val, info)
+    class default
+      call prec%prec%precset(psb_fact_eps_,val,info)
+    end select
   case('INV_THRESH')
-    call prec%prec%precset(psb_inv_thresh_,val,info)
+    select type (p => prec%prec)
+    type is (psb_d_nested_prec_type)
+      field = 0
+      if (present(idx)) field = idx
+      call psb_d_nested_set_field_precsetr(p, field, psb_inv_thresh_, val, info)
+    class default
+      call prec%prec%precset(psb_inv_thresh_,val,info)
+    end select
   case default
     info = psb_err_invalid_args_combination_
     write(psb_err_unit,*) name,&
@@ -339,6 +436,11 @@ end subroutine psb_dcprecsetr
 subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
   use psb_base_mod
   use psb_d_prec_type, psb_protect_name => psb_dcprecsetc
+  use psb_d_nestedprec, only : psb_d_nested_prec_type, &
+       & psb_d_nested_composition_, psb_d_nested_block_solve_, &
+       & psb_d_nested_schur_solve_, psb_d_nested_set_block_solve_field, &
+       & psb_d_nested_inner_solve_, psb_d_nested_set_field_precseti, &
+       & psb_d_nested_set_field_krylov_c
   implicit none
 
   class(psb_dprec_type), intent(inout)   :: prec
@@ -352,68 +454,217 @@ subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
 
   ! Local variables
   character(len=*), parameter            :: name='psb_precsetc'
+  integer(psb_ipk_) :: field
 
   info = psb_success_
 
   ! We need to convert from the 'what' string to the corresponding integer
   ! value befor passing the call to the set of the inner method.
+  if (.not. allocated(prec%prec)) then
+    info = psb_err_invalid_preca_
+    return
+  end if
+
   select case (psb_toupper(trim(what)))
+    case ('COMPOSITION','NEST_COMPOSITION')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        call p%precset(psb_d_nested_composition_, string, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
+    case ('SCHUR_SOLVE','NEST_SCHUR_SOLVE')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        call p%precset(psb_d_nested_schur_solve_, string, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
+    case ('BLOCK_SOLVE','NEST_BLOCK_SOLVE')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        if (present(idx)) then
+          call psb_d_nested_set_block_solve_field(p, idx, string, info)
+        else
+          call p%precset(psb_d_nested_block_solve_, string, info)
+        end if
+      class default
+        info = psb_err_invalid_preca_
+      end select
+    case ('INNER_SOLVE','KRYLOV_SOLVE','FIELD_SOLVE')
+      select type (p => prec%prec)
+      type is (psb_d_nested_prec_type)
+        field = 0
+        if (present(idx)) field = idx
+        call psb_d_nested_set_field_krylov_c(p, field, psb_d_nested_inner_solve_, string, info)
+      class default
+        info = psb_err_invalid_preca_
+      end select
     case ('SUB_SOLVE')
       ! We select here the type of solver on the block
+      field = 0
+      if (present(idx)) field = idx
       select case (psb_toupper(trim(string)))
         case("ILU")
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_f_type_, psb_f_ilu_k_, info)
+            if (info == psb_success_) &
+                 & call psb_d_nested_set_field_precseti(p, field, psb_ilu_ialg_, psb_ilu_n_, info)
+          class default
             call prec%prec%precset(psb_f_type_,psb_f_ilu_k_,info)
-            call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
+            if (info == psb_success_) call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
+          end select
         case("ILUT")
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_f_type_, psb_f_ilu_t_, info)
+            if (info == psb_success_) &
+                 & call psb_d_nested_set_field_precseti(p, field, psb_ilu_ialg_, psb_ilu_t_, info)
+          class default
             call prec%prec%precset(psb_f_type_,psb_f_ilu_t_,info)
-            call prec%prec%precset(psb_ilu_ialg_,psb_ilu_t_,info)
+            if (info == psb_success_) call prec%prec%precset(psb_ilu_ialg_,psb_ilu_t_,info)
+          end select
         case("AINV")
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_f_type_, psb_f_ainv_, info)
+          class default
             call prec%prec%precset(psb_f_type_,psb_f_ainv_,info)
+          end select
         case("INVK")
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_f_type_, psb_f_invk_, info)
+          class default
             call prec%prec%precset(psb_f_type_,psb_f_invk_,info)
+          end select
         case("INVT")
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_f_type_, psb_f_invt_, info)
+          class default
             call prec%prec%precset(psb_f_type_,psb_f_invt_,info)
+          end select
         case default
           ! Default to ILU(0) factorization
-          call prec%prec%precset(psb_f_type_,psb_f_ilu_n_,info)
-          call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_f_type_, psb_f_ilu_n_, info)
+            if (info == psb_success_) &
+                 & call psb_d_nested_set_field_precseti(p, field, psb_ilu_ialg_, psb_ilu_n_, info)
+          class default
+            call prec%prec%precset(psb_f_type_,psb_f_ilu_n_,info)
+            if (info == psb_success_) call prec%prec%precset(psb_ilu_ialg_,psb_ilu_n_,info)
+          end select
       end select
     case ("ILU_ALG")
+      field = 0
+      if (present(idx)) field = idx
       select case (psb_toupper(trim(string)))
         case ("MILU")
-          call prec%prec%precset(psb_ilu_ialg_,psb_milu_n_,info)
+          select type (p => prec%prec)
+          type is (psb_d_nested_prec_type)
+            call psb_d_nested_set_field_precseti(p, field, psb_ilu_ialg_, psb_milu_n_, info)
+          class default
+            call prec%prec%precset(psb_ilu_ialg_,psb_milu_n_,info)
+          end select
         case default
           ! Do nothing
       end select
     case ("ILUT_SCALE")
+      field = 0
+      if (present(idx)) field = idx
       select case (psb_toupper(trim(string)))
       case ("MAXVAL")
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_maxval_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_maxval_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_maxval_,info)
+        end select
       case ("DIAG")
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_diag_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_diag_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_diag_,info)
+        end select
       case ("ARWSUM")
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_arwsum_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_arwsum_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_arwsum_,info)
+        end select
       case ("ARCSUM")
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_arcsum_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_arcsum_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_arcsum_,info)
+        end select
       case ("ACLSUM")
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_aclsum_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_aclsum_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_aclsum_,info)
+        end select
       case ("NONE")
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_none_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
+        end select
       case default
-        call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ilu_scale_, psb_ilu_scale_none_, info)
+        class default
+          call prec%prec%precset(psb_ilu_scale_,psb_ilu_scale_none_,info)
+        end select
       end select
     case ("AINV_ALG")
+      field = 0
+      if (present(idx)) field = idx
       select case (psb_toupper(trim(string)))
       case("LLK")
-        call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ainv_alg_, psb_ainv_llk_, info)
+        class default
+          call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
+        end select
       case("SYM-LLK")
-        call prec%prec%precset(psb_ainv_alg_,psb_ainv_s_llk_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ainv_alg_, psb_ainv_s_llk_, info)
+        class default
+          call prec%prec%precset(psb_ainv_alg_,psb_ainv_s_llk_,info)
+        end select
       case("STAB-LLK")
-        call prec%prec%precset(psb_ainv_alg_,psb_ainv_s_ft_llk_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ainv_alg_, psb_ainv_s_ft_llk_, info)
+        class default
+          call prec%prec%precset(psb_ainv_alg_,psb_ainv_s_ft_llk_,info)
+        end select
       case("MLK","LMX")
-        call prec%prec%precset(psb_ainv_alg_,psb_ainv_mlk_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ainv_alg_, psb_ainv_mlk_, info)
+        class default
+          call prec%prec%precset(psb_ainv_alg_,psb_ainv_mlk_,info)
+        end select
       case default
-        call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
+        select type (p => prec%prec)
+        type is (psb_d_nested_prec_type)
+          call psb_d_nested_set_field_precseti(p, field, psb_ainv_alg_, psb_ainv_llk_, info)
+        class default
+          call prec%prec%precset(psb_ainv_alg_,psb_ainv_llk_,info)
+        end select
       end select
     case default
 

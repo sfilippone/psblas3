@@ -77,6 +77,7 @@ set(PSB_prec_source_files
   psb_z_diagprec.f90
   psb_z_bjacprec.f90
   psb_d_diagprec.f90
+  psb_d_nestedprec.f90
   psb_c_prec_mod.f90
   psb_d_nullprec.f90
   psb_s_diagprec.f90

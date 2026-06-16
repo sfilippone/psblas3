@@ -16,7 +16,8 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 
 EXEDIR=./runs
 
-all: runsd psb_d_nest_glob_test psb_d_nest_rect_test psb_d_nest_cg_test
+all: runsd psb_d_nest_glob_test psb_d_nest_rect_test psb_d_nest_cg_test psb_d_nest_prec_cg_test \
+	psb_d_nest_mult_prec_cg_test psb_d_nest_schur_prec_cg_test
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
@@ -33,9 +34,24 @@ psb_d_nest_cg_test: psb_d_nest_cg_test.o
 	$(FLINK) psb_d_nest_cg_test.o -o psb_d_nest_cg_test $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_nest_cg_test $(EXEDIR)
 
+psb_d_nest_prec_cg_test: psb_d_nest_prec_cg_test.o
+	$(FLINK) psb_d_nest_prec_cg_test.o -o psb_d_nest_prec_cg_test $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_nest_prec_cg_test $(EXEDIR)
+
+psb_d_nest_mult_prec_cg_test: psb_d_nest_mult_prec_cg_test.o
+	$(FLINK) psb_d_nest_mult_prec_cg_test.o -o psb_d_nest_mult_prec_cg_test $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_nest_mult_prec_cg_test $(EXEDIR)
+
+psb_d_nest_schur_prec_cg_test: psb_d_nest_schur_prec_cg_test.o
+	$(FLINK) psb_d_nest_schur_prec_cg_test.o -o psb_d_nest_schur_prec_cg_test $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_nest_schur_prec_cg_test $(EXEDIR)
+
 clean:
-	/bin/rm -f psb_d_nest_glob_test.o psb_d_nest_rect_test.o psb_d_nest_cg_test.o *$(.mod) \
-	$(EXEDIR)/psb_d_nest_glob_test $(EXEDIR)/psb_d_nest_rect_test $(EXEDIR)/psb_d_nest_cg_test
+	/bin/rm -f psb_d_nest_glob_test.o psb_d_nest_rect_test.o psb_d_nest_cg_test.o \
+	psb_d_nest_prec_cg_test.o psb_d_nest_mult_prec_cg_test.o psb_d_nest_schur_prec_cg_test.o *$(.mod) \
+	$(EXEDIR)/psb_d_nest_glob_test $(EXEDIR)/psb_d_nest_rect_test $(EXEDIR)/psb_d_nest_cg_test \
+	$(EXEDIR)/psb_d_nest_prec_cg_test $(EXEDIR)/psb_d_nest_mult_prec_cg_test \
+	$(EXEDIR)/psb_d_nest_schur_prec_cg_test
 verycleanlib:
 	(cd ../..; make veryclean)
 lib:
