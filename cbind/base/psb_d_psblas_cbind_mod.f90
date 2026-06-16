@@ -1042,7 +1042,6 @@ contains
 
   end function psb_c_dspsm
 
-
   function psb_c_dspscal(alpha,ah,cdh) bind(c) result(res)
     implicit none
     integer(psb_c_ipk_)              ::  res

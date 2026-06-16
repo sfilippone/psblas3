@@ -273,13 +273,13 @@ contains
     res = xp%get_entry((index+(1-ixb)))
   end function psb_c_zvect_get_entry
 
-    function psb_c_znnz(ah,cdh) bind(c) result(res)
+  function psb_c_znnz(ah,cdh) bind(c) result(res)
     implicit none
     integer(psb_c_ipk_) :: res
-
+    
     type(psb_c_zspmat)   :: ah
     type(psb_c_descriptor) :: cdh
-
+    
     type(psb_desc_type), pointer      :: descp
     type(psb_zspmat_type), pointer  :: ap
     integer(psb_c_ipk_)               :: info
