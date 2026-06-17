@@ -32,290 +32,94 @@
 ! File: psb_dspsm.f90
 !
 !
-! Subroutine: psb_dsps_vect
-!  Performs one of the distributed matrix-vector operations
-!
-!     Y := alpha * Pr * A-1 * Pc * X + beta * Y,   or
-!
-!     Y := alpha * D * Pr * A-1 * Pc * X + beta * Y, or
-!
-!     Y := alpha * Pr * A-1 * Pc * D * X + beta * Y,  or
-!
-!     Y := alpha * Pr * A-T * Pc * X + beta * Y,   or
-!
-!     Y := alpha * D * Pr * A-T * Pc * X + beta * Y, or
-!
-!     Y := alpha * Pr * A-T * Pc * D * X + beta * Y,  or
-!
-!  X is a distributed
-!  vector and T is a M-by-M distributed triangular matrix.
-!
-!
-! Arguments:   
-!    alpha   -  real.               The scalar alpha.
-!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
-!    x       -  type(psb_d_vect_type) The input vector containing the entries of ( X ).
-!    beta    -  real                The scalar beta.
-!    y       -  type(psb_d_vect_type) The input vector containing the entries of ( Y ).
-!    desc_a  -  type(psb_desc_type).   The communication descriptor.
-!    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    scale   -  character(optional).   Specify some type of operation with
-!                                      the diagonal matrix D.
-!    choice  -  integer(optional).     The kind of update to perform on overlap elements.
-!    d(:)    -  real, optional      Matrix for diagonal scaling.
-!    work(:) -  real, optional      Working area.
-! 
-subroutine  psb_dspsv_vect(alpha,a,x,beta,y,desc_a,info,&
-     & trans, scale, choice, diag, work)   
-  use psb_base_mod, psb_protect_name => psb_dspsv_vect
-  use psi_mod
-  implicit none 
 
-  real(psb_dpk_), intent(in)           :: alpha, beta
-  type(psb_d_vect_type), intent(inout)    :: x
-  type(psb_d_vect_type), intent(inout)    :: y
-  type(psb_dspmat_type), intent(inout)    :: a
-  type(psb_desc_type), intent(in)         :: desc_a
-  integer(psb_ipk_), intent(out)                    :: info
-  type(psb_d_vect_type), intent(inout), optional  :: diag
-  real(psb_dpk_), optional, target, intent(inout) :: work(:)
-  character, intent(in), optional         :: trans, scale
-  integer(psb_ipk_), intent(in), optional           :: choice
-
-  ! locals
-  type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, &
-       & err_act, iix, jjx, ia, ja, iia, jja, lldx,lldy, choice_,&
-       & ix, iy, ik, jx, jy, i, lld,&
-       & m, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
-
-  character                :: lscale
-  integer(psb_ipk_), parameter       :: nb=4
-  real(psb_dpk_),pointer :: iwork(:), xp(:), yp(:)
-  character                :: itrans
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
-
-  name='psb_dspsv_vect'
-  info=psb_success_
-  call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
-  end if
-
-  ctxt=desc_a%get_context()
-
-  call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-  if (.not.allocated(x%v)) then 
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.allocated(y%v)) then 
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-
-
-  if (present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
-
-  if (present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
-
-  if (present(trans)) then     
-    itrans = psb_toupper(trans)
-    if((itrans == 'N').or.(itrans == 'T').or.(itrans == 'C')) then
-      ! Ok
-    else
-      info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name)
-      goto 9999
-    end if
-  else
-    itrans = 'N'
-  endif
-
-  m    = desc_a%get_global_rows()
-  nrow = desc_a%get_local_rows()
-  ncol = desc_a%get_local_cols()
-  lldx = x%get_nrows()
-  lldy = y%get_nrows()
-  if ((info == 0).and.(lldx<ncol)) call x%reall(ncol,info)
-  if ((info == 0).and.(lldy<ncol)) call y%reall(ncol,info)
-
-  if (psb_errstatus_fatal()) then 
-    info=psb_err_from_subroutine_
-    ch_err='reall'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  iwork => null()
-  ! check for presence/size of a work area
-  liwork= 2*ncol
-
-  if (present(work)) then     
-    if (size(work) >= liwork) then 
-      aliw =.false.
-    else 
-      aliw=.true.
-    endif
-  else
-    aliw=.true.
-  end if
-
-  if (aliw) then 
-    allocate(iwork(liwork),stat=info)
-    if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
-      goto 9999
-    end if
-  else
-    iwork => work
-  endif
-
-  iwork(1)=0.d0
-
-  ! Perform local triangular system solve
-  if (present(diag)) then 
-    call a%spsm(alpha,x,beta,y,info,scale=scale,d=diag,trans=trans)    
-  else
-    call a%spsm(alpha,x,beta,y,info,scale=scale,trans=trans)    
-  end if
-  if(info /= psb_success_) then
-    info = psb_err_from_subroutine_
-    ch_err='dcssm'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-
-  ! update overlap elements
-  if (choice_ > 0) then
-    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-         & done,y%v,desc_a,iwork,info,data=psb_comm_ovr_)
-
-
-    if (info == psb_success_) call psi_ovrl_upd(y%v,desc_a,choice_,info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
-      goto 9999
-    end if
-  end if
-
-  if (aliw) deallocate(iwork)
-
-  call psb_erractionrestore(err_act)
-  return  
-
-9999 call psb_error_handler(ctxt,err_act)
-
-  return
-end subroutine psb_dspsv_vect
 !
 ! Subroutine: psb_dspsm
 !  Performs one of the distributed matrix-vector operations
 !
-!     sub( Y ) := alpha * Pr * A-1 * Pc *sub( X ) + beta * sub (Y ),   or
+!     sub( Y ) := alpha * Pr * A-1 * Pc *sub(X) + beta * sub(Y), or
 !
-!     sub( Y ) := alpha * D * Pr * A-1 * Pc * sub( X ) + beta * sub (Y ), or
+!     sub( Y ) := alpha * D * Pr * A-1 * Pc * sub(X) + beta * sub(Y), or
 !
-!     sub( Y ) := alpha * Pr * A-1 * Pc * D * sub( X ) + beta * sub (Y ),  or
+!     sub( Y ) := alpha * Pr * A-1 * Pc * D * sub(X) + beta * sub(Y), or
 !
-!     sub( Y ) := alpha * Pr * A-T * Pc * sub( X ) + beta * sub (Y ),   or
+!     sub( Y ) := alpha * Pr * A-T * Pc * sub(X) + beta * sub(Y), or
 !
-!     sub( Y ) := alpha * D * Pr * A-T * Pc * sub( X ) + beta * sub (Y ), or
+!     sub( Y ) := alpha * D * Pr * A-T * Pc * sub(X) + beta * sub(Y), or
 !
-!     sub( Y ) := alpha * Pr * A-T * Pc * D * sub( X ) + beta * sub (Y ),  or
+!     sub( Y ) := alpha * Pr * A-T * Pc * D * sub(X) + beta * sub(Y), or
 !
 !  where :
 !
-!        sub( X ) denotes X(1:M,JX:JX+K-1),
+!        sub(X) denotes X(1:M, JX:JX+K-1), 
 !      
-!        sub( Y ) denotes Y(1:M,JY:JY+K-1).
+!        sub( Y ) denotes Y(1:M, JY:JY+K-1).
 !
-!  sub( X ) is a distributed
+!  sub(X) is a distributed
 !  vector and T is a M-by-M distributed triangular matrix.
 !
 ! Arguments:   
-!    alpha   -  real.               The scalar alpha.
-!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
-!    x(:,:)  -  real                The input vector containing the entries of ( X ).
-!    beta    -  real                The scalar beta.
-!    y(:,:)  -  real                The input vector containing the entries of ( Y ).
-!    desc_a  -  type(psb_desc_type).   The communication descriptor.
-!    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    scale   -  character(optional).   Specify some type of operation with
-!                                      the diagonal matrix D.
-!    choice  -  integer(optional).     The kind of update to perform on overlap elements.
-!    d(:)    -  real, optional      Matrix for diagonal scaling.
-!    k       -  integer(optional).     The number of right-hand sides.
-!    jx      -  integer(optional).     The column offset for ( X ). Default: 1
-!    jy      -  integer(optional).     The column offset for ( Y ). Default: 1 
-!    work(:) -  real, optional      Working area.
+!    alpha   -  real                  The scalar alpha
+!    a       -  type(psb_dspmat_type) The sparse matrix containing A
+!    x(:, :)  -  real                 The input vector containing the entries of ( X )
+!    beta    -  real                  The scalar beta
+!    y(:, :)  -  real                 The input vector containing the entries of ( Y )
+!    desc_a  -  type(psb_desc_type)   The communication descriptor
+!    info    -  integer               Return code
+!    trans   -  character, optional   Whether A or A' If not present 'N' is assumed
+!    scale   -  character, optional   Specify some type of operation with
+!                                       the diagonal matrix D
+!    choice  -  integer, optional     The kind of update to perform on overlap elements
+!    d(:)    -  real, optional        Matrix for diagonal scaling
+!    k       -  integer, optional     The number of right-hand sides
+!    jx      -  integer, optional     The column offset for ( X ). Default: 1
+!    jy      -  integer, optional     The column offset for ( Y ). Default: 1 
+!    work(:) -  real, optional        Working area
 ! 
-subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
-     & trans, scale, choice, diag, k, jx, jy, work)   
+subroutine psb_dspsm(alpha, a, x, beta, y, desc_a, info, &
+                    & trans, scale, choice, diag, k, jx, jy, work)   
   use psb_base_mod, psb_protect_name => psb_dspsm
   use psi_mod
   implicit none
-
   real(psb_dpk_), intent(in)              :: alpha, beta
-  real(psb_dpk_), intent(in), target      :: x(:,:)
-  real(psb_dpk_), intent(inout), target   :: y(:,:)
-  type (psb_dspmat_type), intent(in)        :: a
-  type(psb_desc_type), intent(in)           :: desc_a
-  integer(psb_ipk_), intent(out)                      :: info
-  real(psb_dpk_), intent(in), optional, target      :: diag(:)
-  real(psb_dpk_), optional, target, intent(inout)   :: work(:)
-  character, intent(in), optional           :: trans, scale
-  integer(psb_ipk_), intent(in), optional             :: choice
-  integer(psb_ipk_), intent(in), optional             :: k, jx, jy
+  type (psb_dspmat_type), intent(in)      :: a
+  real(psb_dpk_), intent(in), target      :: x(:, :)
+  real(psb_dpk_), intent(inout), target   :: y(:, :)
+  type(psb_desc_type), intent(in)         :: desc_a
+  integer(psb_ipk_), intent(out)          :: info
+  character, intent(in), optional                 :: trans, scale
+  integer(psb_ipk_), intent(in), optional         :: choice
+  real(psb_dpk_), intent(in), optional, target    :: diag(:)
+  integer(psb_ipk_), intent(in), optional         :: k, jx, jy
+  real(psb_dpk_), optional, target, intent(inout) :: work(:)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_mpk_) :: np, me, ik
-  integer(psb_ipk_) :: err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
-       & i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy, &
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m, n, ia, ja, lik
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
+  integer(psb_ipk_), parameter  :: nb = 4
 
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik
-  character                :: lscale
-  integer(psb_ipk_), parameter  :: nb=4
-  real(psb_dpk_),pointer :: iwork(:), xp(:,:), yp(:,:), id(:)
-  character                :: itrans
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
-
-  name='psb_dspsm'
-  info=psb_success_
+  name = 'psb_dspsm'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ 
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -324,45 +128,43 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   ja = 1
 
   ix = 1
-  if (present(jx)) then
+  if(present(jx)) then
     ijx = jx
   else
     ijx = 1
   endif
 
   iy = 1
-  if (present(jy)) then
+  if(present(jy)) then
     ijy = jy
   else
     ijy = 1
   endif
 
-  if (present(k)) then
-    lik = min(k,size(x,2)-ijx+1)
-    lik = min(lik,size(y,2)-ijy+1)
+  if(present(k)) then
+    lik = min(k, size(x, 2) - ijx + 1)
+    lik = min(lik, size(y, 2) - ijy + 1)
   else
-    lik = min(size(x,2)-ijx+1,size(y,2)-ijy+1)
+    lik = min(size(x, 2)-ijx+1, size(y, 2) - ijy + 1)
   endif
 
-  if (present(choice)) then     
+  if(present(choice)) then     
     choice_ = choice
   else
     choice_ = psb_avg_
   endif
 
-  if (present(scale)) then     
+  if(present(scale)) then     
     lscale = psb_toupper(scale)
   else
     lscale = 'U'
   endif
 
-  if (present(trans)) then     
+  if(present(trans)) then     
     itrans = psb_toupper(trans)
-    if((itrans == 'N').or.(itrans == 'T').or.  (itrans == 'C')) then
-      ! OK 
-    else
+    if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
       info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name)
+      call psb_errpush(info, name)
       goto 9999
     end if
   else
@@ -372,62 +174,60 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
   m    = desc_a%get_global_rows()
   nrow = desc_a%get_local_rows()
   ncol = desc_a%get_local_cols()
-  lldx = size(x,1)
-  lldy = size(y,1)
+  lldx = size(x, 1)
+  lldy = size(y, 1)
 
-  if((lldx < ncol).or.(lldy < ncol)) then
-    info=psb_err_lld_case_not_implemented_
-    call psb_errpush(info,name)
+  if((lldx < ncol) .or. (lldy < ncol)) then
+    info = psb_err_lld_case_not_implemented_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   ! check for presence/size of a work area
   iwork => null()
-  liwork= 2*ncol
-  if (present(work)) then
-    if (size(work) >= liwork) then
-      aliw =.false.
+  liwork = 2*ncol
+  if(present(work)) then
+    if(size(work) >= liwork) then
+      aliw = .false.
     else
-      aliw=.true.
+      aliw = .true.
     endif
   else
-    aliw=.true.
+    aliw = .true.
   end if
 
-  if (aliw) then
-    allocate(iwork(liwork),stat=info)
+  if(aliw) then
+    allocate(iwork(liwork), stat = info)
     if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
       goto 9999
     end if
   else
     iwork => work
   endif
 
-  iwork(1)=0.d0
+  iwork(1) = 0.d0
 
   if(present(diag)) then
     lld = size(diag)
     id => diag
   else
-    lld=1
+    lld = 1
     allocate(id(1))
-    id=1.d0
+    id = 1.d0
   end if
 
   ! checking for matrix correctness
-  call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
+  call psb_chkmat(m, m, ia, ja, desc_a, info, iia, jja)
   ! checking for vectors correctness
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldx,ix,ijx,desc_a,info,iix,jjx,check_halo=.true.)
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldy,iy,ijy,desc_a,info,iiy,jjy,check_halo=.true.)
+  if(info == psb_success_) call psb_chkvect(m, lik, lldx, ix, ijx, desc_a, info, iix, jjx, check_halo = .true.)
+  if(info == psb_success_) call psb_chkvect(m, lik, lldy, iy, ijy, desc_a, info, iiy, jjy, check_halo = .true.)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect/mat'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect/mat'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
@@ -436,93 +236,90 @@ subroutine  psb_dspsm(alpha,a,x,beta,y,desc_a,info,&
     info = psb_err_ja_nix_ia_niy_unsupported_
   end if
 
-  if((iix /= 1).or.(iiy /= 1)) then
+  if((iix /= 1) .or. (iiy /= 1)) then
     ! this case is not yet implemented
     info = psb_err_ix_n1_iy_n1_unsupported_
   end if
 
   if(info /= psb_success_) then
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   ik = lik ! This should not be a problem.
   ! We expect ik to be small, well within PSB_IPK
   ! Perform local triangular system solve
-  xp => x(iix:lldx,jjx:jjx+ik-1)
-  yp => y(iiy:lldy,jjy:jjy+ik-1)
-  call psb_cssm(alpha,a,xp,beta,yp,info,scale=scale,d=diag,trans=trans)
+  xp => x(iix : lldx, jjx : jjx + ik - 1)
+  yp => y(iiy : lldy, jjy : jjy + ik - 1)
+  call psb_cssm(alpha, a, xp, beta, yp, info, scale = scale, d = diag, trans = trans)
 
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    ch_err='cssm'
-    call psb_errpush(info,name,a_err=ch_err)
+    ch_err = 'cssm'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
   ! update overlap elements
-  if (choice_ > 0) then
-    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),ik,&
-         & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
-
-    if (info == psb_success_) call psi_ovrl_upd(yp,desc_a,choice_,info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
+  if(choice_ > 0) then
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), ik, done, yp, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(yp, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
       goto 9999
     end if
   end if
 
   if(aliw) deallocate(iwork)
-  if(.not.present(diag)) deallocate(id)
+  if(.not. present(diag)) deallocate(id)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsm
 !
 ! Subroutine: psb_dspsv
 !  Performs one of the distributed matrix-vector operations
 !
-!     Y := alpha * Pr * A-1 * Pc * X + beta * Y,   or
+!     Y := alpha * Pr * A-1 * Pc * X + beta * Y, or
 !
 !     Y := alpha * D * Pr * A-1 * Pc * X + beta * Y, or
 !
-!     Y := alpha * Pr * A-1 * Pc * D * X + beta * Y,  or
+!     Y := alpha * Pr * A-1 * Pc * D * X + beta * Y, or
 !
-!     Y := alpha * Pr * A-T * Pc * X + beta * Y,   or
+!     Y := alpha * Pr * A-T * Pc * X + beta * Y, or
 !
 !     Y := alpha * D * Pr * A-T * Pc * X + beta * Y, or
 !
-!     Y := alpha * Pr * A-T * Pc * D * X + beta * Y,  or
+!     Y := alpha * Pr * A-T * Pc * D * X + beta * Y, or
 !
 !  X is a distributed
 !  vector and T is a M-by-M distributed triangular matrix.
 !
 !
 ! Arguments:   
-!    alpha   -  real.               The scalar alpha.
-!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
-!    x(:)    -  real                The input vector containing the entries of ( X ).
-!    beta    -  real                The scalar beta.
-!    y(:)    -  real                The input vector containing the entries of ( Y ).
-!    desc_a  -  type(psb_desc_type).   The communication descriptor.
-!    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. If not present 'N' is assumed.
-!    scale   -  character(optional).   Specify some type of operation with
-!                                      the diagonal matrix D.
-!    choice  -  integer(optional).     The kind of update to perform on overlap elements.
-!    d(:)    -  real, optional      Matrix for diagonal scaling.
-!    work(:) -  real, optional      Working area.
+!    alpha   -  real                  The scalar alpha
+!    a       -  type(psb_dspmat_type) The sparse matrix containing A
+!    x(:)    -  real                  The input vector containing the entries of ( X )
+!    beta    -  real                  The scalar beta
+!    y(:)    -  real                  The input vector containing the entries of ( Y )
+!    desc_a  -  type(psb_desc_type)   The communication descriptor
+!    info    -  integer               Return code
+!    trans   -  character, optional   Whether A or A'. If not present 'N' is assumed
+!    scale   -  character, optional   Specify some type of operation with
+!                                       the diagonal matrix D
+!    choice  -  integer, optional     The kind of update to perform on overlap elements
+!    d(:)    -  real, optional        Matrix for diagonal scaling
+!    work(:) -  real, optional        Working area
 ! 
-subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
-     & trans, scale, choice, diag, work)   
+subroutine psb_dspsv(alpha, a, x, beta, y, desc_a, info, &
+                    & trans, scale, choice, diag, work)   
   use psb_base_mod, psb_protect_name => psb_dspsv
   use psi_mod
   implicit none 
-
   real(psb_dpk_), intent(in)              :: alpha, beta
   real(psb_dpk_), intent(in), target      :: x(:)
   real(psb_dpk_), intent(inout), target   :: y(:)
@@ -536,31 +333,31 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, &
-       & err_act, iix, jjx, iia, jja, lldx,lldy, choice_,&
-       & ik, i, lld, nrow, ncol, liwork, llwork, iiy, jjy, idx, ndm
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy,&
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m, n, ia, ja, lik, jx, jy
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:), id(:)
+  integer(psb_ipk_), parameter  :: nb = 4
 
-  character                :: lscale
-  integer(psb_ipk_), parameter       :: nb=4
-  real(psb_dpk_),pointer :: iwork(:), xp(:), yp(:), id(:)
-  character                :: itrans
-  character(len=20)        :: name, ch_err
-  logical                  :: aliw
-
-  name='psb_dspsv'
-  info=psb_success_
+  name = 'psb_dspsv'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
@@ -574,25 +371,23 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   jx = 1
   jy = 1
 
-  if (present(choice)) then     
+  if(present(choice)) then     
     choice_ = choice
   else
     choice_ = psb_avg_
   endif
 
-  if (present(scale)) then     
+  if(present(scale)) then     
     lscale = psb_toupper(scale)
   else
     lscale = 'U'
   endif
 
-  if (present(trans)) then     
+  if(present(trans)) then     
     itrans = psb_toupper(trans)
-    if((itrans == 'N').or.(itrans == 'T').or.(itrans == 'C')) then
-      ! Ok
-    else
+    if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
       info = psb_err_iarg_invalid_value_
-      call psb_errpush(info,name)
+      call psb_errpush(info, name)
       goto 9999
     end if
   else
@@ -605,60 +400,58 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
   lldx = size(x)
   lldy = size(y)
 
-  if((lldx < ncol).or.(lldy < ncol)) then
-    info=psb_err_lld_case_not_implemented_
-    call psb_errpush(info,name)
+  if((lldx < ncol) .or. (lldy < ncol)) then
+    info = psb_err_lld_case_not_implemented_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   iwork => null()
   ! check for presence/size of a work area
-  liwork= 2*ncol
+  liwork = 2*ncol
 
-  if (present(work)) then     
-    if (size(work) >= liwork) then 
-      aliw =.false.
+  if(present(work)) then     
+    if(size(work) >= liwork) then 
+      aliw = .false.
     else 
-      aliw=.true.
+      aliw = .true.
     endif
   else
-    aliw=.true.
+    aliw = .true.
   end if
 
-  if (aliw) then 
-    allocate(iwork(liwork),stat=info)
+  if(aliw) then 
+    allocate(iwork(liwork), stat = info)
     if(info /= psb_success_) then
-      info=psb_err_from_subroutine_
-      ch_err='psb_realloc'
-      call psb_errpush(info,name,a_err=ch_err)
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
       goto 9999
     end if
   else
     iwork => work
   endif
 
-  iwork(1)=0.d0
+  iwork(1) = 0.d0
 
   if(present(diag)) then
     lld = size(diag)
     id => diag
   else
-    lld=1
+    lld = 1
     allocate(id(1))
-    id=1.d0
+    id = 1.d0
   end if
 
   ! checking for matrix correctness
-  call psb_chkmat(m,m,ia,ja,desc_a,info,iia,jja)
+  call psb_chkmat(m, m, ia, ja, desc_a, info, iia, jja)
   ! checking for vectors correctness
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldx,ix,jx,desc_a,info,iix,jjx,check_halo=.true.)
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lik,lldy,iy,jy,desc_a,info,iiy,jjy,check_halo=.true.)
+  if(info == psb_success_) call psb_chkvect(m, lik, lldx, ix, jx, desc_a, info, iix, jjx, check_halo = .true.)
+  if(info == psb_success_) call psb_chkvect(m, lik, lldy, iy, jy, desc_a, info, iiy, jjy, check_halo = .true.)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect/mat'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect/mat'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
@@ -667,49 +460,362 @@ subroutine  psb_dspsv(alpha,a,x,beta,y,desc_a,info,&
     info = psb_err_ja_nix_ia_niy_unsupported_
   end if
 
-  if((iix /= 1).or.(iiy /= 1)) then
+  if((iix /= 1) .or. (iiy /= 1)) then
     ! this case is not yet implemented
     info = psb_err_ix_n1_iy_n1_unsupported_
   end if
 
   if(info /= psb_success_) then
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   ! Perform local triangular system solve
   xp => x(iix:lldx)
   yp => y(iiy:lldy)
-  call psb_cssm(alpha,a,xp,beta,yp,info,scale=scale,d=diag,trans=trans)
+  call psb_cssm(alpha, a, xp, beta, yp, info, scale = scale, d = diag, trans = trans)
 
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    ch_err='dcssm'
-    call psb_errpush(info,name,a_err=ch_err)
+    ch_err = 'dcssm'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
   ! update overlap elements
   if(choice_ > 0) then
-    call psi_swapdata(ior(psb_swap_send_,psb_swap_recv_),&
-         & done,yp,desc_a,iwork,info,data=psb_comm_ovr_)
-
-
-    if (info == psb_success_) call psi_ovrl_upd(yp,desc_a,choice_,info)
-    if (info /= psb_success_) then
-      call psb_errpush(psb_err_from_subroutine_,name,a_err='Inner updates')
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, yp, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(yp, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
       goto 9999
     end if
   end if
 
-  if (aliw) deallocate(iwork)
-  if(.not.present(diag)) deallocate(id)
+  if(aliw) deallocate(iwork)
+  if(.not. present(diag)) deallocate(id)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsv
 
+
+! Subroutine: psb_dsps_vect
+!  Performs one of the distributed matrix-vector operations
+!
+!     Y := alpha * Pr * A-1 * Pc * X + beta * Y, or
+!
+!     Y := alpha * D * Pr * A-1 * Pc * X + beta * Y, or
+!
+!     Y := alpha * Pr * A-1 * Pc * D * X + beta * Y, or
+!
+!     Y := alpha * Pr * A-T * Pc * X + beta * Y, or
+!
+!     Y := alpha * D * Pr * A-T * Pc * X + beta * Y, or
+!
+!     Y := alpha * Pr * A-T * Pc * D * X + beta * Y, or
+!
+!  X is a distributed
+!  vector and T is a M-by-M distributed triangular matrix.
+!
+!
+! Arguments:   
+!    alpha   -  real.                 The scalar alpha.
+!    a       -  type(psb_dspmat_type) The sparse matrix containing A.
+!    x       -  type(psb_d_vect_type) The input vector containing the entries of ( X ).
+!    beta    -  real                  The scalar beta.
+!    y       -  type(psb_d_vect_type) The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type)   The communication descriptor.
+!    info    -  integer               Return code
+!    trans   -  character, optional   Whether A or A'. If not present 'N' is assumed.
+!    scale   -  character, optional   Specify some type of operation with
+!                                       the diagonal matrix D.
+!    choice  -  integer, optional.    The kind of update to perform on overlap elements.
+!    d(:)    -  real, optional        Matrix for diagonal scaling.
+!    work(:) -  real, optional        Working area.
+! 
+subroutine psb_dspsv_vect(alpha, a, x, beta, y, desc_a, info, &
+                        & trans, scale, choice, diag, work)   
+  use psb_base_mod, psb_protect_name => psb_dspsv_vect
+  use psi_mod
+  implicit none 
+  real(psb_dpk_), intent(in)            :: alpha, beta
+  type(psb_dspmat_type), intent(inout)  :: a
+  type(psb_d_vect_type), intent(inout)  :: x, y
+  type(psb_desc_type), intent(in)       :: desc_a
+  integer(psb_ipk_), intent(out)        :: info
+  character, intent(in), optional         :: trans, scale
+  integer(psb_ipk_), intent(in), optional :: choice
+  type(psb_d_vect_type), intent(inout), optional  :: diag
+  real(psb_dpk_), optional, target, intent(inout) :: work(:)
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy, &
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm, &
+                        & m, ia, ja, ix, iy, jx, jy
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:), yp(:)
+  integer(psb_ipk_), parameter  :: nb = 4
+
+  name = 'psb_dspsv_vect'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if  (psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(present(choice)) then     
+    choice_ = choice
+  else
+    choice_ = psb_avg_
+  endif
+
+  if(present(scale)) then     
+    lscale = psb_toupper(scale)
+  else
+    lscale = 'U'
+  endif
+
+  if(present(trans)) then     
+    itrans = psb_toupper(trans)
+    if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+      info = psb_err_iarg_invalid_value_
+      call psb_errpush(info, name)
+      goto 9999
+    end if
+  else
+    itrans = 'N'
+  endif
+
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if((info == psb_success_) .and. (lldx < ncol)) call x%reall(ncol, info)
+  if((info == psb_success_) .and. (lldy < ncol)) call y%reall(ncol, info)
+
+  if(psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  ! check for presence/size of a work area
+  liwork = 2*ncol
+
+  if(present(work)) then     
+    if(size(work) >= liwork) then 
+      aliw = .false.
+    else 
+      aliw = .true.
+    endif
+  else
+    aliw = .true.
+  end if
+
+  if(aliw) then 
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  iwork(1) = 0.d0
+
+  ! Perform local triangular system solve
+  call a%spsm(alpha, x, beta, y, info, trans = trans, scale = scale, d = diag)    
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'dcssm'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  ! update overlap elements
+  if(choice_ > 0) then
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(y%v, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
+      goto 9999
+    end if
+  end if
+
+  if(aliw) deallocate(iwork)
+
+  call psb_erractionrestore(err_act)
+  return  
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end subroutine psb_dspsv_vect
+
+!
+! Multivector routines
+!
+subroutine psb_dspsv_mv(alpha, t, x, idx_x, beta, y, desc_a, info, &
+                        & trans, scale, choice, diag, work)
+  use psb_base_mod, psb_protect_name => psb_dspsv_mv
+  use psi_mod
+  implicit none
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_dspmat_type), intent(inout)      :: t
+  type(psb_d_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)             :: idx_x
+  type(psb_d_vect_type), intent(inout)      :: y
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)                 :: trans, scale
+  integer(psb_ipk_), optional, intent(in)         :: choice
+  type(psb_d_vect_type), intent(inout), optional  :: diag
+  real(psb_dpk_), optional, intent(inout), target :: work(:)
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy, &
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m, n, ia, ja, lik
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
+  integer(psb_ipk_), parameter  :: nb = 4
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end subroutine psb_dspsv_mv
+
+subroutine psb_dspsv_vm(alpha, t, x, beta, y, idx_y, desc_a, info, &
+                        & trans, scale, choice, diag, work)
+  use psb_base_mod, psb_protect_name => psb_dspsv_vm
+  use psi_mod
+  implicit none
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_dspmat_type), intent(inout)      :: t
+  type(psb_d_vect_type), intent(inout)      :: x
+  type(psb_d_multivect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(in)             :: idx_y
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)                 :: trans, scale
+  integer(psb_ipk_), optional, intent(in)         :: choice
+  type(psb_d_vect_type), intent(inout), optional  :: diag
+  real(psb_dpk_), optional, intent(inout), target :: work(:)
+  
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy, &
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m, n, ia, ja, lik
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
+  integer(psb_ipk_), parameter  :: nb = 4
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end subroutine psb_dspsv_vm
+
+subroutine psb_dspsv_mm_full(alpha, t, x, beta, y, desc_a, info, &
+                        & trans, scale, choice, diag, work)
+  use psb_base_mod, psb_protect_name => psb_dspsv_mm_full
+  use psi_mod
+  implicit none
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_dspmat_type), intent(inout)      :: t
+  type(psb_d_multivect_type), intent(inout) :: x, y
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)                 :: trans, scale
+  integer(psb_ipk_), optional, intent(in)         :: choice
+  type(psb_d_vect_type), intent(inout), optional  :: diag
+  real(psb_dpk_), optional, intent(inout), target :: work(:)
+  
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy, &
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m, n, ia, ja, lik
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
+  integer(psb_ipk_), parameter  :: nb = 4
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end subroutine psb_dspsv_mm_full
+
+subroutine psb_dspsv_mm_idxs(alpha, t, x, idx_x, beta, y, idx_y, desc_a, info, &
+                        & trans, scale, choice, diag, work)
+  use psb_base_mod, psb_protect_name => psb_dspsv_mm_idxs
+  use psi_mod
+  implicit none
+  real(psb_dpk_), intent(in)                :: alpha, beta
+  type(psb_dspmat_type), intent(inout)      :: t
+  type(psb_d_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(in)             :: idx_x, idx_y
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  character, optional, intent(in)                 :: trans, scale
+  integer(psb_ipk_), optional, intent(in)         :: choice
+  type(psb_d_vect_type), intent(inout), optional  :: diag
+  real(psb_dpk_), optional, intent(inout), target :: work(:)
+  
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_mpk_)   :: np, me, ik
+  integer(psb_ipk_)   :: err_act, iia, jja, iix, jjx, iiy, jjy, lldx, lldy, &
+                        & choice_, i, lld, nrow, ncol, liwork, llwork, idx, ndm
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m, n, ia, ja, lik
+  character           :: lscale
+  character           :: itrans
+  character(len=20)   :: name, ch_err
+  logical             :: aliw
+  real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
+  integer(psb_ipk_), parameter  :: nb = 4
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end subroutine psb_dspsv_mm_idxs
