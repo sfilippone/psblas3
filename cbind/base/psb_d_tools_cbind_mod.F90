@@ -702,7 +702,7 @@ contains
 
     ixb = psb_c_get_index_base()
     if (ixb == 1) then
-      call  psb_setelem(index,val,xp,descp,info)
+      call psb_setelem(index,val,xp,descp,info)
     else
       call psb_setelem(index+(1-ixb),val,xp,descp,info)
     end if

@@ -454,6 +454,17 @@ Module psb_c_tools_mod
     end function
   end interface
 
+  interface psb_setelem
+    subroutine psb_c_setelem(index,val,x,desc_a,info)
+      import
+      type(psb_c_vect_type), intent(inout) :: x
+      integer(psb_lpk_), intent(in)          :: index
+      type(psb_desc_type), intent(inout)     :: desc_a
+      integer(psb_ipk_), intent(out)         :: info
+      complex(psb_spk_)                        ::val
+    end subroutine psb_c_setelem
+  end interface
+
   interface psb_remap
     subroutine psb_c_remap(np_remap, desc_in, a_in, &
          & ipd, isrc, nrsrc, naggr, desc_out, a_out, info)
