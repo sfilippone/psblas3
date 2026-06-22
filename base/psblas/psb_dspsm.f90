@@ -816,6 +816,8 @@ subroutine psb_dspsv_mm_idxs(alpha, t, x, idx_x, beta, y, idx_y, desc_a, info, &
   real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
   integer(psb_ipk_), parameter  :: nb = 4
 
+  
+
 9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsv_mm_idxs
