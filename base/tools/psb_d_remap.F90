@@ -120,7 +120,7 @@ subroutine psb_d_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
       goto 9999
     endif
     if (rnp >= np) then 
-      write(0,*) ' No remapping on larger proc count now'
+      write(0,*) ' No remapping on larger proc count now',rnp,np
       info = psb_err_internal_error_
       call psb_errpush(info,name)
       goto 9999
