@@ -39,8 +39,10 @@ subroutine mm_dvet_read(b, info, iunit, filename)
   integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, infile
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
+  logical :: opened
 
   info = psb_success_
+  opened = .false.
   if (present(filename)) then
     if (filename == '-') then 
       infile=5
@@ -51,6 +53,7 @@ subroutine mm_dvet_read(b, info, iunit, filename)
         infile=99
       endif
       open(infile,file=filename, status='OLD', err=901, action='READ')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -83,7 +86,7 @@ subroutine mm_dvet_read(b, info, iunit, filename)
     end do
 
   end if      ! read right hand sides
-  if (infile /= 5) close(infile)
+  if (opened) close(infile)
 
   return 
   ! open failed
@@ -111,8 +114,10 @@ subroutine mm_dvet2_read(b, info, iunit, filename)
   integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, infile
   character            :: mmheader*15, fmt*15, object*10, type*10, sym*15,&
        & line*1024
+  logical :: opened
 
   info = psb_success_
+  opened = .false.
   if (present(filename)) then
     if (filename == '-') then 
       infile=5
@@ -123,6 +128,7 @@ subroutine mm_dvet2_read(b, info, iunit, filename)
         infile=99
       endif
       open(infile,file=filename, status='OLD', err=901, action='READ')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -153,7 +159,7 @@ subroutine mm_dvet2_read(b, info, iunit, filename)
     read(infile,fmt=*,end=902) ((b(i,j), i=1,nrow),j=1,ncol)
 
   end if      ! read right hand sides
-  if (infile /= 5) close(infile)
+  if (opened) close(infile)
 
   return 
   ! open failed
@@ -182,8 +188,10 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
   integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
 
   character(len=80)                 :: frmtv 
+  logical :: opened
 
   info = psb_success_
+  opened = .false.
   if (present(filename)) then
     if (filename == '-') then 
       outfile=6
@@ -194,6 +202,7 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
         outfile=99
       endif
       open(outfile,file=filename, err=901, action='WRITE')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -202,7 +211,7 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
       outfile=6
     endif
   endif
-
+  
   write(outfile,'(a)') '%%MatrixMarket matrix array real general'
   write(outfile,'(a)') '% '//trim(header)
   write(outfile,'(a)') '% '
@@ -210,9 +219,11 @@ subroutine mm_dvet2_write(b, header, info, iunit, filename)
   ncol = size(b,2) 
   write(outfile,*) nrow, ncol
 
-  write(outfile,fmt='(es26.18,1x)') ((b(i,j), i=1,nrow),j=1,ncol)
+  write(frmtv,'(a,i0,a)') '(',ncol,'(es26.18,1x))'
 
-  if (outfile /= 6) close(outfile)
+  write(outfile,fmt=frmtv) ((b(i,j), i=1,nrow),j=1,ncol)
+
+  if (opened) close(outfile)
 
   return 
   ! open failed
@@ -234,8 +245,10 @@ subroutine mm_dvet1_write(b, header, info, iunit, filename)
   integer(psb_ipk_) :: nrow, ncol, i,root, np,  me,  ircode, j, outfile
 
   character(len=80)                 :: frmtv 
+  logical :: opened
 
   info = psb_success_
+  opened = .false.
   if (present(filename)) then
     if (filename == '-') then 
       outfile=6
@@ -246,6 +259,7 @@ subroutine mm_dvet1_write(b, header, info, iunit, filename)
         outfile=99
       endif
       open(outfile,file=filename, err=901, action='WRITE')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -268,7 +282,7 @@ subroutine mm_dvet1_write(b, header, info, iunit, filename)
     write(outfile,frmtv) b(i)
   end do
 
-  if (outfile /= 6) close(outfile)
+  if (opened) close(outfile)
 
   return 
   ! open failed
@@ -324,9 +338,10 @@ subroutine dmm_mat_read(a, info, iunit, filename)
   integer(psb_ipk_) :: nrow, ncol, nnzero
   integer(psb_ipk_) :: ircode, i,nzr,infile
   type(psb_d_coo_sparse_mat), allocatable :: acoo
+  logical :: opened
 
   info = psb_success_
-
+  opened = .false.
   if (present(filename)) then
     if (filename == '-') then 
       infile=5
@@ -337,6 +352,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
         infile=99
       endif
       open(infile,file=filename, status='OLD', err=901, action='READ')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -421,7 +437,7 @@ subroutine dmm_mat_read(a, info, iunit, filename)
     call a%mv_from(acoo)
   end if
 
-  if (infile /= 5) close(infile)
+  if (opened) close(infile)
   return 
 
   ! open failed
@@ -449,10 +465,11 @@ subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
   integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
   integer(psb_ipk_) :: iout
+  logical :: opened
 
 
   info = psb_success_
-
+  opened = .false.
   if (present(filename)) then 
     if (filename == '-') then 
       iout=6
@@ -463,6 +480,7 @@ subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
         iout=99
       endif
       open(iout,file=filename, err=901, action='WRITE')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -474,7 +492,7 @@ subroutine dmm_mat_write(a,mtitle,info,iunit,filename)
 
   call a%print(iout,head=mtitle)
 
-  if (iout /= 6) close(iout)
+  if (opened) close(iout)
 
 
   return
@@ -498,9 +516,10 @@ subroutine ldmm_mat_read(a, info, iunit, filename)
   integer(psb_lpk_) :: nrow, ncol, nnzero, i, nzr
   integer(psb_ipk_) :: ircode, infile
   type(psb_ld_coo_sparse_mat), allocatable :: acoo
+  logical :: opened
 
   info = psb_success_
-
+  opened = .false.
   if (present(filename)) then
     if (filename == '-') then 
       infile=5
@@ -511,6 +530,7 @@ subroutine ldmm_mat_read(a, info, iunit, filename)
         infile=99
       endif
       open(infile,file=filename, status='OLD', err=901, action='READ')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -595,7 +615,7 @@ subroutine ldmm_mat_read(a, info, iunit, filename)
     call a%mv_from(acoo)
   end if
 
-  if (infile /= 5) close(infile)
+  if (opened) close(infile)
   return 
 
   ! open failed
@@ -623,10 +643,10 @@ subroutine ldmm_mat_write(a,mtitle,info,iunit,filename)
   integer(psb_ipk_), optional, intent(in)          :: iunit
   character(len=*), optional, intent(in) :: filename
   integer(psb_ipk_) :: iout
-
+  logical :: opened
 
   info = psb_success_
-
+  opened = .false.
   if (present(filename)) then 
     if (filename == '-') then 
       iout=6
@@ -637,6 +657,7 @@ subroutine ldmm_mat_write(a,mtitle,info,iunit,filename)
         iout=99
       endif
       open(iout,file=filename, err=901, action='WRITE')
+      opened = .true.
     endif
   else 
     if (present(iunit)) then 
@@ -648,7 +669,7 @@ subroutine ldmm_mat_write(a,mtitle,info,iunit,filename)
 
   call a%print(iout,head=mtitle)
 
-  if (iout /= 6) close(iout)
+  if (opened) close(iout)
 
 
   return
@@ -658,5 +679,3 @@ subroutine ldmm_mat_write(a,mtitle,info,iunit,filename)
   write(psb_err_unit,*) 'Error while opening ',filename
   return
 end subroutine ldmm_mat_write
-
-

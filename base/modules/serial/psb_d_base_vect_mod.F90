@@ -157,6 +157,7 @@ module psb_d_base_vect_mod
     procedure, pass(x) :: set_vect => d_base_set_vect
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: get_entry=> d_base_get_entry
+    procedure, pass(x) :: set_entry=> d_base_set_entry
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -1282,14 +1283,32 @@ contains
   !
   function d_base_get_entry(x, index) result(res)
     implicit none
-    class(psb_d_base_vect_type), intent(in) :: x
+    class(psb_d_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)             :: index
     real(psb_dpk_)                           :: res
 
     res = 0
-    if (allocated(x%v)) res = x%v(index)
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      res = x%v(index)
+    end if
 
   end function d_base_get_entry
+
+  subroutine d_base_set_entry(x, index, val)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)             :: index
+    real(psb_dpk_)                           :: val
+
+
+    if (allocated(x%v)) then
+      if (x%is_dev()) call x%sync()
+      x%v(index) =val
+      call x%set_host()
+    end if
+
+  end subroutine d_base_set_entry
 
   !
   ! Overwrite with absolute value
@@ -2189,6 +2208,10 @@ contains
       res = min(res,abs(x%v(i)))
     end do
 #else
+    !
+    ! From M&R&C: if the array is of size zero, MINVAL
+    !           returns the largest positive value
+    !
     res =  minval(x%v(1:n))
 #endif
   end function d_base_min
@@ -2856,7 +2879,7 @@ contains
     logical, intent(in), optional        :: scratch
 
     call psb_realloc(m,n,x%v,info)
-    call x%asb(m,n,info,scratch)
+    call x%asb(m,n,info,scratch=scratch)
 
   end subroutine d_base_mlv_bld_n
 
@@ -3137,23 +3160,26 @@ contains
         case(psb_dupl_err_)
           do i=1,ncfs
             if (any(vv(x%iv(i),:).ne.dzero)) then
-              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
+              info = psb_err_duplicate_coo
+              call psb_errpush(info,'mvect-asb')
               return
             else
               vv(x%iv(i),:) = x%v(i,:)
             end if
           end do
         case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          write(psb_err_unit,*) 'Error in mvect_asb: unsafe dupl',x%get_dupl()
           info =-7
         end select
         call psb_move_alloc(vv,x%v,info)
         if (allocated(x%iv)) deallocate(x%iv,stat=info)
       else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < m) &
+        if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
              & call psb_realloc(m,n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+        if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+        end if
       else
         info = psb_err_invalid_vect_state_        
         call psb_errpush(info,'vect_asb')
@@ -3161,8 +3187,10 @@ contains
     else
       if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
            & call psb_realloc(m,n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      if (info /= 0) then
+          info = psb_err_alloc_dealloc_
+          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+        end if
     end if
     call x%set_host()
     call x%set_asb()

@@ -309,7 +309,7 @@ subroutine psb_lasb_multivect(x, desc_a, info, mold, scratch,n)
   dupl_ = x%get_dupl()
   if (scratch_) then 
     call x%free(info)
-    call x%bld(ncol,n_,mold=mold)
+    call x%bld(ncol,n_,mold=mold,scratch=.true.)
   else
     call x%asb(ncol,n_,info)
     ! ..update halo elements..

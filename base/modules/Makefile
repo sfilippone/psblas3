@@ -189,7 +189,7 @@ auxil/psi_acx_mod.o auxil/psi_alcx_mod.o auxil/psi_lcx_mod.o \
 auxil/psb_string_mod.o auxil/psb_i2_realloc_mod.o auxil/psb_m_realloc_mod.o auxil/psb_e_realloc_mod.o \
 auxil/psb_s_realloc_mod.o \
 auxil/psb_d_realloc_mod.o auxil/psb_c_realloc_mod.o auxil/psb_z_realloc_mod.o \
-desc/psb_desc_const_mod.o psi_penv_mod.o: psb_const_mod.o
+desc/psb_desc_const_mod.o penv/psi_penv_mod.o: psb_const_mod.o
 
 
 desc/psb_indx_map_mod.o desc/psb_hash_mod.o: psb_realloc_mod.o psb_const_mod.o  desc/psb_desc_const_mod.o
@@ -297,8 +297,8 @@ serial/psb_z_csc_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_lz_csr_mat_mod.
 
 serial/psb_mat_mod.o: serial/psb_vect_mod.o serial/psb_s_mat_mod.o serial/psb_d_mat_mod.o serial/psb_c_mat_mod.o serial/psb_z_mat_mod.o
 serial/psb_serial_mod.o: serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o serial/psb_c_serial_mod.o serial/psb_z_serial_mod.o  auxil/psi_serial_mod.o
-serial/psb_i2_vect_mod.o: serial/psb_i2_base_vect_mod.o serial/psb_i_base_vect_mod.o
 serial/psb_i_vect_mod.o: serial/psb_i_base_vect_mod.o
+serial/psb_i2_vect_mod.o: serial/psb_i2_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_l_vect_mod.o: serial/psb_l_base_vect_mod.o serial/psb_i_vect_mod.o 
 serial/psb_s_vect_mod.o: serial/psb_s_base_vect_mod.o serial/psb_i_vect_mod.o
 serial/psb_d_vect_mod.o: serial/psb_d_base_vect_mod.o serial/psb_i_vect_mod.o
@@ -447,5 +447,4 @@ clean:
 	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod) 
 
 veryclean: clean
-	/bin/rm -f *.h
 

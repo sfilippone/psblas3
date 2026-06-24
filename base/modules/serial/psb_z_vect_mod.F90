@@ -108,6 +108,7 @@ module psb_z_vect_mod
     procedure, pass(x) :: check_addr => z_vect_check_addr
 
     procedure, pass(x) :: get_entry => z_vect_get_entry
+    procedure, pass(x) :: set_entry => z_vect_set_entry
 
     procedure, pass(x) :: dot_v    => z_vect_dot_v
     procedure, pass(x) :: dot_a    => z_vect_dot_a
@@ -855,12 +856,20 @@ contains
 
   function z_vect_get_entry(x,index) result(res)
     implicit none
-    class(psb_z_vect_type), intent(in) :: x
+    class(psb_z_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)        :: index
     complex(psb_dpk_) :: res
-    res = 0
+    res = zzero
     if (allocated(x%v)) res = x%v%get_entry(index)
   end function z_vect_get_entry
+
+  subroutine z_vect_set_entry(x,index,val)
+    implicit none
+    class(psb_z_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)        :: index
+    complex(psb_dpk_) :: val
+    if (allocated(x%v)) call x%v%set_entry(index,val)
+  end subroutine z_vect_set_entry
 
   function z_vect_dot_v(n,x,y) result(res)
     implicit none
@@ -1660,19 +1669,20 @@ contains
   end subroutine z_mvect_bld_x
 
 
-  subroutine z_mvect_bld_n(x,m,n,mold)
+  subroutine z_mvect_bld_n(x,m,n,mold,scratch)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_z_multivect_type), intent(out) :: x
     class(psb_z_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-
+    logical, intent(in), optional        :: scratch
+    
     info = psb_success_
     if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_z_get_base_multivect_default())
     endif
-    if (info == psb_success_) call x%v%bld(m,n)
+    if (info == psb_success_) call x%v%bld(m,n,scratch=scratch)
 
   end subroutine z_mvect_bld_n
 
@@ -2153,3 +2163,4 @@ contains
 !!$  end function z_mvect_asum
 
 end module psb_z_multivect_mod
+
