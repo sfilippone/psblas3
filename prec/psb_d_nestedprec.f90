@@ -915,7 +915,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
 
     integer(psb_ipk_) :: i, n_owned, n_col_field
-    real(psb_dpk_), allocatable :: rhs(:), sol(:), wrk(:)
+    real(psb_dpk_), allocatable :: rhs(:), sol(:)
     type(psb_desc_type), pointer :: field_desc
 
     info = psb_success_
@@ -933,7 +933,7 @@ contains
 
       n_col_field = field_desc%get_local_cols()
 
-      allocate(rhs(n_col_field), sol(n_col_field), wrk(n_col_field), stat=info)
+      allocate(rhs(n_col_field), sol(n_col_field), stat=info)
       if (info /= 0) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info, 'd_nested_add_apply', a_err='field vectors')
@@ -946,14 +946,14 @@ contains
       call psb_d_nest_restrict_field(prec%nest_op, i, x, rhs, info)
 
       if (info == psb_success_) then
-        call prec%blocks(i)%pc%apply(done, rhs, dzero, sol, field_desc, info, trans='N', work=wrk)
+        call psb_d_nested_field_solve(prec, i, rhs, sol, info)
       end if
 
       if (info == psb_success_) then
         call psb_d_nest_prolong_field(prec%nest_op, i, sol, z, info)
       end if
 
-      deallocate(rhs, sol, wrk)
+      deallocate(rhs, sol)
 
       if (info /= psb_success_) return
     end do
@@ -970,7 +970,7 @@ contains
     integer(psb_ipk_), intent(out) :: info
 
     integer(psb_ipk_) :: i, j, n_owned, n_col_i, n_col_j
-    real(psb_dpk_), allocatable :: rhs(:), sol(:), z_field(:), wrk(:)
+    real(psb_dpk_), allocatable :: rhs(:), sol(:), z_field(:)
     type(psb_desc_type), pointer :: field_desc_i, field_desc_j
     type(psb_dspmat_type), pointer :: block_ptr
 
@@ -992,7 +992,7 @@ contains
 
       n_col_i = field_desc_i%get_local_cols()
 
-      allocate(rhs(n_col_i), sol(n_col_i), wrk(n_col_i), stat=info)
+      allocate(rhs(n_col_i), sol(n_col_i), stat=info)
       if (info /= 0) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info, 'd_nested_sweep', a_err='field vectors')
@@ -1004,7 +1004,7 @@ contains
 
       call psb_d_nest_restrict_field(prec%nest_op, i, x, rhs, info)
       if (info /= psb_success_) then
-        deallocate(rhs, sol, wrk)
+        deallocate(rhs, sol)
         return
       end if
 
@@ -1018,7 +1018,7 @@ contains
         if (.not. associated(field_desc_j)) then
           info = psb_err_invalid_mat_state_
           call psb_errpush(info, 'd_nested_sweep', a_err='missing column field descriptor')
-          deallocate(rhs, sol, wrk)
+          deallocate(rhs, sol)
           return
         end if
 
@@ -1028,7 +1028,7 @@ contains
         if (info /= 0) then
           info = psb_err_alloc_dealloc_
           call psb_errpush(info, 'd_nested_sweep', a_err='offdiag field vector')
-          deallocate(rhs, sol, wrk)
+          deallocate(rhs, sol)
           return
         end if
 
@@ -1043,18 +1043,18 @@ contains
         deallocate(z_field)
 
         if (info /= psb_success_) then
-          deallocate(rhs, sol, wrk)
+          deallocate(rhs, sol)
           return
         end if
       end do
 
-      call prec%blocks(i)%pc%apply(done, rhs, dzero, sol, field_desc_i, info, trans='N', work=wrk)
+      call psb_d_nested_field_solve(prec, i, rhs, sol, info)
 
       if (info == psb_success_) then
         call psb_d_nest_prolong_field(prec%nest_op, i, sol, z, info)
       end if
 
-      deallocate(rhs, sol, wrk)
+      deallocate(rhs, sol)
 
       if (info /= psb_success_) return
 
