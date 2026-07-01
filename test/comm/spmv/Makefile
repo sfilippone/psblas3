@@ -15,7 +15,7 @@ TOBJS=psb_spmv_test.o
 
 EXEDIR=./runs
 
-all: runsd spmv_overlap
+all: runsd psb_spmv_kernel
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
@@ -23,10 +23,9 @@ runsd:
 psb_spmv_test.o: psb_spmv_test.f90
 	$(FC) $(FCOPT) -cpp $(FINCLUDES) $(FDEFINES) $(FCUDEFINES) -c $< -o $@
 
-spmv_overlap: $(TOBJS)
-	$(FLINK) $(LOPT) $(TOBJS) -o spmv_overlap $(PSBLAS_LIB) $(LDLIBS)
-	/bin/mv spmv_overlap $(EXEDIR)
-	/bin/cp -f $(EXEDIR)/spmv_overlap $(EXEDIR)/psb_spmv_kernel
+psb_spmv_kernel: $(TOBJS)
+	$(FLINK) $(LOPT) $(TOBJS) -o psb_spmv_kernel $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_spmv_kernel $(EXEDIR)
 
 clean:
 	/bin/rm -f $(TOBJS) $(TOBJS_API) *$(.mod) $(EXEDIR)/spmv_overlap $(EXEDIR)/psb_spmv_kernel

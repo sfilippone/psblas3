@@ -77,6 +77,7 @@ module psb_d_cuda_vect_mod
     procedure, pass(x) :: set_sync => d_cuda_set_sync
     procedure, pass(x) :: set_scal => d_cuda_set_scal
 !!$    procedure, pass(x) :: set_vect => d_cuda_set_vect
+    procedure, pass(x) :: gthzv    => d_cuda_gthzv
     procedure, pass(x) :: gthzv_x  => d_cuda_gthzv_x
     procedure, pass(y) :: sctb     => d_cuda_sctb
     procedure, pass(y) :: sctb_x   => d_cuda_sctb_x
@@ -230,6 +231,45 @@ contains
       write(0,*) 'Check addr: cuda  version, why am I here? '
     end select
   end subroutine d_cuda_check_addr
+
+  subroutine d_cuda_gthzv(n,idx,x,y)
+    ! GPU override of the plain-array-index gather  y(1:n) = x(idx(1:n)).
+    ! Without it the generic gth(n,idx(:),buf) -- used ONLY by the RMA swap path
+    ! (psi_d_swapdata, rma_pull/push) -- fell back to the host d_base_gthzv, which
+    ! calls x%sync() and copies the WHOLE vector device->host on EVERY swap. Here
+    ! we gather on the device straight from x%deviceVect (mirrors the class-default
+    ! branch of d_cuda_gthzv_x): only the n boundary indices move H2D, no full D2H.
+    use psb_cuda_env_mod
+    use psi_serial_mod
+    implicit none
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
+    real(psb_dpk_)    :: y(:)
+    class(psb_d_vect_cuda) :: x
+    integer :: info, ni
+
+    info = 0
+    if (x%is_host()) call x%sync()          ! ensure device copy is current (no D2H of the whole vector)
+    ni = size(idx)
+
+    if (x%i_buf_sz < ni) then
+      if (c_associated(x%i_buf)) then
+        call freeInt(x%i_buf); x%i_buf = c_null_ptr
+      end if
+      info = allocateInt(x%i_buf,ni); x%i_buf_sz = ni
+    end if
+    if (x%dt_buf_sz < n) then
+      if (c_associated(x%dt_buf)) then
+        call freeDouble(x%dt_buf); x%dt_buf = c_null_ptr
+      end if
+      info = allocateDouble(x%dt_buf,n); x%dt_buf_sz = n
+    end if
+
+    if (info == 0) info = writeInt(x%i_buf,idx,ni)
+    if (info == 0) info = igathMultiVecDeviceDouble(x%deviceVect, 0, n, 1, x%i_buf, 1, x%dt_buf, 1)
+    if (info == 0) info = readDouble(x%dt_buf,y,n)
+
+  end subroutine d_cuda_gthzv
 
   subroutine d_cuda_gthzv_x(i,n,idx,x,y)
     use psb_cuda_env_mod

@@ -525,7 +525,7 @@ contains
     return
   end subroutine psb_d_gen_pde3d
 
-  subroutine run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_in,times_in,do_swap,comm_mode)
+  subroutine run_spmv_kernel(ctxt,use_gpu,matrix_file,matrix_fmt,cpu_fmt,gpu_fmt,idim_in,times_in,comm_mode)
     use psb_base_mod
 #ifdef PSB_HAVE_CUDA
     use psb_cuda_mod
@@ -539,7 +539,6 @@ contains
     character(len=*), intent(in)    :: cpu_fmt
     character(len=*), intent(in)    :: gpu_fmt
     integer(psb_ipk_), intent(in)   :: idim_in, times_in
-    logical, intent(in)             :: do_swap
     character(len=*), intent(in)    :: comm_mode
 
     type(psb_dspmat_type)           :: a
@@ -628,9 +627,6 @@ contains
     end if
     if (info /= psb_success_) goto 9999
 
-    call psb_comm_set(comm_type,x%v%comm_handle,info)
-    if (info /= psb_success_) goto 9999
-
 #ifdef PSB_HAVE_CUDA
     if (use_gpu) then
       select case(psb_toupper(trim(gpu_fmt)))
@@ -654,14 +650,22 @@ contains
     end if
 #endif
 
+    ! Set the comm scheme on the DESCRIPTOR, not the vector. desc_a%comm_type
+    ! survives the GPU x%cnv above (which allocates a fresh x%v WITHOUT copying
+    ! comm_handle); x then lazy-inits its handle from desc_a%comm_type at the
+    ! first halo. Setting psb_comm_set on x%v%comm_handle *before* cnv silently
+    ! reverted every backend to baseline on GPU (CPU was unaffected: no cnv).
+    call desc_a%set_comm_scheme(comm_type, info)
+    if (info /= psb_success_) goto 9999
+
     ! warm-up
-    call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=do_swap)
+    call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=.true.)
     if (info /= psb_success_) goto 9999
 
     call psb_barrier(ctxt)
     t0 = psb_wtime()
     do i = 1, times
-      call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=do_swap)
+      call psb_spmm(alpha, a, x, beta, y, desc_a, info, doswap=.true.)
       if (info /= psb_success_) exit
     end do
     t1 = psb_wtime()
@@ -672,11 +676,7 @@ contains
     avg_t = dt / real(times, psb_dpk_)
 
     if (my_rank == psb_root_) then
-      if (do_swap) then
-        write(psb_out_unit,'(/,"SpMV benchmark (overlap)")')
-      else
-        write(psb_out_unit,'(/,"SpMV benchmark (no overlap)")')
-      end if
+      write(psb_out_unit,'(/,"SpMV benchmark")')
       write(psb_out_unit,'("  cpu matrix fmt   : ",a)') trim(afmt)
       if (use_gpu) write(psb_out_unit,'("  gpu matrix fmt   : ",a)') trim(psb_toupper(trim(gpu_fmt)))
       if (use_external_matrix) then
@@ -784,7 +784,6 @@ program psb_spmv_kernel
   character(len=8)   :: cpu_fmt
   character(len=8)   :: gpu_fmt
   integer(psb_ipk_) :: idim_arg, times_arg
-  logical           :: do_overlap
   integer :: kmode
   integer, parameter :: n_comm_modes = 5
   character(len=20), parameter :: comm_modes(n_comm_modes) = [character(len=20) :: &
@@ -797,7 +796,6 @@ program psb_spmv_kernel
   matrix_fmt  = 'MM'
   cpu_fmt     = 'CSR'
   gpu_fmt     = 'HLG'
-  do_overlap  = .true.
 
   call psb_init(ctxt)
   call psb_info(ctxt, my_rank, np)
@@ -842,10 +840,6 @@ program psb_spmv_kernel
       gpu_fmt = psb_toupper(adjustl(arg(14:len_trim(arg))))
     else if (index(psb_toupper(trim(arg)), '--GPU_FMT=') == 1) then
       gpu_fmt = psb_toupper(adjustl(arg(11:len_trim(arg))))
-    else if ((trim(psb_toupper(arg)) == '--NOOVERLAP') .or. (trim(psb_toupper(arg)) == '--NO_OVERLAP')) then
-      do_overlap = .false.
-    else if ((trim(psb_toupper(arg)) == '--OVERLAP') .or. (trim(psb_toupper(arg)) == '--SWAP')) then
-      do_overlap = .true.
     else if (trim(psb_toupper(arg)) == '--MATRIX') then
       if (k < command_argument_count()) call get_command_argument(k+1,matrix_file)
     else if (trim(psb_toupper(arg)) == '--FMT') then
@@ -897,7 +891,7 @@ program psb_spmv_kernel
     write(psb_out_unit,'("GPU enabled          : ",l1)') use_gpu
     write(psb_out_unit,'("Usage: ./psb_spmv_kernel [--gpu=TRUE|FALSE] [--dim=N] [--times=N] ",&
       &"[--cpu_fmt=CSR|COO|CSC|ELL|HLL] [--gpu_fmt=HLL|ELL|CSR|HDIA] [--matrix=<path>] [--fmt=MM|HB] ",&
-      &"[--overlap|--nooverlap] (runs all comm backends)")')
+      &"(runs all comm backends)")')
   end if
 
   do kmode = 1, n_comm_modes
@@ -905,7 +899,7 @@ program psb_spmv_kernel
       write(psb_out_unit,'(/,"=== Backend sweep: ",a," ===")') trim(comm_modes(kmode))
     end if
     call run_spmv_kernel(ctxt, use_gpu, matrix_file, matrix_fmt, cpu_fmt, gpu_fmt, &
-      & idim_arg, times_arg, do_overlap, comm_modes(kmode))
+      & idim_arg, times_arg, comm_modes(kmode))
   end do
 
 #ifdef PSB_HAVE_CUDA

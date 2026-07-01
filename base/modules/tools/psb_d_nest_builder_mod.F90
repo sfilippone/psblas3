@@ -83,6 +83,15 @@ module psb_d_nest_builder_mod
     real(psb_dpk_),    allocatable :: entry_vals(:)
   end type psb_d_nest_block_buffer
 
+  ! per-block selective halo support: scatter map from a block's own (restricted)
+  ! column descriptor onto the field-j column space the block matrix is localized
+  ! against.  map(k) is the field-j local column position of the k-th local column
+  ! of block_col_desc(i,j); used to scatter a per-block psb_halo result into the
+  ! field vector consumed by the (field-localized) block csmv.
+  type :: psb_d_nest_blk2field_map
+    integer(psb_ipk_), allocatable :: map(:)
+  end type psb_d_nest_blk2field_map
+
   type :: psb_d_nest_matrix
     type(psb_ctxt_type)                          :: context
     integer(psb_ipk_)                            :: n_fields  = 0
@@ -95,6 +104,14 @@ module psb_d_nest_builder_mod
     type(psb_desc_nest_type)                     :: grid_desc
     type(psb_dspmat_type)                        :: a_glob               ! the matrix to hand to Krylov
     type(psb_desc_type)                          :: desc_glob            ! the global descriptor
+    ! per-block (selective) halo-exchange support.  block_col_desc(i,j) carries
+    ! ONLY block (i,j)'s own off-process columns (a subset of field j's union
+    ! halo), so its halo can be exchanged independently of the rest of column j;
+    ! blk2field(i,j) maps its local columns onto the field-j local columns the
+    ! block matrix is localized against.  These coexist with a_glob/desc_glob
+    ! (the fused union path) WITHOUT a second copy of the blocks.
+    type(psb_desc_type),            allocatable   :: block_col_desc(:,:)
+    type(psb_d_nest_blk2field_map), allocatable   :: blk2field(:,:)
   contains
     procedure, pass(op) :: init => psb_d_nest_op_init
     procedure, pass(op) :: ins  => psb_d_nest_op_ins
@@ -107,7 +124,7 @@ module psb_d_nest_builder_mod
   end type psb_d_nest_matrix
 
   private
-  public :: psb_d_nest_matrix
+  public :: psb_d_nest_matrix, psb_d_nest_blk2field_map
 
 contains
 
@@ -201,6 +218,8 @@ contains
 
     type(psb_d_nest_base_mat) :: nest_operator
     integer(psb_ipk_)         :: n_fields, i_field, j_field
+    integer(psb_ipk_)         :: field_local_rows, n_block_cols, k_col, field_col
+    integer(psb_lpk_)         :: global_col_idx
     character(len=24)         :: name
 
     info = psb_success_
@@ -213,6 +232,50 @@ contains
       if (info /= psb_success_) then
         call psb_errpush(psb_err_from_subroutine_, name, a_err='psb_cdasb'); return
       end if
+    end do
+
+    ! 1b) per-block (restricted-halo) column descriptors + scatter maps, for the
+    !     selective halo-exchange regime.  Each present block (i,j) gets a
+    !     descriptor whose halo is ONLY block (i,j)'s own off-process columns
+    !     (registered from that single block's buffer, NOT the column-wide union),
+    !     sharing field j's owned distribution.  blk2field(i,j)%map sends its
+    !     local columns onto field j's local columns (the space the block matrix
+    !     is localized against), so a per-block psb_halo can be scattered into the
+    !     field vector consumed by the block csmv.  The buffers are still alive
+    !     here (freed in step 6).
+    allocate(op%block_col_desc(n_fields,n_fields), op%blk2field(n_fields,n_fields), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_; call psb_errpush(info, name); return
+    end if
+    do j_field = 1, n_fields
+      field_local_rows = op%field_desc(j_field)%get_local_rows()
+      do i_field = 1, n_fields
+        if (op%block_buffer(i_field,j_field)%n_entries <= 0) cycle
+        ! owned distribution identical to field j (same nl => same global ranges)
+        call psb_cdall(op%context, op%block_col_desc(i_field,j_field), info, nl=field_local_rows)
+        if (info == psb_success_) &
+             & call psb_cdins(op%block_buffer(i_field,j_field)%n_entries,            &
+             &                op%block_buffer(i_field,j_field)%entry_cols(1:op%block_buffer(i_field,j_field)%n_entries), &
+             &                op%block_col_desc(i_field,j_field), info)
+        if (info == psb_success_) call psb_cdasb(op%block_col_desc(i_field,j_field), info)
+        if (info /= psb_success_) then
+          call psb_errpush(psb_err_from_subroutine_, name, a_err='per-block cdasb'); return
+        end if
+        ! block-local column k -> field-j local column position
+        n_block_cols = op%block_col_desc(i_field,j_field)%get_local_cols()
+        allocate(op%blk2field(i_field,j_field)%map(n_block_cols), stat=info)
+        if (info /= 0) then
+          info = psb_err_alloc_dealloc_; call psb_errpush(info, name); return
+        end if
+        do k_col = 1, n_block_cols
+          call op%block_col_desc(i_field,j_field)%l2g(k_col, global_col_idx, info)
+          if (info == psb_success_) call op%field_desc(j_field)%g2l(global_col_idx, field_col, info)
+          if (info /= psb_success_) then
+            call psb_errpush(psb_err_from_subroutine_, name, a_err='blk2field l2g/g2l'); return
+          end if
+          op%blk2field(i_field,j_field)%map(k_col) = field_col
+        end do
+      end do
     end do
 
     ! 2) build the local blocks (generally rectangular) from the triplets
@@ -300,6 +363,17 @@ contains
       call op%desc_glob%free(local_info)
       call op%grid_desc%free(local_info)
     end if
+    if (allocated(op%block_col_desc)) then
+      do j_field = 1, size(op%block_col_desc,2)
+        do i_field = 1, size(op%block_col_desc,1)
+          ! only present blocks were assembled (and carry a blk2field map)
+          if (allocated(op%blk2field) .and. allocated(op%blk2field(i_field,j_field)%map)) &
+               & call op%block_col_desc(i_field,j_field)%free(local_info)
+        end do
+      end do
+      deallocate(op%block_col_desc, stat=local_info)
+    end if
+    if (allocated(op%blk2field)) deallocate(op%blk2field, stat=local_info)
     if (allocated(op%field_desc)) then
       do i_field = 1, size(op%field_desc)
         call op%field_desc(i_field)%free(local_info)

@@ -3,6 +3,7 @@ module psb_comm_rma_mod
   use psb_desc_const_mod, only: psb_proc_id_, psb_n_elem_recv_, psb_elem_recv_, &
        & psb_n_elem_send_, psb_elem_send_
   use psb_error_mod
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_null_ptr
 #ifdef PSB_MPI_MOD
   use mpi
 #endif
@@ -18,6 +19,9 @@ module psb_comm_rma_mod
     integer(psb_mpk_) :: win = mpi_win_null
     logical :: window_ready = .false.
     logical :: window_open = .false.
+    type(c_ptr) :: win_base = c_null_ptr
+    integer(psb_ipk_) :: win_nelem = 0
+    integer(psb_mpk_) :: nbr_grp = mpi_group_null   ! neighbor MPI group, built once with the layout
     logical :: layout_ready = .false.
     integer(psb_ipk_) :: layout_nnbr = -1
     integer(psb_ipk_) :: layout_send = -1
@@ -57,6 +61,8 @@ contains
     this%win = mpi_win_null
     this%window_ready = .false.
     this%window_open = .false.
+    this%win_base = c_null_ptr
+    this%win_nelem = 0
     this%layout_ready = .false.
     this%layout_nnbr = -1
     this%layout_send = -1
@@ -67,8 +73,14 @@ contains
   subroutine psb_comm_rma_clear_memory_buffer_layout(this, info)
     class(psb_comm_rma_handle), intent(inout) :: this
     integer(psb_ipk_), intent(out) :: info
+    integer(psb_mpk_) :: iret
 
     info = psb_success_
+    ! Neighbors change when the layout is rebuilt: free the cached group.
+    if (this%nbr_grp /= mpi_group_null) then
+      call mpi_group_free(this%nbr_grp, iret)
+      this%nbr_grp = mpi_group_null
+    end if
     if (allocated(this%peer_proc)) deallocate(this%peer_proc)
     if (allocated(this%peer_send_counts)) deallocate(this%peer_send_counts)
     if (allocated(this%peer_recv_counts)) deallocate(this%peer_recv_counts)
@@ -105,6 +117,8 @@ contains
     integer(psb_ipk_) :: list_pos, send_offset, recv_offset
     integer(psb_ipk_) :: proc_to_comm, recv_count, send_count
     integer(psb_ipk_) :: local_meta(4), remote_meta(4)
+    integer(psb_mpk_) :: comm_grp, n_off, grp_idx
+    integer(psb_mpk_), allocatable :: grp_ranks(:)
 
     call this%clear_memory_buffer_layout(info)
     if (info /= psb_success_) return
@@ -206,6 +220,39 @@ contains
       return
     end if
 
+    ! Build the neighbor MPI group ONCE (off-diagonal peers); reused by every
+    ! RMA exchange (PSCW post/start) instead of rebuilding it each call.
+    n_off = 0
+    do neighbor_idx = 1, n_neighbors
+      if (this%peer_proc(neighbor_idx) /= my_rank) n_off = n_off + 1
+    end do
+    if (n_off > 0) then
+      allocate(grp_ranks(n_off), stat=iret)
+      if (iret /= 0) then
+        info = psb_err_alloc_dealloc_
+        return
+      end if
+      grp_idx = 0
+      do neighbor_idx = 1, n_neighbors
+        if (this%peer_proc(neighbor_idx) /= my_rank) then
+          grp_idx = grp_idx + 1
+          grp_ranks(grp_idx) = this%peer_mpi_rank(neighbor_idx)
+        end if
+      end do
+      call mpi_comm_group(icomm, comm_grp, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        return
+      end if
+      call mpi_group_incl(comm_grp, n_off, grp_ranks, this%nbr_grp, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        return
+      end if
+      call mpi_group_free(comm_grp, iret)
+      deallocate(grp_ranks, stat=iret)
+    end if
+
     this%layout_nnbr = n_neighbors
     this%layout_send = send_total
     this%layout_recv = recv_total
@@ -229,6 +276,8 @@ contains
       call mpi_win_free(this%win, iret)
       this%win = mpi_win_null
     end if
+    this%win_base = c_null_ptr
+    this%win_nelem = 0
     this%window_ready = .false.
     this%layout_ready = .false.
     this%layout_nnbr = -1

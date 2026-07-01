@@ -1009,6 +1009,8 @@ contains
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
     integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size
     integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
+    integer(psb_mpk_) :: comm_grp, nbr_grp, n_off, grp_idx
+    integer(psb_mpk_), allocatable :: grp_ranks(:)
     logical :: do_start, do_wait, memory_buffer_layout_rebuild_needed
     type(psb_comm_rma_handle), pointer :: rma_handle
     character(len=30) :: name
@@ -1077,59 +1079,42 @@ contains
         end if
       end if
 
+      ! Expose y%combuf as the RMA window (created once, reused). On GPU vectors
+      ! combuf is the pinned/registered buffer, so RMA uses pinned memory.
       if (buffer_size > 0) then
         if (.not. allocated(y%combuf)) then
-          ! Allocate buffer with size of comm_indexes%v to include all metadata,
-          ! matching baseline and topology buffer layout
           call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         else if (size(y%combuf) < size(comm_indexes%v)) then
-          ! Need a larger exposed memory area: recreate the RMA window first,
-          ! then reallocate combuf and lazily create a new window below.
           if (rma_handle%window_open) then
             call mpi_win_unlock_all(rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
             rma_handle%window_open = .false.
           end if
           if (rma_handle%window_ready) then
             call mpi_win_free(rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
-            rma_handle%window_ready = .false.
             rma_handle%win = mpi_win_null
+            rma_handle%window_ready = .false.
           end if
-          ! Allocate buffer with size of comm_indexes%v to include all metadata,
-          ! matching baseline and topology buffer layout
           call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         end if
-      end if
 
-      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
-        ! Expose combuf once and keep the window around until the descriptor changes.
-        element_bytes = storage_size(y%combuf(1))/8
-        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
+        if (.not. rma_handle%window_ready) then
+          element_bytes = storage_size(y%combuf(1))/8
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          rma_handle%window_ready = .true.
         end if
-        rma_handle%window_ready = .true.
       end if
 
       if (buffer_size > 0) then
@@ -1138,7 +1123,19 @@ contains
         end if
         call y%device_wait()
 
-        ! Pull data from each peer with per-neighbor passive lock (neighbor-only sync).
+        ! Open exposure (post) + access (start) epochs over the CACHED neighbor
+        ! group (built once with the layout in the handle) -- no per-call build.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_post(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+          call mpi_win_start(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+        end if
+
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -1161,21 +1158,9 @@ contains
             end if
 
             if (recv_count > 0) then
-              call mpi_win_lock(MPI_LOCK_SHARED, prc_rank, 0, rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
               remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
               call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count, psb_mpi_r_dpk_, &
                    & rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
-              call mpi_win_unlock(prc_rank, rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
                 call psb_errpush(info,name,m_err=(/iret/))
@@ -1191,6 +1176,19 @@ contains
             y%combuf(recv_pos:recv_pos+recv_count-1) = y%combuf(send_pos:send_pos+send_count-1)
           end if
         end do
+
+        ! Close access epoch (my GETs done) then exposure epoch (peers done
+        ! reading my window): received data is now in y%combuf. Cached group, no free.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_complete(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+          call mpi_win_wait(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+        end if
       end if
     end if
 
@@ -1235,7 +1233,8 @@ contains
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
     integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size
     integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
-    integer(psb_mpk_), parameter :: rma_push_notify_tag = 914_psb_mpk_
+    integer(psb_mpk_) :: comm_grp, nbr_grp, n_off, grp_idx
+    integer(psb_mpk_), allocatable :: grp_ranks(:)
     logical :: do_start, do_wait, memory_buffer_layout_rebuild_needed
     type(psb_comm_rma_handle), pointer :: rma_handle
     character(len=30) :: name
@@ -1302,59 +1301,42 @@ contains
         end if
       end if
 
+      ! Expose y%combuf as the RMA window (created once, reused). On GPU vectors
+      ! combuf is the pinned/registered buffer, so RMA uses pinned memory.
       if (buffer_size > 0) then
         if (.not. allocated(y%combuf)) then
-          ! Allocate buffer with size of comm_indexes%v to include all metadata,
-          ! matching baseline and topology buffer layout
           call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         else if (size(y%combuf) < size(comm_indexes%v)) then
-          ! Need a larger exposed memory area: recreate the RMA window first,
-          ! then reallocate combuf and lazily create a new window below.
           if (rma_handle%window_open) then
             call mpi_win_unlock_all(rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
             rma_handle%window_open = .false.
           end if
           if (rma_handle%window_ready) then
             call mpi_win_free(rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
-            rma_handle%window_ready = .false.
             rma_handle%win = mpi_win_null
+            rma_handle%window_ready = .false.
           end if
-          ! Allocate buffer with size of comm_indexes%v to include all metadata,
-          ! matching baseline and topology buffer layout
           call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         end if
-      end if
 
-      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
-        ! Keep the window alive across repetitions: it is created once and reused.
-        element_bytes = storage_size(y%combuf(1))/8
-        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
+        if (.not. rma_handle%window_ready) then
+          element_bytes = storage_size(y%combuf(1))/8
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          rma_handle%window_ready = .true.
         end if
-        rma_handle%window_ready = .true.
       end if
 
       if (buffer_size > 0) then
@@ -1363,34 +1345,20 @@ contains
         end if
         call y%device_wait()
 
-        ! Pre-post notification receives before opening the window (prevents isend/irecv ordering issues).
-        if (num_neighbors > 0) then
-          rma_handle%notify_recv_reqs(1:num_neighbors) = MPI_REQUEST_NULL
-          rma_handle%notify_send_reqs(1:num_neighbors) = MPI_REQUEST_NULL
-        end if
-        do neighbor_idx=1, num_neighbors
-          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
-          if (proc_to_comm /= my_rank) then
-            prc_rank = rma_handle%peer_mpi_rank(neighbor_idx)
-            call mpi_irecv(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
-                 & rma_push_notify_tag, icomm, rma_handle%notify_recv_reqs(neighbor_idx), iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
+        ! Open exposure (post) + access (start) epochs over the CACHED neighbor
+        ! group (built once with the layout in the handle) -- no per-call build.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_post(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
           end if
-        end do
-
-        call mpi_win_lock_all(0, rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
+          call mpi_win_start(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
         end if
-        rma_handle%window_open = .true.
 
-        ! Push data to each peer; after flush send a P2P notification so target knows data arrived.
+        ! Issue every PUT (remote) or perform the self-copy (local).
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -1422,19 +1390,6 @@ contains
                 goto 9999
               end if
             end if
-            call mpi_win_flush(prc_rank, rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
-            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
-                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
           else
             if (send_count /= recv_count) then
               info = psb_err_internal_error_
@@ -1444,36 +1399,24 @@ contains
             y%combuf(recv_pos:recv_pos+recv_count-1) = y%combuf(send_pos:send_pos+send_count-1)
           end if
         end do
+
+        ! Close access epoch (my PUTs done) then exposure epoch (peers' PUTs into
+        ! me done): receive area now holds the pushed data. Cached group, no free.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_complete(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+          call mpi_win_wait(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+        end if
       end if
     end if
 
-    ! WAIT phase: close epoch, wait for P2P notifications, then scatter.
+    ! WAIT phase: data already delivered by PSCW in START; just scatter into Y.
     if (do_wait) then
-      if (rma_handle%window_open) then
-        call mpi_win_unlock_all(rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-        rma_handle%window_open = .false.
-      end if
-
-      if (num_neighbors > 0) then
-        call mpi_waitall(num_neighbors, rma_handle%notify_recv_reqs, MPI_STATUSES_IGNORE, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-        call mpi_waitall(num_neighbors, rma_handle%notify_send_reqs, MPI_STATUSES_IGNORE, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-      end if
-
       if (total_recv > 0) then
         call y%sct(int(total_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(total_send+1:total_send+total_recv), beta)
       end if
@@ -2341,6 +2284,8 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
     integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size, total_send_, total_recv_
     integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
+    integer(psb_mpk_) :: comm_grp, nbr_grp, n_off, grp_idx
+    integer(psb_mpk_), allocatable :: grp_ranks(:)
     logical :: do_start, do_wait, memory_buffer_layout_rebuild_needed
     type(psb_comm_rma_handle), pointer :: rma_handle
     character(len=30) :: name
@@ -2406,33 +2351,42 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
         end if
       end if
 
+      ! Expose y%combuf as the RMA window (created once, reused). On GPU vectors
+      ! combuf is the pinned/registered buffer, so RMA uses pinned memory.
       if (buffer_size > 0) then
         if (.not. allocated(y%combuf)) then
           call y%new_buffer(buffer_size, info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         else if (size(y%combuf) < buffer_size) then
+          if (rma_handle%window_open) then
+            call mpi_win_unlock_all(rma_handle%win, iret)
+            rma_handle%window_open = .false.
+          end if
+          if (rma_handle%window_ready) then
+            call mpi_win_free(rma_handle%win, iret)
+            rma_handle%win = mpi_win_null
+            rma_handle%window_ready = .false.
+          end if
           call y%new_buffer(buffer_size, info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         end if
-      end if
 
-      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
-        element_bytes = storage_size(y%combuf(1))/8
-        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
+        if (.not. rma_handle%window_ready) then
+          element_bytes = storage_size(y%combuf(1))/8
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          rma_handle%window_ready = .true.
         end if
-        rma_handle%window_ready = .true.
       end if
 
       if (buffer_size > 0) then
@@ -2441,7 +2395,19 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
         end if
         call y%device_wait()
 
-        ! Pull data from each peer with per-neighbor passive lock (neighbor-only sync).
+        ! Open exposure (post) + access (start) epochs over the CACHED neighbor
+        ! group (built once with the layout in the handle) -- no per-call build.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_post(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+          call mpi_win_start(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+        end if
+
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -2458,21 +2424,9 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
               goto 9999
             end if
             if (recv_count > 0) then
-              call mpi_win_lock(MPI_LOCK_SHARED, prc_rank, 0, rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
               remote_disp = int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND)
               call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count*n, psb_mpi_r_dpk_, &
                    & rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
-              call mpi_win_unlock(prc_rank, rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
                 call psb_errpush(info,name,m_err=(/iret/))
@@ -2488,6 +2442,19 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
             y%combuf(recv_pos:recv_pos+recv_count*n-1) = y%combuf(send_pos:send_pos+send_count*n-1)
           end if
         end do
+
+        ! Close access epoch (my GETs done) then exposure epoch (peers done
+        ! reading my window): received data is now in y%combuf. Cached group, no free.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_complete(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+          call mpi_win_wait(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+        end if
       end if
     end if
 
@@ -2531,7 +2498,8 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
     integer(psb_ipk_) :: err_act, neighbor_idx, buffer_size, total_send_, total_recv_
     integer(psb_ipk_), allocatable :: peer_mpi_rank(:)
-    integer(psb_mpk_), parameter :: rma_push_notify_tag = 914_psb_mpk_
+    integer(psb_mpk_) :: comm_grp, nbr_grp, n_off, grp_idx
+    integer(psb_mpk_), allocatable :: grp_ranks(:)
     logical :: do_start, do_wait, memory_buffer_layout_rebuild_needed
     type(psb_comm_rma_handle), pointer :: rma_handle
     character(len=30) :: name
@@ -2597,33 +2565,42 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
         end if
       end if
 
+      ! Expose y%combuf as the RMA window (created once, reused). On GPU vectors
+      ! combuf is the pinned/registered buffer, so RMA uses pinned memory.
       if (buffer_size > 0) then
         if (.not. allocated(y%combuf)) then
           call y%new_buffer(buffer_size, info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         else if (size(y%combuf) < buffer_size) then
+          if (rma_handle%window_open) then
+            call mpi_win_unlock_all(rma_handle%win, iret)
+            rma_handle%window_open = .false.
+          end if
+          if (rma_handle%window_ready) then
+            call mpi_win_free(rma_handle%win, iret)
+            rma_handle%win = mpi_win_null
+            rma_handle%window_ready = .false.
+          end if
           call y%new_buffer(buffer_size, info)
           if (info /= psb_success_) then
-            call psb_errpush(psb_err_alloc_dealloc_,name)
-            goto 9999
+            call psb_errpush(psb_err_alloc_dealloc_,name); goto 9999
           end if
         end if
-      end if
 
-      if ((buffer_size > 0).and.(.not. rma_handle%window_ready)) then
-        element_bytes = storage_size(y%combuf(1))/8
-        exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-        call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-             & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
+        if (.not. rma_handle%window_ready) then
+          element_bytes = storage_size(y%combuf(1))/8
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          rma_handle%window_ready = .true.
         end if
-        rma_handle%window_ready = .true.
       end if
 
       if (buffer_size > 0) then
@@ -2632,33 +2609,20 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
         end if
         call y%device_wait()
 
-        ! Pre-post notification receives before opening the window.
-        if (num_neighbors > 0) then
-          rma_handle%notify_recv_reqs(1:num_neighbors) = MPI_REQUEST_NULL
-          rma_handle%notify_send_reqs(1:num_neighbors) = MPI_REQUEST_NULL
-        end if
-        do neighbor_idx=1, num_neighbors
-          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
-          if (proc_to_comm /= my_rank) then
-            prc_rank = rma_handle%peer_mpi_rank(neighbor_idx)
-            call mpi_irecv(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
-                 & rma_push_notify_tag, icomm, rma_handle%notify_recv_reqs(neighbor_idx), iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
+        ! Open exposure (post) + access (start) epochs over the CACHED neighbor
+        ! group (built once with the layout in the handle) -- no per-call build.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_post(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
           end if
-        end do
-
-        call mpi_win_lock_all(0, rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
+          call mpi_win_start(rma_handle%nbr_grp, 0, rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
         end if
-        rma_handle%window_open = .true.
 
+        ! Issue every PUT (remote) or perform the self-copy (local).
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -2684,19 +2648,6 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
                 goto 9999
               end if
             end if
-            call mpi_win_flush(prc_rank, rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
-            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
-                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
           else
             if (send_count /= recv_count) then
               info = psb_err_internal_error_
@@ -2706,34 +2657,24 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
             y%combuf(recv_pos:recv_pos+recv_count*n-1) = y%combuf(send_pos:send_pos+send_count*n-1)
           end if
         end do
+
+        ! Close access epoch (my PUTs done) then exposure epoch (peers' PUTs into
+        ! me done): receive area now holds the pushed data. Cached group, no free.
+        if (rma_handle%nbr_grp /= mpi_group_null) then
+          call mpi_win_complete(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+          call mpi_win_wait(rma_handle%win, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_; call psb_errpush(info,name,m_err=(/iret/)); goto 9999
+          end if
+        end if
       end if
     end if
 
-    ! WAIT phase: close epoch, wait for P2P notifications, then scatter.
+    ! WAIT phase: data already delivered by PSCW in START; just scatter into Y.
     if (do_wait) then
-      if (rma_handle%window_open) then
-        call mpi_win_unlock_all(rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-        rma_handle%window_open = .false.
-      end if
-      if (num_neighbors > 0) then
-        call mpi_waitall(num_neighbors, rma_handle%notify_recv_reqs, MPI_STATUSES_IGNORE, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-        call mpi_waitall(num_neighbors, rma_handle%notify_send_reqs, MPI_STATUSES_IGNORE, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-      end if
       if (total_recv > 0) then
         call y%sct(int(total_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(total_send_+1:total_send_+total_recv_), beta)
       end if

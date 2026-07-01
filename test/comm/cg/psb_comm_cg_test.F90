@@ -18,6 +18,8 @@ program psb_comm_cg_test
   type(psb_dspmat_type) :: a
   type(psb_desc_type) :: desc_a
   type(psb_d_vect_type) :: b, x
+  type(psb_d_vect_type) :: probe          ! mimics a hidden CG work vector for scheme-propagation check
+  integer(psb_ipk_)     :: probe_got
   type(psb_dprec_type)  :: prec
 #ifdef PSB_HAVE_CUDA
   type(psb_d_vect_cuda) :: vmold
@@ -30,7 +32,7 @@ program psb_comm_cg_test
   integer(psb_ipk_) :: desc_me, desc_np
   integer(psb_ipk_) :: idim, itmax, itrace, istop, iter
   integer(psb_ipk_) :: scheme_idx, prec_idx, rep, nrep, nwarm
-  integer(psb_ipk_), parameter :: n_schemes=5, n_precs=2
+  integer(psb_ipk_), parameter :: n_schemes=5, n_precs=3
   integer(psb_ipk_), allocatable :: iter_count(:,:,:), solve_info(:,:,:)
   integer(psb_ipk_) :: scheme_type(n_schemes)
   real(psb_dpk_) :: eps, err, t_start, t_elapsed
@@ -81,8 +83,10 @@ program psb_comm_cg_test
 
   prec_type(1) = 'NONE'
   prec_type(2) = 'DIAG'
+  prec_type(3) = 'BJAC'
   prec_name(1) = 'none'
   prec_name(2) = 'diag'
+  prec_name(3) = 'bjac'
 
   call get_command_argument(1,arg)
   if (len_trim(arg) > 0) then
@@ -167,7 +171,7 @@ program psb_comm_cg_test
     end if
     write(psb_out_unit,'("Number of processors : ",i0)') np
     write(psb_out_unit,'("Iterative method     : CG")')
-    write(psb_out_unit,'("Preconditioners      : NONE, DIAG")')
+    write(psb_out_unit,'("Preconditioners      : NONE, DIAG, BJAC")')
     write(psb_out_unit,'("Max iterations (CG)  : ",i0)') itmax
     write(psb_out_unit,'("Repetitions          : ",i0)') nrep
     write(psb_out_unit,'("Warmup solves        : ",i0)') nwarm
@@ -279,6 +283,36 @@ program psb_comm_cg_test
                    trim(scheme_name(scheme_idx))
           end if
         end if
+
+        ! ---- DECISIVE CHECK: scheme propagation to a HIDDEN-style work vector ----
+        ! The x check above can be silently skipped: inside CG, x is only updated
+        ! with axpby (never haloed), so x%v%comm_handle may stay unallocated. The
+        ! vectors that ARE haloed (r,p,q,z) are allocated and freed *inside* psb_dcg,
+        ! so the test cannot inspect them directly. Here we replicate exactly what
+        ! psb_dcg does to those work vectors -- psb_geall against desc_a + geasb with
+        ! mold=x%v (so it is GPU-resident too when use_gpu) -- then force one halo.
+        ! Its comm_handle must lazy-init from desc_a%comm_type, proving that any
+        ! internally-allocated vector inherits the chosen scheme.
+        call psb_geall(probe, desc_a, info)
+        if (info == psb_success_) call psb_geasb(probe, desc_a, info, mold=x%v)
+        if (info == psb_success_) call psb_geaxpby(done, b, dzero, probe, desc_a, info)
+        if (info == psb_success_) call psb_halo(probe, desc_a, info)   ! triggers dispatch
+        if (info /= psb_success_) goto 9999
+        probe_got = -1
+        if (allocated(probe%v%comm_handle)) probe_got = probe%v%comm_handle%comm_type
+        if (probe_got /= scheme_type(scheme_idx)) then
+          if (my_rank == psb_root_) &
+            write(psb_err_unit,'("INTERNAL-VECTOR SCHEME MISMATCH rank=",i0," expected=",i0," got=",i0)') &
+                 my_rank, scheme_type(scheme_idx), probe_got
+          info = psb_err_internal_error_
+          goto 9999
+        else if (my_rank == psb_root_ .and. rep == 1) then
+          write(psb_out_unit,'("  [OK] internal-style work vector inherited scheme: ",a)') &
+               trim(scheme_name(scheme_idx))
+        end if
+        call psb_gefree(probe, desc_a, info)
+        if (info /= psb_success_) goto 9999
+        ! ------------------------------------------------------------------------
 
         call psb_geaxpby(dzero,b,dzero,x,desc_a,info)
         if (info /= psb_success_) goto 9999

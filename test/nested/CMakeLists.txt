@@ -26,6 +26,7 @@ file(MAKE_DIRECTORY ${EXEDIR})
 set(SOURCES_D_NEST_GLOB_TEST  psb_d_nest_glob_test.F90)
 set(SOURCES_D_NEST_RECT_TEST  psb_d_nest_rect_test.F90)
 set(SOURCES_D_NEST_CG_TEST    psb_d_nest_cg_test.F90)
+set(SOURCES_D_NEST_HALO_TEST  psb_d_nest_halo_regime_test.F90)
 
 add_executable(psb_d_nest_glob_test ${SOURCES_D_NEST_GLOB_TEST})
 target_link_libraries(psb_d_nest_glob_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
@@ -36,8 +37,11 @@ target_link_libraries(psb_d_nest_rect_test psblas::util psblas::linsolve psblas:
 add_executable(psb_d_nest_cg_test ${SOURCES_D_NEST_CG_TEST})
 target_link_libraries(psb_d_nest_cg_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
 
+add_executable(psb_d_nest_halo_regime_test ${SOURCES_D_NEST_HALO_TEST})
+target_link_libraries(psb_d_nest_halo_regime_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
+
 # Set output directory for executables
-foreach(target psb_d_nest_glob_test psb_d_nest_rect_test psb_d_nest_cg_test)
+foreach(target psb_d_nest_glob_test psb_d_nest_rect_test psb_d_nest_cg_test psb_d_nest_halo_regime_test)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
     )

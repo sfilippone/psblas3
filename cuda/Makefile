@@ -106,7 +106,7 @@ svectordev.o:  svectordev.h vectordev.h
 dvectordev.o:  dvectordev.h vectordev.h
 cvectordev.o:  cvectordev.h vectordev.h
 zvectordev.o:  zvectordev.h vectordev.h
-psb_cuda_env_mod.o: base_cusparse_mod.o
+psb_cuda_env_mod.o: base_cusparse_mod.o core_mod.o
 psb_cuda_mod.o:  psb_cuda_env_mod.o psb_i_cuda_vect_mod.o\
 	psb_d_cuda_vect_mod.o  psb_s_cuda_vect_mod.o\
 	psb_z_cuda_vect_mod.o  psb_c_cuda_vect_mod.o\
