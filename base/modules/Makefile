@@ -36,6 +36,7 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	serial/psb_i2_base_vect_mod.o serial/psb_i2_vect_mod.o\
 	serial/psb_i_base_vect_mod.o serial/psb_i_vect_mod.o\
 	serial/psb_l_base_vect_mod.o serial/psb_l_vect_mod.o\
+	serial/psb_i2_base_vect_mod.o serial/psb_i2_vect_mod.o\
 	serial/psb_d_base_vect_mod.o serial/psb_d_vect_mod.o\
 	serial/psb_s_base_vect_mod.o serial/psb_s_vect_mod.o\
 	serial/psb_c_base_vect_mod.o serial/psb_c_vect_mod.o\
@@ -82,7 +83,11 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 	serial/psb_s_base_mat_mod.o serial/psb_s_csr_mat_mod.o serial/psb_s_csc_mat_mod.o serial/psb_s_mat_mod.o \
 	serial/psb_d_base_mat_mod.o serial/psb_d_csr_mat_mod.o serial/psb_d_csc_mat_mod.o serial/psb_d_mat_mod.o \
 	serial/psb_c_base_mat_mod.o serial/psb_c_csr_mat_mod.o serial/psb_c_csc_mat_mod.o serial/psb_c_mat_mod.o \
-	serial/psb_z_base_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_z_csc_mat_mod.o serial/psb_z_mat_mod.o 
+	serial/psb_z_base_mat_mod.o serial/psb_z_csr_mat_mod.o serial/psb_z_csc_mat_mod.o serial/psb_z_mat_mod.o \
+	serial/psb_s_nest_mat_mod.o serial/psb_s_nest_base_mat_mod.o \
+	serial/psb_d_nest_mat_mod.o serial/psb_d_nest_base_mat_mod.o \
+	serial/psb_c_nest_mat_mod.o serial/psb_c_nest_base_mat_mod.o \
+	serial/psb_z_nest_mat_mod.o serial/psb_z_nest_base_mat_mod.o
 #\
 #	serial/psb_ls_csr_mat_mod.o serial/psb_ld_csr_mat_mod.o serial/psb_lc_csr_mat_mod.o serial/psb_lz_csr_mat_mod.o 
 #\
@@ -91,10 +96,15 @@ SERIAL_MODS=serial/psb_s_serial_mod.o serial/psb_d_serial_mod.o \
 UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
         desc/psb_gen_block_map_mod.o desc/psb_list_map_mod.o desc/psb_repl_map_mod.o\
         desc/psb_glist_map_mod.o desc/psb_hash_map_mod.o desc/psb_hashval.o \
-	desc/psb_desc_mod.o auxil/psb_sort_mod.o \
+	desc/psb_desc_mod.o desc/psb_desc_nest_mod.o auxil/psb_sort_mod.o \
 	tools/psb_cd_tools_mod.o \
+	tools/psb_cd_nest_tools_mod.o \
 	tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
 	tools/psb_s_tools_mod.o tools/psb_d_tools_mod.o\
+	tools/psb_s_nest_tools_mod.o tools/psb_d_nest_tools_mod.o \
+	tools/psb_c_nest_tools_mod.o tools/psb_z_nest_tools_mod.o \
+	tools/psb_s_nest_builder_mod.o tools/psb_d_nest_builder_mod.o \
+	tools/psb_c_nest_builder_mod.o tools/psb_z_nest_builder_mod.o \
 	tools/psb_c_tools_mod.o tools/psb_z_tools_mod.o \
 	tools/psb_i2_tools_a_mod.o tools/psb_m_tools_a_mod.o tools/psb_e_tools_a_mod.o \
 	tools/psb_s_tools_a_mod.o tools/psb_d_tools_a_mod.o\
@@ -128,7 +138,7 @@ UTIL_MODS = desc/psb_desc_const_mod.o desc/psb_indx_map_mod.o\
 
 
 MODULES=$(BASIC_MODS) $(SERIAL_MODS) $(UTIL_MODS)
-OBJS = error.o psb_base_mod.o $(EXTRA_COBJS) cutil.o 
+OBJS = error.o psb_base_mod.o psb_s_nest_mod.o psb_d_nest_mod.o psb_c_nest_mod.o psb_z_nest_mod.o $(EXTRA_COBJS) cutil.o 
 MODDIR=../../modules
 INCDIR=../../include
 LIBDIR=../
@@ -413,12 +423,55 @@ comm/psi_s_comm_a_mod.o comm/psi_d_comm_a_mod.o \
 comm/psi_c_comm_a_mod.o comm/psi_z_comm_a_mod.o:  desc/psb_desc_mod.o
 
 tools/psb_tools_mod.o: tools/psb_cd_tools_mod.o tools/psb_s_tools_mod.o  tools/psb_d_tools_mod.o\
+	tools/psb_cd_nest_tools_mod.o \
+	tools/psb_s_nest_tools_mod.o tools/psb_d_nest_tools_mod.o \
+	tools/psb_c_nest_tools_mod.o tools/psb_z_nest_tools_mod.o \
 	tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
 	tools/psb_c_tools_mod.o  tools/psb_z_tools_mod.o \
 	tools/psb_i2_tools_a_mod.o tools/psb_m_tools_a_mod.o tools/psb_e_tools_a_mod.o \
 	tools/psb_s_tools_a_mod.o tools/psb_d_tools_a_mod.o\
 	tools/psb_c_tools_a_mod.o tools/psb_z_tools_a_mod.o 
 
+tools/psb_cd_nest_tools_mod.o: tools/psb_cd_nest_tools_mod.F90 tools/psb_cd_tools_mod.o desc/psb_desc_nest_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_cd_nest_tools_mod.F90 -o tools/psb_cd_nest_tools_mod.o
+
+tools/psb_d_nest_tools_mod.o: tools/psb_d_nest_tools_mod.F90 tools/psb_d_tools_mod.o \
+	desc/psb_desc_nest_mod.o serial/psb_d_nest_mat_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_d_nest_tools_mod.F90 -o tools/psb_d_nest_tools_mod.o
+
+tools/psb_d_nest_builder_mod.o: tools/psb_d_nest_builder_mod.F90 tools/psb_cd_tools_mod.o \
+	tools/psb_cd_nest_tools_mod.o \
+	tools/psb_s_nest_tools_mod.o tools/psb_d_nest_tools_mod.o \
+	tools/psb_c_nest_tools_mod.o tools/psb_z_nest_tools_mod.o \
+	serial/psb_d_nest_base_mat_mod.o serial/psb_d_nest_mat_mod.o desc/psb_desc_nest_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_d_nest_builder_mod.F90 -o tools/psb_d_nest_builder_mod.o
+
+tools/psb_s_nest_tools_mod.o: tools/psb_s_nest_tools_mod.F90 tools/psb_s_tools_mod.o \
+	desc/psb_desc_nest_mod.o serial/psb_s_nest_mat_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_s_nest_tools_mod.F90 -o tools/psb_s_nest_tools_mod.o
+
+tools/psb_s_nest_builder_mod.o: tools/psb_s_nest_builder_mod.F90 tools/psb_cd_tools_mod.o \
+	tools/psb_cd_nest_tools_mod.o tools/psb_s_nest_tools_mod.o \
+	serial/psb_s_nest_base_mat_mod.o serial/psb_s_nest_mat_mod.o desc/psb_desc_nest_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_s_nest_builder_mod.F90 -o tools/psb_s_nest_builder_mod.o
+
+tools/psb_c_nest_tools_mod.o: tools/psb_c_nest_tools_mod.F90 tools/psb_c_tools_mod.o \
+	desc/psb_desc_nest_mod.o serial/psb_c_nest_mat_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_c_nest_tools_mod.F90 -o tools/psb_c_nest_tools_mod.o
+
+tools/psb_c_nest_builder_mod.o: tools/psb_c_nest_builder_mod.F90 tools/psb_cd_tools_mod.o \
+	tools/psb_cd_nest_tools_mod.o tools/psb_c_nest_tools_mod.o \
+	serial/psb_c_nest_base_mat_mod.o serial/psb_c_nest_mat_mod.o desc/psb_desc_nest_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_c_nest_builder_mod.F90 -o tools/psb_c_nest_builder_mod.o
+
+tools/psb_z_nest_tools_mod.o: tools/psb_z_nest_tools_mod.F90 tools/psb_z_tools_mod.o \
+	desc/psb_desc_nest_mod.o serial/psb_z_nest_mat_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_z_nest_tools_mod.F90 -o tools/psb_z_nest_tools_mod.o
+
+tools/psb_z_nest_builder_mod.o: tools/psb_z_nest_builder_mod.F90 tools/psb_cd_tools_mod.o \
+	tools/psb_cd_nest_tools_mod.o tools/psb_z_nest_tools_mod.o \
+	serial/psb_z_nest_base_mat_mod.o serial/psb_z_nest_mat_mod.o desc/psb_desc_nest_mod.o
+	$(FC) $(FCOPT) $(FINCLUDES) $(FDEFINES) -c tools/psb_z_nest_builder_mod.F90 -o tools/psb_z_nest_builder_mod.o
 
 tools/psb_cd_tools_mod.o tools/psb_i_tools_mod.o tools/psb_l_tools_mod.o \
 tools/psb_s_tools_mod.o tools/psb_d_tools_mod.o \
@@ -441,6 +494,48 @@ psblas/psb_z_psblas_mod.o: serial/psb_z_vect_mod.o serial/psb_z_mat_mod.o
 psblas/psb_psblas_mod.o: psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o  psblas/psb_d_psblas_mod.o psblas/psb_z_psblas_mod.o
 psblas/psb_s_psblas_mod.o psblas/psb_c_psblas_mod.o psblas/psb_d_psblas_mod.o psblas/psb_z_psblas_mod.o: serial/psb_mat_mod.o desc/psb_desc_mod.o
 
+# --- nested mat/desc dependencies (MATNEST) ---
+serial/psb_s_nest_mat_mod.o: serial/psb_s_mat_mod.o
+serial/psb_s_nest_base_mat_mod.o: serial/psb_s_nest_mat_mod.o desc/psb_desc_nest_mod.o serial/psb_s_base_mat_mod.o serial/psb_s_mat_mod.o desc/psb_desc_mod.o \
+	serial/psb_i_vect_mod.o serial/psb_s_base_vect_mod.o
+psb_s_nest_mod.o: \
+	desc/psb_desc_nest_mod.o \
+	serial/psb_s_nest_mat_mod.o \
+	serial/psb_s_nest_base_mat_mod.o \
+	tools/psb_cd_nest_tools_mod.o \
+	tools/psb_s_nest_tools_mod.o \
+	tools/psb_s_nest_builder_mod.o
+serial/psb_c_nest_mat_mod.o: serial/psb_c_mat_mod.o
+serial/psb_c_nest_base_mat_mod.o: serial/psb_c_nest_mat_mod.o desc/psb_desc_nest_mod.o serial/psb_c_base_mat_mod.o serial/psb_c_mat_mod.o desc/psb_desc_mod.o \
+	serial/psb_i_vect_mod.o serial/psb_c_base_vect_mod.o
+psb_c_nest_mod.o: \
+	desc/psb_desc_nest_mod.o \
+	serial/psb_c_nest_mat_mod.o \
+	serial/psb_c_nest_base_mat_mod.o \
+	tools/psb_cd_nest_tools_mod.o \
+	tools/psb_c_nest_tools_mod.o \
+	tools/psb_c_nest_builder_mod.o
+serial/psb_z_nest_mat_mod.o: serial/psb_z_mat_mod.o
+serial/psb_z_nest_base_mat_mod.o: serial/psb_z_nest_mat_mod.o desc/psb_desc_nest_mod.o serial/psb_z_base_mat_mod.o serial/psb_z_mat_mod.o desc/psb_desc_mod.o \
+	serial/psb_i_vect_mod.o serial/psb_z_base_vect_mod.o
+psb_z_nest_mod.o: \
+	desc/psb_desc_nest_mod.o \
+	serial/psb_z_nest_mat_mod.o \
+	serial/psb_z_nest_base_mat_mod.o \
+	tools/psb_cd_nest_tools_mod.o \
+	tools/psb_z_nest_tools_mod.o \
+	tools/psb_z_nest_builder_mod.o
+desc/psb_desc_nest_mod.o: desc/psb_desc_mod.o
+serial/psb_d_nest_mat_mod.o: serial/psb_d_mat_mod.o
+serial/psb_d_nest_base_mat_mod.o: serial/psb_d_nest_mat_mod.o desc/psb_desc_nest_mod.o serial/psb_d_base_mat_mod.o serial/psb_d_mat_mod.o desc/psb_desc_mod.o \
+	serial/psb_i_vect_mod.o serial/psb_d_base_vect_mod.o
+psb_d_nest_mod.o: \
+	desc/psb_desc_nest_mod.o \
+	serial/psb_d_nest_mat_mod.o \
+	serial/psb_d_nest_base_mat_mod.o \
+	tools/psb_cd_nest_tools_mod.o \
+	tools/psb_d_nest_tools_mod.o \
+	tools/psb_d_nest_builder_mod.o
 
 psb_base_mod.o: $(MODULES)
 

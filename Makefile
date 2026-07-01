@@ -98,6 +98,7 @@ clean: cleanlib
 cleantest:
 	cd test/fileread && $(MAKE) clean
 	cd test/pdegen && $(MAKE) clean
+	cd test/nested && $(MAKE) clean
 	cd test/util && $(MAKE) clean
 
 cleanlib:

@@ -5,8 +5,10 @@ include $(INCDIR)/Make.inc.psblas
 #
 # Libraries used
 LIBDIR=$(INSTALLDIR)/lib
-PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base 
-LDLIBS=$(PSBLDLIBS)
+# BLASLIBDIR=/opt/share/sdk/intel/nvidia_hpc_sdk/Linux_x86_64/24.3/compilers/lib
+# GKLIBDIR=/home/jalmerol/GKlib/build/Linux-x86_64
+PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_base
+LDLIBS= $(PSBLDLIBS)
 #
 # Compilers and such
 #
@@ -38,10 +40,9 @@ psb_s_pde2d: psb_s_pde2d.o
 	$(FLINK) psb_s_pde2d.o  -o psb_s_pde2d $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_s_pde2d $(EXEDIR)
 
-
 clean: 
-	/bin/rm -f psb_d_pde3d.o psb_d_oacc_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o  *$(.mod) \
-	$(EXEDIR)/psb_d_pde3d $(EXEDIR)/psb_s_pde3d $(EXEDIR)/psb_d_pde2d $(EXEDIR)/psb_s_pde2d 
+	/bin/rm -f psb_d_pde3d.o psb_d_oacc_pde3d.o psb_s_pde3d.o  psb_d_pde2d.o psb_s_pde2d.o *$(.mod) \
+	$(EXEDIR)/psb_d_pde3d $(EXEDIR)/psb_s_pde3d $(EXEDIR)/psb_d_pde2d $(EXEDIR)/psb_s_pde2d
 verycleanlib: 
 	(cd ../..; make veryclean)
 lib:
