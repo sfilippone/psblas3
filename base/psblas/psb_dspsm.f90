@@ -746,8 +746,8 @@ subroutine psb_dspsv_mv(alpha, t, x, idx_x, beta, y, desc_a, info, &
     goto 9999
   endif
 
-  if((idx_x <= 0) .or. (idx_x < x%get_ncols())) then
-    info = psb_err_input_asize_small_i_
+  if((idx_x <= 0) .or. (idx_x > x%get_ncols())) then
+    info = psb_err_iarg_invalid_value_
     call psb_errpush(info, name)
     goto 9999
   endif
@@ -907,8 +907,8 @@ subroutine psb_dspsv_vm(alpha, t, x, beta, y, idx_y, desc_a, info, &
     goto 9999
   endif
 
-  if((idx_y <= 0) .or. (idx_y < y%get_ncols())) then
-    info = psb_err_input_asize_small_i_
+  if((idx_y <= 0) .or. (idx_y > y%get_ncols())) then
+    info = psb_err_iarg_invalid_value_
     call psb_errpush(info, name)
     goto 9999
   endif
@@ -1061,7 +1061,7 @@ subroutine psb_dspsv_mm_full(alpha, t, x, beta, y, desc_a, info, &
   endif
 
   if(x%get_ncols() /= y%get_ncols()) then
-    info = psb_err_input_asize_small_i_
+    info = psb_err_invalid_mvect_size_
     call psb_errpush(info, name)
     goto 9999
   endif
@@ -1213,8 +1213,8 @@ subroutine psb_dspsv_mm_idxs(alpha, t, x, idx_x, beta, y, idx_y, desc_a, info, &
     goto 9999
   endif
 
-  if((idx_x <= 0) .or. (idx_x < x%get_ncols()) .or. (idx_y <= 0) .or. (idx_y < y%get_ncols())) then
-    info = psb_err_input_asize_small_i_
+  if((idx_x <= 0) .or. (idx_x > x%get_ncols()) .or. (idx_y <= 0) .or. (idx_y > y%get_ncols())) then
+    info = psb_err_iarg_invalid_value_
     call psb_errpush(info, name)
     goto 9999
   endif
