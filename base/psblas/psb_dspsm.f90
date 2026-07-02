@@ -569,7 +569,7 @@ subroutine psb_dspsv_vect(alpha, a, x, beta, y, desc_a, info, &
   name = 'psb_dspsv_vect'
   info = psb_success_
   call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
@@ -678,7 +678,7 @@ subroutine psb_dspsv_vect(alpha, a, x, beta, y, desc_a, info, &
   if(aliw) deallocate(iwork)
 
   call psb_erractionrestore(err_act)
-  return  
+  return
 
 9999 call psb_error_handler(ctxt, err_act)
   return
@@ -717,6 +717,133 @@ subroutine psb_dspsv_mv(alpha, t, x, idx_x, beta, y, desc_a, info, &
   real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
   integer(psb_ipk_), parameter  :: nb = 4
 
+  name = 'psb_dspsv_mv'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(.not. allocated(x%v)) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  
+  if(.not. allocated(y%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if((idx_x <= 0) .or. (idx_x < x%get_ncols())) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(present(choice)) then     
+    choice_ = choice
+  else
+    choice_ = psb_avg_
+  endif
+
+  if(present(scale)) then     
+    lscale = psb_toupper(scale)
+  else
+    lscale = 'U'
+  endif
+
+  if(present(trans)) then     
+    itrans = psb_toupper(trans)
+  else
+    itrans = 'N'
+  endif
+  
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if((info == psb_success_) .and. (lldx < ncol)) call x%reall(ncol, x%get_ncols(), info)
+  if((info == psb_success_) .and. (lldy < ncol)) call y%reall(ncol, info)
+
+  if(psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  ! check for presence/size of a work area
+  liwork = 2*ncol
+
+  if(present(work)) then     
+    if(size(work) >= liwork) then 
+      aliw = .false.
+    else 
+      aliw = .true.
+    endif
+  else
+    aliw = .true.
+  end if
+
+  if(aliw) then 
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  iwork(1) = 0.d0
+
+  ! Perform local triangular system solve
+  call t%spsm(alpha, x, idx_x, beta, y, info, trans = trans, scale = scale, d = diag)    
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'dcssm'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  ! update overlap elements
+  if(choice_ > 0) then
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(y%v, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
+      goto 9999
+    end if
+  end if
+
+  if(aliw) deallocate(iwork)
+
+  call psb_erractionrestore(err_act)
+  return
+
 9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsv_mv
@@ -751,6 +878,133 @@ subroutine psb_dspsv_vm(alpha, t, x, beta, y, idx_y, desc_a, info, &
   real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
   integer(psb_ipk_), parameter  :: nb = 4
 
+  name = 'psb_dspsv_mv'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(.not. allocated(x%v)) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+  
+  if(.not. allocated(y%v)) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if((idx_y <= 0) .or. (idx_y < y%get_ncols())) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(present(choice)) then     
+    choice_ = choice
+  else
+    choice_ = psb_avg_
+  endif
+
+  if(present(scale)) then     
+    lscale = psb_toupper(scale)
+  else
+    lscale = 'U'
+  endif
+
+  if(present(trans)) then     
+    itrans = psb_toupper(trans)
+  else
+    itrans = 'N'
+  endif
+  
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if((info == psb_success_) .and. (lldx < ncol)) call x%reall(ncol, info)
+  if((info == psb_success_) .and. (lldy < ncol)) call y%reall(ncol, y%get_ncols(), info)
+
+  if(psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  ! check for presence/size of a work area
+  liwork = 2*ncol
+
+  if(present(work)) then     
+    if(size(work) >= liwork) then 
+      aliw = .false.
+    else 
+      aliw = .true.
+    endif
+  else
+    aliw = .true.
+  end if
+
+  if(aliw) then 
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  iwork(1) = 0.d0
+
+  ! Perform local triangular system solve
+  call t%spsm(alpha, x, beta, y, idx_y, info, trans = trans, scale = scale, d = diag)    
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'dcssm'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  ! update overlap elements
+  if(choice_ > 0) then
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(y%v, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
+      goto 9999
+    end if
+  end if
+
+  if(aliw) deallocate(iwork)
+
+  call psb_erractionrestore(err_act)
+  return
+
 9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsv_vm
@@ -783,6 +1037,126 @@ subroutine psb_dspsv_mm_full(alpha, t, x, beta, y, desc_a, info, &
   real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
   integer(psb_ipk_), parameter  :: nb = 4
 
+  name = 'psb_dspsv_mm_idxs'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(x%get_ncols() /= y%get_ncols()) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(present(choice)) then     
+    choice_ = choice
+  else
+    choice_ = psb_avg_
+  endif
+
+  if(present(scale)) then     
+    lscale = psb_toupper(scale)
+  else
+    lscale = 'U'
+  endif
+
+  if(present(trans)) then     
+    itrans = psb_toupper(trans)
+  else
+    itrans = 'N'
+  endif
+  
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if((info == psb_success_) .and. (lldx < ncol)) call x%reall(ncol, x%get_ncols(), info)
+  if((info == psb_success_) .and. (lldy < ncol)) call y%reall(ncol, y%get_ncols(), info)
+
+  if(psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  ! check for presence/size of a work area
+  liwork = 2*ncol
+
+  if(present(work)) then     
+    if(size(work) >= liwork) then 
+      aliw = .false.
+    else 
+      aliw = .true.
+    endif
+  else
+    aliw = .true.
+  end if
+
+  if(aliw) then 
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  iwork(1) = 0.d0
+
+  ! Perform local triangular system solve
+  call t%spsm(alpha, x, beta, y, info, trans = trans, scale = scale, d = diag)    
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'dcssm'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  ! update overlap elements
+  if(choice_ > 0) then
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(y%v, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
+      goto 9999
+    end if
+  end if
+
+  if(aliw) deallocate(iwork)
+
+  call psb_erractionrestore(err_act)
+  return
 9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsv_mm_full
@@ -816,7 +1190,126 @@ subroutine psb_dspsv_mm_idxs(alpha, t, x, idx_x, beta, y, idx_y, desc_a, info, &
   real(psb_dpk_), pointer :: iwork(:), xp(:, :), yp(:, :), id(:)
   integer(psb_ipk_), parameter  :: nb = 4
 
+  name = 'psb_dspsv_mm_idxs'
+  info = psb_success_
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
+  end if
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then 
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if((idx_x <= 0) .or. (idx_x < x%get_ncols()) .or. (idx_y <= 0) .or. (idx_y < y%get_ncols())) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(present(choice)) then     
+    choice_ = choice
+  else
+    choice_ = psb_avg_
+  endif
+
+  if(present(scale)) then     
+    lscale = psb_toupper(scale)
+  else
+    lscale = 'U'
+  endif
+
+  if(present(trans)) then     
+    itrans = psb_toupper(trans)
+  else
+    itrans = 'N'
+  endif
   
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  m    = desc_a%get_global_rows()
+  nrow = desc_a%get_local_rows()
+  ncol = desc_a%get_local_cols()
+  lldx = x%get_nrows()
+  lldy = y%get_nrows()
+  if((info == psb_success_) .and. (lldx < ncol)) call x%reall(ncol, x%get_ncols(), info)
+  if((info == psb_success_) .and. (lldy < ncol)) call y%reall(ncol, y%get_ncols(), info)
+
+  if(psb_errstatus_fatal()) then 
+    info = psb_err_from_subroutine_
+    ch_err = 'reall'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  iwork => null()
+  ! check for presence/size of a work area
+  liwork = 2*ncol
+
+  if(present(work)) then     
+    if(size(work) >= liwork) then 
+      aliw = .false.
+    else 
+      aliw = .true.
+    endif
+  else
+    aliw = .true.
+  end if
+
+  if(aliw) then 
+    allocate(iwork(liwork), stat = info)
+    if(info /= psb_success_) then
+      info = psb_err_from_subroutine_
+      ch_err = 'psb_realloc'
+      call psb_errpush(info, name, a_err = ch_err)
+      goto 9999
+    end if
+  else
+    iwork => work
+  endif
+
+  iwork(1) = 0.d0
+
+  ! Perform local triangular system solve
+  call t%spsm(alpha, x, idx_x, beta, y, idx_y, info, trans = trans, scale = scale, d = diag)    
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'dcssm'
+    call psb_errpush(info, name, a_err = ch_err)
+    goto 9999
+  end if
+
+  ! update overlap elements
+  if(choice_ > 0) then
+    call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, &
+                      & iwork, info, data = psb_comm_ovr_)
+    if(info == psb_success_) call psi_ovrl_upd(y%v, desc_a, choice_, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_from_subroutine_, name, a_err = 'Inner updates')
+      goto 9999
+    end if
+  end if
+
+  if(aliw) deallocate(iwork)
+
+  call psb_erractionrestore(err_act)
+  return
 
 9999 call psb_error_handler(ctxt, err_act)
   return

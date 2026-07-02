@@ -107,19 +107,35 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: csmm        => psb_d_base_csmm
     procedure, pass(a) :: mvt_mv      => psb_d_base_mvect_mv
     procedure, pass(a) :: mvt_vm      => psb_d_base_mvect_vm
-    procedure, pass(a) :: mvt_mm_idxs => psb_d_base_mvect_mm_idxs
-    procedure, pass(a) :: mvt_mm_full => psb_d_base_mvect_mm_full
-    generic, public    :: spmm        => csmm, csmv, vect_mv, mvt_mv, mvt_vm, mvt_mm_idxs, mvt_mm_full
+    procedure, pass(a) :: mvt_mm_i    => psb_d_base_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_f    => psb_d_base_mvect_mm_full
+    generic, public    :: spmm        => csmm, csmv, vect_mv, &
+                                        & mvt_mv, mvt_vm, &
+                                        & mvt_mm_i, mvt_mm_f
 
-    procedure, pass(a) :: vect_cssv   => psb_d_base_vect_cssv
     procedure, pass(a) :: cssv        => psb_d_base_cssv
     procedure, pass(a) :: cssm        => psb_d_base_cssm
-    generic, public    :: spsm        => cssm, cssv, vect_cssv
+    procedure, pass(a) :: vect_cssv   => psb_d_base_vect_cssv
+    procedure, pass(a) :: cssv_mv     => psb_d_base_cssv_mv
+    procedure, pass(a) :: cssv_vm     => psb_d_base_cssv_vm
+    procedure, pass(a) :: cssv_mm_i   => psb_d_base_cssv_mm_i
+    procedure, pass(a) :: cssv_mm_f   => psb_d_base_cssv_mm_f
+    generic, public    :: spsm        => cssm, cssv, vect_cssv, &
+                                        & cssv_mv, cssv_vm, &
+                                        & cssv_mm_i, cssv_mm_f
 
-    procedure, pass(a) :: in_vect_sv  => psb_d_base_inner_vect_sv
+    ! Multivector inner object routines are not implemented.
+    ! The base ones calls use directly the underlying fortran arrays
     procedure, pass(a) :: inner_cssv  => psb_d_base_inner_cssv
     procedure, pass(a) :: inner_cssm  => psb_d_base_inner_cssm
-    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv
+    procedure, pass(a) :: in_vect_sv  => psb_d_base_inner_vect_sv
+    ! procedure, pass(a) :: inner_cssv_mv   => psb_d_base_inner_cssv_mv
+    ! procedure, pass(a) :: inner_cssv_vm   => psb_d_base_inner_cssv_vm
+    ! procedure, pass(a) :: inner_cssv_mm_i => psb_d_base_inner_cssv_mm_i
+    ! procedure, pass(a) :: inner_cssv_mm_f => psb_d_base_inner_cssv_mm_f
+    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv !, &
+                                        ! & inner_cssv_mv, inner_cssv_vm, &
+                                        ! & inner_cssv_mm_i, inner_cssv_mm_f
 
     procedure, pass(a) :: scals       => psb_d_base_scals
     procedure, pass(a) :: scalv       => psb_d_base_scal
@@ -1505,6 +1521,58 @@ module psb_d_base_mat_mod
   !
   ! Multivector version
   !
+  interface
+    subroutine psb_d_base_cssv_mv(alpha, a, x, idx_x, beta, y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_d_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_mv
+  end interface
+
+  interface
+    subroutine psb_d_base_cssv_vm(alpha, a, x, beta, y, idx_y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_vect_type), intent(inout)      :: x
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_vm
+  end interface
+
+  interface
+    subroutine psb_d_base_cssv_mm_i(alpha, a, x, idx_x, beta, y, idx_y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_mm_i
+  end interface
+
+  interface
+    subroutine psb_d_base_cssv_mm_f(alpha, a, x, beta, y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_mm_f
+  end interface
 
   !
   !> Function base_scals:

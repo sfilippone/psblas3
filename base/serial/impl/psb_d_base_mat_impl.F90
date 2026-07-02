@@ -58,7 +58,7 @@ subroutine psb_d_base_cp_to_coo(a, b, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_cp_to_coo
@@ -81,7 +81,7 @@ subroutine psb_d_base_cp_from_coo(a, b, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_cp_from_coo
@@ -111,11 +111,11 @@ subroutine psb_d_base_cp_to_fmt(a, b, info)
     call a%cp_to_coo(b, info)
   class default
     call a%cp_to_coo(tmp, info)
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   end select
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -143,7 +143,7 @@ subroutine psb_d_base_cp_from_fmt(a, b, info)
   !
   ! Default implementation
   !
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   select type(b)
@@ -151,12 +151,12 @@ subroutine psb_d_base_cp_from_fmt(a, b, info)
     call a%cp_from_coo(b, info)
   class default
     call b%cp_to_coo(tmp, info)
-    if (info == psb_success_) call a%mv_from_coo(tmp, info)
+    if(info == psb_success_) call a%mv_from_coo(tmp, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -182,14 +182,14 @@ subroutine psb_d_base_mv_to_coo(a, b, info)
   logical, parameter :: debug=.false.
 
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_to_coo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to coo')
+    call psb_errpush(info, name, a_err = 'to coo')
     goto 9999
   end if
 
@@ -216,14 +216,14 @@ subroutine psb_d_base_mv_from_coo(a, b, info)
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_from_coo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='from coo')
+    call psb_errpush(info, name, a_err = 'from coo')
     goto 9999
   end if
 
@@ -260,7 +260,7 @@ subroutine psb_d_base_mv_to_fmt(a, b, info)
     call a%mv_to_coo(b, info)
   class default
     call a%mv_to_coo(tmp, info)
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   end select
 
   return
@@ -290,7 +290,7 @@ subroutine psb_d_base_mv_from_fmt(a, b, info)
     call a%mv_from_coo(b, info)
   class default
     call b%mv_to_coo(tmp, info)
-    if (info == psb_success_) call a%mv_from_coo(tmp, info)
+    if(info == psb_success_) call a%mv_from_coo(tmp, info)
   end select
   return
 
@@ -306,8 +306,8 @@ subroutine psb_d_base_clean_zeros(a, info)
   type(psb_d_coo_sparse_mat) :: tmpcoo
 
   call a%mv_to_coo(tmpcoo, info)
-  if (info == 0) call tmpcoo%clean_zeros(info)
-  if (info == 0) call a%mv_from_coo(tmpcoo, info)
+  if(info == 0) call tmpcoo%clean_zeros(info)
+  if(info == 0) call a%mv_from_coo(tmpcoo, info)
 
 end subroutine psb_d_base_clean_zeros
 
@@ -329,7 +329,7 @@ subroutine psb_d_base_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_csput_a
@@ -354,16 +354,16 @@ subroutine psb_d_base_csput_v(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
-    if (a%is_dev())   call a%sync()
-    if (val%is_dev()) call val%sync()
-    if (ia%is_dev())  call ia%sync()
-    if (ja%is_dev())  call ja%sync()
+  if(allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    if(a%is_dev())   call a%sync()
+    if(val%is_dev()) call val%sync()
+    if(ia%is_dev())  call ia%sync()
+    if(ja%is_dev())  call ja%sync()
     call a%csput(nz, ia%v, ja%v, val%v, imin, imax, jmin, jmax, info)
   else
     info = psb_err_invalid_mat_state_
   endif
-  if (info /= 0) then
+  if(info /= 0) then
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -402,7 +402,7 @@ subroutine psb_d_base_csgetrow(imin, imax, a, nz, ia, ja, val, info, &
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_csgetrow
@@ -437,49 +437,49 @@ subroutine psb_d_base_csgetblk(imin, imax, a, b, info, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(append)) then
+  if(present(append)) then
     append_ = append
   else
     append_ = .false.
   endif
-  if (append_) then
+  if(append_) then
     nzin = a%get_nzeros()
   else
     nzin = 0
   endif
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_=rscale
   else
     rscale_=.false.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_=cscale
   else
     cscale_=.false.
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   endif
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   endif
 
-  if (append_.and.(rscale_.or.cscale_)) then
+  if(append_.and.(rscale_.or.cscale_)) then
     write(psb_err_unit, *) &
          & 'd_csgetblk: WARNING: dubious input: append_ and rscale_|cscale_'
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     call b%set_nrows(imax-imin+1)
   else
     call b%set_nrows(max(min(imax, a%get_nrows()), b%get_nrows()))
   end if
 
-  if (cscale_) then
+  if(cscale_) then
     call b%set_ncols(jmax_-jmin_+1)
   else
     call b%set_ncols(max(min(jmax_, a%get_ncols()), b%get_ncols()))
@@ -489,11 +489,11 @@ subroutine psb_d_base_csgetblk(imin, imax, a, b, info, &
        & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
        & nzin=nzin, rscale=rscale, cscale=cscale, chksz=chksz)
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call b%set_nzeros(nzin+nzout)
   call b%fix(info)
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -525,43 +525,43 @@ subroutine psb_d_base_csclip(a, b, info, &
   info = psb_success_
 
   nzin = 0
-  if (present(imin)) then
+  if(present(imin)) then
     imin_ = imin
   else
     imin_ = 1
   end if
-  if (present(imax)) then
+  if(present(imax)) then
     imax_ = imax
   else
     imax_ = a%get_nrows()
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   end if
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   end if
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_ = rscale
   else
     rscale_ = .true.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_ = cscale
   else
     cscale_ = .true.
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     mb = imax_ - imin_ +1
   else
     mb = a%get_nrows() ! Should this be imax_ ??
   endif
-  if (cscale_) then
+  if(cscale_) then
     nb = jmax_ - jmin_ +1
   else
     nb = a%get_ncols()  ! Should this be jmax_ ??
@@ -570,12 +570,12 @@ subroutine psb_d_base_csclip(a, b, info, &
   call a%csget(imin_, imax_, nzout, b%ia, b%ja, b%val, info, &
        & jmin=jmin_, jmax=jmax_, append=.false., &
        & nzin=nzin, rscale=rscale_, cscale=cscale_)
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call b%set_nzeros(nzin+nzout)
   call b%fix(info)
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -615,48 +615,48 @@ subroutine psb_d_base_tril(a, l, info, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(diag)) then
+  if(present(diag)) then
     diag_ = diag
   else
     diag_ = 0
   end if
-  if (present(imin)) then
+  if(present(imin)) then
     imin_ = imin
   else
     imin_ = 1
   end if
-  if (present(imax)) then
+  if(present(imax)) then
     imax_ = imax
   else
     imax_ = a%get_nrows()
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   end if
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   end if
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_ = rscale
   else
     rscale_ = .true.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_ = cscale
   else
     cscale_ = .true.
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     mb = imax_ - imin_ +1
   else
     mb = imax_
   endif
-  if (cscale_) then
+  if(cscale_) then
     nb = jmax_ - jmin_ +1
   else
     nb = jmax_
@@ -666,7 +666,7 @@ subroutine psb_d_base_tril(a, l, info, &
   nz = a%get_nzeros()
   call l%allocate(mb, nb, nz)
 
-  if (present(u)) then
+  if(present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
     call u%allocate(mb, nb, nz)
     nzuin = u%get_nzeros() ! At this point it should be 0
@@ -680,7 +680,7 @@ subroutine psb_d_base_tril(a, l, info, &
       call a%csget(i, i+ibk-1, nzout, ia, ja, val, info, &
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        if ((ja(k)-ia(k))<=diag_) then
+        if((ja(k)-ia(k))<=diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
@@ -698,11 +698,11 @@ subroutine psb_d_base_tril(a, l, info, &
     call u%set_nzeros(nzuin)
     call u%fix(info)
     nzout = u%get_nzeros()
-    if (rscale_) &
+    if(rscale_) &
          & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
-    if (cscale_) &
+    if(cscale_) &
          & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
-    if ((diag_ >= -1).and.(imin_ == jmin_)) then
+    if((diag_ >= -1).and.(imin_ == jmin_)) then
       call u%set_triangle(.true.)
       call u%set_lower(.false.)
     end if
@@ -713,24 +713,24 @@ subroutine psb_d_base_tril(a, l, info, &
       call a%csget(i, i, nzout, l%ia, l%ja, l%val, info, &
            & jmin=jmin_, jmax=k, append=.true., &
            & nzin=nzin)
-      if (info /= psb_success_) goto 9999
+      if(info /= psb_success_) goto 9999
       call l%set_nzeros(nzin+nzout)
       nzin = nzin+nzout
     end do
   end if
   call l%fix(info)
   nzout = l%get_nzeros()
-  if (rscale_) &
+  if(rscale_) &
        & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
-  if (cscale_) &
+  if(cscale_) &
        & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
 
-  if ((diag_ <= 0).and.(imin_ == jmin_)) then
+  if((diag_ <= 0).and.(imin_ == jmin_)) then
     call l%set_triangle(.true.)
     call l%set_lower(.true.)
   end if
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -766,48 +766,48 @@ subroutine psb_d_base_triu(a, u, info, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(diag)) then
+  if(present(diag)) then
     diag_ = diag
   else
     diag_ = 0
   end if
-  if (present(imin)) then
+  if(present(imin)) then
     imin_ = imin
   else
     imin_ = 1
   end if
-  if (present(imax)) then
+  if(present(imax)) then
     imax_ = imax
   else
     imax_ = a%get_nrows()
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   end if
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   end if
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_ = rscale
   else
     rscale_ = .true.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_ = cscale
   else
     cscale_ = .true.
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     mb = imax_ - imin_ +1
   else
     mb = imax_
   endif
-  if (cscale_) then
+  if(cscale_) then
     nb = jmax_ - jmin_ +1
   else
     nb = jmax_
@@ -817,7 +817,7 @@ subroutine psb_d_base_triu(a, u, info, &
   nz = a%get_nzeros()
   call u%allocate(mb, nb, nz)
 
-  if (present(l)) then
+  if(present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
     call l%allocate(mb, nb, nz)
     nzlin = l%get_nzeros() ! At this point it should be 0
@@ -831,7 +831,7 @@ subroutine psb_d_base_triu(a, u, info, &
       call a%csget(i, i+ibk-1, nzout, ia, ja, val, info, &
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        if ((ja(k)-ia(k))<diag_) then
+        if((ja(k)-ia(k))<diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
@@ -848,11 +848,11 @@ subroutine psb_d_base_triu(a, u, info, &
     call l%set_nzeros(nzlin)
     call l%fix(info)
     nzout = l%get_nzeros()
-    if (rscale_) &
+    if(rscale_) &
          & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
-    if (cscale_) &
+    if(cscale_) &
          & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
-    if ((diag_ <=1).and.(imin_ == jmin_)) then
+    if((diag_ <=1).and.(imin_ == jmin_)) then
       call l%set_triangle(.true.)
       call l%set_lower(.true.)
     end if
@@ -863,24 +863,24 @@ subroutine psb_d_base_triu(a, u, info, &
       call a%csget(i, i, nzout, u%ia, u%ja, u%val, info, &
            & jmin=k, jmax=jmax_, append=.true., &
            & nzin=nzin)
-      if (info /= psb_success_) goto 9999
+      if(info /= psb_success_) goto 9999
       call u%set_nzeros(nzin+nzout)
       nzin = nzin+nzout
     end do
   end if
   call u%fix(info)
   nzout = u%get_nzeros()
-  if (rscale_) &
+  if(rscale_) &
        & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
-  if (cscale_) &
+  if(cscale_) &
        & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
 
-  if ((diag_ >= 0).and.(imin_ == jmin_)) then
+  if((diag_ >= 0).and.(imin_ == jmin_)) then
     call u%set_triangle(.true.)
     call u%set_upper(.true.)
   end if
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -899,11 +899,11 @@ subroutine psb_d_base_clone(a, b, info)
   integer(psb_ipk_), intent(out) :: info
 
   info = 0
-  if (allocated(b)) then
+  if(allocated(b)) then
     call b%free()
     deallocate(b, stat=info)
   end if
-  if (info /= 0) then
+  if(info /= 0) then
     info = psb_err_alloc_dealloc_
     return
   end if
@@ -911,8 +911,8 @@ subroutine psb_d_base_clone(a, b, info)
   ! Do not use SOURCE allocation: this makes sure that
   ! memory allocated elsewhere is treated properly.
   allocate(b, mold=a, stat=info)
-  if (info /= psb_success_) info = psb_err_alloc_dealloc_
-  if (info == psb_success_) call b%cp_from_fmt(a, info)
+  if(info /= psb_success_) info = psb_err_alloc_dealloc_
+  if(info == psb_success_) call b%cp_from_fmt(a, info)
 
 end subroutine psb_d_base_clone
 
@@ -925,9 +925,9 @@ subroutine psb_d_base_make_nonunit(a)
 
   integer(psb_ipk_) :: i, j, m, n, nz, mnm, info
 
-  if (a%is_unit()) then
+  if(a%is_unit()) then
     call a%mv_to_coo(tmp, info)
-    if (info /= 0) return
+    if(info /= 0) return
     m = tmp%get_nrows()
     n = tmp%get_ncols()
     mnm = min(m, n)
@@ -942,7 +942,7 @@ subroutine psb_d_base_make_nonunit(a)
     call tmp%set_nzeros(nz+mnm)
     call tmp%set_unit(.false.)
     call tmp%fix(info)
-    if (info /= 0) &
+    if(info /= 0) &
          & call a%mv_from_coo(tmp, info)
   end if
 
@@ -964,7 +964,7 @@ subroutine psb_d_base_mold(a, b, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_d_base_mold
 
@@ -986,13 +986,13 @@ subroutine psb_d_base_transp_2mat(a, b)
   select type(b)
   class is (psb_d_base_sparse_mat)
     call a%cp_to_coo(tmp, info)
-    if (info == psb_success_) call tmp%transp()
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call tmp%transp()
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   class default
     info = psb_err_invalid_dynamic_type_
   end select
-  if (info /= psb_success_) then
-    call psb_errpush(info, name, a_err=b%get_fmt(), i_err=(/ione/))
+  if(info /= psb_success_) then
+    call psb_errpush(info, name, a_err = b%get_fmt(), i_err=(/ione/))
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -1020,13 +1020,13 @@ subroutine psb_d_base_transc_2mat(a, b)
   select type(b)
   class is (psb_d_base_sparse_mat)
     call a%cp_to_coo(tmp, info)
-    if (info == psb_success_) call tmp%transc()
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call tmp%transc()
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   class default
     info = psb_err_invalid_dynamic_type_
   end select
-  if (info /= psb_success_) then
-    call psb_errpush(info, name, a_err=b%get_fmt(), i_err=(/ione/))
+  if(info /= psb_success_) then
+    call psb_errpush(info, name, a_err = b%get_fmt(), i_err=(/ione/))
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -1051,12 +1051,12 @@ subroutine psb_d_base_transp_1mat(a)
   call psb_erractionsave(err_act)
   info = psb_success_
   call a%mv_to_coo(tmp, info)
-  if (info == psb_success_) call tmp%transp()
-  if (info == psb_success_) call a%mv_from_coo(tmp, info)
+  if(info == psb_success_) call tmp%transp()
+  if(info == psb_success_) call a%mv_from_coo(tmp, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_missing_override_method_
-    call psb_errpush(info, name, a_err=a%get_fmt())
+    call psb_errpush(info, name, a_err = a%get_fmt())
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -1080,12 +1080,12 @@ subroutine psb_d_base_transc_1mat(a)
   call psb_erractionsave(err_act)
   info = psb_success_
   call a%mv_to_coo(tmp, info)
-  if (info == psb_success_) call tmp%transc()
-  if (info == psb_success_) call a%mv_from_coo(tmp, info)
+  if(info == psb_success_) call tmp%transc()
+  if(info == psb_success_) call a%mv_from_coo(tmp, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_missing_override_method_
-    call psb_errpush(info, name, a_err=a%get_fmt())
+    call psb_errpush(info, name, a_err = a%get_fmt())
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -1125,7 +1125,7 @@ subroutine psb_d_base_csmm(alpha, a, x, beta, y, info, trans)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_csmm
@@ -1149,7 +1149,7 @@ subroutine psb_d_base_csmv(alpha, a, x, beta, y, info, trans)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 
@@ -1174,7 +1174,7 @@ subroutine psb_d_base_inner_cssm(alpha, a, x, beta, y, info, trans)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_inner_cssm
@@ -1198,7 +1198,7 @@ subroutine psb_d_base_inner_cssv(alpha, a, x, beta, y, info, trans)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_inner_cssv
@@ -1223,7 +1223,7 @@ subroutine psb_d_base_cssm(alpha, a, x, beta, y, info, trans, scale, d)
 
   call psb_erractionsave(err_act)
 
-  if (.not.a%is_asb()) then
+  if(.not.a%is_asb()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info, name)
     goto 9999
@@ -1232,81 +1232,81 @@ subroutine psb_d_base_cssm(alpha, a, x, beta, y, info, trans, scale, d)
   nar = a%get_nrows()
   nac = a%get_ncols()
   nc = min(size(x, 2), size(y, 2))
-  if (size(x, 1) < nac) then
+  if(size(x, 1) < nac) then
     info = psb_err_input_asize_small_i_
     call psb_errpush(info, name, i_err=(/3_psb_ipk_, nac/))
     goto 9999
   end if
-  if (size(y, 1) < nar) then
+  if(size(y, 1) < nar) then
     info = psb_err_input_asize_small_i_
     call psb_errpush(info, name, i_err=(/5_psb_ipk_, nar/))
     goto 9999
   end if
 
-  if (.not. (a%is_triangle())) then
+  if(.not. (a%is_triangle())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (present(d)) then
-    if (present(scale)) then
+  if(present(d)) then
+    if(present(scale)) then
       scale_ = scale
     else
       scale_ = 'L'
     end if
 
-    if (psb_toupper(scale_) == 'R') then
-      if (size(d, 1) < nac) then
+    if(psb_toupper(scale_) == 'R') then
+      if(size(d, 1) < nac) then
         info = psb_err_input_asize_small_i_
         call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
         goto 9999
       end if
 
       allocate(tmp(nac, nc), stat=info)
-      if (info /= psb_success_) info = psb_err_alloc_dealloc_
-      if (info == psb_success_) then
-        do i=1, nac
+      if(info /= psb_success_) info = psb_err_alloc_dealloc_
+      if(info == psb_success_) then
+        do i = 1, nac
           tmp(i, 1:nc) = d(i)*x(i, 1:nc)
         end do
       end if
-      if (info == psb_success_)&
+      if(info == psb_success_)&
            & call a%inner_spsm(alpha, tmp, beta, y, info, trans)
 
-      if (info == psb_success_) then
+      if(info == psb_success_) then
         deallocate(tmp, stat=info)
-        if (info /= psb_success_) info = psb_err_alloc_dealloc_
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
 
-    else if (psb_toupper(scale_) == 'L') then
+    else if(psb_toupper(scale_) == 'L') then
 
-      if (size(d, 1) < nar) then
+      if(size(d, 1) < nar) then
         info = psb_err_input_asize_small_i_
         call psb_errpush(info, name, i_err=(/9_psb_ipk_, nar/))
         goto 9999
       end if
 
       allocate(tmp(nar, nc), stat=info)
-      if (info /= psb_success_) info = psb_err_alloc_dealloc_
-      if (info == psb_success_)&
+      if(info /= psb_success_) info = psb_err_alloc_dealloc_
+      if(info == psb_success_)&
            & call a%inner_spsm(done, x, dzero, tmp, info, trans)
 
-      if (info == psb_success_)then
+      if(info == psb_success_)then
         do i=1, nar
           tmp(i, 1:nc) = d(i)*tmp(i, 1:nc)
         end do
       end if
-      if (info == psb_success_)&
+      if(info == psb_success_)&
            & call psb_geaxpby(nar, nc, alpha, tmp, beta, y, info)
 
-      if (info == psb_success_) then
+      if(info == psb_success_) then
         deallocate(tmp, stat=info)
-        if (info /= psb_success_) info = psb_err_alloc_dealloc_
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
 
     else
       info = 31
-      call psb_errpush(info, name, i_err=(/8_psb_ipk_, izero/), a_err=scale_)
+      call psb_errpush(info, name, i_err=(/8_psb_ipk_, izero/), a_err = scale_)
       goto 9999
     end if
   else
@@ -1314,9 +1314,9 @@ subroutine psb_d_base_cssm(alpha, a, x, beta, y, info, trans, scale, d)
     call a%inner_spsm(alpha, x, beta, y, info, trans)
   end if
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='inner_cssm')
+    call psb_errpush(info, name, a_err = 'inner_cssm')
     goto 9999
   end if
 
@@ -1347,7 +1347,7 @@ subroutine psb_d_base_cssv(alpha, a, x, beta, y, info, trans, scale, d)
 
   call psb_erractionsave(err_act)
 
-  if (.not.a%is_asb()) then
+  if(.not.a%is_asb()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info, name)
     goto 9999
@@ -1356,76 +1356,76 @@ subroutine psb_d_base_cssv(alpha, a, x, beta, y, info, trans, scale, d)
   nar = a%get_nrows()
   nac = a%get_ncols()
   nc = 1
-  if (size(x, 1) < nac) then
+  if(size(x, 1) < nac) then
     info = psb_err_input_asize_small_i_
     call psb_errpush(info, name, i_err=(/3_psb_ipk_, nac/))
     goto 9999
   end if
-  if (size(y, 1) < nar) then
+  if(size(y, 1) < nar) then
     info = psb_err_input_asize_small_i_
     call psb_errpush(info, name, i_err=(/5_psb_ipk_, nar/))
     goto 9999
   end if
 
-  if (.not. (a%is_triangle())) then
+  if(.not. (a%is_triangle())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (present(d)) then
-    if (present(scale)) then
+  if(present(d)) then
+    if(present(scale)) then
       scale_ = scale
     else
       scale_ = 'L'
     end if
 
-    if (psb_toupper(scale_) == 'R') then
-      if (size(d, 1) < nac) then
+    if(psb_toupper(scale_) == 'R') then
+      if(size(d, 1) < nac) then
         info = psb_err_input_asize_small_i_
         call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
         goto 9999
       end if
 
       allocate(tmp(nac), stat=info)
-      if (info /= psb_success_) info = psb_err_alloc_dealloc_
-      if (info == psb_success_) call inner_vscal(nac, d, x, tmp)
-      if (info == psb_success_)&
+      if(info /= psb_success_) info = psb_err_alloc_dealloc_
+      if(info == psb_success_) call inner_vscal(nac, d, x, tmp)
+      if(info == psb_success_)&
            & call a%inner_spsm(alpha, tmp, beta, y, info, trans)
 
-      if (info == psb_success_) then
+      if(info == psb_success_) then
         deallocate(tmp, stat=info)
-        if (info /= psb_success_) info = psb_err_alloc_dealloc_
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
 
-    else if (psb_toupper(scale_) == 'L') then
-      if (size(d, 1) < nar) then
+    else if(psb_toupper(scale_) == 'L') then
+      if(size(d, 1) < nar) then
         info = psb_err_input_asize_small_i_
         call psb_errpush(info, name, i_err=(/9_psb_ipk_, nar/))
         goto 9999
       end if
 
-      if (beta == dzero) then
+      if(beta == dzero) then
         call a%inner_spsm(alpha, x, dzero, y, info, trans)
-        if (info == psb_success_)  call inner_vscal1(nar, d, y)
+        if(info == psb_success_)  call inner_vscal1(nar, d, y)
       else
         allocate(tmp(nar), stat=info)
-        if (info /= psb_success_) info = psb_err_alloc_dealloc_
-        if (info == psb_success_)&
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
+        if(info == psb_success_)&
              & call a%inner_spsm(alpha, x, dzero, tmp, info, trans)
 
-        if (info == psb_success_)  call inner_vscal1(nar, d, tmp)
-        if (info == psb_success_)&
+        if(info == psb_success_)  call inner_vscal1(nar, d, tmp)
+        if(info == psb_success_)&
              & call psb_geaxpby(nar, done, tmp, beta, y, info)
-        if (info == psb_success_) then
+        if(info == psb_success_) then
           deallocate(tmp, stat=info)
-          if (info /= psb_success_) info = psb_err_alloc_dealloc_
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
         end if
       end if
 
     else
       info = 31
-      call psb_errpush(info, name, i_err=(/8_psb_ipk_, izero/), a_err=scale_)
+      call psb_errpush(info, name, i_err=(/8_psb_ipk_, izero/), a_err = scale_)
       goto 9999
     end if
   else
@@ -1433,9 +1433,9 @@ subroutine psb_d_base_cssv(alpha, a, x, beta, y, info, trans, scale, d)
     call a%inner_spsm(alpha, x, beta, y, info, trans)
   end if
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='inner_spsm')
+    call psb_errpush(info, name, a_err = 'inner_spsm')
     goto 9999
   end if
 
@@ -1491,7 +1491,7 @@ subroutine psb_d_base_scals(d, a, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_scals
@@ -1511,23 +1511,23 @@ subroutine psb_d_base_scalplusidentity(d, a, info)
 
   call psb_erractionsave(err_act)
   call a%mv_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_coo')
+    call psb_errpush(info, name, a_err = 'mv_to_coo')
     goto 9999
   end if
 
   call acoo%scalpid(d, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='scalpid')
+    call psb_errpush(info, name, a_err = 'scalpid')
     goto 9999
   end if
 
   call acoo%mv_to_fmt(a, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_fmt')
+    call psb_errpush(info, name, a_err = 'mv_to_fmt')
     goto 9999
   end if
 
@@ -1557,7 +1557,7 @@ subroutine psb_d_base_scal(d, a, info, side)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_scal
@@ -1581,7 +1581,7 @@ function psb_d_base_maxval(a) result(res)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end function psb_d_base_maxval
@@ -1606,8 +1606,8 @@ function psb_d_base_csnmi(a) result(res)
   call psb_erractionsave(err_act)
   res = dzero
   call psb_realloc(a%get_nrows(), vt, info)
-  if (info /= 0) then
-    info  = psb_err_alloc_dealloc_
+  if(info /= 0) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -1642,8 +1642,8 @@ function psb_d_base_csnm1(a) result(res)
   call psb_erractionsave(err_act)
   res = dzero
   call psb_realloc(a%get_ncols(), vt, info)
-  if (info /= 0) then
-    info  = psb_err_alloc_dealloc_
+  if(info /= 0) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -1674,7 +1674,7 @@ subroutine psb_d_base_rowsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_rowsum
@@ -1695,7 +1695,7 @@ subroutine psb_d_base_arwsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_arwsum
@@ -1716,7 +1716,7 @@ subroutine psb_d_base_colsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_colsum
@@ -1737,7 +1737,7 @@ subroutine psb_d_base_aclsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_aclsum
@@ -1761,7 +1761,7 @@ subroutine psb_d_base_get_diag(a, d, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_d_base_get_diag
@@ -1785,29 +1785,29 @@ subroutine psb_d_base_spaxpby(alpha, a, beta, b, info)
 
   call psb_erractionsave(err_act)
   if((a%get_ncols() /= b%get_ncols()).or.(a%get_nrows() /= b%get_nrows())) then
-    info  = psb_err_from_subroutine_
+    info = psb_err_from_subroutine_
     call psb_errpush(info, name)
     goto 9999
   end if
 
   call a%mv_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_coo')
+    call psb_errpush(info, name, a_err = 'mv_to_coo')
     goto 9999
   end if
 
   call acoo%spaxpby(alpha, beta, b, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='spaxby')
+    call psb_errpush(info, name, a_err = 'spaxby')
     goto 9999
   end if
 
   call acoo%mv_to_fmt(a, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_fmt')
+    call psb_errpush(info, name, a_err = 'mv_to_fmt')
     goto 9999
   end if
 
@@ -1836,16 +1836,16 @@ function psb_d_base_cmpval(a, val, tol, info) result(res)
   type(psb_d_coo_sparse_mat) :: acoo
 
   call a%cp_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='cp_to_coo')
+    call psb_errpush(info, name, a_err = 'cp_to_coo')
     goto 9999
   end if
 
   res = acoo%spcmp(val, tol, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='cmpval')
+    call psb_errpush(info, name, a_err = 'cmpval')
     goto 9999
   end if
 
@@ -1874,24 +1874,24 @@ function psb_d_base_cmpmat(a, b, tol, info) result(res)
   type(psb_d_coo_sparse_mat) :: acoo
 
   call a%cp_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='cp_to_coo')
+    call psb_errpush(info, name, a_err = 'cp_to_coo')
     goto 9999
   end if
 
   ! Fix the indexes
   call acoo%fix(info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='fix')
+    call psb_errpush(info, name, a_err = 'fix')
     goto 9999
   end if
 
   res = acoo%spcmp(b, tol, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='cmpmat')
+    call psb_errpush(info, name, a_err = 'cmpmat')
     goto 9999
   end if
 
@@ -1928,8 +1928,8 @@ subroutine psb_d_base_vect_mv(alpha, a, x, beta, y, info, trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
   call a%spmm(alpha, x%v, beta, y%v, info, trans)
   call y%set_host()
 end subroutine psb_d_base_vect_mv
@@ -1949,8 +1949,8 @@ subroutine psb_d_base_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
   call a%spmm(alpha, x%v, beta, y%v(:, idx_y), info, trans)
   call y%set_host()
 end subroutine psb_d_base_mvect_mv
@@ -1970,8 +1970,8 @@ subroutine psb_d_base_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
 
   call a%spmm(alpha, x%v(:, idx_x), beta, y%v, info, trans)
   call y%set_host()
@@ -1991,8 +1991,8 @@ subroutine psb_d_base_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, tr
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
   call a%spmm(alpha, x%v(:, idx_x), beta, y%v(:, idx_y), info, trans)
   call y%set_host()
 end subroutine psb_d_base_mvect_mm_idxs
@@ -2010,8 +2010,8 @@ subroutine psb_d_base_mvect_mm_full(alpha, a, x, beta, y, info, trans)
 
   ! For the time being we just throw everything back
   ! onto the normal routines.
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
   call a%spmm(alpha, x%v, beta, y%v, info, trans)
   call y%set_host()
 end subroutine psb_d_base_mvect_mm_full
@@ -2022,23 +2022,23 @@ subroutine psb_d_base_vect_cssv(alpha, a, x, beta, y, info, trans, scale, d)
   use psb_error_mod
   use psb_string_mod
   implicit none
-  class(psb_d_base_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)       :: alpha, beta
-  class(psb_d_base_vect_type), intent(inout) :: x, y
-  integer(psb_ipk_), intent(out)             :: info
-  character, optional, intent(in)  :: trans, scale
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  class(psb_d_base_sparse_mat), intent(in)    :: a
+  class(psb_d_base_vect_type), intent(inout)  :: x, y
+  integer(psb_ipk_), intent(out)              :: info
+  character, optional, intent(in)                       :: trans, scale
   class(psb_d_base_vect_type), intent(inout), optional  :: d
 
-  real(psb_dpk_), allocatable :: tmp(:)
-  class(psb_d_base_vect_type), allocatable :: tmpv
-  integer(psb_ipk_)  :: err_act, nar, nac, nc, i
-  character(len=1)   :: scale_
-  character(len=20)  :: name='d_cssm'
-  logical, parameter :: debug=.false.
+  integer(psb_ipk_)   :: err_act, nar, nac, nc, i
+  character(len=1)    :: scale_
+  character(len=20)   :: name = 'd_cssm'
+  logical, parameter  :: debug = .false.
+  class(psb_d_base_vect_type), allocatable  :: tmpv
+  real(psb_dpk_), allocatable               :: tmp(:)
 
   call psb_erractionsave(err_act)
 
-  if (.not.a%is_asb()) then
+  if(.not. a%is_asb()) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info, name)
     goto 9999
@@ -2047,82 +2047,79 @@ subroutine psb_d_base_vect_cssv(alpha, a, x, beta, y, info, trans, scale, d)
   nar = a%get_nrows()
   nac = a%get_ncols()
   nc = 1
-  if (x%get_nrows() < nac) then
+  if(x%get_nrows() < nac) then
     info = psb_err_input_asize_small_i_
-    call psb_errpush(info, name, i_err=(/3_psb_ipk_, nac/))
-    goto 9999
-  end if
-  if (y%get_nrows() < nar) then
-    info = psb_err_input_asize_small_i_
-    call psb_errpush(info, name, i_err=(/5_psb_ipk_, nar/))
+    call psb_errpush(info, name, i_err = (/3_psb_ipk_, nac/))
     goto 9999
   end if
 
-  if (.not. (a%is_triangle())) then
+  if(y%get_nrows() < nar) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/5_psb_ipk_, nar/))
+    goto 9999
+  end if
+
+  if(.not. (a%is_triangle())) then
     info = psb_err_invalid_mat_state_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
-  if (present(d)) then
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
+
+  if(present(d)) then
     call d%sync()
-    if (present(scale)) then
+    if(present(scale)) then
       scale_ = scale
     else
       scale_ = 'L'
     end if
 
-    if (psb_toupper(scale_) == 'R') then
-      if (d%get_nrows() < nac) then
+    if(psb_toupper(scale_) == 'R') then
+      if(d%get_nrows() < nac) then
         info = psb_err_input_asize_small_i_
         call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
         goto 9999
       end if
-      allocate(tmpv, mold=y, stat=info)
-      if (info /= psb_success_) info = psb_err_alloc_dealloc_
-      if (info == psb_success_) call tmpv%mlt(done, d%v(1:nac), x, dzero, info)
-      if (info == psb_success_)&
-           & call a%inner_spsm(alpha, tmpv, beta, y, info, trans)
+
+      allocate(tmpv, mold = y, stat = info)
+
+      if(info /= psb_success_) info = psb_err_alloc_dealloc_
+      if(info == psb_success_) call tmpv%mlt(done, d%v(1 : nac), x, dzero, info)
+      if(info == psb_success_) call a%inner_spsm(alpha, tmpv, beta, y, info, trans)
 
       call y%set_host()
-      if (info == psb_success_) then
+      if(info == psb_success_) then
         call tmpv%free(info)
-        if (info == psb_success_) deallocate(tmpv, stat=info)
-        if (info /= psb_success_) info = psb_err_alloc_dealloc_
+        if(info == psb_success_) deallocate(tmpv, stat = info)
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
       end if
-
-    else if (psb_toupper(scale_) == 'L') then
-      if (d%get_nrows() < nar) then
+    else if(psb_toupper(scale_) == 'L') then
+      if(d%get_nrows() < nar) then
         info = psb_err_input_asize_small_i_
-        call psb_errpush(info, name, i_err=(/9_psb_ipk_, nar/))
+        call psb_errpush(info, name, i_err = (/9_psb_ipk_, nar/))
         goto 9999
       end if
 
-      if (beta == dzero) then
+      if(beta == dzero) then
         call a%inner_spsm(alpha, x, dzero, y, info, trans)
-        if (info == psb_success_)  call y%mlt(d%v(1:nar), info)
-
+        if(info == psb_success_) call y%mlt(d%v(1 : nar), info)
       else
-        allocate(tmpv, mold=y, stat=info)
-        if (info /= psb_success_) info = psb_err_alloc_dealloc_
-        if (info == psb_success_)&
-             & call a%inner_spsm(alpha, x, dzero, tmpv, info, trans)
-
-        if (info == psb_success_)  call tmpv%mlt(d%v(1:nar), info)
-        if (info == psb_success_)&
-             & call y%axpby(nar, done, tmpv, beta, info)
-        if (info == psb_success_) then
+        allocate(tmpv, mold = y, stat = info)
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
+        if(info == psb_success_) call a%inner_spsm(alpha, x, dzero, tmpv, info, trans)
+        if(info == psb_success_) call tmpv%mlt(d%v(1 : nar), info)
+        if(info == psb_success_) call y%axpby(nar, done, tmpv, beta, info)
+        if(info == psb_success_) then
           call tmpv%free(info)
-          if (info == psb_success_) deallocate(tmpv, stat=info)
-          if (info /= psb_success_) info = psb_err_alloc_dealloc_
+          if(info == psb_success_) deallocate(tmpv, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
         end if
       end if
-
     else
       info = 31
-      call psb_errpush(info, name, i_err=(/8_psb_ipk_, izero/), a_err=scale_)
+      call psb_errpush(info, name, i_err = (/8_psb_ipk_, izero/), a_err = scale_)
       goto 9999
     end if
   else
@@ -2130,9 +2127,9 @@ subroutine psb_d_base_vect_cssv(alpha, a, x, beta, y, info, trans, scale, d)
     call a%inner_spsm(alpha, x, beta, y, info, trans)
   end if
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='inner_spsm')
+    call psb_errpush(info, name, a_err = 'inner_spsm')
     goto 9999
   end if
 
@@ -2149,30 +2146,29 @@ subroutine psb_d_base_inner_vect_sv(alpha, a, x, beta, y, info, trans)
   use psb_string_mod
   use psb_d_base_vect_mod
   implicit none
-  class(psb_d_base_sparse_mat), intent(in) :: a
-  real(psb_dpk_), intent(in)       :: alpha, beta
-  class(psb_d_base_vect_type), intent(inout) :: x, y
-  integer(psb_ipk_), intent(out)             :: info
-  character, optional, intent(in)  :: trans
+  real(psb_dpk_), intent(in)                  :: alpha, beta
+  class(psb_d_base_sparse_mat), intent(in)    :: a
+  class(psb_d_base_vect_type), intent(inout)  :: x, y
+  integer(psb_ipk_), intent(out)              :: info
+  character, optional, intent(in) :: trans
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='d_base_inner_vect_sv'
-  logical, parameter :: debug=.false.
+  character(len=20)  :: name = 'd_base_inner_vect_sv'
+  logical, parameter :: debug = .false.
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (x%is_dev()) call x%sync()
-  if (y%is_dev()) call y%sync()
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
 
   call a%inner_spsm(alpha, x%v, beta, y%v, info, trans)
   call y%set_host()
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='inner_spsm')
+    call psb_errpush(info, name, a_err = 'inner_spsm')
     goto 9999
   end if
-
 
   call psb_erractionrestore(err_act)
   return
@@ -2181,10 +2177,559 @@ subroutine psb_d_base_inner_vect_sv(alpha, a, x, beta, y, info, trans)
   return
 end subroutine psb_d_base_inner_vect_sv
 
+! Multivector version skip inner object routine level, calling directly the inner for underlying fortran array
+subroutine psb_d_base_cssv_mv(alpha, a, x, idx_x, beta, y, info, trans, scale, d)
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_cssv_mv
+  use psb_d_base_vect_mod
+  use psb_d_base_multivect_mod
+  use psb_error_mod
+  use psb_string_mod
+  real(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_d_base_sparse_mat), intent(in)        :: a
+  class(psb_d_base_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)                   :: idx_x
+  class(psb_d_base_vect_type), intent(inout)      :: y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in)                       :: trans, scale
+  class(psb_d_base_vect_type), optional, intent(inout)  :: d
+
+  integer(psb_ipk_)   :: err_act, nar, nac, nc, i
+  character(len=1)    :: scale_
+  character(len=20)   :: name = 'd_cssm'
+  logical, parameter  :: debug = .false.
+  class(psb_d_base_vect_type), allocatable  :: tmpv
+
+  call psb_erractionsave(err_act)
+
+  if(.not. a%is_asb()) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  nar = a%get_nrows()
+  nac = a%get_ncols()
+  nc = 1
+  if(x%get_nrows() < nac) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/3_psb_ipk_, nac/))
+    goto 9999
+  end if
+
+  if(y%get_nrows() < nar) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/5_psb_ipk_, nar/))
+    goto 9999
+  end if
+
+  if(.not. (a%is_triangle())) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
+
+  if(.not. present(d)) then
+    call a%inner_spsm(alpha, x%v(:, idx_x), beta, y%v, info, trans)
+  else
+    call d%sync()
+    if(present(scale)) then
+      scale_ = psb_toupper(scale)
+    else
+      scale_ = 'L'
+    end if
+
+    select case(scale_)
+      case('R')
+        if(d%get_nrows() < nac) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
+          goto 9999
+        end if
+
+        allocate(tmpv, mold = y, stat = info)
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
+
+        !TEMP: check d size since we didn't have the mlt routines with sizeable input
+        if((info == psb_success_) .and. (d%get_nrows() /= nac)) info = psb_err_input_asize_small_i_
+
+        if(info == psb_success_) call x%mlt(x%get_nrows(), alpha, d, idx_x, dzero, tmpv, info)
+        if(info == psb_success_) call a%inner_spsm(alpha, tmpv%v, beta, y%v, info, trans)
+
+        call y%set_host()
+        if(info == psb_success_) then
+          call tmpv%free(info)
+          if(info == psb_success_) deallocate(tmpv, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+        end if
+        
+      case('L')
+        if(d%get_nrows() < nar) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err = (/9_psb_ipk_, nar/))
+          goto 9999
+        end if
+
+        if(beta == dzero) then
+          call a%inner_spsm(alpha, x%v(:, idx_x), dzero, y%v, info, trans)
+          
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call y%mlt(d, info)
+        else
+          allocate(tmpv, mold = y, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          if(info == psb_success_) call a%inner_spsm(alpha, x%v(:, idx_x), dzero, tmpv%v, info, trans)
+          
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call tmpv%mlt(d, info)
+          if(info == psb_success_) call y%axpby(nar, done, tmpv, beta, info)
+          if(info == psb_success_) then
+            call tmpv%free(info)
+            if(info == psb_success_) deallocate(tmpv, stat = info)
+            if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          end if
+        end if
+
+      case default
+        info = 31
+        call psb_errpush(info, name, i_err = (/8_psb_ipk_, izero/), a_err = scale_)
+        goto 9999
+    end select
+  end if
+
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name, a_err = 'inner_spsm')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psb_d_base_cssv_mv
+
+subroutine psb_d_base_cssv_vm(alpha, a, x, beta, y, idx_y, info, trans, scale, d)
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_cssv_vm
+  use psb_d_base_vect_mod
+  use psb_d_base_multivect_mod
+  use psb_error_mod
+  use psb_string_mod
+  real(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_d_base_sparse_mat), intent(in)        :: a
+  class(psb_d_base_vect_type), intent(inout)      :: x
+  class(psb_d_base_multivect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(in)                   :: idx_y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in)                       :: trans, scale
+  class(psb_d_base_vect_type), optional, intent(inout)  :: d
+
+  integer(psb_ipk_)   :: err_act, nar, nac, nc, i
+  character(len=1)    :: scale_
+  character(len=20)   :: name = 'd_cssm'
+  logical, parameter  :: debug = .false.
+  class(psb_d_base_multivect_type), allocatable :: tmpv
+
+  call psb_erractionsave(err_act)
+
+  if(.not. a%is_asb()) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  nar = a%get_nrows()
+  nac = a%get_ncols()
+  nc = 1
+  if(x%get_nrows() < nac) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/3_psb_ipk_, nac/))
+    goto 9999
+  end if
+
+  if(y%get_nrows() < nar) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/5_psb_ipk_, nar/))
+    goto 9999
+  end if
+
+  if(.not. (a%is_triangle())) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
+
+  if(.not. present(d)) then
+    call a%inner_spsm(alpha, x%v, beta, y%v(:, idx_y), info, trans)
+  else
+    call d%sync()
+    if(present(scale)) then
+      scale_ = psb_toupper(scale)
+    else
+      scale_ = 'L'
+    end if
+
+    select case(scale_)
+      case('R')
+        if(d%get_nrows() < nac) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
+          goto 9999
+        end if
+
+        allocate(tmpv, mold = y, stat = info)
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
+
+        !TEMP: check d size since we didn't have the mlt routines with sizeable input
+        if((info == psb_success_) .and. (d%get_nrows() /= nac)) info = psb_err_input_asize_small_i_
+
+        if(info == psb_success_) call tmpv%mlt(tmpv%get_nrows(), alpha, d, x, dzero, idx_y, info) 
+        if(info == psb_success_) call a%inner_spsm(alpha, tmpv%v(:, idx_y), beta, y%v(:, idx_y), info, trans)
+
+        call y%set_host()
+        if(info == psb_success_) then
+          call tmpv%free(info)
+          if(info == psb_success_) deallocate(tmpv, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+        end if
+        
+      case('L')
+        if(d%get_nrows() < nar) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err = (/9_psb_ipk_, nar/))
+          goto 9999
+        end if
+
+        if(beta == dzero) then
+          call a%inner_spsm(alpha, x%v, dzero, y%v(:, idx_y), info, trans)
+
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call y%mlt(y%get_nrows(), done, d, idx_y, dzero, info)
+        else
+          allocate(tmpv, mold = y, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          if(info == psb_success_) call a%inner_spsm(alpha, x%v, dzero, tmpv%v(:, idx_y), info, trans)
+
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call tmpv%mlt(tmpv%get_nrows(), done, d, idx_y, dzero, info)
+          if(info == psb_success_) call y%axpby(nar, done, tmpv, idx_y, beta, idx_y, info)
+          if(info == psb_success_) then
+            call tmpv%free(info)
+            if(info == psb_success_) deallocate(tmpv, stat = info)
+            if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          end if
+        end if
+
+      case default
+        info = 31
+        call psb_errpush(info, name, i_err = (/8_psb_ipk_, izero/), a_err = scale_)
+        goto 9999
+    end select
+  end if
+
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name, a_err = 'inner_spsm')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psb_d_base_cssv_vm
+
+subroutine psb_d_base_cssv_mm_i(alpha, a, x, idx_x, beta, y, idx_y, info, trans, scale, d)
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_cssv_mm_i
+  use psb_d_base_vect_mod
+  use psb_d_base_multivect_mod
+  use psb_error_mod
+  use psb_string_mod
+  real(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_d_base_sparse_mat), intent(in)        :: a
+  class(psb_d_base_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in)                       :: trans, scale
+  class(psb_d_base_vect_type), optional, intent(inout)  :: d
+
+  integer(psb_ipk_)   :: err_act, nar, nac, nc, i
+  character(len=1)    :: scale_
+  character(len=20)   :: name = 'd_cssm'
+  logical, parameter  :: debug = .false.
+  class(psb_d_base_multivect_type), allocatable :: tmpv
+
+  call psb_erractionsave(err_act)
+
+  if(.not. a%is_asb()) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  nar = a%get_nrows()
+  nac = a%get_ncols()
+  nc = 1
+  if(x%get_nrows() < nac) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/3_psb_ipk_, nac/))
+    goto 9999
+  end if
+
+  if(y%get_nrows() < nar) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/5_psb_ipk_, nar/))
+    goto 9999
+  end if
+
+  if(.not. (a%is_triangle())) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
+
+  if(.not. present(d)) then
+    call a%inner_spsm(alpha, x%v(:, idx_x), beta, y%v(:, idx_y), info, trans)
+  else
+    call d%sync()
+    if(present(scale)) then
+      scale_ = psb_toupper(scale)
+    else
+      scale_ = 'L'
+    end if
+
+    select case(scale_)
+      case('R')
+        if(d%get_nrows() < nac) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
+          goto 9999
+        end if
+
+        allocate(tmpv, mold = y, stat = info)
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
+
+        !TEMP: check d size since we didn't have the mlt routines with sizeable input
+        if((info == psb_success_) .and. (d%get_nrows() /= nac)) info = psb_err_input_asize_small_i_
+
+        if(info == psb_success_) call tmpv%mlt(tmpv%get_nrows(), alpha, d, x, idx_x, dzero, idx_y, info) 
+        if(info == psb_success_) call a%inner_spsm(alpha, tmpv%v(:, idx_y), beta, y%v(:, idx_y), info, trans)
+
+        call y%set_host()
+        if(info == psb_success_) then
+          call tmpv%free(info)
+          if(info == psb_success_) deallocate(tmpv, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+        end if
+        
+      case('L')
+        if(d%get_nrows() < nar) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err = (/9_psb_ipk_, nar/))
+          goto 9999
+        end if
+
+        if(beta == dzero) then
+          call a%inner_spsm(alpha, x%v(:, idx_x), dzero, y%v(:, idx_y), info, trans)
+
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call y%mlt(y%get_nrows(), done, d, idx_y, dzero, info)
+        else
+          allocate(tmpv, mold = y, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          if(info == psb_success_) call a%inner_spsm(alpha, x%v(:, idx_x), dzero, tmpv%v(:, idx_y), info, trans)
+
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call tmpv%mlt(tmpv%get_nrows(), done, d, idx_y, dzero, info)
+          if(info == psb_success_) call y%axpby(nar, done, tmpv, idx_y, beta, idx_y, info)
+          if(info == psb_success_) then
+            call tmpv%free(info)
+            if(info == psb_success_) deallocate(tmpv, stat = info)
+            if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          end if
+        end if
+
+      case default
+        info = 31
+        call psb_errpush(info, name, i_err = (/8_psb_ipk_, izero/), a_err = scale_)
+        goto 9999
+    end select
+  end if
+
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name, a_err = 'inner_spsm')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psb_d_base_cssv_mm_i
+
+subroutine psb_d_base_cssv_mm_f(alpha, a, x, beta, y, info, trans, scale, d)
+  use psb_d_base_mat_mod, psb_protect_name => psb_d_base_cssv_mm_f
+  use psb_d_base_vect_mod
+  use psb_d_base_multivect_mod
+  use psb_error_mod
+  use psb_string_mod
+  real(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_d_base_sparse_mat), intent(in)        :: a
+  class(psb_d_base_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in)                       :: trans, scale
+  class(psb_d_base_vect_type), optional, intent(inout)  :: d
+
+  integer(psb_ipk_)   :: err_act, nar, nac, nc, i
+  character(len=1)    :: scale_
+  character(len=20)   :: name = 'd_cssm'
+  logical, parameter  :: debug = .false.
+  class(psb_d_base_multivect_type), allocatable :: tmpv
+
+  call psb_erractionsave(err_act)
+
+  if(.not. a%is_asb()) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  nar = a%get_nrows()
+  nac = a%get_ncols()
+  nc = 1
+  if(x%get_nrows() < nac) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/3_psb_ipk_, nac/))
+    goto 9999
+  end if
+
+  if(y%get_nrows() < nar) then
+    info = psb_err_input_asize_small_i_
+    call psb_errpush(info, name, i_err = (/5_psb_ipk_, nar/))
+    goto 9999
+  end if
+
+  if(.not. (a%is_triangle())) then
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  if(x%is_dev()) call x%sync()
+  if(y%is_dev()) call y%sync()
+
+  if(.not. present(d)) then
+    call a%inner_spsm(alpha, x%v, beta, y%v, info, trans)
+  else
+    call d%sync()
+    if(present(scale)) then
+      scale_ = psb_toupper(scale)
+    else
+      scale_ = 'L'
+    end if
+
+    select case(scale_)
+      case('R')
+        if(d%get_nrows() < nac) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err=(/9_psb_ipk_, nac/))
+          goto 9999
+        end if
+
+        allocate(tmpv, mold = y, stat = info)
+        if(info /= psb_success_) info = psb_err_alloc_dealloc_
+
+        !TEMP: check d size since we didn't have the mlt routines with sizeable input
+        if((info == psb_success_) .and. (d%get_nrows() /= nac)) info = psb_err_input_asize_small_i_
+
+        if(info == psb_success_) call tmpv%mlt(tmpv%get_nrows(), alpha, d, x, dzero, info) 
+        if(info == psb_success_) call a%inner_spsm(alpha, tmpv%v, beta, y%v, info, trans)
+
+        call y%set_host()
+        if(info == psb_success_) then
+          call tmpv%free(info)
+          if(info == psb_success_) deallocate(tmpv, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+        end if
+        
+      case('L')
+        if(d%get_nrows() < nar) then
+          info = psb_err_input_asize_small_i_
+          call psb_errpush(info, name, i_err = (/9_psb_ipk_, nar/))
+          goto 9999
+        end if
+
+        if(beta == dzero) then
+          call a%inner_spsm(alpha, x%v, dzero, y%v, info, trans)
+
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call y%mlt(y%get_nrows(), done, d, dzero, info)
+        else
+          allocate(tmpv, mold = y, stat = info)
+          if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          if(info == psb_success_) call a%inner_spsm(alpha, x%v, dzero, tmpv%v, info, trans)
+
+          !TEMP: check d size since we didn't have the mlt routines with sizeable input
+          if((info == psb_success_) .and. (d%get_nrows() /= nar)) info = psb_err_input_asize_small_i_
+
+          if(info == psb_success_) call tmpv%mlt(tmpv%get_nrows(), done, d, dzero, info)
+          if(info == psb_success_) call y%axpby(nar, done, tmpv, beta, info)
+          if(info == psb_success_) then
+            call tmpv%free(info)
+            if(info == psb_success_) deallocate(tmpv, stat = info)
+            if(info /= psb_success_) info = psb_err_alloc_dealloc_
+          end if
+        end if
+
+      case default
+        info = 31
+        call psb_errpush(info, name, i_err = (/8_psb_ipk_, izero/), a_err = scale_)
+        goto 9999
+    end select
+  end if
+
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    call psb_errpush(info, name, a_err = 'inner_spsm')
+    goto 9999
+  end if
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+end subroutine psb_d_base_cssv_mm_f
+
 !
 ! Convert internal indices
 !
-
 subroutine psb_d_base_cp_to_lcoo(a, b, info)
   use psb_d_base_mat_mod, psb_protect_name => psb_d_base_cp_to_lcoo
   use psb_error_mod
@@ -2206,11 +2751,11 @@ subroutine psb_d_base_cp_to_lcoo(a, b, info)
   call psb_erractionsave(err_act)
 
   call a%cp_to_coo(tmp, info)
-  if (info == psb_success_) call tmp%mv_to_lcoo(b, info)
+  if(info == psb_success_) call tmp%mv_to_lcoo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2242,11 +2787,11 @@ subroutine psb_d_base_cp_from_lcoo(a, b, info)
   call psb_erractionsave(err_act)
 
   call tmp%cp_from_lcoo(b, info)
-  if (info == psb_success_) call a%mv_from_coo(tmp, info)
+  if(info == psb_success_) call a%mv_from_coo(tmp, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2283,13 +2828,13 @@ subroutine psb_d_base_cp_to_lfmt(a, b, info)
     call a%cp_to_lcoo(b, info)
   class default
     call a%cp_to_coo(icoo, info)
-    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
-    if (info == psb_success_) call b%mv_from_coo(lcoo, info)
+    if(info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
+    if(info == psb_success_) call b%mv_from_coo(lcoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2317,7 +2862,7 @@ subroutine psb_d_base_cp_from_lfmt(a, b, info)
   !
   ! Default implementation
   !
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   select type(b)
@@ -2325,13 +2870,13 @@ subroutine psb_d_base_cp_from_lfmt(a, b, info)
     call a%cp_from_lcoo(b, info)
   class default
     call b%cp_to_coo(lcoo, info)
-    if (info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
-    if (info == psb_success_) call a%mv_from_coo(icoo, info)
+    if(info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
+    if(info == psb_success_) call a%mv_from_coo(icoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2356,14 +2901,14 @@ subroutine psb_d_base_mv_to_lcoo(a, b, info)
   logical, parameter :: debug=.false.
 
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_to_lcoo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to coo')
+    call psb_errpush(info, name, a_err = 'to coo')
     goto 9999
   end if
 
@@ -2389,14 +2934,14 @@ subroutine psb_d_base_mv_from_lcoo(a, b, info)
   character(len=20)  :: name='from_lcoo'
   logical, parameter :: debug=.false.
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_from_lcoo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='from coo')
+    call psb_errpush(info, name, a_err = 'from coo')
     goto 9999
   end if
 
@@ -2435,13 +2980,13 @@ subroutine psb_d_base_mv_to_lfmt(a, b, info)
     call a%mv_to_lcoo(b, info)
   class default
     call a%mv_to_coo(icoo, info)
-    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
-    if (info == psb_success_) call b%mv_from_coo(lcoo, info)
+    if(info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
+    if(info == psb_success_) call b%mv_from_coo(lcoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2469,7 +3014,7 @@ subroutine psb_d_base_mv_from_lfmt(a, b, info)
   !
   ! Default implementation
   !
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   select type(b)
@@ -2477,13 +3022,13 @@ subroutine psb_d_base_mv_from_lfmt(a, b, info)
     call a%mv_from_lcoo(b, info)
   class default
     call b%mv_to_coo(lcoo, info)
-    if (info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
-    if (info == psb_success_) call a%mv_from_coo(icoo, info)
+    if(info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
+    if(info == psb_success_) call a%mv_from_coo(icoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -2525,7 +3070,7 @@ subroutine psb_ld_base_cp_to_coo(a, b, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_cp_to_coo
@@ -2548,7 +3093,7 @@ subroutine psb_ld_base_cp_from_coo(a, b, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_cp_from_coo
@@ -2578,11 +3123,11 @@ subroutine psb_ld_base_cp_to_fmt(a, b, info)
     call a%cp_to_coo(b, info)
   class default
     call a%cp_to_coo(tmp, info)
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   end select
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2610,7 +3155,7 @@ subroutine psb_ld_base_cp_from_fmt(a, b, info)
   !
   ! Default implementation
   !
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   select type(b)
@@ -2618,12 +3163,12 @@ subroutine psb_ld_base_cp_from_fmt(a, b, info)
     call a%cp_from_coo(b, info)
   class default
     call b%cp_to_coo(tmp, info)
-    if (info == psb_success_) call a%mv_from_coo(tmp, info)
+    if(info == psb_success_) call a%mv_from_coo(tmp, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -2649,14 +3194,14 @@ subroutine psb_ld_base_mv_to_coo(a, b, info)
   logical, parameter :: debug=.false.
 
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_to_coo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to coo')
+    call psb_errpush(info, name, a_err = 'to coo')
     goto 9999
   end if
 
@@ -2683,14 +3228,14 @@ subroutine psb_ld_base_mv_from_coo(a, b, info)
   character(len=20)  :: name='from_coo'
   logical, parameter :: debug=.false.
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_from_coo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='from coo')
+    call psb_errpush(info, name, a_err = 'from coo')
     goto 9999
   end if
 
@@ -2726,7 +3271,7 @@ subroutine psb_ld_base_mv_to_fmt(a, b, info)
     call a%mv_to_coo(b, info)
   class default
     call a%mv_to_coo(tmp, info)
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   end select
 
   return
@@ -2756,7 +3301,7 @@ subroutine psb_ld_base_mv_from_fmt(a, b, info)
     call a%mv_from_coo(b, info)
   class default
     call b%mv_to_coo(tmp, info)
-    if (info == psb_success_) call a%mv_from_coo(tmp, info)
+    if(info == psb_success_) call a%mv_from_coo(tmp, info)
   end select
   return
 
@@ -2772,8 +3317,8 @@ subroutine psb_ld_base_clean_zeros(a, info)
   type(psb_ld_coo_sparse_mat) :: tmpcoo
 
   call a%mv_to_coo(tmpcoo, info)
-  if (info == 0) call tmpcoo%clean_zeros(info)
-  if (info == 0) call a%mv_from_coo(tmpcoo, info)
+  if(info == 0) call tmpcoo%clean_zeros(info)
+  if(info == 0) call a%mv_from_coo(tmpcoo, info)
 
 end subroutine psb_ld_base_clean_zeros
 
@@ -2795,7 +3340,7 @@ subroutine psb_ld_base_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_csput_a
@@ -2821,16 +3366,16 @@ subroutine psb_ld_base_csput_v(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
-    if (a%is_dev())   call a%sync()
-    if (val%is_dev()) call val%sync()
-    if (ia%is_dev())  call ia%sync()
-    if (ja%is_dev())  call ja%sync()
+  if(allocated(val%v).and.allocated(ia%v).and.allocated(ja%v)) then
+    if(a%is_dev())   call a%sync()
+    if(val%is_dev()) call val%sync()
+    if(ia%is_dev())  call ia%sync()
+    if(ja%is_dev())  call ja%sync()
     call a%csput_a(nz, ia%v, ja%v, val%v, imin, imax, jmin, jmax, info)
   else
     info = psb_err_invalid_mat_state_
   endif
-  if (info /= 0) then
+  if(info /= 0) then
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -2869,7 +3414,7 @@ subroutine psb_ld_base_csgetrow(imin, imax, a, nz, ia, ja, val, info, &
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_csgetrow
@@ -2906,49 +3451,49 @@ subroutine psb_ld_base_csgetblk(imin, imax, a, b, info, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(append)) then
+  if(present(append)) then
     append_ = append
   else
     append_ = .false.
   endif
-  if (append_) then
+  if(append_) then
     nzin = a%get_nzeros()
   else
     nzin = 0
   endif
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_=rscale
   else
     rscale_=.false.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_=cscale
   else
     cscale_=.false.
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   endif
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   endif
 
-  if (append_.and.(rscale_.or.cscale_)) then
+  if(append_.and.(rscale_.or.cscale_)) then
     write(psb_err_unit, *) &
          & 'ld_csgetblk: WARNING: dubious input: append_ and rscale_|cscale_'
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     call b%set_nrows(imax-imin+1)
   else
     call b%set_nrows(max(min(imax, a%get_nrows()), b%get_nrows()))
   end if
 
-  if (cscale_) then
+  if(cscale_) then
     call b%set_ncols(jmax_-jmin_+1)
   else
     call b%set_ncols(max(min(jmax_, a%get_ncols()), b%get_ncols()))
@@ -2958,11 +3503,11 @@ subroutine psb_ld_base_csgetblk(imin, imax, a, b, info, &
        & jmin=jmin, jmax=jmax, iren=iren, append=append_, &
        & nzin=nzin, rscale=rscale, cscale=cscale)
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call b%set_nzeros(nzin+nzout)
   call b%fix(info)
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -2995,43 +3540,43 @@ subroutine psb_ld_base_csclip(a, b, info, &
   info = psb_success_
 
   nzin = 0
-  if (present(imin)) then
+  if(present(imin)) then
     imin_ = imin
   else
     imin_ = 1
   end if
-  if (present(imax)) then
+  if(present(imax)) then
     imax_ = imax
   else
     imax_ = a%get_nrows()
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   end if
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   end if
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_ = rscale
   else
     rscale_ = .true.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_ = cscale
   else
     cscale_ = .true.
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     mb = imax_ - imin_ +1
   else
     mb = a%get_nrows() ! Should this be imax_ ??
   endif
-  if (cscale_) then
+  if(cscale_) then
     nb = jmax_ - jmin_ +1
   else
     nb = a%get_ncols()  ! Should this be jmax_ ??
@@ -3040,12 +3585,12 @@ subroutine psb_ld_base_csclip(a, b, info, &
   call a%csget(imin_, imax_, nzout, b%ia, b%ja, b%val, info, &
        & jmin=jmin_, jmax=jmax_, append=.false., &
        & nzin=nzin, rscale=rscale_, cscale=cscale_)
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call b%set_nzeros(nzin+nzout)
   call b%fix(info)
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
   call psb_erractionrestore(err_act)
   return
 
@@ -3087,48 +3632,48 @@ subroutine psb_ld_base_tril(a, l, info, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(diag)) then
+  if(present(diag)) then
     diag_ = diag
   else
     diag_ = 0
   end if
-  if (present(imin)) then
+  if(present(imin)) then
     imin_ = imin
   else
     imin_ = 1
   end if
-  if (present(imax)) then
+  if(present(imax)) then
     imax_ = imax
   else
     imax_ = a%get_nrows()
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   end if
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   end if
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_ = rscale
   else
     rscale_ = .true.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_ = cscale
   else
     cscale_ = .true.
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     mb = imax_ - imin_ +1
   else
     mb = imax_
   endif
-  if (cscale_) then
+  if(cscale_) then
     nb = jmax_ - jmin_ +1
   else
     nb = jmax_
@@ -3138,7 +3683,7 @@ subroutine psb_ld_base_tril(a, l, info, &
   nz = a%get_nzeros()
   call l%allocate(mb, nb, nz)
 
-  if (present(u)) then
+  if(present(u)) then
     nzlin = l%get_nzeros() ! At this point it should be 0
     call u%allocate(mb, nb, nz)
     nzuin = u%get_nzeros() ! At this point it should be 0
@@ -3152,7 +3697,7 @@ subroutine psb_ld_base_tril(a, l, info, &
       call a%csget(i, i+ibk-1, nzout, ia, ja, val, info, &
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        if ((ja(k)-ia(k))<=diag_) then
+        if((ja(k)-ia(k))<=diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
@@ -3170,11 +3715,11 @@ subroutine psb_ld_base_tril(a, l, info, &
     call u%set_nzeros(nzuin)
     call u%fix(info)
     nzout = u%get_nzeros()
-    if (rscale_) &
+    if(rscale_) &
          & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
-    if (cscale_) &
+    if(cscale_) &
          & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
-    if ((diag_ >= -1).and.(imin_ == jmin_)) then
+    if((diag_ >= -1).and.(imin_ == jmin_)) then
       call u%set_triangle(.true.)
       call u%set_lower(.false.)
     end if
@@ -3185,24 +3730,24 @@ subroutine psb_ld_base_tril(a, l, info, &
       call a%csget(i, i, nzout, l%ia, l%ja, l%val, info, &
            & jmin=jmin_, jmax=k, append=.true., &
            & nzin=nzin)
-      if (info /= psb_success_) goto 9999
+      if(info /= psb_success_) goto 9999
       call l%set_nzeros(nzin+nzout)
       nzin = nzin+nzout
     end do
   end if
   call l%fix(info)
   nzout = l%get_nzeros()
-  if (rscale_) &
+  if(rscale_) &
        & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
-  if (cscale_) &
+  if(cscale_) &
        & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
 
-  if ((diag_ <= 0).and.(imin_ == jmin_)) then
+  if((diag_ <= 0).and.(imin_ == jmin_)) then
     call l%set_triangle(.true.)
     call l%set_lower(.true.)
   end if
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3239,48 +3784,48 @@ subroutine psb_ld_base_triu(a, u, info, &
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (present(diag)) then
+  if(present(diag)) then
     diag_ = diag
   else
     diag_ = 0
   end if
-  if (present(imin)) then
+  if(present(imin)) then
     imin_ = imin
   else
     imin_ = 1
   end if
-  if (present(imax)) then
+  if(present(imax)) then
     imax_ = imax
   else
     imax_ = a%get_nrows()
   end if
-  if (present(jmin)) then
+  if(present(jmin)) then
     jmin_ = jmin
   else
     jmin_ = 1
   end if
-  if (present(jmax)) then
+  if(present(jmax)) then
     jmax_ = jmax
   else
     jmax_ = a%get_ncols()
   end if
-  if (present(rscale)) then
+  if(present(rscale)) then
     rscale_ = rscale
   else
     rscale_ = .true.
   end if
-  if (present(cscale)) then
+  if(present(cscale)) then
     cscale_ = cscale
   else
     cscale_ = .true.
   end if
 
-  if (rscale_) then
+  if(rscale_) then
     mb = imax_ - imin_ +1
   else
     mb = imax_
   endif
-  if (cscale_) then
+  if(cscale_) then
     nb = jmax_ - jmin_ +1
   else
     nb = jmax_
@@ -3290,7 +3835,7 @@ subroutine psb_ld_base_triu(a, u, info, &
   nz = a%get_nzeros()
   call u%allocate(mb, nb, nz)
 
-  if (present(l)) then
+  if(present(l)) then
     nzuin = u%get_nzeros() ! At this point it should be 0
     call l%allocate(mb, nb, nz)
     nzlin = l%get_nzeros() ! At this point it should be 0
@@ -3304,7 +3849,7 @@ subroutine psb_ld_base_triu(a, u, info, &
       call a%csget(i, i+ibk-1, nzout, ia, ja, val, info, &
            & jmin=jmin_, jmax=jmax_)
       do k=1, nzout
-        if ((ja(k)-ia(k))<diag_) then
+        if((ja(k)-ia(k))<diag_) then
           nzlin = nzlin + 1
           l%ia(nzlin)  = ia(k)
           l%ja(nzlin)  = ja(k)
@@ -3321,11 +3866,11 @@ subroutine psb_ld_base_triu(a, u, info, &
     call l%set_nzeros(nzlin)
     call l%fix(info)
     nzout = l%get_nzeros()
-    if (rscale_) &
+    if(rscale_) &
          & l%ia(1:nzout) = l%ia(1:nzout) - imin_ + 1
-    if (cscale_) &
+    if(cscale_) &
          & l%ja(1:nzout) = l%ja(1:nzout) - jmin_ + 1
-    if ((diag_ <=1).and.(imin_ == jmin_)) then
+    if((diag_ <=1).and.(imin_ == jmin_)) then
       call l%set_triangle(.true.)
       call l%set_lower(.true.)
     end if
@@ -3336,24 +3881,24 @@ subroutine psb_ld_base_triu(a, u, info, &
       call a%csget(i, i, nzout, u%ia, u%ja, u%val, info, &
            & jmin=k, jmax=jmax_, append=.true., &
            & nzin=nzin)
-      if (info /= psb_success_) goto 9999
+      if(info /= psb_success_) goto 9999
       call u%set_nzeros(nzin+nzout)
       nzin = nzin+nzout
     end do
   end if
   call u%fix(info)
   nzout = u%get_nzeros()
-  if (rscale_) &
+  if(rscale_) &
        & u%ia(1:nzout) = u%ia(1:nzout) - imin_ + 1
-  if (cscale_) &
+  if(cscale_) &
        & u%ja(1:nzout) = u%ja(1:nzout) - jmin_ + 1
 
-  if ((diag_ >= 0).and.(imin_ == jmin_)) then
+  if((diag_ >= 0).and.(imin_ == jmin_)) then
     call u%set_triangle(.true.)
     call u%set_upper(.true.)
   end if
 
-  if (info /= psb_success_) goto 9999
+  if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
   return
@@ -3372,11 +3917,11 @@ subroutine psb_ld_base_clone(a, b, info)
   integer(psb_ipk_), intent(out) :: info
 
   info = 0
-  if (allocated(b)) then
+  if(allocated(b)) then
     call b%free()
     deallocate(b, stat=info)
   end if
-  if (info /= 0) then
+  if(info /= 0) then
     info = psb_err_alloc_dealloc_
     return
   end if
@@ -3384,8 +3929,8 @@ subroutine psb_ld_base_clone(a, b, info)
   ! Do not use SOURCE allocation: this makes sure that
   ! memory allocated elsewhere is treated properly.
   allocate(b, mold=a, stat=info)
-  if (info /= psb_success_) info = psb_err_alloc_dealloc_
-  if (info == psb_success_) call b%cp_from_fmt(a, info)
+  if(info /= psb_success_) info = psb_err_alloc_dealloc_
+  if(info == psb_success_) call b%cp_from_fmt(a, info)
 
 end subroutine psb_ld_base_clone
 
@@ -3399,9 +3944,9 @@ subroutine psb_ld_base_make_nonunit(a)
   integer(psb_ipk_) :: info
   integer(psb_lpk_) :: i, j, m, n, nz, mnm
 
-  if (a%is_unit()) then
+  if(a%is_unit()) then
     call a%mv_to_coo(tmp, info)
-    if (info /= 0) return
+    if(info /= 0) return
     m = tmp%get_nrows()
     n = tmp%get_ncols()
     mnm = min(m, n)
@@ -3416,7 +3961,7 @@ subroutine psb_ld_base_make_nonunit(a)
     call tmp%set_nzeros(nz+mnm)
     call tmp%set_unit(.false.)
     call tmp%fix(info)
-    if (info /= 0) &
+    if(info /= 0) &
          & call a%mv_from_coo(tmp, info)
   end if
 
@@ -3438,7 +3983,7 @@ subroutine psb_ld_base_mold(a, b, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_mold
@@ -3461,13 +4006,13 @@ subroutine psb_ld_base_transp_2mat(a, b)
   select type(b)
   class is (psb_ld_base_sparse_mat)
     call a%cp_to_coo(tmp, info)
-    if (info == psb_success_) call tmp%transp()
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call tmp%transp()
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   class default
     info = psb_err_invalid_dynamic_type_
   end select
-  if (info /= psb_success_) then
-    call psb_errpush(info, name, a_err=b%get_fmt(), i_err=(/ione/))
+  if(info /= psb_success_) then
+    call psb_errpush(info, name, a_err = b%get_fmt(), i_err=(/ione/))
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -3495,13 +4040,13 @@ subroutine psb_ld_base_transc_2mat(a, b)
   select type(b)
   class is (psb_ld_base_sparse_mat)
     call a%cp_to_coo(tmp, info)
-    if (info == psb_success_) call tmp%transc()
-    if (info == psb_success_) call b%mv_from_coo(tmp, info)
+    if(info == psb_success_) call tmp%transc()
+    if(info == psb_success_) call b%mv_from_coo(tmp, info)
   class default
     info = psb_err_invalid_dynamic_type_
   end select
-  if (info /= psb_success_) then
-    call psb_errpush(info, name, a_err=b%get_fmt(), i_err=(/ione/))
+  if(info /= psb_success_) then
+    call psb_errpush(info, name, a_err = b%get_fmt(), i_err=(/ione/))
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -3526,12 +4071,12 @@ subroutine psb_ld_base_transp_1mat(a)
   call psb_erractionsave(err_act)
   info = psb_success_
   call a%mv_to_coo(tmp, info)
-  if (info == psb_success_) call tmp%transp()
-  if (info == psb_success_) call a%mv_from_coo(tmp, info)
+  if(info == psb_success_) call tmp%transp()
+  if(info == psb_success_) call a%mv_from_coo(tmp, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_missing_override_method_
-    call psb_errpush(info, name, a_err=a%get_fmt())
+    call psb_errpush(info, name, a_err = a%get_fmt())
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -3555,12 +4100,12 @@ subroutine psb_ld_base_transc_1mat(a)
   call psb_erractionsave(err_act)
   info = psb_success_
   call a%mv_to_coo(tmp, info)
-  if (info == psb_success_) call tmp%transc()
-  if (info == psb_success_) call a%mv_from_coo(tmp, info)
+  if(info == psb_success_) call tmp%transc()
+  if(info == psb_success_) call a%mv_from_coo(tmp, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_missing_override_method_
-    call psb_errpush(info, name, a_err=a%get_fmt())
+    call psb_errpush(info, name, a_err = a%get_fmt())
     goto 9999
   end if
   call psb_erractionrestore(err_act)
@@ -3588,7 +4133,7 @@ subroutine psb_ld_base_scals(d, a, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_ld_base_scals
 
@@ -3607,23 +4152,23 @@ subroutine psb_ld_base_scalplusidentity(d, a, info)
 
   call psb_erractionsave(err_act)
   call a%mv_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_coo')
+    call psb_errpush(info, name, a_err = 'mv_to_coo')
     goto 9999
   end if
 
   call acoo%scalpid(d, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='scalpid')
+    call psb_errpush(info, name, a_err = 'scalpid')
     goto 9999
   end if
 
   call acoo%mv_to_fmt(a, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_fmt')
+    call psb_errpush(info, name, a_err = 'mv_to_fmt')
     goto 9999
   end if
 
@@ -3653,7 +4198,7 @@ subroutine psb_ld_base_scal(d, a, info, side)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_scal
@@ -3677,7 +4222,7 @@ function psb_ld_base_maxval(a) result(res)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end function psb_ld_base_maxval
@@ -3702,8 +4247,8 @@ function psb_ld_base_csnmi(a) result(res)
   call psb_erractionsave(err_act)
   res = dzero
   call psb_realloc(a%get_nrows(), vt, info)
-  if (info /= 0) then
-    info  = psb_err_alloc_dealloc_
+  if(info /= 0) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -3737,8 +4282,8 @@ function psb_ld_base_csnm1(a) result(res)
   call psb_erractionsave(err_act)
   res = dzero
   call psb_realloc(a%get_ncols(), vt, info)
-  if (info /= 0) then
-    info  = psb_err_alloc_dealloc_
+  if(info /= 0) then
+    info = psb_err_alloc_dealloc_
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -3768,7 +4313,7 @@ subroutine psb_ld_base_rowsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_rowsum
@@ -3789,7 +4334,7 @@ subroutine psb_ld_base_arwsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_arwsum
@@ -3810,7 +4355,7 @@ subroutine psb_ld_base_colsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_colsum
@@ -3831,7 +4376,7 @@ subroutine psb_ld_base_aclsum(d, a)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_aclsum
@@ -3855,29 +4400,29 @@ subroutine psb_ld_base_spaxpby(alpha, a, beta, b, info)
 
   call psb_erractionsave(err_act)
   if((a%get_ncols() /= b%get_ncols()).or.(a%get_nrows() /= b%get_nrows())) then
-    info  = psb_err_from_subroutine_
+    info = psb_err_from_subroutine_
     call psb_errpush(info, name)
     goto 9999
   end if
 
   call a%mv_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_coo')
+    call psb_errpush(info, name, a_err = 'mv_to_coo')
     goto 9999
   end if
 
   call acoo%spaxpby(alpha, beta, b, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='spaxby')
+    call psb_errpush(info, name, a_err = 'spaxby')
     goto 9999
   end if
 
   call acoo%mv_to_fmt(a, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_fmt')
+    call psb_errpush(info, name, a_err = 'mv_to_fmt')
     goto 9999
   end if
 
@@ -3906,16 +4451,16 @@ function psb_ld_base_cmpval(a, val, tol, info) result(res)
   type(psb_ld_coo_sparse_mat) :: acoo
 
   call a%mv_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_coo')
+    call psb_errpush(info, name, a_err = 'mv_to_coo')
     goto 9999
   end if
 
   res = acoo%spcmp(val, tol, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='cmpval')
+    call psb_errpush(info, name, a_err = 'cmpval')
     goto 9999
   end if
 
@@ -3944,24 +4489,24 @@ function psb_ld_base_cmpmat(a, b, tol, info) result(res)
   type(psb_ld_coo_sparse_mat) :: acoo
 
   call a%mv_to_coo(acoo, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='mv_to_coo')
+    call psb_errpush(info, name, a_err = 'mv_to_coo')
     goto 9999
   end if
 
   ! Fix the indexes
   call acoo%fix(info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='fix')
+    call psb_errpush(info, name, a_err = 'fix')
     goto 9999
   end if
 
   res = acoo%spcmp(b, tol, info)
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='cmpmat')
+    call psb_errpush(info, name, a_err = 'cmpmat')
     goto 9999
   end if
 
@@ -3991,7 +4536,7 @@ subroutine psb_ld_base_get_diag(a, d, info)
   ! it means the derived class is incomplete, 
   ! so we throw an error.
   info = psb_err_missing_override_method_
-  call psb_errpush(info, name, a_err=a%get_fmt())
+  call psb_errpush(info, name, a_err = a%get_fmt())
   call psb_error_handler(err_act)
 
 end subroutine psb_ld_base_get_diag
@@ -4017,11 +4562,11 @@ subroutine psb_ld_base_cp_to_icoo(a, b, info)
   call psb_erractionsave(err_act)
 
   call a%cp_to_coo(tmp, info)
-  if (info == psb_success_) call tmp%mv_to_icoo(b, info)
+  if(info == psb_success_) call tmp%mv_to_icoo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -4053,11 +4598,11 @@ subroutine psb_ld_base_cp_from_icoo(a, b, info)
   call psb_erractionsave(err_act)
 
   call tmp%cp_from_icoo(b, info)
-  if (info == psb_success_) call a%mv_from_coo(tmp, info)
+  if(info == psb_success_) call a%mv_from_coo(tmp, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -4094,13 +4639,13 @@ subroutine psb_ld_base_cp_to_ifmt(a, b, info)
     call a%cp_to_icoo(b, info)
   class default
     call a%cp_to_coo(lcoo, info)
-    if (info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
-    if (info == psb_success_) call b%mv_from_coo(icoo, info)
+    if(info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
+    if(info == psb_success_) call b%mv_from_coo(icoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -4128,7 +4673,7 @@ subroutine psb_ld_base_cp_from_ifmt(a, b, info)
   !
   ! Default implementation
   !
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   select type(b)
@@ -4136,13 +4681,13 @@ subroutine psb_ld_base_cp_from_ifmt(a, b, info)
     call a%cp_from_icoo(b, info)
   class default
     call b%cp_to_coo(icoo, info)
-    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
-    if (info == psb_success_) call a%mv_from_coo(lcoo, info)
+    if(info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
+    if(info == psb_success_) call a%mv_from_coo(lcoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -4167,14 +4712,14 @@ subroutine psb_ld_base_mv_to_icoo(a, b, info)
   logical, parameter :: debug=.false.
 
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_to_icoo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to coo')
+    call psb_errpush(info, name, a_err = 'to coo')
     goto 9999
   end if
 
@@ -4201,14 +4746,14 @@ subroutine psb_ld_base_mv_from_icoo(a, b, info)
   character(len=20)  :: name='from_icoo'
   logical, parameter :: debug=.false.
 
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   call a%cp_from_icoo(b, info)
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='from coo')
+    call psb_errpush(info, name, a_err = 'from coo')
     goto 9999
   end if
 
@@ -4248,13 +4793,13 @@ subroutine psb_ld_base_mv_to_ifmt(a, b, info)
     call a%mv_to_icoo(b, info)
   class default
     call a%mv_to_coo(lcoo, info)
-    if (info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
-    if (info == psb_success_) call b%mv_from_coo(icoo, info)
+    if(info == psb_success_) call lcoo%mv_to_icoo(icoo, info)
+    if(info == psb_success_) call b%mv_from_coo(icoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
@@ -4282,7 +4827,7 @@ subroutine psb_ld_base_mv_from_ifmt(a, b, info)
   !
   ! Default implementation
   !
-  info  = psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
 
   select type(b)
@@ -4290,13 +4835,13 @@ subroutine psb_ld_base_mv_from_ifmt(a, b, info)
     call a%mv_from_icoo(b, info)
   class default
     call b%mv_to_coo(icoo, info)
-    if (info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
-    if (info == psb_success_) call a%mv_from_coo(lcoo, info)
+    if(info == psb_success_) call icoo%mv_to_lcoo(lcoo, info)
+    if(info == psb_success_) call a%mv_from_coo(lcoo, info)
   end select
 
-  if (info /= psb_success_) then
+  if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info, name, a_err='to/from coo')
+    call psb_errpush(info, name, a_err = 'to/from coo')
     goto 9999
   end if
 
