@@ -527,9 +527,11 @@ y
 
 No Schur matrix is ever stored. The code only needs block products and field solves.
 
-### Richardson Schur Solve
+### Matrix-Free Schur Solves
 
-When `SCHUR_SOLVE = MATRIX_FREE`, the preconditioner needs an approximation to `S^{-1}` even though it only has a routine for `S x`. The implementation therefore uses a small preconditioned Richardson iteration:
+When `SCHUR_SOLVE = MATRIX_FREE`, the preconditioner needs an approximation to a Schur inverse even though it only has routines that apply Schur products. The implementation uses two matrix-free strategies, depending on the selected composition.
+
+For the two-field Schur compositions (`SCHUR_LOWER`, `SCHUR_UPPER`, and `SCHUR_FULL`), the matrix-free Schur solve uses a small preconditioned Richardson iteration:
 
 ```text
 z_{k+1} = z_k + M^{-1} (b - S z_k)
@@ -543,7 +545,15 @@ Each Richardson step uses:
 2. a Schur residual `b - S z_k`
 3. the field-2 preconditioner or field-2 inner solve to correct `z_k`
 
-This gives a cheap inner solve for the Schur complement without assembling or storing `S`.
+For the three-field PDE-control composition (`SCHUR_PDE_CONTROL`), the Schur field is field 3 and the KKT Schur complement is negative for the standard distributed-control block signs. The implementation therefore solves the positive matrix-free equation
+
+```text
+T x_3 = -r_3,       T = -S
+```
+
+with a small conjugate-gradient iteration. The product `T x_3` is applied without assembling `T`; each CG iteration calls the PDE-control Schur action and uses `psb_gedot` with the field-3 descriptor for global reductions. The field-3 block preconditioner is still used as an optional left preconditioner, but when `A_33 = 0` it is only an identity fallback.
+
+This gives a stronger Schur inverse approximation for KKT optimal-control systems where the diagonal field-3 block is zero and a Richardson update based on `A_33` is ineffective.
 
 The implementation does not assemble an exact sparse Schur complement. Instead, it applies Schur actions using:
 
@@ -556,13 +566,23 @@ Supported Schur compositions are:
 - `SCHUR_LOWER`
 - `SCHUR_UPPER`
 - `SCHUR_FULL`
+- `SCHUR_PDE_CONTROL` (aliases: `PDE_CONTROL_SCHUR`, `SCHUR_2PLUS1`, `SCHUR3`, `SCHUR_3FIELD`, `SCHUR_THREE_FIELD`)
 
 The Schur solve mode is controlled by `SCHUR_SOLVE`:
 
 - `A22`: use the field-2 block preconditioner as the Schur approximation
-- `MATRIX_FREE`: use a small Richardson iteration around the matrix-free Schur action
+- `MATRIX_FREE`: use a matrix-free Schur solve; two-field Schur compositions use Richardson, while `SCHUR_PDE_CONTROL` uses CG on the positive field-3 Schur action
+- `SELFP` or `SELF`: build a PETSc-style lumped Schur approximation from `A_21`, the diagonal of `A_11`, and `A_12`, then build a normal PSBLAS `BJAC` Schur preconditioner on that approximation
 
-The `MATRIX_FREE` mode is controlled by `SCHUR_MAXIT` and `SCHUR_TOL`.
+For two-field Schur compositions, `SELFP` approximates
+
+```text
+S_p ~= A_22 - A_21 diag(A_11)^{-1} A_12
+```
+
+The assembled `S_p` is not the exact Schur complement. It is a sparse local approximation intended for use as a preconditioner, analogous in spirit to PETSc field-split `selfp` with a lumped inverse for `A_11`. After assembly, the nested preconditioner attaches the existing block-preconditioner machinery to `S_p`: currently this is a `BJAC` block preconditioner, and routed sub-options such as `SUB_SOLVE=ILU` and `SUB_FILLIN` are replayed onto it. During Schur application, `SCHUR_SOLVE=SELFP` applies this built Schur preconditioner directly instead of running Richardson on the matrix-free Schur action.
+
+The `MATRIX_FREE` mode is controlled by `SCHUR_MAXIT` and `SCHUR_TOL`. The `SELFP` mode is controlled primarily by the sub-preconditioner options routed to the Schur approximation, especially `SUB_SOLVE` and `SUB_FILLIN`.
 
 ## Implementation Structure
 
@@ -795,6 +815,39 @@ S x_2 = A_22 x_2 - A_21 B_1 A_12 x_2
 
 where `B_1` is the field-1 block solve or inner field solve. `psb_d_nested_schur_solve` either applies the field-2 block solve directly (`A22`) or runs a short preconditioned Richardson iteration using the matrix-free Schur action (`MATRIX_FREE`).
 
+## PDE-Control Schur Apply Path
+
+`psb_d_nested_apply_pde_control_schur` is defined for exactly three fields. It targets KKT systems with the block structure
+
+```text
+[ A_11   0    A_13 ]
+[  0    A_22  A_23 ]
+[ A_31  A_32  A_33 ]
+```
+
+Fields 1 and 2 are grouped into the leading diagonal block `D = diag(A_11,A_22)`, and field 3 is the Schur field. The preconditioner applies the usual block factorization steps:
+
+1. solve the leading fields with `B_1` and `B_2`
+2. update the field-3 residual with `A_31 x_1 + A_32 x_2`
+3. approximately solve the field-3 Schur equation
+4. correct fields 1 and 2 with the upper coupling through `A_13` and `A_23`
+
+The matrix-free positive PDE-control Schur action is
+
+```text
+T x_3 = A_31 B_1 A_13 x_3 + A_32 B_2 A_23 x_3 - A_33 x_3
+```
+
+For a standard distributed-control KKT matrix such as
+
+```text
+[ M      0      K  ]
+[ 0    alpha M -M  ]
+[ K     -M      0  ]
+```
+
+this operator is `T = -S`, where `S` is the field-3 KKT Schur complement. `psb_d_nested_pde_control_schur_solve` solves `T x_3 = -r_3` with a matrix-free CG iteration controlled by `SCHUR_MAXIT` and `SCHUR_TOL`. This is important when `A_33 = 0`: the old field-3 diagonal-block approximation cannot precondition the Schur complement, but the matrix-free CG path can still use the actual Schur action.
+
 ## Public Options
 
 The nested preconditioner exposes integer option keys in `psb_d_nestedprec`:
@@ -816,9 +869,9 @@ The user-facing string options routed by `psb_d_prec_type_impl.f90` are:
 
 | Option | Type | Values | Scope |
 | --- | --- | --- | --- |
-| `COMPOSITION`, `NEST_COMPOSITION` | character | `ADDITIVE`, `DIAGONAL`, `MULTIPLICATIVE`, `SYMMETRIC_MULTIPLICATIVE`, `SCHUR_LOWER`, `SCHUR_UPPER`, `SCHUR_FULL` | global |
+| `COMPOSITION`, `NEST_COMPOSITION` | character | `ADDITIVE`, `DIAGONAL`, `MULTIPLICATIVE`, `SYMMETRIC_MULTIPLICATIVE`, `SCHUR_LOWER`, `SCHUR_UPPER`, `SCHUR_FULL`, `SCHUR_PDE_CONTROL` | global |
 | `BLOCK_SOLVE`, `NEST_BLOCK_SOLVE` | character | `DIAG`, `BJAC`, `NONE` | global or `idx` field |
-| `SCHUR_SOLVE`, `NEST_SCHUR_SOLVE` | character | `A22`, `MATRIX_FREE` | global |
+| `SCHUR_SOLVE`, `NEST_SCHUR_SOLVE` | character | `A22`, `A33`, `MATRIX_FREE`, `SELFP`, `SELF` | global |
 | `SCHUR_MAXIT`, `NEST_SCHUR_MAXIT` | integer | nonnegative iteration count | global |
 | `SCHUR_TOL`, `NEST_SCHUR_TOL` | real | nonnegative tolerance | global |
 | `INNER_SOLVE`, `KRYLOV_SOLVE`, `FIELD_SOLVE` | character | `NONE`, `CG`, `BICGSTAB` | global or `idx` field |
@@ -843,6 +896,12 @@ call prec%set('SCHUR_SOLVE', 'MATRIX_FREE', info)
 call prec%set('SCHUR_MAXIT', 6, info)
 call prec%set('SCHUR_TOL', 1.0d-8, info)
 
+! Alternative two-field Stokes-style Schur approximation:
+! call prec%set('SCHUR_SOLVE', 'SELFP', info)
+! call prec%set('BLOCK_SOLVE', 'BJAC', info)
+! call prec%set('SUB_SOLVE', 'ILU', info)
+! call prec%set('SUB_FILLIN', 0, info)
+
 call prec%set('BLOCK_SOLVE', 'BJAC', info, idx=1)
 call prec%set('BLOCK_SOLVE', 'DIAG', info, idx=2)
 
@@ -856,6 +915,26 @@ call psb_krylov('BICGSTAB', nested_matrix%a_glob, prec, b, x, eps, &
 ```
 
 This keeps the outer solve in the existing PSBLAS API while allowing field-specific behavior inside the nested preconditioner.
+
+For a three-field optimal-control KKT system, the PDE-control Schur composition is configured as:
+
+```fortran
+call prec%init('NEST', info)
+call prec%set('COMPOSITION', 'SCHUR_PDE_CONTROL', info)
+call prec%set('SCHUR_SOLVE', 'MATRIX_FREE', info)
+call prec%set('SCHUR_MAXIT', 200, info)
+call prec%set('SCHUR_TOL', 0.0d0, info)
+
+call prec%set('BLOCK_SOLVE', 'DIAG', info, idx=1)
+call prec%set('BLOCK_SOLVE', 'DIAG', info, idx=2)
+call prec%set('BLOCK_SOLVE', 'DIAG', info, idx=3)
+
+call prec%build(nested_matrix%a_glob, nested_matrix%desc_glob, info)
+call psb_krylov('BICGSTAB', nested_matrix%a_glob, prec, b, x, eps, &
+     & nested_matrix%desc_glob, info)
+```
+
+The field-3 `DIAG` setting is harmless for zero `A_33` blocks because PSBLAS diagonal preconditioning treats zero diagonal entries as identity. The useful inverse approximation comes from the matrix-free CG solve on the PDE-control Schur action.
 
 ## Factory And API Integration
 
@@ -915,12 +994,23 @@ These tests exercise:
 - nested preconditioner initialization
 - additive/diagonal composition
 - multiplicative and symmetric multiplicative composition
-- Schur lower, upper, and full composition
-- matrix-free Schur solve mode
+- Schur lower, upper, full, and PDE-control composition
+- matrix-free Schur solve mode, including CG for `SCHUR_PDE_CONTROL`
 - per-field inner Krylov configuration and apply through the Schur preconditioner
 - serial and MPI execution paths in the nested examples
 
-Validation of the nested preconditioner examples showed convergence for the additive, multiplicative, and Schur-style configurations on the nested Laplacian test problems.
+Validation of the nested preconditioner examples showed convergence for the additive, multiplicative, and Schur-style configurations on the nested Laplacian test problems. The AMG4PSBLAS nested optimal-control MatrixMarket sample also converges with `SCHUR_PDE_CONTROL`, `SCHUR_SOLVE=MATRIX_FREE`, and `SCHUR_MAXIT=200` on serial and two-rank MPI runs.
+
+The PETSc binary Stokes nested test was also used to compare the original matrix-free Schur solve against the new `SELFP` approximation on two MPI ranks. With `SCHUR_FULL`, `BICGSTAB`, `BLOCK_SOLVE=BJAC`, and `SUB_SOLVE=ILU`, the observed runs were:
+
+| Schur solve | Sub fill | Iterations | Relative residual | Solve time |
+| --- | ---: | ---: | ---: | ---: |
+| `MATRIX_FREE` | 1 | 532 | `8.9510E-05` | about `4.95s` |
+| `SELFP` | 0 | 412 | `9.5632E-05` | about `0.50s` |
+| `SELFP` | 1 | 393 | `9.5120E-05` | about `0.51s` |
+| `SELFP` | 2 | 570 | `9.5620E-05` | about `0.80s` |
+
+For this case, `SELFP` reduced the iteration count compared with the matrix-free Schur solve and made each solve substantially cheaper. `SUB_FILLIN=1` gave the lowest iteration count, while `SUB_FILLIN=0` was the best practical default in the measured runs because it was close in iterations and cheapest to build/apply. Larger fill was not automatically better for the lumped Schur approximation.
 
 The Schur nested preconditioner test includes an additional `SCHUR_FULL` / `A22+INNER` case. That case configures independent per-field inner Krylov contexts, builds the nested preconditioner, applies it directly to the right-hand side, and verifies a successful finite preconditioner application. The existing Schur cases continue to check outer BiCGSTAB convergence.
 
@@ -933,8 +1023,9 @@ The current implementation has the following limitations:
 - double precision only
 - nested preconditioner name currently exposed as `NEST`
 - transposed preconditioner application is rejected
-- Schur-style compositions are implemented for exactly two fields
-- matrix-free Schur solve currently uses a small Richardson iteration
+- two-field Schur compositions are implemented by `SCHUR_LOWER`, `SCHUR_UPPER`, and `SCHUR_FULL`; the specialized three-field Schur composition is `SCHUR_PDE_CONTROL` only
+- two-field matrix-free Schur solves use Richardson; PDE-control matrix-free Schur solves use CG on the positive field-3 Schur action
+- `SELFP` is currently a two-field Schur approximation for `SCHUR_LOWER`, `SCHUR_UPPER`, and `SCHUR_FULL`; it assembles a local lumped Schur preconditioning matrix, not an exact distributed Schur complement
 - inner Krylov methods currently include `CG` and `BICGSTAB`
 
 ## Future Work
@@ -942,10 +1033,11 @@ The current implementation has the following limitations:
 Recommended next steps are:
 
 - add single, complex, and complex double precision variants
+- expose a dedicated Schur preconditioner for the PDE-control CG solve, instead of relying on the field-3 block preconditioner fallback
 
 ## Summary
 
-The nested preconditioner adds a field-split preconditioning layer to PSBLAS while preserving the existing solver and preconditioner API. It reuses standard PSBLAS block preconditioners on diagonal field blocks and combines them through additive, multiplicative, symmetric multiplicative, and Schur-style compositions.
+The nested preconditioner adds a field-split preconditioning layer to PSBLAS while preserving the existing solver and preconditioner API. It reuses standard PSBLAS block preconditioners on diagonal field blocks and combines them through additive, multiplicative, symmetric multiplicative, two-field Schur, and three-field PDE-control Schur compositions.
 
 The implementation integrates with:
 

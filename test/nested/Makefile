@@ -6,7 +6,11 @@ include $(INCDIR)/Make.inc.psblas
 # Libraries used
 LIBDIR=$(INSTALLDIR)/lib
 PSBLAS_LIB= -L$(LIBDIR) -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_ext -lpsb_base
+ifeq ($(strip $(BLAS)),)
+LDLIBS= $(PSBLDLIBS) -lblas
+else
 LDLIBS= $(PSBLDLIBS)
+endif
 #
 # Compilers and such
 #
@@ -17,7 +21,7 @@ FINCLUDES=$(FMFLAG)$(MODDIR) $(FMFLAG).
 EXEDIR=./runs
 
 all: runsd psb_d_nest_glob_test psb_d_nest_rect_test psb_d_nest_cg_test psb_d_nest_prec_cg_test \
-	psb_d_nest_mult_prec_cg_test psb_d_nest_schur_prec_cg_test
+	psb_d_nest_mult_prec_cg_test psb_d_nest_schur_prec_cg_test psb_d_nest_petsc_stokes_test
 
 runsd:
 	(if test ! -d runs ; then mkdir runs; fi)
@@ -46,12 +50,19 @@ psb_d_nest_schur_prec_cg_test: psb_d_nest_schur_prec_cg_test.o
 	$(FLINK) psb_d_nest_schur_prec_cg_test.o -o psb_d_nest_schur_prec_cg_test $(PSBLAS_LIB) $(LDLIBS)
 	/bin/mv psb_d_nest_schur_prec_cg_test $(EXEDIR)
 
+
+psb_d_nest_petsc_stokes_test: psb_d_nest_petsc_stokes_test.o
+	$(FLINK) psb_d_nest_petsc_stokes_test.o -o psb_d_nest_petsc_stokes_test $(PSBLAS_LIB) $(LDLIBS)
+	/bin/mv psb_d_nest_petsc_stokes_test $(EXEDIR)
+
+
 clean:
 	/bin/rm -f psb_d_nest_glob_test.o psb_d_nest_rect_test.o psb_d_nest_cg_test.o \
-	psb_d_nest_prec_cg_test.o psb_d_nest_mult_prec_cg_test.o psb_d_nest_schur_prec_cg_test.o *$(.mod) \
+	psb_d_nest_prec_cg_test.o psb_d_nest_mult_prec_cg_test.o psb_d_nest_schur_prec_cg_test.o \
+	psb_d_nest_petsc_stokes_test.o *$(.mod) \
 	$(EXEDIR)/psb_d_nest_glob_test $(EXEDIR)/psb_d_nest_rect_test $(EXEDIR)/psb_d_nest_cg_test \
 	$(EXEDIR)/psb_d_nest_prec_cg_test $(EXEDIR)/psb_d_nest_mult_prec_cg_test \
-	$(EXEDIR)/psb_d_nest_schur_prec_cg_test
+	$(EXEDIR)/psb_d_nest_schur_prec_cg_test $(EXEDIR)/psb_d_nest_petsc_stokes_test
 verycleanlib:
 	(cd ../..; make veryclean)
 lib:

@@ -215,6 +215,33 @@ A field-split interface (`psb_d_nest_get_block`, `psb_d_nest_get_field_desc`, `p
 
 All tests run both serially and in parallel, and the result is invariant with respect to the number of MPI processes.
 
+
+### PETSc Stokes block file test
+
+`psb_d_nest_petsc_stokes_test` reads PETSc-style Stokes MatrixMarket blocks and
+assembles the saddle-point operator as
+
+```text
+[ A   Bt ]
+[ B    0 ]
+```
+
+using `psb_d_nest_matrix`, so the rectangular `Bt` and `B` blocks are kept as
+nested sub-blocks. Configure it with environment variables:
+
+```sh
+export PETSC_STOKES_DIR=/path/to/petsc/stokes/files
+export PETSC_STOKES_METHOD=BICGSTAB
+export PETSC_STOKES_PREC=NEST
+export PETSC_STOKES_COMPOSITION=SCHUR_FULL
+export PETSC_STOKES_SCHUR_SOLVE=MATRIX_FREE
+./runs/psb_d_nest_petsc_stokes_test
+```
+
+The deal.II Stokes file test and optimal-control file test are not part of
+`test/nested`; the retained file-based nested sample here is the PETSc Stokes
+variant.
+
 ### Build and run
 
 The PSBLAS library must be built/installed first (from the repository root):

@@ -30,11 +30,11 @@
 !
 module psb_d_nestedprec
 
-  use psb_base_mod, only : psb_ipk_, psb_epk_, psb_dpk_, psb_success_, &
+  use psb_base_mod, only : psb_ipk_, psb_lpk_, psb_epk_, psb_dpk_, psb_success_, &
        & psb_err_invalid_input_, psb_err_invalid_preca_, psb_err_invalid_mat_state_, &
        & psb_err_alloc_dealloc_, psb_err_transpose_not_n_unsupported_, &
        & psb_root_, psb_toupper, psb_info, psb_errpush, psb_halo, psb_gedot, &
-       & done, dzero
+       & psb_spall, psb_spins, psb_spasb, psb_dupl_add_, done, dzero
   use psb_d_base_prec_mod
   use psb_d_nullprec, only : psb_d_null_prec_type
   use psb_d_diagprec, only : psb_d_diag_prec_type
@@ -63,8 +63,10 @@ module psb_d_nestedprec
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_lower_ = 5
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_upper_ = 6
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_full_  = 7
+  integer(psb_ipk_), parameter, private :: psb_d_nested_schur_pde_control_ = 8
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_a22_ = 1
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_mf_  = 2
+  integer(psb_ipk_), parameter, private :: psb_d_nested_schur_selfp_ = 3
 
   type :: psb_d_nested_iopt
     integer(psb_ipk_) :: field
@@ -89,6 +91,9 @@ module psb_d_nestedprec
     class(psb_d_base_prec_type), allocatable :: pc
   end type psb_d_nested_block_prec
 
+  type(psb_dspmat_type), pointer, save :: selfp_schur_mat => null()
+  type(psb_d_nested_block_prec), pointer, save :: selfp_schur_block => null()
+
   type :: psb_d_nested_krylov_context
     logical :: enabled
     character(len=16) :: method
@@ -110,6 +115,7 @@ module psb_d_nestedprec
     integer(psb_ipk_) :: nfields
     type(psb_d_nest_base_mat), pointer :: nest_op
     type(psb_d_nested_block_prec), allocatable :: blocks(:)
+    logical :: schur_selfp_built
     character(len=16), allocatable :: field_block_ptype(:)
     type(psb_d_nested_krylov_context), allocatable :: field_krylov(:)
     type(psb_d_nested_iopt), allocatable :: field_iopts(:)
@@ -138,12 +144,15 @@ module psb_d_nestedprec
        & psb_d_nested_precsetr, psb_d_nested_precsetc, &
        & psb_d_nested_clear_built, psb_d_nested_valid_block_solve, &
        & psb_d_nested_get_field_block_ptype, psb_d_nested_field_solve, &
-       & psb_d_nested_apply_schur, psb_d_nested_replay_field_options, &
+       & psb_d_nested_apply_schur, psb_d_nested_apply_pde_control_schur, &
+       & psb_d_nested_replay_field_options, &
        & psb_d_nested_append_iopt, psb_d_nested_append_ropt, &
        & psb_d_nested_append_copt, psb_d_nested_schur_action, &
-       & psb_d_nested_schur_solve, psb_d_nested_get_field_krylov, &
+       & psb_d_nested_schur_solve, psb_d_nested_pde_control_schur_action, &
+       & psb_d_nested_pde_control_schur_solve, psb_d_nested_get_field_krylov, &
        & psb_d_nested_inner_solve, psb_d_nested_inner_cg, psb_d_nested_inner_bicgstab, &
-       & psb_d_nested_field_matvec, psb_d_nested_ensure_krylov_field
+       & psb_d_nested_field_matvec, psb_d_nested_ensure_krylov_field, &
+       & psb_d_nested_build_selfp, psb_d_nested_replay_schur_options
 
 contains
 
@@ -160,6 +169,7 @@ contains
     prec%schur_solve_name = 'A22'
     prec%schur_maxit = 4
     prec%schur_tol = 0.0_psb_dpk_
+    prec%schur_selfp_built = .false.
     prec%default_krylov%enabled = .false.
     prec%default_krylov%method = 'CG'
     prec%default_krylov%itmax = 20
@@ -192,6 +202,24 @@ contains
       deallocate(prec%blocks, stat=local_info)
       if (local_info /= 0 .and. info == psb_success_) info = local_info
     end if
+    if (associated(selfp_schur_block)) then
+      if (allocated(selfp_schur_block%pc)) then
+        call selfp_schur_block%pc%free(local_info)
+        if (local_info /= psb_success_ .and. info == psb_success_) info = local_info
+        deallocate(selfp_schur_block%pc, stat=local_info)
+        if (local_info /= 0 .and. info == psb_success_) info = local_info
+      end if
+      deallocate(selfp_schur_block, stat=local_info)
+      if (local_info /= 0 .and. info == psb_success_) info = local_info
+      nullify(selfp_schur_block)
+    end if
+    if (associated(selfp_schur_mat)) then
+      call selfp_schur_mat%free()
+      deallocate(selfp_schur_mat, stat=local_info)
+      if (local_info /= 0 .and. info == psb_success_) info = local_info
+      nullify(selfp_schur_mat)
+    end if
+    prec%schur_selfp_built = .false.
     prec%nfields = 0
     prec%nest_op => null()
   end subroutine psb_d_nested_clear_built
@@ -287,6 +315,12 @@ contains
       case ('SCHUR','SCHUR_FULL','FULL_SCHUR')
         prec%composition = psb_d_nested_schur_full_
         prec%composition_name = 'SCHUR_FULL'
+      case ('SCHUR_PDE_CONTROL','PDE_CONTROL_SCHUR','SCHUR_2PLUS1', &
+           & 'SCHUR3','SCHUR_3FIELD','SCHUR_THREE_FIELD')
+        prec%composition = psb_d_nested_schur_pde_control_
+        prec%composition_name = 'SCHUR_PDE_CONTROL'
+        prec%schur_solve = psb_d_nested_schur_mf_
+        prec%schur_solve_name = 'MATRIX_FREE'
       case default
         info = psb_err_invalid_input_
       end select
@@ -301,9 +335,15 @@ contains
       case ('A22','A_22','FIELD','FIELD_BLOCK')
         prec%schur_solve = psb_d_nested_schur_a22_
         prec%schur_solve_name = 'A22'
-      case ('MATRIX_FREE','MATFREE','MF','SELF')
+      case ('A33','A_33','FIELD3','FIELD_3','FIELD_BLOCK3','FIELD_BLOCK_3')
+        prec%schur_solve = psb_d_nested_schur_a22_
+        prec%schur_solve_name = 'A33'
+      case ('MATRIX_FREE','MATFREE','MF')
         prec%schur_solve = psb_d_nested_schur_mf_
         prec%schur_solve_name = 'MATRIX_FREE'
+      case ('SELFP','SELF')
+        prec%schur_solve = psb_d_nested_schur_selfp_
+        prec%schur_solve_name = 'SELFP'
       case default
         info = psb_err_invalid_input_
       end select
@@ -396,6 +436,14 @@ contains
       end if
       if (info /= psb_success_) return
     end do
+
+    if ((prec%schur_solve == psb_d_nested_schur_selfp_) .and. &
+         & (prec%composition == psb_d_nested_schur_lower_ .or. &
+         &  prec%composition == psb_d_nested_schur_upper_ .or. &
+         &  prec%composition == psb_d_nested_schur_full_)) then
+      call psb_d_nested_build_selfp(prec, info, amold, vmold, imold)
+      if (info /= psb_success_) return
+    end if
   end subroutine psb_d_nested_precbld
 
   ! Allocate the concrete PSBLAS preconditioner requested for one field block.
@@ -888,6 +936,8 @@ contains
              & call psb_d_nested_sweep(prec, x, z, desc_data, prec%nfields, 1, -1, info)
       case (psb_d_nested_schur_lower_, psb_d_nested_schur_upper_, psb_d_nested_schur_full_)
         call psb_d_nested_apply_schur(prec, x, z, desc_data, info)
+      case (psb_d_nested_schur_pde_control_)
+        call psb_d_nested_apply_pde_control_schur(prec, x, z, desc_data, info)
       case default
         info = psb_err_invalid_input_
         call psb_errpush(info, name, a_err='unknown composition')
@@ -1415,6 +1465,217 @@ contains
     deallocate(x2h, t1, w1, w1h, t2)
   end subroutine psb_d_nested_schur_action
 
+
+  subroutine psb_d_nested_replay_schur_options(prec, info)
+    class(psb_d_nested_prec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: k
+
+    info = psb_success_
+    if (.not. associated(selfp_schur_block)) return
+    if (.not. allocated(selfp_schur_block%pc)) return
+
+    if (allocated(prec%field_iopts)) then
+      do k = 1, size(prec%field_iopts)
+        if ((prec%field_iopts(k)%field == 0) .or. (prec%field_iopts(k)%field == 2)) then
+          call selfp_schur_block%pc%precset(prec%field_iopts(k)%what, &
+               & prec%field_iopts(k)%val, info)
+          if (info /= psb_success_) return
+        end if
+      end do
+    end if
+
+    if (allocated(prec%field_ropts)) then
+      do k = 1, size(prec%field_ropts)
+        if ((prec%field_ropts(k)%field == 0) .or. (prec%field_ropts(k)%field == 2)) then
+          call selfp_schur_block%pc%precset(prec%field_ropts(k)%what, &
+               & prec%field_ropts(k)%val, info)
+          if (info /= psb_success_) return
+        end if
+      end do
+    end if
+
+    if (allocated(prec%field_copts)) then
+      do k = 1, size(prec%field_copts)
+        if ((prec%field_copts(k)%field == 0) .or. (prec%field_copts(k)%field == 2)) then
+          call selfp_schur_block%pc%precset(prec%field_copts(k)%what, &
+               & trim(prec%field_copts(k)%val), info)
+          if (info /= psb_success_) return
+        end if
+      end do
+    end if
+  end subroutine psb_d_nested_replay_schur_options
+  subroutine psb_d_nested_build_selfp(prec, info, amold, vmold, imold)
+    class(psb_d_nested_prec_type), intent(inout) :: prec
+    integer(psb_ipk_), intent(out) :: info
+    class(psb_d_base_sparse_mat), intent(in), optional :: amold
+    class(psb_d_base_vect_type), intent(in), optional :: vmold
+    class(psb_i_base_vect_type), intent(in), optional :: imold
+
+    type(psb_desc_type), pointer :: desc1, desc2
+    type(psb_dspmat_type), pointer :: block11, block12, block21, block22
+    real(psb_dpk_), allocatable :: diag1(:), acc(:), vals(:), va21(:), va12(:), va22(:)
+    integer(psb_lpk_), allocatable :: owned_rows(:)
+    integer(psb_ipk_), allocatable :: ia21(:), ja21(:), ia12(:), ja12(:), ia22(:), ja22(:)
+    integer(psb_lpk_), allocatable :: rows(:), cols(:)
+    integer(psb_ipk_) :: i, k, m, nz21, nz12, nz22, n_insert
+    integer(psb_ipk_) :: n_owned_1, n_owned_2, vloc
+    real(psb_dpk_) :: scale, row_norm
+
+    info = psb_success_
+    if (prec%nfields < 2) then
+      info = psb_err_invalid_mat_state_
+      call psb_errpush(info, 'd_nested_build_selfp', a_err='SELFP requires two fields')
+      return
+    end if
+
+    desc1 => psb_d_nest_get_field_desc(prec%nest_op, 1)
+    desc2 => psb_d_nest_get_field_desc(prec%nest_op, 2)
+    block11 => psb_d_nest_get_block(prec%nest_op, 1, 1)
+    block12 => psb_d_nest_get_block(prec%nest_op, 1, 2)
+    block21 => psb_d_nest_get_block(prec%nest_op, 2, 1)
+    block22 => psb_d_nest_get_block(prec%nest_op, 2, 2)
+    if ((.not. associated(desc1)) .or. (.not. associated(desc2)) .or. &
+         & (.not. associated(block11)) .or. (.not. associated(block12)) .or. &
+         & (.not. associated(block21))) then
+      info = psb_err_invalid_mat_state_
+      call psb_errpush(info, 'd_nested_build_selfp', a_err='missing Schur blocks')
+      return
+    end if
+
+    diag1 = block11%get_diag(info)
+    if (info /= psb_success_) then
+      call psb_errpush(info, 'd_nested_build_selfp', a_err='A11 get_diag')
+      return
+    end if
+
+    n_owned_1 = desc1%get_local_rows()
+    n_owned_2 = desc2%get_local_rows()
+    owned_rows = desc2%get_global_indices(owned=.true.)
+    allocate(acc(n_owned_2), rows(n_owned_2), cols(n_owned_2), vals(n_owned_2), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_build_selfp', a_err='work arrays')
+      return
+    end if
+
+    if (associated(selfp_schur_mat)) then
+      call selfp_schur_mat%free()
+      deallocate(selfp_schur_mat, stat=info)
+      nullify(selfp_schur_mat)
+      if (info /= 0) then
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info, 'd_nested_build_selfp', a_err='Schur matrix reset')
+        goto 100
+      end if
+    end if
+    allocate(selfp_schur_mat, stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_build_selfp', a_err='Schur matrix')
+      goto 100
+    end if
+    call psb_spall(selfp_schur_mat, desc2, info)
+    if (info /= psb_success_) goto 100
+
+    do i = 1, n_owned_2
+      acc(:) = dzero
+
+      if (associated(block22)) then
+        call block22%csget(i, i, nz22, ia22, ja22, va22, info, jmax=n_owned_2)
+        if (info /= psb_success_) exit
+        do m = 1, nz22
+          if (ja22(m) >= 1 .and. ja22(m) <= n_owned_2) acc(ja22(m)) = acc(ja22(m)) + va22(m)
+        end do
+      end if
+
+      call block21%csget(i, i, nz21, ia21, ja21, va21, info)
+      if (info /= psb_success_) exit
+      do k = 1, nz21
+        vloc = ja21(k)
+        if (vloc < 1 .or. vloc > n_owned_1) cycle
+        if (abs(diag1(vloc)) <= tiny(done)) cycle
+        scale = -va21(k) / diag1(vloc)
+        call block12%csget(vloc, vloc, nz12, ia12, ja12, va12, info, jmax=n_owned_2)
+        if (info /= psb_success_) exit
+        do m = 1, nz12
+          if (ja12(m) >= 1 .and. ja12(m) <= n_owned_2) &
+               & acc(ja12(m)) = acc(ja12(m)) + scale * va12(m)
+        end do
+      end do
+      if (info /= psb_success_) exit
+
+      if (abs(acc(i)) <= tiny(done)) then
+        row_norm = sum(abs(acc(:)))
+        acc(i) = -max(row_norm, done)
+      end if
+
+      n_insert = 0
+      do m = 1, n_owned_2
+        if (abs(acc(m)) > dzero) then
+          n_insert = n_insert + 1
+          rows(n_insert) = owned_rows(i)
+          cols(n_insert) = owned_rows(m)
+          vals(n_insert) = acc(m)
+        end if
+      end do
+      if (n_insert > 0) then
+        call psb_spins(n_insert, rows(1:n_insert), cols(1:n_insert), vals(1:n_insert), &
+             & selfp_schur_mat, desc2, info)
+        if (info /= psb_success_) exit
+      end if
+    end do
+    if (info /= psb_success_) goto 100
+
+    call psb_spasb(selfp_schur_mat, desc2, info, dupl=psb_dupl_add_)
+    if (info /= psb_success_) goto 100
+    call selfp_schur_mat%cscnv(info, type='CSR')
+    if (info /= psb_success_) goto 100
+
+    if (associated(selfp_schur_block)) then
+      if (allocated(selfp_schur_block%pc)) then
+        call selfp_schur_block%pc%free(info)
+        if (info /= psb_success_) return
+        deallocate(selfp_schur_block%pc, stat=info)
+        if (info /= psb_success_) return
+      end if
+      deallocate(selfp_schur_block, stat=info)
+      if (info /= psb_success_) return
+      nullify(selfp_schur_block)
+    end if
+    allocate(selfp_schur_block, stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_build_selfp', a_err='Schur block')
+      goto 100
+    end if
+    selfp_schur_block%ptype = 'BJAC'
+    call psb_d_nested_alloc_block_pc(selfp_schur_block, info)
+    if (info /= psb_success_) goto 100
+    call selfp_schur_block%pc%precinit(info)
+    if (info /= psb_success_) goto 100
+    if (info /= psb_success_) goto 100
+    call selfp_schur_block%pc%precbld(selfp_schur_mat, desc2, info, &
+         & amold=amold, vmold=vmold, imold=imold)
+    if (info == psb_success_) prec%schur_selfp_built = .true.
+
+100 continue
+    if (allocated(diag1)) deallocate(diag1)
+    if (allocated(owned_rows)) deallocate(owned_rows)
+    if (allocated(acc)) deallocate(acc)
+    if (allocated(rows)) deallocate(rows)
+    if (allocated(cols)) deallocate(cols)
+    if (allocated(vals)) deallocate(vals)
+    if (allocated(ia21)) deallocate(ia21)
+    if (allocated(ja21)) deallocate(ja21)
+    if (allocated(va21)) deallocate(va21)
+    if (allocated(ia12)) deallocate(ia12)
+    if (allocated(ja12)) deallocate(ja12)
+    if (allocated(va12)) deallocate(va12)
+    if (allocated(ia22)) deallocate(ia22)
+    if (allocated(ja22)) deallocate(ja22)
+    if (allocated(va22)) deallocate(va22)
+  end subroutine psb_d_nested_build_selfp
   ! Approximately solve the Schur block using A22 or the matrix-free Schur action.
   subroutine psb_d_nested_schur_solve(prec, rhs, sol, gwork, desc_data, info)
     class(psb_d_nested_prec_type), intent(inout) :: prec
@@ -1427,10 +1688,36 @@ contains
     real(psb_dpk_), allocatable :: sx(:), res(:), dz(:)
     integer(psb_ipk_) :: k, maxit, n_owned
     real(psb_dpk_) :: rnrm
+    type(psb_desc_type), pointer :: desc2
 
     info = psb_success_
     if (prec%schur_solve == psb_d_nested_schur_a22_) then
       call psb_d_nested_field_solve(prec, 2, rhs, sol, info)
+      return
+    else if (prec%schur_solve == psb_d_nested_schur_selfp_) then
+      if (.not. prec%schur_selfp_built .or. (.not. associated(selfp_schur_block)) .or. &
+           & (.not. allocated(selfp_schur_block%pc))) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'd_nested_schur_solve', a_err='SELFP not built')
+        return
+      end if
+      allocate(dz(size(rhs)), stat=info)
+      if (info /= 0) then
+        info = psb_err_alloc_dealloc_
+        call psb_errpush(info, 'd_nested_schur_solve', a_err='SELFP work vector')
+        return
+      end if
+      desc2 => psb_d_nest_get_field_desc(prec%nest_op, 2)
+      if (.not. associated(desc2)) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'd_nested_schur_solve', a_err='missing field descriptor')
+        deallocate(dz)
+        return
+      end if
+      sol(:) = dzero
+      call selfp_schur_block%pc%apply(done, rhs, dzero, sol, desc2, info, &
+           & trans='N', work=dz)
+      deallocate(dz)
       return
     end if
 
@@ -1582,6 +1869,342 @@ contains
 100 continue
     deallocate(b1, b2, x1, x2, t1, t2, c1, gwork)
   end subroutine psb_d_nested_apply_schur
+
+  ! Apply the positive PDE-control Schur action on field 3:
+  !   T x3 = [A31 A32] diag(B1,B2) [A13; A23] x3 - A33 x3.
+  ! For the KKT matrix [M 0 K; 0 alpha*M -M; K -M 0], T is -S.
+  subroutine psb_d_nested_pde_control_schur_action(prec, x3, y3, gwork, desc_data, info)
+    class(psb_d_nested_prec_type), intent(inout) :: prec
+    real(psb_dpk_), intent(inout) :: x3(:)
+    real(psb_dpk_), intent(inout) :: y3(:)
+    real(psb_dpk_), intent(inout) :: gwork(:)
+    type(psb_desc_type), intent(in) :: desc_data
+    integer(psb_ipk_), intent(out) :: info
+
+    real(psb_dpk_), allocatable :: x3h(:), t1(:), t2(:), w1(:), w2(:), &
+         & w1h(:), w2h(:), t3(:)
+    type(psb_desc_type), pointer :: desc1, desc2, desc3
+    type(psb_dspmat_type), pointer :: block13, block23, block31, block32, block33
+    integer(psb_ipk_) :: n_col_1, n_col_2, n_col_3
+
+    info = psb_success_
+    desc1 => psb_d_nest_get_field_desc(prec%nest_op, 1)
+    desc2 => psb_d_nest_get_field_desc(prec%nest_op, 2)
+    desc3 => psb_d_nest_get_field_desc(prec%nest_op, 3)
+    if ((.not. associated(desc1)) .or. (.not. associated(desc2)) .or. &
+         & (.not. associated(desc3))) then
+      info = psb_err_invalid_mat_state_
+      call psb_errpush(info, 'd_nested_pde_schur_action', a_err='missing field descriptor')
+      return
+    end if
+
+    n_col_1 = desc1%get_local_cols()
+    n_col_2 = desc2%get_local_cols()
+    n_col_3 = desc3%get_local_cols()
+    allocate(x3h(n_col_3), t1(n_col_1), t2(n_col_2), w1(n_col_1), w2(n_col_2), &
+         & w1h(n_col_1), w2h(n_col_2), t3(n_col_3), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_pde_schur_action', a_err='field vectors')
+      return
+    end if
+
+    x3h(:) = dzero
+    t1(:) = dzero
+    t2(:) = dzero
+    w1(:) = dzero
+    w2(:) = dzero
+    w1h(:) = dzero
+    w2h(:) = dzero
+    t3(:) = dzero
+    y3(:) = dzero
+
+    gwork(:) = dzero
+    call psb_d_nest_prolong_field(prec%nest_op, 3, x3, gwork, info)
+    if (info /= psb_success_) goto 100
+    call psb_halo(gwork, desc_data, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field_local(prec%nest_op, 3, gwork, x3h, info)
+    if (info /= psb_success_) goto 100
+
+    block13 => psb_d_nest_get_block(prec%nest_op, 1, 3)
+    block23 => psb_d_nest_get_block(prec%nest_op, 2, 3)
+    block31 => psb_d_nest_get_block(prec%nest_op, 3, 1)
+    block32 => psb_d_nest_get_block(prec%nest_op, 3, 2)
+    block33 => psb_d_nest_get_block(prec%nest_op, 3, 3)
+
+    if (associated(block13) .and. associated(block31)) then
+      call psb_d_nest_apply_block(prec%nest_op, 1, 3, done, x3h, dzero, t1, info)
+      if (info /= psb_success_) goto 100
+      call psb_d_nested_field_solve(prec, 1, t1, w1, info)
+      if (info /= psb_success_) goto 100
+
+      gwork(:) = dzero
+      call psb_d_nest_prolong_field(prec%nest_op, 1, w1, gwork, info)
+      if (info /= psb_success_) goto 100
+      call psb_halo(gwork, desc_data, info)
+      if (info /= psb_success_) goto 100
+      call psb_d_nest_restrict_field_local(prec%nest_op, 1, gwork, w1h, info)
+      if (info /= psb_success_) goto 100
+
+      call psb_d_nest_apply_block(prec%nest_op, 3, 1, done, w1h, done, y3, info)
+      if (info /= psb_success_) goto 100
+    end if
+
+    if (associated(block23) .and. associated(block32)) then
+      call psb_d_nest_apply_block(prec%nest_op, 2, 3, done, x3h, dzero, t2, info)
+      if (info /= psb_success_) goto 100
+      call psb_d_nested_field_solve(prec, 2, t2, w2, info)
+      if (info /= psb_success_) goto 100
+
+      gwork(:) = dzero
+      call psb_d_nest_prolong_field(prec%nest_op, 2, w2, gwork, info)
+      if (info /= psb_success_) goto 100
+      call psb_halo(gwork, desc_data, info)
+      if (info /= psb_success_) goto 100
+      call psb_d_nest_restrict_field_local(prec%nest_op, 2, gwork, w2h, info)
+      if (info /= psb_success_) goto 100
+
+      call psb_d_nest_apply_block(prec%nest_op, 3, 2, done, w2h, done, y3, info)
+      if (info /= psb_success_) goto 100
+    end if
+
+    if (associated(block33)) then
+      call psb_d_nest_apply_block(prec%nest_op, 3, 3, done, x3h, dzero, t3, info)
+      if (info /= psb_success_) goto 100
+      y3(:) = y3(:) - t3(:)
+    end if
+
+100 continue
+    deallocate(x3h, t1, t2, w1, w2, w1h, w2h, t3)
+  end subroutine psb_d_nested_pde_control_schur_action
+
+  ! Approximately solve the field-3 PDE-control Schur equation S x = rhs.
+  ! Internally this solves T x = -rhs, where T = -S is the positive
+  ! PDE-control Schur action assembled matrix-free by
+  ! psb_d_nested_pde_control_schur_action.  The old Richardson update used the
+  ! field-3 diagonal block as the Schur preconditioner; for KKT systems with
+  ! A33 = 0 that is only an identity fallback.  Use a matrix-free CG iteration
+  ! instead, with the field-3 block preconditioner as an optional left
+  ! preconditioner when it is meaningful.
+  subroutine psb_d_nested_pde_control_schur_solve(prec, rhs, sol, gwork, desc_data, info)
+    class(psb_d_nested_prec_type), intent(inout) :: prec
+    real(psb_dpk_), intent(inout) :: rhs(:)
+    real(psb_dpk_), intent(inout) :: sol(:)
+    real(psb_dpk_), intent(inout) :: gwork(:)
+    type(psb_desc_type), intent(in) :: desc_data
+    integer(psb_ipk_), intent(out) :: info
+
+    real(psb_dpk_), allocatable :: q(:), r(:), zc(:), p(:), ap(:)
+    type(psb_desc_type), pointer :: desc3
+    integer(psb_ipk_) :: k, maxit
+    real(psb_dpk_) :: alpha, beta, rz, rz_old, pap, rnorm, rhs_norm, tol
+
+    info = psb_success_
+    desc3 => psb_d_nest_get_field_desc(prec%nest_op, 3)
+    if (.not. associated(desc3)) then
+      info = psb_err_invalid_mat_state_
+      call psb_errpush(info, 'd_nested_pde_schur_solve', a_err='missing field descriptor')
+      return
+    end if
+
+    if (prec%schur_solve == psb_d_nested_schur_a22_) then
+      call psb_d_nested_field_solve(prec, 3, rhs, sol, info)
+      if (info == psb_success_) sol(:) = -sol(:)
+      return
+    end if
+
+    allocate(q(size(rhs)), r(size(rhs)), zc(size(rhs)), p(size(rhs)), ap(size(rhs)), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_pde_schur_solve', a_err='Schur work vectors')
+      return
+    end if
+
+    sol(:) = dzero
+    q(:) = -rhs(:)
+    r(:) = q(:)
+    rhs_norm = sqrt(max(dzero, psb_gedot(q, q, desc3, info)))
+    if (info /= psb_success_) goto 100
+    tol = prec%schur_tol
+    if (tol <= dzero) tol = 1.0e-6_psb_dpk_ * max(done, rhs_norm)
+
+    call psb_d_nested_field_solve(prec, 3, r, zc, info)
+    if (info /= psb_success_) goto 100
+    p(:) = zc(:)
+    rz = psb_gedot(r, zc, desc3, info)
+    if (info /= psb_success_) goto 100
+    if (abs(rz) <= tiny(done)) then
+      p(:) = r(:)
+      zc(:) = r(:)
+      rz = psb_gedot(r, zc, desc3, info)
+      if (info /= psb_success_) goto 100
+    end if
+
+    maxit = max(1, prec%schur_maxit)
+    do k = 1, maxit
+      ap(:) = dzero
+      call psb_d_nested_pde_control_schur_action(prec, p, ap, gwork, desc_data, info)
+      if (info /= psb_success_) exit
+      pap = psb_gedot(p, ap, desc3, info)
+      if (info /= psb_success_) exit
+      if (abs(pap) <= tiny(done)) exit
+      alpha = rz / pap
+      sol(:) = sol(:) + alpha * p(:)
+      r(:) = r(:) - alpha * ap(:)
+      rnorm = sqrt(max(dzero, psb_gedot(r, r, desc3, info)))
+      if (info /= psb_success_) exit
+      if (rnorm <= tol) exit
+
+      call psb_d_nested_field_solve(prec, 3, r, zc, info)
+      if (info /= psb_success_) exit
+      rz_old = rz
+      rz = psb_gedot(r, zc, desc3, info)
+      if (info /= psb_success_) exit
+      if (abs(rz) <= tiny(done)) then
+        zc(:) = r(:)
+        rz = psb_gedot(r, zc, desc3, info)
+        if (info /= psb_success_) exit
+      end if
+      beta = rz / rz_old
+      p(:) = zc(:) + beta * p(:)
+    end do
+
+100 continue
+    deallocate(q, r, zc, p, ap)
+  end subroutine psb_d_nested_pde_control_schur_solve
+
+  ! Apply a three-field PDE-control Schur preconditioner.
+  ! Fields 1 and 2 are grouped into the leading block D=diag(A11,A22);
+  ! field 3 is the Schur field.
+  subroutine psb_d_nested_apply_pde_control_schur(prec, x, z, desc_data, info)
+    class(psb_d_nested_prec_type), intent(inout) :: prec
+    real(psb_dpk_), intent(in) :: x(:)
+    real(psb_dpk_), intent(inout) :: z(:)
+    type(psb_desc_type), intent(in) :: desc_data
+    integer(psb_ipk_), intent(out) :: info
+
+    real(psb_dpk_), allocatable :: b1(:), b2(:), b3(:), x1(:), x2(:), x3(:), &
+         & t1(:), t2(:), c1(:), c2(:), gwork(:)
+    type(psb_desc_type), pointer :: desc1, desc2, desc3
+    type(psb_dspmat_type), pointer :: block13, block23, block31, block32
+    integer(psb_ipk_) :: n_col_1, n_col_2, n_col_3
+
+    info = psb_success_
+    z(:) = dzero
+
+    if (prec%nfields /= 3) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, 'd_nested_apply_pde_schur', &
+           & a_err='PDE-control Schur composition requires three fields')
+      return
+    end if
+
+    desc1 => psb_d_nest_get_field_desc(prec%nest_op, 1)
+    desc2 => psb_d_nest_get_field_desc(prec%nest_op, 2)
+    desc3 => psb_d_nest_get_field_desc(prec%nest_op, 3)
+    if ((.not. associated(desc1)) .or. (.not. associated(desc2)) .or. &
+         & (.not. associated(desc3))) then
+      info = psb_err_invalid_mat_state_
+      call psb_errpush(info, 'd_nested_apply_pde_schur', a_err='missing field descriptor')
+      return
+    end if
+
+    n_col_1 = desc1%get_local_cols()
+    n_col_2 = desc2%get_local_cols()
+    n_col_3 = desc3%get_local_cols()
+    allocate(b1(n_col_1), b2(n_col_2), b3(n_col_3), x1(n_col_1), x2(n_col_2), &
+         & x3(n_col_3), t1(n_col_1), t2(n_col_2), c1(n_col_1), c2(n_col_2), &
+         & gwork(size(z)), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_apply_pde_schur', a_err='field vectors')
+      return
+    end if
+
+    b1(:) = dzero
+    b2(:) = dzero
+    b3(:) = dzero
+    x1(:) = dzero
+    x2(:) = dzero
+    x3(:) = dzero
+    t1(:) = dzero
+    t2(:) = dzero
+    c1(:) = dzero
+    c2(:) = dzero
+    gwork(:) = dzero
+
+    call psb_d_nest_restrict_field(prec%nest_op, 1, x, b1, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field(prec%nest_op, 2, x, b2, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field(prec%nest_op, 3, x, b3, info)
+    if (info /= psb_success_) goto 100
+
+    block13 => psb_d_nest_get_block(prec%nest_op, 1, 3)
+    block23 => psb_d_nest_get_block(prec%nest_op, 2, 3)
+    block31 => psb_d_nest_get_block(prec%nest_op, 3, 1)
+    block32 => psb_d_nest_get_block(prec%nest_op, 3, 2)
+
+    call psb_d_nested_field_solve(prec, 1, b1, x1, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nested_field_solve(prec, 2, b2, x2, info)
+    if (info /= psb_success_) goto 100
+
+    call psb_d_nest_prolong_field(prec%nest_op, 1, x1, z, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_prolong_field(prec%nest_op, 2, x2, z, info)
+    if (info /= psb_success_) goto 100
+    call psb_halo(z, desc_data, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field_local(prec%nest_op, 1, z, x1, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field_local(prec%nest_op, 2, z, x2, info)
+    if (info /= psb_success_) goto 100
+
+    if (associated(block31)) then
+      call psb_d_nest_apply_block(prec%nest_op, 3, 1, -done, x1, done, b3, info)
+      if (info /= psb_success_) goto 100
+    end if
+    if (associated(block32)) then
+      call psb_d_nest_apply_block(prec%nest_op, 3, 2, -done, x2, done, b3, info)
+      if (info /= psb_success_) goto 100
+    end if
+
+    call psb_d_nested_pde_control_schur_solve(prec, b3, x3, gwork, desc_data, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_prolong_field(prec%nest_op, 3, x3, z, info)
+    if (info /= psb_success_) goto 100
+
+    call psb_halo(z, desc_data, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field_local(prec%nest_op, 3, z, x3, info)
+    if (info /= psb_success_) goto 100
+
+    if (associated(block13)) then
+      call psb_d_nest_apply_block(prec%nest_op, 1, 3, done, x3, dzero, t1, info)
+      if (info /= psb_success_) goto 100
+      call psb_d_nested_field_solve(prec, 1, t1, c1, info)
+      if (info /= psb_success_) goto 100
+      x1(:) = x1(:) - c1(:)
+      call psb_d_nest_prolong_field(prec%nest_op, 1, x1, z, info)
+      if (info /= psb_success_) goto 100
+    end if
+    if (associated(block23)) then
+      call psb_d_nest_apply_block(prec%nest_op, 2, 3, done, x3, dzero, t2, info)
+      if (info /= psb_success_) goto 100
+      call psb_d_nested_field_solve(prec, 2, t2, c2, info)
+      if (info /= psb_success_) goto 100
+      x2(:) = x2(:) - c2(:)
+      call psb_d_nest_prolong_field(prec%nest_op, 2, x2, z, info)
+      if (info /= psb_success_) goto 100
+    end if
+
+    call psb_halo(z, desc_data, info)
+
+100 continue
+    deallocate(b1, b2, b3, x1, x2, x3, t1, t2, c1, c2, gwork)
+  end subroutine psb_d_nested_apply_pde_control_schur
 
   ! Print a short description of the nested preconditioner configuration.
   subroutine psb_d_nested_precdescr(prec, iout, root, verbosity, prefix)

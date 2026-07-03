@@ -248,6 +248,7 @@ subroutine psb_drgmres_vect(a,prec,b,x,eps,desc_a,info,&
   if (info == psb_success_) call psb_geasb(w,desc_a,info,mold=x%v)  
   if (info == psb_success_) call psb_geasb(w1,desc_a,info,mold=x%v)  
   if (info == psb_success_) call psb_geasb(xt,desc_a,info,mold=x%v)  
+  if (info == psb_success_) allocate(h(nl+1,nl), c(nl), s(nl), rs(nl+1), rst(nl+1), stat=info)
   if (info /= psb_success_) then 
     info=psb_err_from_subroutine_non_ 
     call psb_errpush(info,name)
