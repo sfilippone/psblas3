@@ -57,6 +57,10 @@ module psb_base_linmap_mod
     procedure, pass(map)  :: set_kind  => base_set_kind
     procedure, pass(map)  :: free      => base_free
     procedure, pass(map)  :: clone     => base_clone
+    procedure, pass(map)  :: set_pU    => base_set_pU
+    procedure, pass(map)  :: set_pV    => base_set_pV
+    procedure, pass(map)  :: get_pU    => base_get_pU
+    procedure, pass(map)  :: get_pV    => base_get_pV
   end type psb_base_linmap_type
 
 
@@ -134,8 +138,13 @@ contains
       if (.not.associated(map%p_desc_U)) return
       if (.not.associated(map%p_desc_V)) return
       res = map%p_desc_U%is_asb().and.map%p_desc_V%is_asb()    
+!!$      write(0,*) 'map_aggr ',map%p_desc_U%is_asb(),map%p_desc_V%is_asb()    
     case(psb_map_gen_linear_)    
-      res = map%desc_U%is_asb().and.map%desc_V%is_asb()    
+      res = map%desc_U%is_asb().and.map%desc_V%is_asb()
+!!$      write(0,*) 'map_gen_linear ',map%desc_U%is_asb(),map%desc_V%is_asb()    
+    case default
+      write(0,*) 'Unknown map kind ',map%get_kind(),&
+           & psb_map_aggr_, psb_map_gen_linear_
     end select
 
   end function base_is_asb
@@ -221,7 +230,42 @@ contains
     if (map%desc_V%is_ok()) call map%desc_V%free(info)
 
   end subroutine base_free
-  
+
+  subroutine  base_set_pU(map,desc)
+    implicit none 
+    class(psb_base_linmap_type) :: map
+    type(psb_desc_type), target :: desc
+    
+    map%p_desc_U  => desc
+
+  end subroutine base_set_pU
+ 
+  subroutine  base_set_pV(map,desc)
+    implicit none 
+    class(psb_base_linmap_type) :: map
+    type(psb_desc_type), target :: desc
+    
+    map%p_desc_V  => desc
+
+  end subroutine base_set_pV
+
+  function base_get_pU(map) result(desc)
+    implicit none 
+    class(psb_base_linmap_type) :: map
+    type(psb_desc_type), pointer :: desc
+    
+    desc => map%p_desc_U  
+
+  end function base_get_pU
+ 
+  function base_get_pV(map) result(desc)
+    implicit none 
+    class(psb_base_linmap_type) :: map
+    type(psb_desc_type), pointer :: desc
+    
+    desc => map%p_desc_V  
+
+  end function base_get_pV
 
 
 end module psb_base_linmap_mod
