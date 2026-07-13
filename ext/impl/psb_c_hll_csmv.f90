@@ -224,6 +224,24 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
           end do
           if (info /= psb_success_) goto 9999
 
+        case(64)
+          !$omp parallel do private(i, j,ir,mxrwl, hkpnt)
+          do i=1,mmhk,hksz
+            j = ((i-1)/hksz)+1
+            ir    = hksz
+            mxrwl = (a%hkoffs(j+1) - a%hkoffs(j))/hksz
+            if (mxrwl>0) then 
+              hkpnt = a%hkoffs(j) + 1
+              if (info ==  psb_success_) &
+                   & call psb_c_hll_csmv_notra_64(i,mxrwl,a%irn(i),&
+                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & a%is_triangle(),a%is_unit(),&
+                   & x,beta,y,info) 
+            end if
+            j = j + 1 
+          end do
+          if (info /= psb_success_) goto 9999
+
         case default
           !$omp parallel do private(i, j,ir,mxrwl, hkpnt)
           do i=1,mmhk,hksz
@@ -382,7 +400,7 @@ contains
 
     integer(psb_ipk_), parameter :: m=8
     integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: acc(4), tmp(m)
+    complex(psb_spk_)   :: tmp(m)
 
     info = psb_success_
 
@@ -420,7 +438,7 @@ contains
 
     integer(psb_ipk_), parameter :: m=24
     integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: acc(4), tmp(m)
+    complex(psb_spk_)   :: tmp(m)
 
     info = psb_success_
 
@@ -458,7 +476,7 @@ contains
 
     integer(psb_ipk_), parameter :: m=16
     integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: acc(4), tmp(m)
+    complex(psb_spk_)   :: tmp(m)
 
     info = psb_success_
 
@@ -496,7 +514,7 @@ contains
 
     integer(psb_ipk_), parameter :: m=32
     integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: acc(4), tmp(m)
+    complex(psb_spk_)   :: tmp(m)
 
     info = psb_success_
 
@@ -522,6 +540,45 @@ contains
 
   end subroutine psb_c_hll_csmv_notra_32
 
+  subroutine psb_c_hll_csmv_notra_64(ir,n,irn,alpha,ja,ldj,val,ldv,&
+       & is_triangle,is_unit, x,beta,y,info) 
+    use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
+    implicit none 
+    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
+    complex(psb_spk_), intent(inout)   :: y(*)
+    logical, intent(in)              :: is_triangle,is_unit
+    integer(psb_ipk_), intent(out)   :: info
+
+    integer(psb_ipk_), parameter :: m=64
+    integer(psb_ipk_) :: i,j,k, m4, jc
+    complex(psb_spk_)   :: tmp(m)
+
+    info = psb_success_
+
+
+    tmp(:) = czero
+    if (alpha /= czero) then 
+      do j=1, maxval(irn(1:64))
+        tmp(1:64) = tmp(1:64) + val(1:64,j)*x(ja(1:64,j))
+      end do
+    end if
+    if (beta == czero) then 
+      y(ir:ir+64-1) = alpha*tmp(1:64) 
+    else
+      y(ir:ir+64-1) = alpha*tmp(1:64) + beta*y(ir:ir+64-1)
+    end if
+
+
+    if (is_unit) then 
+      do i=1, min(64,n)
+        y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
+      end do
+    end if
+
+  end subroutine psb_c_hll_csmv_notra_64
+
+ 
   subroutine psb_c_hll_csmv_notra_4(ir,n,irn,alpha,ja,ldj,val,ldv,&
        & is_triangle,is_unit, x,beta,y,info)
     use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
@@ -534,7 +591,7 @@ contains
 
     integer(psb_ipk_), parameter :: m=4
     integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: acc(4), tmp(m)
+    complex(psb_spk_)   :: tmp(m)
 
     info = psb_success_
 

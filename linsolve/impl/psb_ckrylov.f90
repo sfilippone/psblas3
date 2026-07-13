@@ -150,7 +150,7 @@ Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   procedure(psb_ckryl_vect) :: psb_cbicg_vect, psb_ccgstab_vect,&
        & psb_ccgs_vect
   procedure(psb_ckryl_rest_vect) :: psb_crgmres_vect, psb_ccgstabl_vect, psb_cgcr_vect
-  procedure(psb_ckryl_cond_vect) :: psb_ccg_vect, psb_cfcg_vect
+  procedure(psb_ckryl_cond_vect) :: psb_ccg_vect, psb_cfcg_vect, psb_cminres_vect
 
   logical           :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
@@ -199,6 +199,9 @@ Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   case('RGMRES','GMRES')
     call  psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
+  case('MINRES','PMINRES')
+    call  psb_cminres_vect(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err,itrace=itrace_,istop=istop)
   case('BICGSTABL')
     call  psb_ccgstabl_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)

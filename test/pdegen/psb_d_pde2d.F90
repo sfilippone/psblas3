@@ -467,8 +467,8 @@ contains
           ! compute gridpoint coordinates
           call idx2ijk(ix,iy,glob_row,idim,idim)
           ! x, y coordinates
-          x = (ix-1)*deltah
-          y = (iy-1)*deltah
+          x = (ix)*deltah
+          y = (iy)*deltah
           
           zt(k) = f_(x,y)
           ! internal point: build discretization
@@ -778,7 +778,7 @@ program psb_d_pde2d
          & desc_a,info,itmax=itmax,iter=iter,&
          & err=err,itrace=itrace,&
          & istop=istopc)
-  case('BICGSTAB','BICGSTABL','BICG','CG','CGS','FCG','GCR','RGMRES')
+  case('BICGSTAB','BICGSTABL','BICG','CG','CGS','FCG','GCR','RGMRES','MINRES')
     call psb_krylov(kmethd,a,prec,bv,xxv,eps,&
          & desc_a,info,itmax=itmax,iter=iter,err=err,itrace=itrace,&
          & istop=istopc,irst=irst)

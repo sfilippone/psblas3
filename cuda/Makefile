@@ -18,7 +18,8 @@ LIBNAME=libpsb_cuda.a
 
 
 FOBJS=cusparse_mod.o base_cusparse_mod.o \
- s_cusparse_mod.o  d_cusparse_mod.o  c_cusparse_mod.o  z_cusparse_mod.o \
+	s_cusparse_mod.o  d_cusparse_mod.o  \
+	c_cusparse_mod.o  z_cusparse_mod.o \
 	psb_vectordev_mod.o core_mod.o \
 	psb_s_vectordev_mod.o psb_d_vectordev_mod.o psb_i_vectordev_mod.o\
 	psb_c_vectordev_mod.o psb_z_vectordev_mod.o psb_base_vectordev_mod.o \

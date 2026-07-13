@@ -1,6 +1,10 @@
 module psb_base_cbind_mod
   use psb_objhandle_mod
   use psb_cpenv_mod
+  use psb_s_serial_cbind_mod
+  use psb_d_serial_cbind_mod
+  use psb_c_serial_cbind_mod
+  use psb_z_serial_cbind_mod  
   use psb_base_tools_cbind_mod
   use psb_s_tools_cbind_mod
   use psb_d_tools_cbind_mod

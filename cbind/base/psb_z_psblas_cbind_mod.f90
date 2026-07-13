@@ -429,14 +429,13 @@ contains
   function psb_c_zgecmp(xh,ch,zh,cdh) bind(c) result(res)
     implicit none
     integer(psb_c_ipk_)    :: res
-
+    real(c_double_complex), value :: ch
     type(psb_c_zvector)  :: xh,zh
     type(psb_c_descriptor) :: cdh
 
     type(psb_desc_type), pointer :: descp
     type(psb_z_vect_type), pointer :: xp,zp
     integer(psb_c_ipk_)          :: info
-    real(c_double_complex), value :: ch
 
     res = -1
 

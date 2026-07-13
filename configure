@@ -7871,8 +7871,6 @@ fi
 if test x"$pac_cv_lpk_size" == x"" ; then
   pac_cv_lpk_size=8
 fi
-PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
-PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 # Enforce sensible combination
 if (( $pac_cv_lpk_size < $pac_cv_ipk_size )); then
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Invalid combination of size specs PSB_IPK ${pac_cv_ipk_size} PSB_LPK ${pac_cv_lpk_size}. " >&5
@@ -7881,6 +7879,8 @@ printf "%s\n" "$as_me: Invalid combination of size specs PSB_IPK ${pac_cv_ipk_si
 printf "%s\n" "$as_me: Forcing equal values" >&6;}
    pac_cv_lpk_size=$pac_cv_ipk_size;
 fi
+PSB_IPKDEF="#define PSB_IPK$pac_cv_ipk_size"
+PSB_LPKDEF="#define PSB_LPK$pac_cv_lpk_size"
 FDEFINES="$psblas_cv_define_prepend-DPSB_IPK${pac_cv_ipk_size} $FDEFINES";
 FDEFINES="$psblas_cv_define_prepend-DPSB_LPK${pac_cv_lpk_size} $FDEFINES";
 
@@ -9122,6 +9122,7 @@ else
   AR="$ac_cv_prog_AR"
 fi
 
+AR="${AR} -cr"
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2
@@ -9226,7 +9227,6 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
-AR="$AR -cr"
 
 ###############################################################################
 #		BLAS  library presence checks
@@ -11287,6 +11287,8 @@ pac_cv_cuda="$enableval";
 
 fi
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $pac_cv_cuda" >&5
+printf "%s\n" "$pac_cv_cuda" >&6; }
 
 
 if test "x$pac_cv_cuda" == "xyes"; then
@@ -11609,30 +11611,12 @@ if test ${enable_openacc+y}
 then :
   enableval=$enable_openacc;
 pac_cv_openacc="$enableval";
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enableval." >&5
+printf "%s\n" "$enableval." >&6; }
 
 
 fi
 
-if test x"$pac_cv_openacc" == x"yes" ; then
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes." >&5
-printf "%s\n" "yes." >&6; }
-#   AC_LANG_PUSH([Fortran])
-#   AC_OPENACC()
-#   pac_cv_openacc_fcopt="$OPENACC_FCFLAGS";
-#   AC_LANG_POP()
-#   AC_LANG_PUSH([C])
-#   AC_OPENACC()
-#   pac_cv_openacc_ccopt="$OPENACC_CFLAGS";
-#   AC_LANG_POP()
-#   AC_LANG_PUSH([C++])
-#   AC_OPENACC()
-#   pac_cv_openacc_cxxopt="$OPENACC_CXXFLAGS";
-#   AC_LANG_POP()
-else
- pac_cv_openacc="no";
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no." >&5
-printf "%s\n" "no." >&6; }
-fi
 
 
 if test x"$pac_cv_openacc" == x"yes" ; then
@@ -13523,7 +13507,7 @@ fi
 
         EXTRA_OPT             : ${EXTRA_OPT}
 
-	CUDA 		      : ${PSB_HAVE_CUDA}
+	CUDA 		      : ${pac_cv_cuda}
 	CUDA_CC               : ${pac_cv_cudacc}
 
 	OPENACC		      : ${pac_cv_openacc}
@@ -13565,7 +13549,7 @@ printf "%s\n" "$as_me:
 
         EXTRA_OPT             : ${EXTRA_OPT}
 
-	CUDA 		      : ${PSB_HAVE_CUDA}
+	CUDA 		      : ${pac_cv_cuda}
 	CUDA_CC               : ${pac_cv_cudacc}
 
 	OPENACC		      : ${pac_cv_openacc}

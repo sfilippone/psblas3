@@ -160,19 +160,29 @@ subroutine psb_zbicg_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 2
+    istop_ = psb_get_istop_default()
   endif
-  !
-  !  istop_ = 1:  normwise backward error, infinity norm 
-  !  istop_ = 2:  ||r||/||b||   norm 2 
-  !
-
-  if ((istop_ < 1 ).or.(istop_ > 2 ) ) then
+  if (.not.psb_is_valid_istop(istop_)) then
     info=psb_err_invalid_istop_
     err=info
     call psb_errpush(info,name,i_err=(/istop_/))
     goto 9999
-  endif
+  end if
+  !
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2
+  !
+  select case(istop_)
+  case(psb_istop_ani_,psb_istop_bn2_,&
+       & psb_istop_rn2_abs_, psb_istop_rrn2_)
+    ! nothing needed
+  case default
+    ! should never get here
+    info=psb_err_internal_error_
+    err=info
+    call psb_errpush(info,name,a_err="invalid istop_")
+    goto 9999
+  end select
 
   call psb_chkvect(mglob,lone,x%get_nrows(),lone,lone,desc_a,info)
   if(info /= psb_success_) then

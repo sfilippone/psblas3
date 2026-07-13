@@ -42,6 +42,10 @@ set(PSB_krylov_source_files
   psb_z_krylov_conv_mod.f90
   psb_zkrylov.f90
   psb_zrgmres.f90
+  psb_dminres.f90
+  psb_sminres.f90
+  psb_cminres.f90
+  psb_zminres.f90
   )
 foreach(file IN LISTS PSB_krylov_source_files)
   list(APPEND krylov_source_files ${CMAKE_CURRENT_LIST_DIR}/${file})

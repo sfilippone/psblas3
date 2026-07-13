@@ -16,7 +16,8 @@ OBJS=psb_d_pMPK.o \
 	psb_ccgstab.o psb_ccg.o psb_cfcg.o psb_cgcr.o psb_ccgs.o  \
 		psb_cbicg.o psb_ccgstabl.o psb_crgmres.o \
 	psb_zcgstab.o psb_zcg.o psb_zfcg.o psb_zgcr.o psb_zcgs.o  \
-		psb_zbicg.o psb_zcgstabl.o psb_zrgmres.o
+		psb_zbicg.o psb_zcgstabl.o psb_zrgmres.o \
+		psb_dminres.o psb_sminres.o psb_cminres.o psb_zminres.o 
 
 LIBNAME=$(METHDLIBNAME)
 COBJS=

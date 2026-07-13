@@ -281,13 +281,19 @@ contains
     end if
 
     ixb = psb_c_get_index_base()
-    if (ixb == 1) then
-      call psb_geins(nz,irw(1:nz),val(1:nz),&
-           & xp,descp,info)
-    else
+    select case(ixb)
+    case (0)  
+      !write(0,*) 'C_GEINS:  IDX_BASE',ixb,' :',irw(1:nz)+(1-ixb),val(1:nz)
       call psb_geins(nz,(irw(1:nz)+(1-ixb)),val(1:nz),&
            & xp,descp,info)
-    end if
+    case(1)
+      !write(0,*) 'C_GEINS:  IDX_BASE',ixb,' :',irw(1:nz),val(1:nz)
+      call psb_geins(nz,irw(1:nz),val(1:nz),&
+           & xp,descp,info)
+    case default
+      write(0,*) 'C_GEINS: Unkonwn inndex base ',ixb
+      info =-2
+    end select
 
     res = min(0,info)
 

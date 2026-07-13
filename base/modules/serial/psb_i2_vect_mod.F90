@@ -984,19 +984,20 @@ contains
   end subroutine i2_mvect_bld_x
 
 
-  subroutine i2_mvect_bld_n(x,m,n,mold)
+  subroutine i2_mvect_bld_n(x,m,n,mold,scratch)
     integer(psb_ipk_), intent(in) :: m,n
     class(psb_i2_multivect_type), intent(out) :: x
     class(psb_i2_base_multivect_type), intent(in), optional :: mold
     integer(psb_ipk_) :: info
-
+    logical, intent(in), optional        :: scratch
+    
     info = psb_success_
     if (present(mold)) then
       allocate(x%v,stat=info,mold=mold)
     else
       allocate(x%v,stat=info, mold=psb_i2_get_base_multivect_default())
     endif
-    if (info == psb_success_) call x%v%bld(m,n)
+    if (info == psb_success_) call x%v%bld(m,n,scratch=scratch)
 
   end subroutine i2_mvect_bld_n
 
@@ -1269,3 +1270,4 @@ contains
 
 
 end module psb_i2_multivect_mod
+
