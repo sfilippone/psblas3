@@ -63,6 +63,6 @@ veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)
 
 clean:
-	/bin/rm -f $(OBJS) *$(.mod)
+	/bin/rm -f $(OBJS) *$(.mod) *smod
 
 veryclean: clean

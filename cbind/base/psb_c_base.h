@@ -80,7 +80,8 @@ extern "C" {
   void psb_c_delete_ctxt(psb_c_ctxt *);
   psb_i_t    psb_c_cdall_vg(psb_l_t ng, psb_i_t *vg, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_vl(psb_i_t nl, psb_l_t *vl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
-  psb_i_t    psb_c_cdall_vl_lidx(psb_i_t nl, psb_l_t *vl, psb_i_t *lidx, psb_c_ctxt cctxt, psb_c_descriptor *cd);
+  psb_i_t    psb_c_cdall_vl_lidx(psb_i_t nl, psb_l_t *vl, psb_i_t *lidx,
+				 psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_nl(psb_i_t nl, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdall_repl(psb_l_t n, psb_c_ctxt cctxt, psb_c_descriptor *cd);
   psb_i_t    psb_c_cdasb(psb_c_descriptor *cd);
