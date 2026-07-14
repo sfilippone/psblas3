@@ -56,9 +56,19 @@ subroutine psb_d_map_U2V_a(alpha,x,beta,y,map,info,work)
   character(len=20), parameter  :: name='psb_map_U2V'
 
   info = psb_success_
-  if (.not.map%is_asb()) then 
-    write(psb_err_unit,*) trim(name),' Invalid map input: unassembled'
-    info = 1
+  if (.not.map%is_asb()) then
+    block
+      integer(psb_ipk_) :: meu,npu,mev,npv
+      type(psb_ctxt_type) :: ct
+      ct = map%p_desc_u%get_context()
+      call psb_info(ct,meu,npu)
+      ct = map%p_desc_v%get_context()
+      call psb_info(ct,mev,npv)
+      
+      write(psb_err_unit,*) trim(name),' Invalid map input: unassembled',&
+           & ':',meu,npu,mev,npv
+      info = 1
+    end block
     return 
   end if
 
@@ -132,7 +142,17 @@ subroutine psb_d_map_U2V_v(alpha,x,beta,y,map,info,work,vtx,vty)
 
   info = psb_success_
   if (.not.map%is_asb()) then 
-    write(psb_err_unit,*) trim(name),' Invalid map input: unassembled'
+    block
+      integer(psb_ipk_) :: meu,npu,mev,npv
+      type(psb_ctxt_type) :: ct
+      ct = map%p_desc_u%get_context()
+      call psb_info(ct,meu,npu)
+      ct = map%p_desc_v%get_context()
+      call psb_info(ct,mev,npv)
+      
+      write(psb_err_unit,*) trim(name),' Invalid map input: unassembled',&
+           & ':',meu,npu,mev,npv
+    end block
     info = 1
     return 
   end if

@@ -36,9 +36,10 @@ Module psb_c_tools_mod
        & psb_lc_csr_sparse_mat, psb_lc_coo_sparse_mat, &
        & psb_c_csr_sparse_mat, psb_c_coo_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
+  use psb_c_linmap_mod, only : psb_clinmap_type
   use psb_c_multivect_mod, only : psb_c_base_multivect_type, psb_c_multivect_type
   use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
-
+  
   interface  psb_geall
     subroutine psb_calloc_vect(x, desc_a,info, dupl, bldmode)
       import
@@ -469,6 +470,16 @@ Module psb_c_tools_mod
       integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:), naggr(:)
       integer(psb_ipk_), intent(out)       :: info
     end subroutine psb_c_remap
+    subroutine psb_c_remap2(map_in, desc_new, map_out, flag, info)
+      import
+      implicit none
+      !....parameters...
+      type(psb_desc_type), intent(inout)   :: desc_new
+      type(psb_clinmap_type), intent(inout) :: map_in
+      type(psb_clinmap_type), intent(out)   :: map_out
+      integer(psb_ipk_), intent(in)       :: flag
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psb_c_remap2
   end interface psb_remap
 
 end module psb_c_tools_mod

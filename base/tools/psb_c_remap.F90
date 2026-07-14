@@ -86,7 +86,6 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
   endif
 
 !!$  write(0,*) ' Remapping from ',np,' onto ', np_remap
-  mipd = ipd
   if (desc_in%get_fmt() == 'BLOCK') then
     !
     ! Should we spread the processes in the new context,
@@ -121,7 +120,7 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
       goto 9999
     endif
     if (rnp >= np) then 
-      write(0,*) ' No remapping on larger proc count now'
+      write(0,*) ' No remapping on larger proc count now',rnp,np
       info = psb_err_internal_error_
       call psb_errpush(info,name)
       goto 9999
@@ -245,6 +244,7 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
     else
       naggr(me+1) = 0
     end if
+    ipd = mipd
     call psb_sum(ctxt,naggr)
     
   end block
@@ -257,3 +257,16 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
   return  
 
 end subroutine psb_c_remap
+subroutine psb_c_remap2(map_in, desc_new, map_out, flag, info)
+
+  use psb_base_mod, psb_protect_name => psb_c_remap2
+  
+  implicit none
+  !....parameters...
+  type(psb_desc_type), intent(inout)   :: desc_new
+  type(psb_clinmap_type), intent(inout) :: map_in
+  type(psb_clinmap_type), intent(out)   :: map_out
+  integer(psb_ipk_), intent(in)       :: flag
+  integer(psb_ipk_), intent(out)       :: info
+  
+end subroutine psb_c_remap2
