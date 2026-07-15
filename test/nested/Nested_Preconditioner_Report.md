@@ -848,6 +848,22 @@ For a standard distributed-control KKT matrix such as
 
 this operator is `T = -S`, where `S` is the field-3 KKT Schur complement. `psb_d_nested_pde_control_schur_solve` solves `T x_3 = -r_3` with a matrix-free CG iteration controlled by `SCHUR_MAXIT` and `SCHUR_TOL`. This is important when `A_33 = 0`: the old field-3 diagonal-block approximation cannot precondition the Schur complement, but the matrix-free CG path can still use the actual Schur action.
 
+The `SCHUR_PDE_CONTROL_DIAG` composition applies the block-diagonal action
+
+```text
+z_1 = B_1 r_1,   z_2 = B_2 r_2,   z_3 = B_S r_3.
+```
+
+It reuses the PDE-control Schur solver for field 3 but reverses the KKT Schur
+sign so that the third block approximates the positive operator `T^{-1}`.
+Unlike `SCHUR_PDE_CONTROL`, it performs no lower or upper coupling corrections.
+The composition is therefore structurally symmetric.  MINRES also requires
+each selected block action to be fixed and SPD; in particular, the
+residual-dependent inner CG used by `SCHUR_SOLVE=MATRIX_FREE` is not a fixed
+linear preconditioner.  A fixed SPD field-3 solve such as the `A33`/identity
+fallback is MINRES-compatible, while a future explicit SPD Schur
+preconditioner can be attached through the same block-diagonal composition.
+
 ## Public Options
 
 The nested preconditioner exposes integer option keys in `psb_d_nestedprec`:
@@ -869,7 +885,7 @@ The user-facing string options routed by `psb_d_prec_type_impl.f90` are:
 
 | Option | Type | Values | Scope |
 | --- | --- | --- | --- |
-| `COMPOSITION`, `NEST_COMPOSITION` | character | `ADDITIVE`, `DIAGONAL`, `MULTIPLICATIVE`, `SYMMETRIC_MULTIPLICATIVE`, `SCHUR_LOWER`, `SCHUR_UPPER`, `SCHUR_FULL`, `SCHUR_PDE_CONTROL` | global |
+| `COMPOSITION`, `NEST_COMPOSITION` | character | `ADDITIVE`, `DIAGONAL`, `MULTIPLICATIVE`, `SYMMETRIC_MULTIPLICATIVE`, `SCHUR_LOWER`, `SCHUR_UPPER`, `SCHUR_FULL`, `SCHUR_PDE_CONTROL`, `SCHUR_PDE_CONTROL_DIAG` | global |
 | `BLOCK_SOLVE`, `NEST_BLOCK_SOLVE` | character | `DIAG`, `BJAC`, `NONE` | global or `idx` field |
 | `SCHUR_SOLVE`, `NEST_SCHUR_SOLVE` | character | `A22`, `A33`, `MATRIX_FREE`, `SELFP`, `SELF` | global |
 | `SCHUR_MAXIT`, `NEST_SCHUR_MAXIT` | integer | nonnegative iteration count | global |

@@ -64,6 +64,7 @@ module psb_d_nestedprec
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_upper_ = 6
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_full_  = 7
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_pde_control_ = 8
+  integer(psb_ipk_), parameter, private :: psb_d_nested_schur_pde_control_diag_ = 9
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_a22_ = 1
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_mf_  = 2
   integer(psb_ipk_), parameter, private :: psb_d_nested_schur_selfp_ = 3
@@ -144,6 +145,7 @@ module psb_d_nestedprec
        & psb_d_nested_clear_built, psb_d_nested_valid_block_solve, &
        & psb_d_nested_get_field_block_ptype, psb_d_nested_field_solve, &
        & psb_d_nested_apply_schur, psb_d_nested_apply_pde_control_schur, &
+       & psb_d_nested_apply_pde_control_diag, &
        & psb_d_nested_replay_field_options, &
        & psb_d_nested_append_iopt, psb_d_nested_append_ropt, &
        & psb_d_nested_append_copt, psb_d_nested_schur_action, &
@@ -323,6 +325,12 @@ contains
            & 'SCHUR3','SCHUR_3FIELD','SCHUR_THREE_FIELD')
         prec%composition = psb_d_nested_schur_pde_control_
         prec%composition_name = 'SCHUR_PDE_CONTROL'
+        prec%schur_solve = psb_d_nested_schur_mf_
+        prec%schur_solve_name = 'MATRIX_FREE'
+      case ('SCHUR_PDE_CONTROL_DIAG','PDE_CONTROL_DIAG', &
+           & 'BLOCK_DIAG_SCHUR','SCHUR_BLOCK_DIAG')
+        prec%composition = psb_d_nested_schur_pde_control_diag_
+        prec%composition_name = 'SCHUR_PDE_CONTROL_DIAG'
         prec%schur_solve = psb_d_nested_schur_mf_
         prec%schur_solve_name = 'MATRIX_FREE'
       case default
@@ -942,6 +950,8 @@ contains
         call psb_d_nested_apply_schur(prec, x, z, desc_data, info)
       case (psb_d_nested_schur_pde_control_)
         call psb_d_nested_apply_pde_control_schur(prec, x, z, desc_data, info)
+      case (psb_d_nested_schur_pde_control_diag_)
+        call psb_d_nested_apply_pde_control_diag(prec, x, z, desc_data, info)
       case default
         info = psb_err_invalid_input_
         call psb_errpush(info, name, a_err='unknown composition')
@@ -2078,6 +2088,96 @@ contains
 100 continue
     deallocate(q, r, zc, p, ap)
   end subroutine psb_d_nested_pde_control_schur_solve
+
+  ! Apply the block-diagonal three-field PDE-control preconditioner
+  !
+  !   diag(B1, B2, BS),
+  !
+  ! where B1 and B2 are the configured field solves and BS is the configured
+  ! field-3 Schur solve.  Unlike SCHUR_PDE_CONTROL, this composition performs
+  ! no lower or upper coupling corrections.  The composition is therefore
+  ! structurally symmetric; MINRES additionally requires B1, B2, and BS to be
+  ! fixed symmetric positive-definite operators.
+  subroutine psb_d_nested_apply_pde_control_diag(prec, x, z, desc_data, info)
+    class(psb_d_nested_prec_type), intent(inout) :: prec
+    real(psb_dpk_), intent(in) :: x(:)
+    real(psb_dpk_), intent(inout) :: z(:)
+    type(psb_desc_type), intent(in) :: desc_data
+    integer(psb_ipk_), intent(out) :: info
+
+    real(psb_dpk_), allocatable :: rhs1(:), rhs2(:), rhs3(:), &
+         & sol1(:), sol2(:), sol3(:), gwork(:)
+    type(psb_desc_type), pointer :: desc1, desc2, desc3
+    integer(psb_ipk_) :: ncol1, ncol2, ncol3
+
+    info = psb_success_
+    z(:) = dzero
+
+    if (prec%nfields /= 3) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, 'd_nested_apply_pde_diag', &
+           & a_err='PDE-control block diagonal requires three fields')
+      return
+    end if
+
+    desc1 => psb_d_nest_get_field_desc(prec%nest_op, 1)
+    desc2 => psb_d_nest_get_field_desc(prec%nest_op, 2)
+    desc3 => psb_d_nest_get_field_desc(prec%nest_op, 3)
+    if ((.not. associated(desc1)) .or. ( .not. associated(desc2)) .or. &
+         & (.not. associated(desc3))) then
+      info = psb_err_invalid_mat_state_
+      call psb_errpush(info, 'd_nested_apply_pde_diag', &
+           & a_err='missing field descriptor')
+      return
+    end if
+
+    ncol1 = desc1%get_local_cols()
+    ncol2 = desc2%get_local_cols()
+    ncol3 = desc3%get_local_cols()
+    allocate(rhs1(ncol1), rhs2(ncol2), rhs3(ncol3), sol1(ncol1), &
+         & sol2(ncol2), sol3(ncol3), gwork(size(z)), stat=info)
+    if (info /= 0) then
+      info = psb_err_alloc_dealloc_
+      call psb_errpush(info, 'd_nested_apply_pde_diag', a_err='field vectors')
+      return
+    end if
+
+    rhs1(:) = dzero
+    rhs2(:) = dzero
+    rhs3(:) = dzero
+    sol1(:) = dzero
+    sol2(:) = dzero
+    sol3(:) = dzero
+    gwork(:) = dzero
+
+    call psb_d_nest_restrict_field(prec%nest_op, 1, x, rhs1, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field(prec%nest_op, 2, x, rhs2, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_restrict_field(prec%nest_op, 3, x, rhs3, info)
+    if (info /= psb_success_) goto 100
+
+    call psb_d_nested_field_solve(prec, 1, rhs1, sol1, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nested_field_solve(prec, 2, rhs2, sol2, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nested_pde_control_schur_solve(prec, rhs3, sol3, gwork, &
+         & desc_data, info)
+    if (info /= psb_success_) goto 100
+    ! The factorization path solves T*x3=-r3 because its KKT Schur block is
+    ! -T.  A positive-definite block-diagonal preconditioner needs +T^{-1},
+    ! so reverse that sign here.
+    sol3(:) = -sol3(:)
+
+    call psb_d_nest_prolong_field(prec%nest_op, 1, sol1, z, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_prolong_field(prec%nest_op, 2, sol2, z, info)
+    if (info /= psb_success_) goto 100
+    call psb_d_nest_prolong_field(prec%nest_op, 3, sol3, z, info)
+
+100 continue
+    deallocate(rhs1, rhs2, rhs3, sol1, sol2, sol3, gwork)
+  end subroutine psb_d_nested_apply_pde_control_diag
 
   ! Apply a three-field PDE-control Schur preconditioner.
   ! Fields 1 and 2 are grouped into the leading block D=diag(A11,A22);
