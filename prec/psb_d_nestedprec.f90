@@ -91,9 +91,6 @@ module psb_d_nestedprec
     class(psb_d_base_prec_type), allocatable :: pc
   end type psb_d_nested_block_prec
 
-  type(psb_dspmat_type), pointer, save :: selfp_schur_mat => null()
-  type(psb_d_nested_block_prec), pointer, save :: selfp_schur_block => null()
-
   type :: psb_d_nested_krylov_context
     logical :: enabled
     character(len=16) :: method
@@ -115,6 +112,8 @@ module psb_d_nestedprec
     integer(psb_ipk_) :: nfields
     type(psb_d_nest_base_mat), pointer :: nest_op
     type(psb_d_nested_block_prec), allocatable :: blocks(:)
+    type(psb_dspmat_type), pointer :: selfp_schur_mat => null()
+    type(psb_d_nested_block_prec), pointer :: selfp_schur_block => null()
     logical :: schur_selfp_built
     character(len=16), allocatable :: field_block_ptype(:)
     type(psb_d_nested_krylov_context), allocatable :: field_krylov(:)
@@ -162,6 +161,11 @@ contains
     integer(psb_ipk_), intent(out) :: info
 
     info = psb_success_
+    if (allocated(prec%blocks) .or. associated(prec%selfp_schur_mat) .or. &
+         & associated(prec%selfp_schur_block)) then
+      call psb_d_nested_clear_built(prec, info)
+      if (info /= psb_success_) return
+    end if
     prec%composition = psb_d_nested_add_
     prec%composition_name = 'ADDITIVE'
     prec%default_block_ptype = 'DIAG'
@@ -202,22 +206,22 @@ contains
       deallocate(prec%blocks, stat=local_info)
       if (local_info /= 0 .and. info == psb_success_) info = local_info
     end if
-    if (associated(selfp_schur_block)) then
-      if (allocated(selfp_schur_block%pc)) then
-        call selfp_schur_block%pc%free(local_info)
+    if (associated(prec%selfp_schur_block)) then
+      if (allocated(prec%selfp_schur_block%pc)) then
+        call prec%selfp_schur_block%pc%free(local_info)
         if (local_info /= psb_success_ .and. info == psb_success_) info = local_info
-        deallocate(selfp_schur_block%pc, stat=local_info)
+        deallocate(prec%selfp_schur_block%pc, stat=local_info)
         if (local_info /= 0 .and. info == psb_success_) info = local_info
       end if
-      deallocate(selfp_schur_block, stat=local_info)
+      deallocate(prec%selfp_schur_block, stat=local_info)
       if (local_info /= 0 .and. info == psb_success_) info = local_info
-      nullify(selfp_schur_block)
+      nullify(prec%selfp_schur_block)
     end if
-    if (associated(selfp_schur_mat)) then
-      call selfp_schur_mat%free()
-      deallocate(selfp_schur_mat, stat=local_info)
+    if (associated(prec%selfp_schur_mat)) then
+      call prec%selfp_schur_mat%free()
+      deallocate(prec%selfp_schur_mat, stat=local_info)
       if (local_info /= 0 .and. info == psb_success_) info = local_info
-      nullify(selfp_schur_mat)
+      nullify(prec%selfp_schur_mat)
     end if
     prec%schur_selfp_built = .false.
     prec%nfields = 0
@@ -1472,13 +1476,13 @@ contains
     integer(psb_ipk_) :: k
 
     info = psb_success_
-    if (.not. associated(selfp_schur_block)) return
-    if (.not. allocated(selfp_schur_block%pc)) return
+    if (.not. associated(prec%selfp_schur_block)) return
+    if (.not. allocated(prec%selfp_schur_block%pc)) return
 
     if (allocated(prec%field_iopts)) then
       do k = 1, size(prec%field_iopts)
         if ((prec%field_iopts(k)%field == 0) .or. (prec%field_iopts(k)%field == 2)) then
-          call selfp_schur_block%pc%precset(prec%field_iopts(k)%what, &
+          call prec%selfp_schur_block%pc%precset(prec%field_iopts(k)%what, &
                & prec%field_iopts(k)%val, info)
           if (info /= psb_success_) return
         end if
@@ -1488,7 +1492,7 @@ contains
     if (allocated(prec%field_ropts)) then
       do k = 1, size(prec%field_ropts)
         if ((prec%field_ropts(k)%field == 0) .or. (prec%field_ropts(k)%field == 2)) then
-          call selfp_schur_block%pc%precset(prec%field_ropts(k)%what, &
+          call prec%selfp_schur_block%pc%precset(prec%field_ropts(k)%what, &
                & prec%field_ropts(k)%val, info)
           if (info /= psb_success_) return
         end if
@@ -1498,7 +1502,7 @@ contains
     if (allocated(prec%field_copts)) then
       do k = 1, size(prec%field_copts)
         if ((prec%field_copts(k)%field == 0) .or. (prec%field_copts(k)%field == 2)) then
-          call selfp_schur_block%pc%precset(prec%field_copts(k)%what, &
+          call prec%selfp_schur_block%pc%precset(prec%field_copts(k)%what, &
                & trim(prec%field_copts(k)%val), info)
           if (info /= psb_success_) return
         end if
@@ -1559,23 +1563,23 @@ contains
       return
     end if
 
-    if (associated(selfp_schur_mat)) then
-      call selfp_schur_mat%free()
-      deallocate(selfp_schur_mat, stat=info)
-      nullify(selfp_schur_mat)
+    if (associated(prec%selfp_schur_mat)) then
+      call prec%selfp_schur_mat%free()
+      deallocate(prec%selfp_schur_mat, stat=info)
+      nullify(prec%selfp_schur_mat)
       if (info /= 0) then
         info = psb_err_alloc_dealloc_
         call psb_errpush(info, 'd_nested_build_selfp', a_err='Schur matrix reset')
         goto 100
       end if
     end if
-    allocate(selfp_schur_mat, stat=info)
+    allocate(prec%selfp_schur_mat, stat=info)
     if (info /= 0) then
       info = psb_err_alloc_dealloc_
       call psb_errpush(info, 'd_nested_build_selfp', a_err='Schur matrix')
       goto 100
     end if
-    call psb_spall(selfp_schur_mat, desc2, info)
+    call psb_spall(prec%selfp_schur_mat, desc2, info)
     if (info /= psb_success_) goto 100
 
     do i = 1, n_owned_2
@@ -1621,41 +1625,42 @@ contains
       end do
       if (n_insert > 0) then
         call psb_spins(n_insert, rows(1:n_insert), cols(1:n_insert), vals(1:n_insert), &
-             & selfp_schur_mat, desc2, info)
+             & prec%selfp_schur_mat, desc2, info)
         if (info /= psb_success_) exit
       end if
     end do
     if (info /= psb_success_) goto 100
 
-    call psb_spasb(selfp_schur_mat, desc2, info, dupl=psb_dupl_add_)
+    call psb_spasb(prec%selfp_schur_mat, desc2, info, dupl=psb_dupl_add_)
     if (info /= psb_success_) goto 100
-    call selfp_schur_mat%cscnv(info, type='CSR')
+    call prec%selfp_schur_mat%cscnv(info, type='CSR')
     if (info /= psb_success_) goto 100
 
-    if (associated(selfp_schur_block)) then
-      if (allocated(selfp_schur_block%pc)) then
-        call selfp_schur_block%pc%free(info)
+    if (associated(prec%selfp_schur_block)) then
+      if (allocated(prec%selfp_schur_block%pc)) then
+        call prec%selfp_schur_block%pc%free(info)
         if (info /= psb_success_) return
-        deallocate(selfp_schur_block%pc, stat=info)
+        deallocate(prec%selfp_schur_block%pc, stat=info)
         if (info /= psb_success_) return
       end if
-      deallocate(selfp_schur_block, stat=info)
+      deallocate(prec%selfp_schur_block, stat=info)
       if (info /= psb_success_) return
-      nullify(selfp_schur_block)
+      nullify(prec%selfp_schur_block)
     end if
-    allocate(selfp_schur_block, stat=info)
+    allocate(prec%selfp_schur_block, stat=info)
     if (info /= 0) then
       info = psb_err_alloc_dealloc_
       call psb_errpush(info, 'd_nested_build_selfp', a_err='Schur block')
       goto 100
     end if
-    selfp_schur_block%ptype = 'BJAC'
-    call psb_d_nested_alloc_block_pc(selfp_schur_block, info)
+    prec%selfp_schur_block%ptype = 'BJAC'
+    call psb_d_nested_alloc_block_pc(prec%selfp_schur_block, info)
     if (info /= psb_success_) goto 100
-    call selfp_schur_block%pc%precinit(info)
+    call prec%selfp_schur_block%pc%precinit(info)
     if (info /= psb_success_) goto 100
+    call psb_d_nested_replay_schur_options(prec, info)
     if (info /= psb_success_) goto 100
-    call selfp_schur_block%pc%precbld(selfp_schur_mat, desc2, info, &
+    call prec%selfp_schur_block%pc%precbld(prec%selfp_schur_mat, desc2, info, &
          & amold=amold, vmold=vmold, imold=imold)
     if (info == psb_success_) prec%schur_selfp_built = .true.
 
@@ -1695,8 +1700,8 @@ contains
       call psb_d_nested_field_solve(prec, 2, rhs, sol, info)
       return
     else if (prec%schur_solve == psb_d_nested_schur_selfp_) then
-      if (.not. prec%schur_selfp_built .or. (.not. associated(selfp_schur_block)) .or. &
-           & (.not. allocated(selfp_schur_block%pc))) then
+      if (.not. prec%schur_selfp_built .or. (.not. associated(prec%selfp_schur_block)) .or. &
+           & (.not. allocated(prec%selfp_schur_block%pc))) then
         info = psb_err_invalid_mat_state_
         call psb_errpush(info, 'd_nested_schur_solve', a_err='SELFP not built')
         return
@@ -1715,7 +1720,7 @@ contains
         return
       end if
       sol(:) = dzero
-      call selfp_schur_block%pc%apply(done, rhs, dzero, sol, desc2, info, &
+      call prec%selfp_schur_block%pc%apply(done, rhs, dzero, sol, desc2, info, &
            & trans='N', work=dz)
       deallocate(dz)
       return
@@ -2334,6 +2339,22 @@ contains
                & call prec%blocks(i)%pc%clone(pout%blocks(i)%pc, info)
           if (info /= psb_success_) return
         end do
+      end if
+      pout%schur_selfp_built = .false.
+      if (prec%schur_selfp_built .and. associated(prec%selfp_schur_mat) .and. &
+           & associated(prec%selfp_schur_block)) then
+        allocate(pout%selfp_schur_mat, stat=info)
+        if (info /= 0) return
+        call prec%selfp_schur_mat%clone(pout%selfp_schur_mat, info)
+        if (info /= psb_success_) return
+        allocate(pout%selfp_schur_block, stat=info)
+        if (info /= 0) return
+        pout%selfp_schur_block%ptype = prec%selfp_schur_block%ptype
+        if (allocated(prec%selfp_schur_block%pc)) then
+          call prec%selfp_schur_block%pc%clone(pout%selfp_schur_block%pc, info)
+          if (info /= psb_success_) return
+        end if
+        pout%schur_selfp_built = allocated(pout%selfp_schur_block%pc)
       end if
     end select
   end subroutine psb_d_nested_clone
