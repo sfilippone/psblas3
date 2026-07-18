@@ -144,7 +144,7 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
               hkpnt = a%hkoffs(j) + 1
               if (info ==  psb_success_) &
                    & call psb_c_hll_csmv_notra_4(i,mxrwl,a%irn(i),&
-                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & alpha,a%ja(hkpnt),a%val(hkpnt),&
                    & a%is_triangle(),a%is_unit(),&
                    & x,beta,y,info) 
             end if
@@ -162,7 +162,7 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
               hkpnt = a%hkoffs(j) + 1
               if (info ==  psb_success_) &
                    &call psb_c_hll_csmv_notra_8(i,mxrwl,a%irn(i),&
-                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & alpha,a%ja(hkpnt),a%val(hkpnt),&
                    & a%is_triangle(),a%is_unit(),&
                    & x,beta,y,info) 
             end if
@@ -180,7 +180,7 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
               hkpnt = a%hkoffs(j) + 1
               if (info ==  psb_success_) &
                    & call psb_c_hll_csmv_notra_16(i,mxrwl,a%irn(i),&
-                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & alpha,a%ja(hkpnt),a%val(hkpnt),&
                    & a%is_triangle(),a%is_unit(),&
                    & x,beta,y,info) 
             end if
@@ -198,7 +198,7 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
               hkpnt = a%hkoffs(j) + 1
               if (info ==  psb_success_) &
                    & call psb_c_hll_csmv_notra_24(i,mxrwl,a%irn(i),&
-                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & alpha,a%ja(hkpnt),a%val(hkpnt),&
                    & a%is_triangle(),a%is_unit(),&
                    & x,beta,y,info) 
             end if
@@ -216,7 +216,7 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
               hkpnt = a%hkoffs(j) + 1
               if (info ==  psb_success_) &
                    & call psb_c_hll_csmv_notra_32(i,mxrwl,a%irn(i),&
-                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & alpha,a%ja(hkpnt),a%val(hkpnt),&
                    & a%is_triangle(),a%is_unit(),&
                    & x,beta,y,info) 
             end if
@@ -234,7 +234,7 @@ subroutine psb_c_hll_csmv(alpha,a,x,beta,y,info,trans)
               hkpnt = a%hkoffs(j) + 1
               if (info ==  psb_success_) &
                    & call psb_c_hll_csmv_notra_64(i,mxrwl,a%irn(i),&
-                   & alpha,a%ja(hkpnt),hksz,a%val(hkpnt),hksz,&
+                   & alpha,a%ja(hkpnt),a%val(hkpnt),&
                    & a%is_triangle(),a%is_unit(),&
                    & x,beta,y,info) 
             end if
@@ -388,17 +388,17 @@ contains
 
   end subroutine psb_c_hll_csmv_inner
 
-  subroutine psb_c_hll_csmv_notra_8(ir,n,irn,alpha,ja,ldj,val,ldv,&
+  subroutine psb_c_hll_csmv_notra_4(ir,n,irn,alpha,ja,val,&
        & is_triangle,is_unit, x,beta,y,info)
     use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
     implicit none 
-    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
-    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
+    integer(psb_ipk_), parameter :: m=4
+    integer(psb_ipk_), intent(in)    :: ir,n,ja(m,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(m,*)
     complex(psb_spk_), intent(inout)   :: y(*)
     logical, intent(in)              :: is_triangle,is_unit
     integer(psb_ipk_), intent(out)   :: info
 
-    integer(psb_ipk_), parameter :: m=8
     integer(psb_ipk_) :: i,j,k, m4, jc
     complex(psb_spk_)   :: tmp(m)
 
@@ -407,74 +407,74 @@ contains
 
     tmp(:) = czero
     if (alpha /= czero) then 
-      do j=1, maxval(irn(1:8))
-        tmp(1:8) = tmp(1:8) + val(1:8,j)*x(ja(1:8,j))
+      do j=1, maxval(irn(1:m))
+        tmp(1:m) = tmp(1:m) + val(1:m,j)*x(ja(1:m,j))
       end do
     end if
     if (beta == czero) then 
-      y(ir:ir+8-1) = alpha*tmp(1:8) 
+      y(ir:ir+m-1) = alpha*tmp(1:m) 
     else
-      y(ir:ir+8-1) = alpha*tmp(1:8) + beta*y(ir:ir+8-1)
+      y(ir:ir+m-1) = alpha*tmp(1:m) + beta*y(ir:ir+m-1)
     end if
 
 
     if (is_unit) then 
-      do i=1, min(8,n)
+      do i=1, min(m,n)
+        y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
+      end do
+    end if
+
+  end subroutine psb_c_hll_csmv_notra_4
+
+  subroutine psb_c_hll_csmv_notra_8(ir,n,irn,alpha,ja,val,&
+       & is_triangle,is_unit, x,beta,y,info)
+    use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
+    implicit none 
+    integer(psb_ipk_), parameter :: m=8
+    integer(psb_ipk_), intent(in)    :: ir,n,ja(m,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(m,*)
+    complex(psb_spk_), intent(inout)   :: y(*)
+    logical, intent(in)              :: is_triangle,is_unit
+    integer(psb_ipk_), intent(out)   :: info
+
+    integer(psb_ipk_) :: i,j,k, m4, jc
+    complex(psb_spk_)   :: tmp(m)
+
+    info = psb_success_
+
+
+    tmp(:) = czero
+    if (alpha /= czero) then 
+      do j=1, maxval(irn(1:m))
+        tmp(1:m) = tmp(1:m) + val(1:m,j)*x(ja(1:m,j))
+      end do
+    end if
+    if (beta == czero) then 
+      y(ir:ir+m-1) = alpha*tmp(1:m) 
+    else
+      y(ir:ir+m-1) = alpha*tmp(1:m) + beta*y(ir:ir+m-1)
+    end if
+
+
+    if (is_unit) then 
+      do i=1, min(m,n)
         y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
       end do
     end if
 
   end subroutine psb_c_hll_csmv_notra_8
 
-  subroutine psb_c_hll_csmv_notra_24(ir,n,irn,alpha,ja,ldj,val,ldv,&
+  subroutine psb_c_hll_csmv_notra_16(ir,n,irn,alpha,ja,val,&
        & is_triangle,is_unit, x,beta,y,info)
     use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
     implicit none 
-    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
-    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
-    complex(psb_spk_), intent(inout)   :: y(*)
-    logical, intent(in)              :: is_triangle,is_unit
-    integer(psb_ipk_), intent(out)   :: info
-
-    integer(psb_ipk_), parameter :: m=24
-    integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: tmp(m)
-
-    info = psb_success_
-
-
-    tmp(:) = czero
-    if (alpha /= czero) then 
-      do j=1, maxval(irn(1:24))
-        tmp(1:24) = tmp(1:24) + val(1:24,j)*x(ja(1:24,j))
-      end do
-    end if
-    if (beta == czero) then 
-      y(ir:ir+24-1) = alpha*tmp(1:24) 
-    else
-      y(ir:ir+24-1) = alpha*tmp(1:24) + beta*y(ir:ir+24-1)
-    end if
-
-
-    if (is_unit) then 
-      do i=1, min(24,n)
-        y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
-      end do
-    end if
-
-  end subroutine psb_c_hll_csmv_notra_24
-
-  subroutine psb_c_hll_csmv_notra_16(ir,n,irn,alpha,ja,ldj,val,ldv,&
-       & is_triangle,is_unit, x,beta,y,info)
-    use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
-    implicit none 
-    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
-    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
-    complex(psb_spk_), intent(inout)   :: y(*)
-    logical, intent(in)              :: is_triangle,is_unit
-    integer(psb_ipk_), intent(out)   :: info
-
     integer(psb_ipk_), parameter :: m=16
+    integer(psb_ipk_), intent(in)    :: ir,n,ja(m,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(m,*)
+    complex(psb_spk_), intent(inout)   :: y(*)
+    logical, intent(in)              :: is_triangle,is_unit
+    integer(psb_ipk_), intent(out)   :: info
+
     integer(psb_ipk_) :: i,j,k, m4, jc
     complex(psb_spk_)   :: tmp(m)
 
@@ -483,36 +483,36 @@ contains
 
     tmp(:) = czero
     if (alpha /= czero) then 
-      do j=1, maxval(irn(1:16))
-        tmp(1:16) = tmp(1:16) + val(1:16,j)*x(ja(1:16,j))
+      do j=1, maxval(irn(1:m))
+        tmp(1:m) = tmp(1:m) + val(1:m,j)*x(ja(1:m,j))
       end do
     end if
     if (beta == czero) then 
-      y(ir:ir+16-1) = alpha*tmp(1:16) 
+      y(ir:ir+m-1) = alpha*tmp(1:m) 
     else
-      y(ir:ir+16-1) = alpha*tmp(1:16) + beta*y(ir:ir+16-1)
+      y(ir:ir+m-1) = alpha*tmp(1:m) + beta*y(ir:ir+m-1)
     end if
 
 
     if (is_unit) then 
-      do i=1, min(16,n)
+      do i=1, min(m,n)
         y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
       end do
     end if
 
   end subroutine psb_c_hll_csmv_notra_16
 
-  subroutine psb_c_hll_csmv_notra_32(ir,n,irn,alpha,ja,ldj,val,ldv,&
-       & is_triangle,is_unit, x,beta,y,info) 
+  subroutine psb_c_hll_csmv_notra_24(ir,n,irn,alpha,ja,val,&
+       & is_triangle,is_unit, x,beta,y,info)
     use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
     implicit none 
-    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
-    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
+    integer(psb_ipk_), parameter :: m=24
+    integer(psb_ipk_), intent(in)    :: ir,n,ja(m,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(m,*)
     complex(psb_spk_), intent(inout)   :: y(*)
     logical, intent(in)              :: is_triangle,is_unit
     integer(psb_ipk_), intent(out)   :: info
 
-    integer(psb_ipk_), parameter :: m=32
     integer(psb_ipk_) :: i,j,k, m4, jc
     complex(psb_spk_)   :: tmp(m)
 
@@ -521,36 +521,74 @@ contains
 
     tmp(:) = czero
     if (alpha /= czero) then 
-      do j=1, maxval(irn(1:32))
-        tmp(1:32) = tmp(1:32) + val(1:32,j)*x(ja(1:32,j))
+      do j=1, maxval(irn(1:m))
+        tmp(1:m) = tmp(1:m) + val(1:m,j)*x(ja(1:m,j))
       end do
     end if
     if (beta == czero) then 
-      y(ir:ir+32-1) = alpha*tmp(1:32) 
+      y(ir:ir+m-1) = alpha*tmp(1:m) 
     else
-      y(ir:ir+32-1) = alpha*tmp(1:32) + beta*y(ir:ir+32-1)
+      y(ir:ir+m-1) = alpha*tmp(1:m) + beta*y(ir:ir+m-1)
     end if
 
 
     if (is_unit) then 
-      do i=1, min(32,n)
+      do i=1, min(m,n)
+        y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
+      end do
+    end if
+
+  end subroutine psb_c_hll_csmv_notra_24
+
+  subroutine psb_c_hll_csmv_notra_32(ir,n,irn,alpha,ja,val,&
+       & is_triangle,is_unit, x,beta,y,info)
+    use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
+    implicit none 
+    integer(psb_ipk_), parameter :: m=32
+    integer(psb_ipk_), intent(in)    :: ir,n,ja(m,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(m,*)
+    complex(psb_spk_), intent(inout)   :: y(*)
+    logical, intent(in)              :: is_triangle,is_unit
+    integer(psb_ipk_), intent(out)   :: info
+
+    integer(psb_ipk_) :: i,j,k, m4, jc
+    complex(psb_spk_)   :: tmp(m)
+
+    info = psb_success_
+
+
+    tmp(:) = czero
+    if (alpha /= czero) then 
+      do j=1, maxval(irn(1:m))
+        tmp(1:m) = tmp(1:m) + val(1:m,j)*x(ja(1:m,j))
+      end do
+    end if
+    if (beta == czero) then 
+      y(ir:ir+m-1) = alpha*tmp(1:m) 
+    else
+      y(ir:ir+m-1) = alpha*tmp(1:m) + beta*y(ir:ir+m-1)
+    end if
+
+
+    if (is_unit) then 
+      do i=1, min(m,n)
         y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
       end do
     end if
 
   end subroutine psb_c_hll_csmv_notra_32
 
-  subroutine psb_c_hll_csmv_notra_64(ir,n,irn,alpha,ja,ldj,val,ldv,&
-       & is_triangle,is_unit, x,beta,y,info) 
+  subroutine psb_c_hll_csmv_notra_64(ir,n,irn,alpha,ja,val,&
+       & is_triangle,is_unit, x,beta,y,info)
     use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
     implicit none 
-    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
-    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
+    integer(psb_ipk_), parameter :: m=64
+    integer(psb_ipk_), intent(in)    :: ir,n,ja(m,*),irn(*)
+    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(m,*)
     complex(psb_spk_), intent(inout)   :: y(*)
     logical, intent(in)              :: is_triangle,is_unit
     integer(psb_ipk_), intent(out)   :: info
 
-    integer(psb_ipk_), parameter :: m=64
     integer(psb_ipk_) :: i,j,k, m4, jc
     complex(psb_spk_)   :: tmp(m)
 
@@ -559,62 +597,23 @@ contains
 
     tmp(:) = czero
     if (alpha /= czero) then 
-      do j=1, maxval(irn(1:64))
-        tmp(1:64) = tmp(1:64) + val(1:64,j)*x(ja(1:64,j))
+      do j=1, maxval(irn(1:m))
+        tmp(1:m) = tmp(1:m) + val(1:m,j)*x(ja(1:m,j))
       end do
     end if
     if (beta == czero) then 
-      y(ir:ir+64-1) = alpha*tmp(1:64) 
+      y(ir:ir+m-1) = alpha*tmp(1:m) 
     else
-      y(ir:ir+64-1) = alpha*tmp(1:64) + beta*y(ir:ir+64-1)
+      y(ir:ir+m-1) = alpha*tmp(1:m) + beta*y(ir:ir+m-1)
     end if
 
 
     if (is_unit) then 
-      do i=1, min(64,n)
+      do i=1, min(m,n)
         y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
       end do
     end if
 
   end subroutine psb_c_hll_csmv_notra_64
-
- 
-  subroutine psb_c_hll_csmv_notra_4(ir,n,irn,alpha,ja,ldj,val,ldv,&
-       & is_triangle,is_unit, x,beta,y,info)
-    use psb_base_mod, only : psb_ipk_, psb_spk_, czero, psb_success_
-    implicit none 
-    integer(psb_ipk_), intent(in)    :: ir,n,ldj,ldv,ja(ldj,*),irn(*)
-    complex(psb_spk_), intent(in)      :: alpha, beta, x(*),val(ldv,*)
-    complex(psb_spk_), intent(inout)   :: y(*)
-    logical, intent(in)              :: is_triangle,is_unit
-    integer(psb_ipk_), intent(out)   :: info
-
-    integer(psb_ipk_), parameter :: m=4
-    integer(psb_ipk_) :: i,j,k, m4, jc
-    complex(psb_spk_)   :: tmp(m)
-
-    info = psb_success_
-
-
-    tmp(:) = czero
-    if (alpha /= czero) then 
-      do j=1, maxval(irn(1:4))
-        tmp(1:4) = tmp(1:4) + val(1:4,j)*x(ja(1:4,j))
-      end do
-    end if
-    if (beta == czero) then 
-      y(ir:ir+4-1) = alpha*tmp(1:4) 
-    else
-      y(ir:ir+4-1) = alpha*tmp(1:4) + beta*y(ir:ir+4-1)
-    end if
-
-
-    if (is_unit) then 
-      do i=1, min(4,n)
-        y(ir+i-1) = y(ir+i-1) + alpha*x(ir+i-1)
-      end do
-    end if
-
-  end subroutine psb_c_hll_csmv_notra_4
 
 end subroutine psb_c_hll_csmv

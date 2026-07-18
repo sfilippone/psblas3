@@ -36,9 +36,10 @@ Module psb_z_tools_mod
        & psb_lz_csr_sparse_mat, psb_lz_coo_sparse_mat, &
        & psb_z_csr_sparse_mat, psb_z_coo_sparse_mat
   use psb_l_vect_mod, only : psb_l_vect_type
+  use psb_z_linmap_mod, only : psb_zlinmap_type
   use psb_z_multivect_mod, only : psb_z_base_multivect_type, psb_z_multivect_type
   use psi_mod, only : psb_snd, psb_rcv ! Needed only for psb_getelem
-
+  
   interface  psb_geall
     subroutine psb_zalloc_vect(x, desc_a,info, dupl, bldmode)
       import
@@ -469,6 +470,16 @@ Module psb_z_tools_mod
       integer(psb_ipk_), allocatable, intent(out) :: isrc(:), nrsrc(:), naggr(:)
       integer(psb_ipk_), intent(out)       :: info
     end subroutine psb_z_remap
+    subroutine psb_z_remap2(map_in, desc_new, map_out, flag, info)
+      import
+      implicit none
+      !....parameters...
+      type(psb_desc_type), intent(inout)   :: desc_new
+      type(psb_zlinmap_type), intent(inout) :: map_in
+      type(psb_zlinmap_type), intent(out)   :: map_out
+      integer(psb_ipk_), intent(in)       :: flag
+      integer(psb_ipk_), intent(out)       :: info
+    end subroutine psb_z_remap2
   end interface psb_remap
 
 end module psb_z_tools_mod
