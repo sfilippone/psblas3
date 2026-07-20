@@ -93,8 +93,8 @@ subroutine psb_d_bjac_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, des
   character           :: trans_
   character(len=20)   :: ch_err
   character(len=20)   :: name = 'd_bjac_prec_apply'
-  type(psb_d_vect_type)   :: wv, wv1
-  real(psb_dpk_), pointer :: ww(:), aux(:)
+  type(psb_d_multivect_type)  :: wv, wv1
+  real(psb_dpk_), pointer     :: ww(:), aux(:)
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -154,70 +154,75 @@ subroutine psb_d_bjac_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, des
     goto 9999
   end if
 
-  do_alloc_wrk = .not. prec%is_allocated_wrk()
-  if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
+  ! TO DO: can we skip this? Implement multivector work
+  ! do_alloc_wrk = .not. prec%is_allocated_wrk()
+  ! if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
 
-  associate (wv => prec%wrk(1), wv1 => prec%wrk(2))
-    select case(prec%iprcparm(psb_f_type_))
-      case(psb_f_ilu_n_, psb_f_ilu_k_, psb_f_ilu_t_)
-        select case(trans_)
-          case('N')
-            call psb_spsm(done, prec%av(psb_l_pr_), x, idx_x, dzero, wv, desc_data, info, &
-                          & trans = trans_, scale = 'L', diag = prec%dv, choice = psb_none_, work = aux)
-            if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_u_pr_), wv, beta, y, idx_y, desc_data, info, &
-                                                  & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
+  ! associate (wv => prec%wrk(1), wv1 => prec%wrk(2))
+  call psb_geall(wv, desc_data, info, n = ione)
+  call psb_geasb(wv, desc_data, info, mold = x%v)
+  call psb_geall(wv1, desc_data, info, n = ione)
+  call psb_geasb(wv1, desc_data, info, mold = x%v)
 
-          case('T')
-            call psb_spsm(done, prec%av(psb_u_pr_), x, idx_x, dzero, wv, desc_data, info, &
-                          & trans = trans_, scale = 'L', diag = prec%dv, choice = psb_none_, work = aux)
-            if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv, beta, y, idx_y, desc_data, info, &
-                                                  & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
+  select case(prec%iprcparm(psb_f_type_))
+    case(psb_f_ilu_n_, psb_f_ilu_k_, psb_f_ilu_t_)
+      select case(trans_)
+        case('N')
+          call psb_spsm(done, prec%av(psb_l_pr_), x, idx_x, dzero, wv, ione, desc_data, info, &
+                        & trans = trans_, scale = 'L', diag = prec%dv, choice = psb_none_, work = aux)
+          if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_u_pr_), wv, ione, beta, y, idx_y, desc_data, info, &
+                                                & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
 
-          case('C')
-            call psb_spsm(done, prec%av(psb_u_pr_), x, idx_x, dzero, wv, desc_data, info, &
-                          & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
+        case('T')
+          call psb_spsm(done, prec%av(psb_u_pr_), x, idx_x, dzero, wv, ione, desc_data, info, &
+                        & trans = trans_, scale = 'L', diag = prec%dv, choice = psb_none_, work = aux)
+          if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv, ione, beta, y, idx_y, desc_data, info, &
+                                                & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
 
-            call wv1%mlt(done, prec%dv, wv, dzero, info, conjgx = trans_)
+        case('C')
+          call psb_spsm(done, prec%av(psb_u_pr_), x, idx_x, dzero, wv, ione, desc_data, info, &
+                        & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
 
-            if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv1, beta, y, idx_y, desc_data, info, &
-                                                  & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
-        end select
+          call wv1%mlt(wv1%get_nrows(), done, prec%dv, wv, dzero, info, conjgx = trans_)
 
-        if(info /= psb_success_) then
-          ch_err = "psb_spsm"
-          goto 9999
-        end if
+          if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv1, ione, beta, y, idx_y, desc_data, info, &
+                                                & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
+      end select
 
-      case(psb_f_ainv_, psb_f_invt_, psb_f_invk_)
-        ! Application of approximate inverse preconditioner, just some spmm
-        select case(trans_)
-          case('N')
-            call psb_spmm(done, prec%av(psb_l_pr_), x, idx_x, dzero, wv, desc_data, info, &
-                          & trans = trans_, work = aux, doswap = .false.)
-
-            if(info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
-            if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, beta, y, idx_y, desc_data, info, &
-                                                  & trans = trans_, work = aux, doswap = .false.)
-
-          case('T', 'C')
-            call psb_spmm(done, prec%av(psb_l_pr_), x, idx_x, dzero, wv, desc_data, info, &
-                  & trans = trans_, work = aux, doswap = .false.)
-            if(info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
-            if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, beta, y, idx_y, desc_data, info, &
-                                                  & trans = trans_, work = aux, doswap = .false.)
-        end select
-
-        if(info /= psb_success_) then
-          ch_err = "psb_spsm"
-          goto 9999
-        end if
-
-      case default
-        info = psb_err_internal_error_
-        call psb_errpush(info, name, a_err = 'Invalid factorization')
+      if(info /= psb_success_) then
+        ch_err = "psb_spsm"
         goto 9999
-    end select
-  end associate
+      end if
+
+    case(psb_f_ainv_, psb_f_invt_, psb_f_invk_)
+      ! Application of approximate inverse preconditioner, just some spmm
+      select case(trans_)
+        case('N')
+          call psb_spmm(done, prec%av(psb_l_pr_), x, idx_x, dzero, wv, ione, desc_data, info, &
+                        & trans = trans_, work = aux, doswap = .false.)
+
+          if(info == psb_success_) call wv1%mlt(wv1%get_nrows(), done, prec%dv, wv, dzero, info)
+          if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, ione, beta, y, idx_y, desc_data, info, &
+                                                & trans = trans_, work = aux, doswap = .false.)
+
+        case('T', 'C')
+          call psb_spmm(done, prec%av(psb_l_pr_), x, idx_x, dzero, wv, ione, desc_data, info, &
+                & trans = trans_, work = aux, doswap = .false.)
+          if(info == psb_success_) call wv1%mlt(wv1%get_nrows(), done, prec%dv, wv, dzero, info)
+          if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, ione, beta, y, idx_y, desc_data, info, &
+                                                & trans = trans_, work = aux, doswap = .false.)
+      end select
+
+      if(info /= psb_success_) then
+        ch_err = "psb_spsm"
+        goto 9999
+      end if
+
+    case default
+      info = psb_err_internal_error_
+      call psb_errpush(info, name, a_err = 'Invalid factorization')
+      goto 9999
+  end select
 
   call psb_halo(y, desc_data, info, data = psb_comm_mov_)
 
@@ -320,7 +325,7 @@ subroutine psb_d_bjac_apply_mvect(alpha, prec, x, beta, y, desc_data, info, tran
     goto 9999
   end if
 
-  ! TO DO: can we skip this?
+  ! TO DO: can we skip this? Implement multivector work
   ! do_alloc_wrk = .not. prec%is_allocated_wrk()
   ! if(do_alloc_wrk) call prec%allocate_wrk(info, vmold = x%v)
 
@@ -349,7 +354,7 @@ subroutine psb_d_bjac_apply_mvect(alpha, prec, x, beta, y, desc_data, info, tran
           call psb_spsm(done, prec%av(psb_u_pr_), x, dzero, wv, desc_data, info, &
                         & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
 
-          call wv1%mlt(done, prec%dv, wv, dzero, info, conjgx = trans_)
+          call wv1%mlt(wv1%get_nrows(), done, prec%dv, wv, dzero, info, conjgx = trans_)
 
           if(info == psb_success_) call psb_spsm(alpha, prec%av(psb_l_pr_), wv1, beta, y, desc_data, info, &
                                                 & trans = trans_, scale = 'U', choice = psb_none_, work = aux)
@@ -367,14 +372,14 @@ subroutine psb_d_bjac_apply_mvect(alpha, prec, x, beta, y, desc_data, info, tran
           call psb_spmm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
                         & trans = trans_, work = aux, doswap = .false.)
 
-          if(info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
+          if(info == psb_success_) call wv1%mlt(wv1%get_nrows(), done, prec%dv, wv, dzero, info)
           if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, beta, y, desc_data, info, &
                                                 & trans = trans_, work = aux, doswap = .false.)
 
         case('T', 'C')
           call psb_spmm(done, prec%av(psb_l_pr_), x, dzero, wv, desc_data, info, &
                 & trans = trans_, work = aux, doswap = .false.)
-          if(info == psb_success_) call wv1%mlt(done, prec%dv, wv, dzero, info)
+          if(info == psb_success_) call wv1%mlt(wv1%get_nrows(), done, prec%dv, wv, dzero, info)
           if(info == psb_success_) call psb_spmm(alpha, prec%av(psb_u_pr_), wv1, beta, y, desc_data, info, &
                                                 & trans = trans_, work = aux, doswap = .false.)
       end select
