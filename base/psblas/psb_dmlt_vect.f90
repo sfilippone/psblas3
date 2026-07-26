@@ -34,7 +34,6 @@
 ! 
 ! Vector routines
 ! 
-
 subroutine psb_dmlt_vect(x, y, desc_a, info)
   use psb_base_mod, psb_protect_name => psb_dmlt_vect
   implicit none

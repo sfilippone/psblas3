@@ -171,7 +171,6 @@ module psb_d_bjacprec
     end subroutine psb_d_bjac_precsetr
   end interface
 contains
-
   !
   !
   ! verbosity:
@@ -183,7 +182,6 @@ contains
     use psb_penv_mod
     use psb_error_mod
     implicit none
-
     class(psb_d_bjac_prec_type), intent(in) :: prec
     integer(psb_ipk_), intent(in), optional :: iout
     integer(psb_ipk_), intent(in), optional :: root
@@ -197,34 +195,21 @@ contains
     character(1024)     :: prefix_
 
     call psb_erractionsave(err_act)
-
     info = psb_success_
 
-    if(present(iout)) then
-      iout_ = iout
-    else
-      iout_ = 6
-    end if
+    iout_ = 6
+    if(present(iout)) iout_ = iout
 
-    if(present(root)) then
-      root_ = root
-    else
-      root_ = psb_root_
-    end if
+    root_ = psb_root_
+    if(present(root)) root_ = root
 
-    if(present(verbosity)) then
-      verbosity_ = verbosity
-    else
-      verbosity_ = 0
-    end if
+    verbosity_ = 0
+    if(present(verbosity)) verbosity_ = verbosity
 
     if(verbosity_ < 0) goto 9998
 
-    if(present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
     
     if(.not. allocated(prec%iprcparm)) then
       info = 1124
@@ -364,6 +349,7 @@ contains
   subroutine psb_d_bjac_allocate_wrk(prec, info, vmold, desc)
     use psb_base_mod
     implicit none
+    ! Arguments
     class(psb_d_bjac_prec_type), intent(inout)  :: prec
     integer(psb_ipk_), intent(out)              :: info
     class(psb_d_base_vect_type), intent(in), optional :: vmold
@@ -421,6 +407,7 @@ contains
   subroutine psb_d_bjac_free_wrk(prec, info)
     use psb_base_mod
     implicit none
+    ! Arguments
     class(psb_d_bjac_prec_type), intent(inout)  :: prec
     integer(psb_ipk_), intent(out)              :: info
 

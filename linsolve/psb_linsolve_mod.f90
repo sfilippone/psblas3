@@ -71,13 +71,13 @@ module psb_linsolve_mod
       class(psb_cprec_type), intent(inout)  :: prec 
       type(psb_c_vect_type), intent(inout)  :: b
       type(psb_c_vect_type), intent(inout)  :: x
-      real(psb_spk), intent(in)            :: eps
+      real(psb_spk_), intent(in)            :: eps
       integer(psb_ipk_), intent(out)        :: info
       integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, irst, istop, steps
       integer(psb_ipk_), optional, intent(out)  :: iter
-      real(psb_spk), optional, intent(out)     :: err, cond
+      real(psb_spk_), optional, intent(out)     :: err, cond
       character, optional, intent(in)           :: base_type
-      real(psb_spk), optional, intent(in)      :: eigext(2)
+      real(psb_spk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
     end subroutine psb_ckrylov_vect
@@ -102,7 +102,7 @@ module psb_linsolve_mod
       real(psb_dpk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
-    end subroutine psb_zkrylov_vect
+    end subroutine psb_dkrylov_vect
 
     subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
                           & itmax, iter, err, itrace, irst, istop, cond, &

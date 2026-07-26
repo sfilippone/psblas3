@@ -35,16 +35,14 @@ module psb_s_prec_mod
   use psb_s_base_prec_mod
 
   interface psb_ilu_fct
-    subroutine psb_silu_fct(a,l,u,d,info,blck)
+    subroutine psb_silu_fct(a, l, u, d, info, blck)
       import :: psb_ipk_, psb_desc_type, psb_sspmat_type, &
-           & psb_s_csr_sparse_mat, psb_spk_
-      integer(psb_ipk_), intent(out)                ::     info
-      type(psb_sspmat_type),intent(in)    :: a
-      type(psb_s_csr_sparse_mat),intent(inout) :: l,u
-      type(psb_sspmat_type),intent(in), optional, target :: blck
-      real(psb_spk_), intent(inout)     ::  d(:)
+              & psb_s_csr_sparse_mat, psb_spk_
+      type(psb_sspmat_type), intent(in)         :: a
+      type(psb_s_csr_sparse_mat), intent(inout) :: l, u
+      real(psb_spk_), intent(inout)             :: d(:)
+      integer(psb_ipk_), intent(out)            :: info
+      type(psb_sspmat_type), intent(in), optional, target :: blck
     end subroutine psb_silu_fct
   end interface
-
-
 end module psb_s_prec_mod

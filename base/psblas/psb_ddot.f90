@@ -32,7 +32,7 @@
 ! File: psb_ddot.f90
 !
 ! Function: psb_ddot_vect
-!    psb_ddot computes the dot product of two distributed vectors,
+!    psb_ddot computes the dot product of two distributed vectors, 
 !
 !    dot := ( X )**C * ( Y )
 !
@@ -40,15 +40,15 @@
 ! Arguments:
 !    x      -  type(psb_d_vect_type) The input vector containing the entries of sub( X ).
 !    y      -  type(psb_d_vect_type) The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).  The communication descriptor.
-!    info   -  integer.              Return code
-!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!    global -  logical, optional     Whether to perform the global sum, default: .true.
 !
 !  Note: from a functional point of view, X and Y are input, but here
 !        they are declared INOUT because of the sync() methods. 
 !
 !
-function psb_ddot_vect(x, y, desc_a,info,global) result(res)
+function psb_ddot_vect(x, y, desc_a, info, global) result(res)
   use psb_desc_mod
   use psb_d_base_mat_mod
   use psb_check_mod
@@ -65,81 +65,73 @@ function psb_ddot_vect(x, y, desc_a,info,global) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, iiy, jjy, i, nr
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  logical :: global_
-  character(len=20)      :: name, ch_err
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, nr
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  character(len=20)   :: name, ch_err
+  logical             :: global_
 
-  name='psb_ddot_vect'
+  name = 'psb_ddot_vect'
   res = dzero
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.allocated(x%v)) then 
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
-    goto 9999
-  endif
-  if (.not.allocated(y%v)) then 
-    info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  if((.not.allocated(x%v)) .or. (.not.allocated(y%v))) then 
+    info = psb_err_invalid_vect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
 
-  ix = ione
+  global_ = .true.
+  if(present(global)) global_ = global
+
+  ix  = ione
   ijx = ione
-
-  iy = ione
+  iy  = ione
   ijy = ione
 
   m = desc_a%get_global_rows()
 
   ! check vector correctness
-  call psb_chkvect(m,lone,x%get_nrows(),ix,ijx,desc_a,info,iix,jjx)
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lone,y%get_nrows(),iy,ijy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m, lone, x%get_nrows(), ix, ijx, desc_a, info, iix, jjx)
+  if(info == psb_success_) &
+       & call psb_chkvect(m, lone, y%get_nrows(), iy, ijy, desc_a, info, iiy, jjy)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((iix /= ione).or.(iiy /= ione)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = x%dot(nr,y)
+    res = x%dot(nr, y)
     ! FIXME
     ! adjust dot_local because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem,1)>0) then
-      if (x%is_dev()) call x%sync()
-      if (y%is_dev()) call y%sync()
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        res = res - (real(ndm-1)/real(ndm))*(x%v%v(idx)*y%v%v(idx))
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
+      if(y%is_dev()) call y%sync()
+      do i = 1, size(desc_a%ovrlap_elem, 1)
+        idx = desc_a%ovrlap_elem(i, 1)
+        ndm = desc_a%ovrlap_elem(i, 2)
+        res = res - (real(ndm-1) / real(ndm)) * (x%v%v(idx) * y%v%v(idx))
       end do
     end if
   else
@@ -147,141 +139,128 @@ function psb_ddot_vect(x, y, desc_a,info,global) result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ctxt, res)
+  if(global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_ddot_vect
+
 !
 ! Function: psb_ddot
-!    psb_ddot computes the dot product of two distributed vectors,
+!    psb_ddot computes the dot product of two distributed vectors, 
 !
 !    dot := sub( X )**C * sub( Y )
 !
-!    where sub( X ) denotes X(:,JX)
+!    where sub( X ) denotes X(:, JX)
 !
-!    sub( Y ) denotes Y(:,JY).
+!    sub( Y ) denotes Y(:, JY).
 !
 ! Arguments:
-!    x(:,:) -  real                The input vector containing the entries of sub( X ).
-!    y(:,:) -  real                The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type).  The communication descriptor.
-!    info   -  integer.              Return code
-!    jx     -  integer(optional).    The column offset for sub( X ).
-!    jy     -  integer(optional).    The column offset for sub( Y ).
-!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!    x(:, :) - real                 The input vector containing the entries of sub( X ).
+!    y(:, :) - real                 The input vector containing the entries of sub( Y ).
+!    desc_a  - type(psb_desc_type)  The communication descriptor.
+!    info    - integer              Return code.
+!    jx      - integer, optional    The column offset for sub( X ).
+!    jy      - integer, optional    The column offset for sub( Y ).
+!    global  - logical, optional    Whether to perform the global sum, default: .true.
 !
-function psb_ddot(x, y, desc_a, info, jx, jy,global)  result(res)
+function psb_ddot(x, y, desc_a, info, jx, jy, global) result(res)
   use psb_base_mod, psb_protect_name => psb_ddot
   implicit none
-
-  real(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(in), optional    :: jx, jy
-  integer(psb_ipk_), intent(out)   :: info
-  real(psb_dpk_)              :: res
-  logical, intent(in), optional        :: global
+  real(psb_dpk_), intent(in)      :: x(:, :), y(:, :)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  integer(psb_ipk_), intent(in), optional :: jx, jy
+  logical, intent(in), optional           :: global
+  real(psb_dpk_) :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  real(psb_dpk_)        :: ddot
-  logical :: global_
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  character(len=20)   :: name, ch_err
+  logical             :: global_
+  real(psb_dpk_) :: ddot
 
-  name='psb_ddot'
-  info=psb_success_
+  name = 'psb_ddot'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  ix = ione
-  if (present(jx)) then
-    ijx = jx
-  else
-    ijx = ione
-  endif
-
+  ix = ione  
   iy = ione
-  if (present(jy)) then
-    ijy = jy
-  else
-    ijy = ione
-  endif
+
+  ijx = ione
+  if(present(jx)) ijx = jx
+
+  ijy = ione
+  if(present(jy)) ijy = jy
 
   if(ijx /= ijy) then
-    info=3050
-    call psb_errpush(info,name)
+    info = 3050
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   m = desc_a%get_global_rows()
-  lldx = size(x,1)
-  lldy = size(y,1)
+  lldx = size(x, 1)
+  lldy = size(y, 1)
 
   ! check vector correctness
-  call psb_chkvect(m,lone,lldx,ix,ijx,desc_a,info,iix,jjx)
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lone,lldy,iy,ijy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m, lone, lldx, ix, ijx, desc_a, info, iix, jjx)
+  if(info == psb_success_) call psb_chkvect(m, lone, lldy, iy, ijy, desc_a, info, iiy, jjy)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((iix /= ione).or.(iiy /= ione)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = ddot(int(nr,kind=psb_mpk_), x(iix:,jjx),1,y(iiy:,jjy),1)
+    res = ddot(int(nr, kind = psb_mpk_), x(iix:, jjx), 1, y(iiy:, jjy), 1)
     ! adjust dot_local because overlapped elements are computed more than once
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx  = desc_a%ovrlap_elem(i,1)
-      ndm  = desc_a%ovrlap_elem(i,2)
-      res = res - (real(ndm-1)/real(ndm))*((x(idx,jjx))*y(idx,jjy))
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
+      res = res - (real(ndm-1)/real(ndm)) * ((x(idx, jjx)) * y(idx, jjy))
     end do
   else
     res = dzero
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ctxt, res)
+  if(global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_ddot
-
-
-
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
@@ -316,89 +295,87 @@ end function psb_ddot
 !!$
 ! 
 ! Function: psb_ddotv
-!    psb_ddotv computes the dot product of two distributed vectors,
+!    psb_ddotv computes the dot product of two distributed vectors, 
 !
 !    dot := X**C * Y
 !
 ! Arguments:
 !    x(:)   -  real               The input vector containing the entries of X.
 !    y(:)   -  real               The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type).  The communication descriptor.
-!    info   -  integer.              Return code
-!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!    desc_a -  type(psb_desc_type)  The communication descriptor.
+!    info   -  integer              Return code
+!    global -  logical, optional     Whether to perform the global sum, default: .true.
 !
-function psb_ddotv(x, y,desc_a, info,global)  result(res)
+function psb_ddotv(x, y, desc_a, info, global)  result(res)
   use psb_base_mod, psb_protect_name => psb_ddotv
   implicit none
-
-  real(psb_dpk_), intent(in)   :: x(:), y(:)
+  real(psb_dpk_), intent(in)      :: x(:), y(:)
   type(psb_desc_type), intent(in) :: desc_a
   integer(psb_ipk_), intent(out)  :: info
-  real(psb_dpk_)              :: res
-  logical, intent(in), optional        :: global
+  logical, intent(in), optional :: global
+  real(psb_dpk_) :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
-  integer(psb_lpk_) :: ix, jx, iy, jy, m
-  logical :: global_
-  real(psb_dpk_)         :: ddot
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_)   :: ix, jx, iy, jy, m
+  character(len=20)   :: name, ch_err
+  logical             :: global_
+  real(psb_dpk_) :: ddot
 
-  name='psb_ddot'
-  info=psb_success_
+  name = 'psb_ddot'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = ione
   iy = ione
   jx = ione
   jy = ione
+
   m = desc_a%get_global_rows()
-  lldx = size(x,1)
-  lldy = size(y,1)
+  lldx = size(x, 1)
+  lldy = size(y, 1)
+
   ! check vector correctness
-  call psb_chkvect(m,lone,lldx,ix,jx,desc_a,info,iix,jjx)
-  if (info == psb_success_)&
-       & call psb_chkvect(m,lone,lldy,iy,jy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m, lone, lldx, ix, jx, desc_a, info, iix, jjx)
+  if(info == psb_success_)&
+       & call psb_chkvect(m, lone, lldy, iy, jy, desc_a, info, iiy, jjy)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((iix /= ione).or.(iiy /= ione)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = ddot(int(nr,kind=psb_mpk_), x,1,y,1)
+    res = ddot(int(nr, kind = psb_mpk_), x, 1, y, 1)
     ! adjust res because overlapped elements are computed more than once
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx  = desc_a%ovrlap_elem(i,1)
-      ndm  = desc_a%ovrlap_elem(i,2)
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
       res = res - (real(ndm-1)/real(ndm))*((x(idx))*y(idx))
     end do
   else
@@ -406,20 +383,17 @@ function psb_ddotv(x, y,desc_a, info,global)  result(res)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ctxt, res)
-
+  if(global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_ddotv
 
-
 ! mvect dot products now available only as subroutines. 
 ! Maybe worth to implemented them also as allocatable-output functions
-
 subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
   use psb_base_mod, psb_protect_name => psb_ddot_mvect
   implicit none
@@ -431,8 +405,7 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, &
-                        & iix, jjx, iiy, jjy, i, nr
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, nr
   integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
   character(len=20)   :: name, ch_err
   logical             :: global_
@@ -440,38 +413,36 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
   integer(psb_ipk_)           :: ovrlap_size, outm, outn
   real(psb_dpk_), allocatable :: ovrlap_xval(:), ovrlap_yval(:)
 
-  name='psb_ddot_mvect'
+  name = 'psb_ddot_mvect'
   xty = dzero
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
-  if ((.not.allocated(x%v)) .or. (.not.allocated(y%v))) then 
+
+  if((.not.allocated(x%v)) .or. (.not.allocated(y%v))) then 
     info = psb_err_invalid_mvect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
-  ix = ione
+  ix  = ione
   ijx = ione
-  iy = ione
+  iy  = ione
   ijy = ione
 
   m = desc_a%get_global_rows()
@@ -481,20 +452,21 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'psb_chkvect'
-    call psb_errpush(info, name, a_err=ch_err)
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
+
   call psb_chkvect(m, lone, y%get_nrows(), iy, ijy, desc_a, info, iiy, jjy)
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'psb_chkvect'
-    call psb_errpush(info, name, a_err=ch_err)
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((iix /= ione).or.(iiy /= ione)) then
+  if((iix /= ione) .or. (iiy /= ione)) then
     info = psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   end if
 
@@ -504,16 +476,16 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
     if(info /= psb_success_) then
       info = psb_err_from_subroutine_
       ch_err = 'psb_d_base_vect_dot_mm'
-      call psb_errpush(info, name, a_err=ch_err)
+      call psb_errpush(info, name, a_err = ch_err)
       goto 9999
     end if
     
     ! Adjust dot_local because overlapped elements are computed more than once
     ! Note: the correction is performed using multiple dger, maybe is not optimal...
     ovrlap_size = size(desc_a%ovrlap_elem, 1)
-    if (ovrlap_size > 0) then
-      ! if (x%is_dev()) call x%sync()
-      ! if (y%is_dev()) call y%sync()
+    if(ovrlap_size > 0) then
+      ! if(x%is_dev()) call x%sync()
+      ! if(y%is_dev()) call y%sync()
 
       outm = x%get_ncols()
       outn = y%get_ncols()
@@ -523,7 +495,7 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
       do i = 1, ovrlap_size
         idx = desc_a%ovrlap_elem(i, 1)
         ndm = desc_a%ovrlap_elem(i, 2)  
-        ovrlap_xval = x%v%v(idx, :)
+        ovrlap_xval = (x%v%v(idx, :))
         ovrlap_yval = y%v%v(idx, :)
         call dger(outm, outn, real(1-ndm)/real(ndm), ovrlap_xval, 1, ovrlap_yval, 1, xty, outm)
       end do
@@ -533,12 +505,12 @@ subroutine psb_ddot_mvect(x, y, xty, desc_a, info, global)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ctxt, xty)
+  if(global_) call psb_sum(ctxt, xty)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_ddot_mvect
 
@@ -554,54 +526,50 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm, &
-       & err_act, iix, jjx, iiy, jjy, i, nr
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  character(len=20) :: name, ch_err
-  logical :: global_
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, nr
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  character(len=20)   :: name, ch_err
+  logical             :: global_
 
   integer(psb_ipk_)           :: ovrlap_size, outm
   real(psb_dpk_), allocatable :: ovrlap_xval(:)
 
-  name='psb_ddot_mvect_vect'
+  name = 'psb_ddot_mvect_vect'
   xty = dzero
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then 
+  if(.not.allocated(x%v)) then 
     info = psb_err_invalid_mvect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(y%v)) then 
+  if(.not.allocated(y%v)) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
-  ix = ione
+  ix  = ione
   ijx = ione
-  iy = ione
+  iy  = ione
   ijy = ione
 
   m = desc_a%get_global_rows()
@@ -611,7 +579,7 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'psb_chkvect'
-    call psb_errpush(info, name, a_err=ch_err)
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
@@ -619,13 +587,13 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'psb_chkvect'
-    call psb_errpush(info, name, a_err=ch_err)
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((iix /= ione).or.(iiy /= ione)) then
+  if((iix /= ione) .or. (iiy /= ione)) then
     info = psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   end if
 
@@ -635,15 +603,15 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
     if(info /= psb_success_) then
       info = psb_err_from_subroutine_
       ch_err = 'psb_d_base_vect_dot_mm'
-      call psb_errpush(info, name, a_err=ch_err)
+      call psb_errpush(info, name, a_err = ch_err)
       goto 9999
     end if
     
     ! Adjust dot_local because overlapped elements are computed more than once
     ovrlap_size = size(desc_a%ovrlap_elem, 1)
-    if (ovrlap_size > 0) then
-      ! if (x%is_dev()) call x%sync()
-      ! if (y%is_dev()) call y%sync()
+    if(ovrlap_size > 0) then
+      ! if(x%is_dev()) call x%sync()
+      ! if(y%is_dev()) call y%sync()
 
       outm = x%get_ncols()
       allocate(ovrlap_xval(outm))
@@ -651,7 +619,7 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
       do i = 1, ovrlap_size
         idx = desc_a%ovrlap_elem(i, 1)
         ndm = desc_a%ovrlap_elem(i, 2)  
-        ovrlap_xval = x%v%v(idx, :)
+        ovrlap_xval = (x%v%v(idx, :))
         call daxpy(outm, real(1-ndm)/real(ndm) * y%v%v(idx), ovrlap_xval, 1, xty, 1)
       end do
 
@@ -660,12 +628,12 @@ subroutine psb_ddot_mvect_vect(x, y, xty, desc_a, info, global)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ctxt, xty)
+  if(global_) call psb_sum(ctxt, xty)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_ddot_mvect_vect
 
@@ -702,7 +670,7 @@ end subroutine psb_ddot_mvect_vect
 !!$
 !  
 ! Subroutine: psb_ddotvs
-!    psb_ddotvs computes the dot product of two distributed vectors,
+!    psb_ddotvs computes the dot product of two distributed vectors, 
 !
 !    res := X**C * Y
 !
@@ -710,80 +678,76 @@ end subroutine psb_ddot_mvect_vect
 !    res    -  real.             The result.
 !    x(:)   -  real              The input vector containing the entries of X.
 !    y(:)   -  real              The input vector containing the entries of Y.
-!    desc_a -  type(psb_desc_type). The communication descriptor.
-!    info   -  integer.             Return code
-!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!    desc_a -  type(psb_desc_type) The communication descriptor.
+!    info   -  integer             Return code
+!    global -  logical, optional     Whether to perform the global sum, default: .true.
 !
-subroutine psb_ddotvs(res, x, y,desc_a, info,global)  
+subroutine psb_ddotvs(res, x, y, desc_a, info, global)  
   use psb_base_mod, psb_protect_name => psb_ddotvs
   implicit none
-
-  real(psb_dpk_), intent(in)    :: x(:), y(:)
-  real(psb_dpk_), intent(out)   :: res
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)   :: info
-  logical, intent(in), optional        :: global
+  real(psb_dpk_), intent(in)      :: x(:), y(:)
+  real(psb_dpk_), intent(out)     :: res
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  logical, intent(in), optional :: global
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, iiy, jjy, i,nr, lldx, lldy
-  integer(psb_lpk_) :: ix, jx, iy, jy, m
-  logical :: global_
-  real(psb_dpk_)        :: ddot
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, nr, lldx, lldy
+  integer(psb_lpk_)   :: ix, jx, iy, jy, m
+  character(len=20)   :: name, ch_err
+  logical             :: global_
+  real(psb_dpk_) :: ddot
 
-  name='psb_ddot'
-  info=psb_success_
+  name = 'psb_ddot'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = ione
   iy = ione
   m = desc_a%get_global_rows()
-  lldx = size(x,1)
-  lldy = size(y,1)
+  lldx = size(x, 1)
+  lldy = size(y, 1)
+
   ! check vector correctness
-  call psb_chkvect(m,lone,lldx,ix,ix,desc_a,info,iix,jjx)
-  if (info == psb_success_) &
-       & call psb_chkvect(m,lone,lldy,iy,iy,desc_a,info,iiy,jjy)
+  call psb_chkvect(m, lone, lldx, ix, ix, desc_a, info, iix, jjx)
+  if(info == psb_success_) call psb_chkvect(m, lone, lldy, iy, iy, desc_a, info, iiy, jjy)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((iix /= ione).or.(iiy /= ione)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if((iix /= ione) .or. (iiy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    res = ddot(int(nr,kind=psb_mpk_), x,1,y,1)
+    res = ddot(int(nr, kind = psb_mpk_), x, 1, y, 1)
     ! adjust res because overlapped elements are computed more than once
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx  = desc_a%ovrlap_elem(i,1)
-      ndm  = desc_a%ovrlap_elem(i,2)
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
       res = res - (real(ndm-1)/real(ndm))*((x(idx))*y(idx))
     end do
   else
@@ -791,18 +755,14 @@ subroutine psb_ddotvs(res, x, y,desc_a, info,global)
   end if
 
   ! compute global sum
-  if (global_) call psb_sum(ctxt, res)
+  if(global_) call psb_sum(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_ddotvs
-
-
-
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
@@ -837,113 +797,108 @@ end subroutine psb_ddotvs
 !!$
 !
 ! Subroutine: psb_dmdots
-!    psb_dmdots computes the dot product of multiple distributed vectors,
+!    psb_dmdots computes the dot product of multiple distributed vectors, 
 !
-!    res(i) := ( X(:,i) )**C * ( Y(:,i) )
+!    res(i) := ( X(:, i) )**C * ( Y(:, i) )
 !
 ! Arguments:
 !    res(:) -  real.             The result.
 !    x(:)   -  real              The input vector containing the entries of sub( X ).
 !    y(:)   -  real              The input vector containing the entries of sub( Y ).
-!    desc_a -  type(psb_desc_type). The communication descriptor.
-!    info   -  integer.             Return code
-!    global -  logical(optional)     Whether to perform the global sum, default: .true.
+!    desc_a -  type(psb_desc_type) The communication descriptor.
+!    info   -  integer             Return code
+!    global -  logical, optional     Whether to perform the global sum, default: .true.
 !
-subroutine psb_dmdots(res, x, y, desc_a, info,global)  
+subroutine psb_dmdots(res, x, y, desc_a, info, global)  
   use psb_base_mod, psb_protect_name => psb_dmdots
   implicit none
-
-  real(psb_dpk_), intent(in)    :: x(:,:), y(:,:)
-  real(psb_dpk_), intent(out)   :: res(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)   :: info
-  logical, intent(in), optional        :: global
+  real(psb_dpk_), intent(in)      :: x(:, :), y(:, :)
+  real(psb_dpk_), intent(out)     :: res(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  logical, intent(in), optional :: global
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, idx, ndm,&
-       & err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  logical :: global_
-  real(psb_dpk_)        :: ddot
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_)   :: np, me, idx, ndm, err_act, iix, jjx, iiy, jjy, i, j, k, nr, lldx, lldy
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  character(len=20)   :: name, ch_err
+  logical             :: global_
+  real(psb_dpk_) :: ddot
 
-  name='psb_dmdots'
-  info=psb_success_
+  name = 'psb_dmdots'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -ione) then
+  if(np == -ione) then
     info = psb_err_context_error_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
+
   ix = ione
   iy = ione
 
   m = desc_a%get_global_rows()
-  lldx = size(x,1)
-  lldy = size(y,1)
+  lldx = size(x, 1)
+  lldy = size(y, 1)
 
   ! check vector correctness
-  call psb_chkvect(m,lone,lldx,ix,ix,desc_a,info,iix,jjx)
+  call psb_chkvect(m, lone, lldx, ix, ix, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
-    goto 9999
-  end if
-  call psb_chkvect(m,lone,lldy,iy,iy,desc_a,info,iiy,jjy)
-  if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  if ((ix /= ione).or.(iy /= ione)) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  call psb_chkvect(m, lone, lldy, iy, iy, desc_a, info, iiy, jjy)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
     goto 9999
   end if
 
-  k = min(size(x,2),size(y,2))
+  if((ix /= ione) .or. (iy /= ione)) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  k = min(size(x, 2), size(y, 2))
 
   nr = desc_a%get_local_rows() 
   if(nr > 0) then
-    do j=1,k
-      res(j) = ddot(int(nr,kind=psb_mpk_),x(1:,j),1,y(1:,j),1)
+    do j = 1, k
+      res(j) = ddot(int(nr, kind = psb_mpk_), x(1:, j), 1, y(1:, j), 1)
       ! adjust res because overlapped elements are computed more than once
     end do
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx  = desc_a%ovrlap_elem(i,1)
-      ndm  = desc_a%ovrlap_elem(i,2)
-      res(1:k) = res(1:k) - &
-           & (real(ndm-1)/real(ndm))*((x(idx,1:k))*y(idx,1:k))
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
+      res(1:k) = res(1:k) - (real(ndm-1)/real(ndm)) * ((x(idx, 1:k)) * y(idx, 1:k))
     end do
   else
     res(:) = dzero
   end if
 
-
   ! compute global sum
-  if (global_) call psb_sum(ctxt, res(1:k))
+  if(global_) call psb_sum(ctxt, res(1:k))
 
   call psb_erractionrestore(err_act)
   return  
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dmdots

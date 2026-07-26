@@ -34,7 +34,7 @@
 ! Function: psb_dnrm2
 !    Computes the norm2 of a distributed vector, 
 !
-!    norm2 : = sqrt ( sub( X )**C * sub( X ) )
+!    norm2 := sqrt ( sub( X )**C * sub( X ) )
 !
 !    where sub( X ) denotes X(:, JX).
 !
@@ -50,7 +50,6 @@ function psb_dnrm2(x, desc_a, info, jx, global) result(res)
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
-
   implicit none
   real(psb_dpk_), intent(in)      ::  x(:, :)
   type(psb_desc_type), intent(in) :: desc_a
@@ -61,17 +60,16 @@ function psb_dnrm2(x, desc_a, info, jx, global) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & ndim, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
   logical             :: global_
-  real(psb_dpk_)      :: dnrm2, dd
   character(len = 20) :: name, ch_err
+  real(psb_dpk_)      :: dnrm2, dd
 
   name = 'psb_dnrm2'
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ 
     goto 9999
   end if
@@ -79,24 +77,18 @@ function psb_dnrm2(x, desc_a, info, jx, global) result(res)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
   ix = 1
-  if (present(jx)) then
-    ijx = jx
-  else
-    ijx = 1
-  endif
+  ijx = 1
+  if(present(jx)) ijx = jx
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   m = desc_a%get_global_rows()
   ldx = size(x, 1)
@@ -107,13 +99,13 @@ function psb_dnrm2(x, desc_a, info, jx, global) result(res)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res = dnrm2(int(ndim, kind = psb_mpk_), x(iix:, jjx), int(ione, kind = psb_mpk_))
 
@@ -121,14 +113,14 @@ function psb_dnrm2(x, desc_a, info, jx, global) result(res)
     do i = 1, size(desc_a%ovrlap_elem, 1)
       idx = desc_a%ovrlap_elem(i, 1)
       ndm = desc_a%ovrlap_elem(i, 2)
-      dd = real(ndm-1)/real(ndm)
+      dd = real(ndm-1) / real(ndm)
       res = res * sqrt(done - dd*(abs(x(idx, jjx))/res)**2)
     end do
   else
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -172,7 +164,7 @@ end function psb_dnrm2
 ! Function: psb_dnrm2
 !    Computes the norm2 of a distributed vector, 
 !
-!    norm2 : = sqrt ( X**C * X)
+!    norm2 := sqrt ( X**C * X)
 !
 ! Arguments:
 !    x(:)   -  real               The input vector containing the entries of X.
@@ -185,7 +177,6 @@ function psb_dnrm2v(x, desc_a, info, global) result(res)
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
-
   implicit none
   real(psb_dpk_), intent(in)      :: x(:)
   type(psb_desc_type), intent(in) :: desc_a
@@ -195,17 +186,16 @@ function psb_dnrm2v(x, desc_a, info, global) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & ndim, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
-  real(psb_dpk_)      :: dnrm2, dd
   logical             :: global_
   character(len = 20) :: name, ch_err
+  real(psb_dpk_)      :: dnrm2, dd
 
   name = 'psb_dnrm2v'
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
@@ -213,17 +203,14 @@ function psb_dnrm2v(x, desc_a, info, global) result(res)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -236,13 +223,13 @@ function psb_dnrm2v(x, desc_a, info, global) result(res)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res = dnrm2(int(ndim, kind = psb_mpk_), x, int(ione, kind = psb_mpk_))
 
@@ -257,7 +244,7 @@ function psb_dnrm2v(x, desc_a, info, global) result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -269,7 +256,7 @@ end function psb_dnrm2v
 ! Function: psb_dnrm2_vect
 !    Computes the norm2 of a distributed vector, 
 !
-!    norm2 : = sqrt ( X**C * X)
+!    norm2 := sqrt ( X**C * X)
 !
 ! Arguments:
 !    x      -  type(psb_d_vect_type) The input vector containing the entries of X.
@@ -283,7 +270,6 @@ function psb_dnrm2_vect(x, desc_a, info, global) result(res)
   use psb_error_mod
   use psb_penv_mod
   use psb_d_vect_mod
-
   implicit none
   type(psb_d_vect_type), intent(inout)  :: x
   type(psb_desc_type), intent(in)       :: desc_a
@@ -293,16 +279,15 @@ function psb_dnrm2_vect(x, desc_a, info, global) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & ndim, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
   logical             :: global_
-  real(psb_dpk_)      :: snrm2, dd
   character(len = 20) :: name, ch_err
+  real(psb_dpk_)      :: dnrm2, dd
 
   name = 'psb_dnrm2v'
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ 
     goto 9999
   end if
@@ -311,23 +296,20 @@ function psb_dnrm2_vect(x, desc_a, info, global) result(res)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -340,18 +322,18 @@ function psb_dnrm2_vect(x, desc_a, info, global) result(res)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res = x%nrm2(ndim)
     ! adjust because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem, 1)>0) then
-      if (x%is_dev()) call x%sync()
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
       do i = 1, size(desc_a%ovrlap_elem, 1)
         idx = desc_a%ovrlap_elem(i, 1)
         ndm = desc_a%ovrlap_elem(i, 2)
@@ -363,7 +345,7 @@ function psb_dnrm2_vect(x, desc_a, info, global) result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -378,7 +360,6 @@ function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
   use psb_error_mod
   use psb_penv_mod
   use psb_d_multivect_mod
-
   implicit none
   type(psb_d_multivect_type), intent(inout) :: x
   type(psb_desc_type), intent(in)           :: desc_a
@@ -388,18 +369,16 @@ function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & nr, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx,  nr, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
-  logical             :: global_
-  real(psb_dpk_)      :: snrm2, dd
-  character(len = 20) :: name, ch_err
-
   integer(psb_ipk_)   :: ovrlap_size
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_dpk_)      :: dnrm2, dd
 
   name = 'psb_dnrm2v'
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ 
     goto 9999
   end if
@@ -408,20 +387,20 @@ function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not. allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_mvect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
   global_ = .true.
-  if (present(global)) global_ = global
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -434,20 +413,20 @@ function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
   nr = desc_a%get_local_rows()
-  if (nr > 0) then
+  if(nr > 0) then
     res = x%nrm2(nr)
 
     ! adjust because overlapped elements are computed more than once
     ovrlap_size = size(desc_a%ovrlap_elem, 1)
-    if (ovrlap_size > 0) then
-      ! if (x%is_dev()) call x%sync()
+    if(ovrlap_size > 0) then
+      ! if(x%is_dev()) call x%sync()
 
       do i = 1, ovrlap_size
         idx = desc_a%ovrlap_elem(i, 1)
@@ -460,7 +439,7 @@ function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -475,7 +454,6 @@ function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
   use psb_error_mod
   use psb_penv_mod
   use psb_d_multivect_mod
-
   implicit none
   type(psb_d_multivect_type), intent(inout) :: x
   integer(psb_ipk_), intent(in)             :: idx_x
@@ -486,18 +464,16 @@ function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & nr, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, nr, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
-  logical             :: global_
-  real(psb_dpk_)      :: snrm2, dd
-  character(len = 20) :: name, ch_err
-
   integer(psb_ipk_)   :: ovrlap_size
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_dpk_)      :: dnrm2, dd
 
   name = 'psb_dnrm2v'
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ 
     goto 9999
   end if
@@ -506,20 +482,20 @@ function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not. allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_mvect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
   global_ = .true.
-  if (present(global)) global_ = global
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -532,20 +508,20 @@ function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
   nr = desc_a%get_local_rows()
-  if (nr > 0) then
+  if(nr > 0) then
     res = x%nrm2(nr, idx_x)
 
     ! adjust because overlapped elements are computed more than once
     ovrlap_size = size(desc_a%ovrlap_elem, 1)
-    if (ovrlap_size > 0) then
-      ! if (x%is_dev()) call x%sync()
+    if(ovrlap_size > 0) then
+      ! if(x%is_dev()) call x%sync()
 
       do i = 1, ovrlap_size
         idx = desc_a%ovrlap_elem(i, 1)
@@ -558,7 +534,7 @@ function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -571,7 +547,7 @@ end function psb_dnrm2_mvect_idxs
 ! Function: psb_dnrm2_weight_vect
 !    Computes the weighted norm2 of a distributed vector, 
 !
-!    norm2 : = sqrt ( (w.*X)**C * (w.*X))
+!    norm2 := sqrt ( (w.*X)**C * (w.*X))
 !
 ! Arguments:
 !    x      -  type(psb_d_vect_type) The input vector containing the entries of X.
@@ -586,7 +562,6 @@ function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
   use psb_error_mod
   use psb_penv_mod
   use psb_d_vect_mod
-
   implicit none
   type(psb_d_vect_type), intent(inout) :: x
   type(psb_d_vect_type), intent(inout) :: w
@@ -598,16 +573,15 @@ function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & ndim, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
   logical             :: global_
-  real(psb_dpk_)      :: snrm2, dd
+  real(psb_dpk_)      :: dnrm2, dd
   character(len = 20) :: name, ch_err
 
   name = 'psb_dnrm2v_weight'
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
@@ -616,23 +590,20 @@ function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -645,19 +616,19 @@ function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res = x%nrm2(ndim, w, aux)
 
     ! adjust because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem, 1)>0) then
-      if (x%is_dev()) call x%sync()
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
       do i = 1, size(desc_a%ovrlap_elem, 1)
         idx = desc_a%ovrlap_elem(i, 1)
         ndm = desc_a%ovrlap_elem(i, 2)
@@ -669,7 +640,7 @@ function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -682,7 +653,7 @@ end function psb_dnrm2_weight_vect
 !    Computes the weighted norm2 of a distributed vector with respect to a mask
 !    contained in the vector id.
 !
-!    norm2 : = sqrt ( (w(id > 0).*X(id > 0))**C * (w(id > 0).*X(id > 0)))
+!    norm2 := sqrt ( (w(id > 0).*X(id > 0))**C * (w(id > 0).*X(id > 0)))
 !
 ! Arguments:
 !    x      -  type(psb_d_vect_type) The input vector containing the entries of X.
@@ -698,7 +669,6 @@ function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(
   use psb_error_mod
   use psb_penv_mod
   use psb_d_vect_mod
-
   implicit none
   type(psb_d_vect_type), intent(inout)  :: x
   type(psb_d_vect_type), intent(inout)  :: w
@@ -711,16 +681,15 @@ function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & ndim, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
   logical             :: global_
-  real(psb_dpk_)      :: snrm2, dd
+  real(psb_dpk_)      :: dnrm2, dd
   character(len = 20) :: name, ch_err
 
   name = 'psb_dnrm2v_weightmask'
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
@@ -729,23 +698,20 @@ function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -758,19 +724,19 @@ function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
     res = x%nrm2(ndim, w, idv, info, aux)
 
     ! adjust because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem, 1)>0) then
-      if (x%is_dev()) call x%sync()
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
       do i = 1, size(desc_a%ovrlap_elem, 1)
         idx = desc_a%ovrlap_elem(i, 1)
         ndm = desc_a%ovrlap_elem(i, 2)
@@ -782,7 +748,7 @@ function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
@@ -826,7 +792,7 @@ end function psb_dnrm2_weightmask_vect
 ! Subroutine: psb_dnrm2vs
 !    Computes the norm2 of a distributed vector, subroutine version
 !
-!    norm2 : = sqrt ( X**C * X)
+!    norm2 := sqrt ( X**C * X)
 !
 ! Arguments:
 !    res    -  real                  The result.
@@ -840,7 +806,6 @@ subroutine psb_dnrm2vs(res, x, desc_a, info, global)
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
-
   implicit none
   real(psb_dpk_), intent(out)     :: res
   real(psb_dpk_), intent(in)      :: x(:)
@@ -850,17 +815,16 @@ subroutine psb_dnrm2vs(res, x, desc_a, info, global)
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, &
-                        & ndim, i, id, idx, ndm, ldx
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
   integer(psb_lpk_)   :: ix, jx, iy, ijy, m
   logical             :: global_
-  real(psb_dpk_)      :: nrm2, dnrm2, dd
   character(len = 20) :: name, ch_err
+  real(psb_dpk_)      :: dnrm2, dd
 
   name = 'psb_dnrm2'
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_
     goto 9999
   end if
@@ -868,17 +832,14 @@ subroutine psb_dnrm2vs(res, x, desc_a, info, global)
   ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
+  if(np == -1) then
     info = psb_err_context_error_
     call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
@@ -891,15 +852,15 @@ subroutine psb_dnrm2vs(res, x, desc_a, info, global)
     call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
+  if(iix /= 1) then
     info = psb_err_ix_n1_iy_n1_unsupported_
     call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res = dnrm2( int(ndim, kind = psb_mpk_), x, int(ione, kind = psb_mpk_) )
+    res = dnrm2(int(ndim, kind = psb_mpk_), x, int(ione, kind = psb_mpk_))
 
     ! adjust because overlapped elements are computed more than once
     do i = 1, size(desc_a%ovrlap_elem, 1)
@@ -912,7 +873,7 @@ subroutine psb_dnrm2vs(res, x, desc_a, info, global)
     res = dzero
   end if
 
-  if (global_) call psb_nrm2(ctxt, res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return

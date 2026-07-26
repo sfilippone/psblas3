@@ -2,7 +2,6 @@ subroutine psb_d_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, &
                             & base_type, alpha, beta, gamma, mvec_temp, farr_temp)
     use psb_base_mod
     use psb_prec_mod
-
     implicit none
     type(psb_dspmat_type), intent(in)           :: spmat
     class(psb_dprec_type), intent(inout)        :: prec
@@ -174,7 +173,6 @@ subroutine psb_d_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  &
     use psb_base_mod
     use psb_prec_mod
     implicit none
-
     type(psb_dspmat_type), intent(in)           :: spmat
     class(psb_dprec_type), intent(inout)        :: prec
     type(psb_d_vect_type), intent(inout)        :: vec_in

@@ -29,17 +29,17 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-subroutine psi_d_exscanv(n,x,info,shift)
-  use psb_serial_mod, psb_protect_name => psi_d_exscanv
+subroutine psi_d_exscanv(n, x, info, shift)
+  use psi_d_serial_mod, psb_protect_name => psi_d_exscanv
   use psb_const_mod
   use psb_error_mod
 #if defined(PSB_OPENMP)
   use omp_lib
 #endif
   implicit none
-  integer(psb_ipk_), intent(in)      :: n
-  real(psb_dpk_), intent(inout)    :: x(:)
-  integer(psb_ipk_), intent(out)     :: info
+  integer(psb_ipk_), intent(in)   :: n
+  real(psb_dpk_), intent(inout)   :: x(:)
+  integer(psb_ipk_), intent(out)  :: info
   real(psb_dpk_), intent(in), optional :: shift
   
   real(psb_dpk_) :: shift_, tp, ts
@@ -47,15 +47,13 @@ subroutine psi_d_exscanv(n,x,info,shift)
   logical is_nested, is_parallel
 
   info = psb_success_
-  if (present(shift)) then
-    shift_ = shift
-  else
-    shift_ = dzero
-  end if
+  
+  shift_ = dzero
+  if(present(shift)) shift_ = shift
     
 #if defined(PSB_OPENMP)
   is_parallel = omp_in_parallel()
-  if (is_parallel) then 
+  if(is_parallel) then 
     call inner_d_exscan()
   else
     !$OMP PARALLEL default(shared) 
@@ -64,7 +62,7 @@ subroutine psi_d_exscanv(n,x,info,shift)
   end if
 #else
   tp = shift_
-  do i=1,n
+  do i = 1, n
     ts = x(i)
     x(i) = tp
     tp = tp + ts
@@ -80,9 +78,9 @@ contains
     ! we need in this case. If it was an ALLOCATABLE, then it would be the contents
     ! that would get copied, and the SHARED effect would  no longer be there.
     ! Simple parallel version of EXSCAN
-    integer(psb_ipk_)  :: i,ithread,nthreads,idxstart,idxend,wrk
+    integer(psb_ipk_)       :: i, ithread, nthreads, idxstart, idxend, wrk
     real(psb_dpk_), pointer :: sumb(:)
-    real(psb_dpk_)   :: tp, ts
+    real(psb_dpk_)          :: tp, ts
 
     nthreads = omp_get_num_threads()
     ithread = omp_get_thread_num()
@@ -92,17 +90,17 @@ contains
     !$OMP END SINGLE COPYPRIVATE(sumb)
 
     wrk = (n)/nthreads
-    if (ithread < MOD((n),nthreads)) then
+    if(ithread < MOD((n), nthreads)) then
       wrk = wrk + 1
       idxstart = ithread*wrk + 1
     else
-      idxstart = ithread*wrk + MOD((n),nthreads) + 1
+      idxstart = ithread*wrk + MOD((n), nthreads) + 1
     end if
 
-    idxend = min(idxstart + wrk - 1,n )
+    idxend = min(idxstart + wrk - 1, n )
     tp = dzero
-    if (idxstart<=idxend) then
-      do i=idxstart,idxend
+    if(idxstart<=idxend) then
+      do i = idxstart, idxend
         ts = x(i)
         x(i) = tp 
         tp = tp + ts 
@@ -112,7 +110,7 @@ contains
     !$OMP BARRIER
     
     !$OMP SINGLE
-    do i=2,nthreads+1
+    do i = 2, nthreads+1
       sumb(i) = sumb(i) + sumb(i-1)
     end do
     !$OMP END SINGLE      
@@ -120,7 +118,7 @@ contains
     !$OMP BARRIER
 
     !$OMP DO SCHEDULE(STATIC)
-    do i=1,n
+    do i = 1, n
       x(i) = x(i) + sumb(ithread+1) + shift_ 
     end do
     !$OMP END DO
@@ -131,77 +129,77 @@ contains
 #endif
 end subroutine psi_d_exscanv
 
-subroutine psb_m_dgelp(trans,iperm,x,info)
+subroutine psb_m_dgelp(trans, iperm, x, info)
   use psb_serial_mod, psb_protect_name => psb_m_dgelp
   use psb_const_mod
   use psb_error_mod
   implicit none
-
-  real(psb_dpk_), intent(inout) :: x(:,:)
-  integer(psb_mpk_), intent(in)           :: iperm(:)
-  integer(psb_ipk_), intent(out)          :: info
-  character, intent(in)         :: trans
+  real(psb_dpk_), intent(inout)   :: x(:, :)
+  integer(psb_mpk_), intent(in)   :: iperm(:)
+  integer(psb_ipk_), intent(out)  :: info
+  character, intent(in)           :: trans
 
   ! local variables
-  real(psb_dpk_),allocatable :: temp(:)
-  integer(psb_ipk_) :: int_err(5), i1sz, i2sz, err_act,i,j
-  integer(psb_ipk_), allocatable          :: itemp(:)
-  real(psb_dpk_),parameter   :: one=1
+  real(psb_dpk_), allocatable     :: temp(:)
+  integer(psb_ipk_), allocatable  :: itemp(:)
+  integer(psb_ipk_)               :: int_err(5), i1sz, i2sz, err_act, i, j
+  real(psb_dpk_), parameter  :: one = 1
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20) :: name
   name = 'psb_dgelp'
 
   if(psb_get_errstatus() /= 0) return 
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  i1sz    = size(x,dim=1)
-  i2sz    = size(x,dim=2)
+  i1sz = size(x, dim=1)
+  i2sz = size(x, dim=2)
 
-  if (debug_level >= psb_debug_serial_)&
-       & write(debug_unit,*)  trim(name),': size',i1sz,i2sz
+  if(debug_level >= psb_debug_serial_) write(debug_unit, *) trim(name), ': size', i1sz, i2sz
 
-  allocate(temp(i1sz),itemp(size(iperm)),stat=info)
-  if (info /= psb_success_) then
-    info=2040
-    call psb_errpush(info,name)
+  allocate(temp(i1sz), itemp(size(iperm)), stat=info)
+  if(info /= psb_success_) then
+    info = 2040
+    call psb_errpush(info, name)
     goto 9999
   end if
   itemp(:) = iperm(:) 
 
-  if (.not.psb_isaperm(i1sz,itemp)) then
-    info=psb_err_iarg_invalid_value_
+  if(.not. psb_isaperm(i1sz, itemp)) then
+    info = psb_err_iarg_invalid_value_
     int_err(1) = 1      
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info, name, i_err = int_err)
     goto 9999
   endif
-  select case( psb_toupper(trans))
-  case('N') 
-    do j=1,i2sz
-      do i=1,i1sz
-        temp(i) = x(itemp(i),j)
+  select case(psb_toupper(trans))
+    case('N') 
+      do j = 1, i2sz
+        do i = 1, i1sz
+          temp(i) = x(itemp(i), j)
+        end do
+        do i = 1, i1sz
+          x(i, j) = temp(i) 
+        end do
       end do
-      do i=1,i1sz
-        x(i,j) = temp(i) 
+
+    case('T')
+      do j = 1, i2sz
+        do i = 1, i1sz
+          temp(itemp(i)) = x(i, j)
+        end do
+        do i = 1, i1sz
+          x(i, j) = temp(i) 
+        end do
       end do
-    end do
-  case('T')
-    do j=1,i2sz
-      do i=1,i1sz
-        temp(itemp(i)) = x(i,j)
-      end do
-      do i=1,i1sz
-        x(i,j) = temp(i) 
-      end do
-    end do
-  case default
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='dgelp')
+
+    case default
+      info = psb_err_from_subroutine_
+      call psb_errpush(info, name, a_err='dgelp')
   end select
 
-  deallocate(temp,itemp)
+  deallocate(temp, itemp)
 
   call psb_erractionrestore(err_act)
   return
@@ -210,8 +208,6 @@ subroutine psb_m_dgelp(trans,iperm,x,info)
   return
 end subroutine psb_m_dgelp
 
-
-
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
@@ -253,72 +249,74 @@ end subroutine psb_m_dgelp
 ! iperm    - integer.
 ! x        - real, dimension(:).
 ! info     - integer.                 Return code.
-subroutine psb_m_dgelpv(trans,iperm,x,info)
+subroutine psb_m_dgelpv(trans, iperm, x, info)
   use psb_serial_mod, psb_protect_name => psb_m_dgelpv
   use psb_const_mod
   use psb_error_mod
   implicit none
+  !Arguments
+  character, intent(in)           :: trans
+  integer(psb_mpk_), intent(in)   :: iperm(:)
+  real(psb_dpk_), intent(inout)   :: x(:)
+  integer(psb_ipk_), intent(out)  :: info
 
-  real(psb_dpk_), intent(inout) :: x(:)
-  integer(psb_mpk_), intent(in)           :: iperm(:)
-  integer(psb_ipk_), intent(out)          :: info
-  character, intent(in)         :: trans
-
-  ! local variables
-  integer(psb_ipk_) :: int_err(5), i1sz, err_act, i
-  real(psb_dpk_),allocatable :: temp(:)
-  integer(psb_ipk_), allocatable          :: itemp(:)
-  real(psb_dpk_),parameter   :: one=1
+  !Local variables
+  real(psb_dpk_), allocatable    :: temp(:)
+  integer(psb_ipk_), allocatable  :: itemp(:)
+  integer(psb_ipk_)           :: int_err(5), i1sz, err_act, i
+  real(psb_dpk_), parameter  :: one = 1
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20) :: name
   name = 'psb_dgelpv'
 
   if(psb_get_errstatus() /= 0) return 
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  i1sz = min(size(x),size(iperm))
+  i1sz = min(size(x), size(iperm))
 
-  if (debug_level >= psb_debug_serial_)&
-       & write(debug_unit,*)  trim(name),': size',i1sz
-  allocate(temp(i1sz),itemp(size(iperm)),stat=info)
-  if (info /= psb_success_) then
-    info=2040
-    call psb_errpush(info,name)
+  if(debug_level >= psb_debug_serial_) write(debug_unit, *)  trim(name), ': size', i1sz
+
+  allocate(temp(i1sz), itemp(size(iperm)), stat=info)
+  if(info /= psb_success_) then
+    info = 2040
+    call psb_errpush(info, name)
     goto 9999
   end if
   itemp(:) = iperm(:) 
 
-  if (.not.psb_isaperm(i1sz,itemp)) then
-    info=psb_err_iarg_invalid_value_
+  if(.not. psb_isaperm(i1sz, itemp)) then
+    info = psb_err_iarg_invalid_value_
     int_err(1) = 1      
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info, name, i_err = int_err)
     goto 9999
   endif
 
-  select case( psb_toupper(trans))
-  case('N') 
-    do i=1,i1sz
-      temp(i) = x(itemp(i))
-    end do
-    do i=1,i1sz
-      x(i) = temp(i) 
-    end do
-  case('T')
-    do i=1,i1sz
-      temp(itemp(i)) = x(i)
-    end do
-    do i=1,i1sz
-      x(i) = temp(i) 
-    end do
-  case default
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='dgelp')
+  select case(psb_toupper(trans))
+    case('N') 
+      do i = 1, i1sz
+        temp(i) = x(itemp(i))
+      end do
+      do i = 1, i1sz
+        x(i) = temp(i) 
+      end do
+
+    case('T')
+      do i = 1, i1sz
+        temp(itemp(i)) = x(i)
+      end do
+      do i = 1, i1sz
+        x(i) = temp(i) 
+      end do
+
+    case default
+      info = psb_err_from_subroutine_
+      call psb_errpush(info, name, a_err='dgelp')
   end select
 
-  deallocate(temp,itemp)
+  deallocate(temp, itemp)
 
   call psb_erractionrestore(err_act)
   return
@@ -327,78 +325,78 @@ subroutine psb_m_dgelpv(trans,iperm,x,info)
   return
 end subroutine psb_m_dgelpv
 
-subroutine psb_e_dgelp(trans,iperm,x,info)
+subroutine psb_e_dgelp(trans, iperm, x, info)
   use psb_serial_mod, psb_protect_name => psb_e_dgelp
   use psb_const_mod
   use psb_error_mod
   implicit none
-
-  real(psb_dpk_), intent(inout) :: x(:,:)
-  integer(psb_epk_), intent(in)           :: iperm(:)
-  integer(psb_ipk_), intent(out)          :: info
-  character, intent(in)         :: trans
+  character, intent(in)           :: trans
+  integer(psb_epk_), intent(in)   :: iperm(:)
+  real(psb_dpk_), intent(inout)   :: x(:, :)
+  integer(psb_ipk_), intent(out)  :: info
 
   ! local variables
-  real(psb_dpk_),allocatable :: temp(:)
-  integer(psb_ipk_) :: int_err(5), err_act
-  integer(psb_epk_) :: i1sz, i2sz, i, j
-  integer(psb_epk_), allocatable          :: itemp(:)
-  real(psb_dpk_),parameter   :: one=1
+  real(psb_dpk_), allocatable     :: temp(:)
+  integer(psb_epk_), allocatable  :: itemp(:)
+  integer(psb_ipk_)           :: int_err(5), err_act
+  integer(psb_epk_)           :: i1sz, i2sz, i, j
+  real(psb_dpk_), parameter  :: one = 1
   integer(psb_ipk_) :: debug_level, debug_unit
-  character(len=20)   :: name
+  character(len=20) :: name
   name = 'psb_dgelp'
 
   if(psb_get_errstatus() /= 0) return 
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  i1sz    = size(x,dim=1)
-  i2sz    = size(x,dim=2)
+  i1sz = size(x, dim=1)
+  i2sz = size(x, dim=2)
 
-  if (debug_level >= psb_debug_serial_)&
-       & write(debug_unit,*)  trim(name),': size',i1sz,i2sz
+  if(debug_level >= psb_debug_serial_) write(debug_unit, *)  trim(name), ': size', i1sz, i2sz
 
-  allocate(temp(i1sz),itemp(size(iperm)),stat=info)
-  if (info /= psb_success_) then
-    info=2040
-    call psb_errpush(info,name)
+  allocate(temp(i1sz), itemp(size(iperm)), stat=info)
+  if(info /= psb_success_) then
+    info = 2040
+    call psb_errpush(info, name)
     goto 9999
   end if
   itemp(:) = iperm(:) 
 
-  if (.not.psb_isaperm(i1sz,itemp)) then
-    info=psb_err_iarg_invalid_value_
+  if(.not. psb_isaperm(i1sz, itemp)) then
+    info = psb_err_iarg_invalid_value_
     int_err(1) = 1      
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info, name, i_err = int_err)
     goto 9999
   endif
-  select case( psb_toupper(trans))
-  case('N') 
-    do j=1,i2sz
-      do i=1,i1sz
-        temp(i) = x(itemp(i),j)
+  select case(psb_toupper(trans))
+    case('N') 
+      do j = 1, i2sz
+        do i = 1, i1sz
+          temp(i) = x(itemp(i), j)
+        end do
+        do i = 1, i1sz
+          x(i, j) = temp(i) 
+        end do
       end do
-      do i=1,i1sz
-        x(i,j) = temp(i) 
+
+    case('T')
+      do j = 1, i2sz
+        do i = 1, i1sz
+          temp(itemp(i)) = x(i, j)
+        end do
+        do i = 1, i1sz
+          x(i, j) = temp(i) 
+        end do
       end do
-    end do
-  case('T')
-    do j=1,i2sz
-      do i=1,i1sz
-        temp(itemp(i)) = x(i,j)
-      end do
-      do i=1,i1sz
-        x(i,j) = temp(i) 
-      end do
-    end do
-  case default
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='dgelp')
+
+    case default
+      info = psb_err_from_subroutine_
+      call psb_errpush(info, name, a_err='dgelp')
   end select
 
-  deallocate(temp,itemp)
+  deallocate(temp, itemp)
 
   call psb_erractionrestore(err_act)
   return
@@ -406,8 +404,6 @@ subroutine psb_e_dgelp(trans,iperm,x,info)
 9999 call psb_error_handler(err_act)
   return
 end subroutine psb_e_dgelp
-
-
 
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
@@ -450,72 +446,73 @@ end subroutine psb_e_dgelp
 ! iperm    - integer.
 ! x        - real, dimension(:).
 ! info     - integer.                 Return code.
-subroutine psb_e_dgelpv(trans,iperm,x,info)
+subroutine psb_e_dgelpv(trans, iperm, x, info)
   use psb_serial_mod, psb_protect_name => psb_e_dgelpv
   use psb_const_mod
   use psb_error_mod
   implicit none
-
-  real(psb_dpk_), intent(inout) :: x(:)
-  integer(psb_epk_), intent(in)           :: iperm(:)
-  integer(psb_ipk_), intent(out)          :: info
-  character, intent(in)         :: trans
+  character, intent(in)           :: trans
+  integer(psb_epk_), intent(in)   :: iperm(:)
+  real(psb_dpk_), intent(inout)   :: x(:)
+  integer(psb_ipk_), intent(out)  :: info
 
   ! local variables
-  integer(psb_ipk_) :: int_err(5), err_act
-  real(psb_dpk_),allocatable :: temp(:)
+  real(psb_dpk_), allocatable    :: temp(:)
+  integer(psb_epk_), allocatable  :: itemp(:)
   integer(psb_epk_) :: i1sz, i
-  integer(psb_epk_), allocatable          :: itemp(:)
+  integer(psb_ipk_) :: int_err(5), err_act
   integer(psb_ipk_) :: debug_level, debug_unit
   character(len=20) :: name
 
   name = 'psb_dgelp'
   if(psb_get_errstatus() /= 0) return 
-  info=psb_success_
+  info = psb_success_
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
 
-  i1sz = min(size(x),size(iperm))
+  i1sz = min(size(x), size(iperm))
 
-  if (debug_level >= psb_debug_serial_)&
-       & write(debug_unit,*)  trim(name),': size',i1sz
-  allocate(temp(i1sz),itemp(size(iperm)),stat=info)
-  if (info /= psb_success_) then
-    info=2040
-    call psb_errpush(info,name)
+  if(debug_level >= psb_debug_serial_) write(debug_unit, *)  trim(name), ': size', i1sz
+
+  allocate(temp(i1sz), itemp(size(iperm)), stat=info)
+  if(info /= psb_success_) then
+    info = 2040
+    call psb_errpush(info, name)
     goto 9999
   end if
   itemp(:) = iperm(:) 
 
-  if (.not.psb_isaperm(i1sz,itemp)) then
-    info=psb_err_iarg_invalid_value_
+  if(.not. psb_isaperm(i1sz, itemp)) then
+    info = psb_err_iarg_invalid_value_
     int_err(1) = 1      
-    call psb_errpush(info,name,i_err=int_err)
+    call psb_errpush(info, name, i_err = int_err)
     goto 9999
   endif
 
-  select case( psb_toupper(trans))
-  case('N') 
-    do i=1,i1sz
-      temp(i) = x(itemp(i))
-    end do
-    do i=1,i1sz
-      x(i) = temp(i) 
-    end do
-  case('T')
-    do i=1,i1sz
-      temp(itemp(i)) = x(i)
-    end do
-    do i=1,i1sz
-      x(i) = temp(i) 
-    end do
-  case default
-    info=psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err='dgelp')
+  select case(psb_toupper(trans))
+    case('N') 
+      do i = 1, i1sz
+        temp(i) = x(itemp(i))
+      end do
+      do i = 1, i1sz
+        x(i) = temp(i) 
+      end do
+
+    case('T')
+      do i = 1, i1sz
+        temp(itemp(i)) = x(i)
+      end do
+      do i = 1, i1sz
+        x(i) = temp(i) 
+      end do
+
+    case default
+      info = psb_err_from_subroutine_
+      call psb_errpush(info, name, a_err='dgelp')
   end select
 
-  deallocate(temp,itemp)
+  deallocate(temp, itemp)
 
   call psb_erractionrestore(err_act)
   return
@@ -524,14 +521,13 @@ subroutine psb_e_dgelpv(trans,iperm,x,info)
   return
 end subroutine psb_e_dgelpv
 
-
 subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
   integer(psb_ipk_), intent(in)   :: m, n
-  real(psb_dpk_), intent(in)      :: x(:,:)
-  real(psb_dpk_), intent(inout)   :: y(:,:)
+  real(psb_dpk_), intent(in)      :: x(:, :)
+  real(psb_dpk_), intent(inout)   :: y(:, :)
   real(psb_dpk_), intent(in)      :: alpha, beta
   integer(psb_ipk_), intent(out)  :: info
   integer(psb_ipk_) :: err_act
@@ -539,41 +535,43 @@ subroutine psi_daxpby(m, n, alpha, x, beta, y, info)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
-  name='psb_geaxpby'
-  info=psb_success_
+  name = 'psb_geaxpby'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  end if
-  lx = size(x,1)
-  ly = size(y,1)
-  if (lx < m) then
-    info = psb_err_input_asize_small_i_
-    ierr(1) = 4; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
-    goto 9999
-  end if
-  if (ly < m) then
-    info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if ((m>0).and.(n>0)) call daxpby(m, n, alpha, x, lx, beta, y, ly, info)
+  lx = size(x, 1)
+  ly = size(y, 1)
+  if(lx < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 4; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+  if(ly < m) then
+    info = psb_err_input_asize_small_i_
+    ierr(1) = 6; ierr(2) = m
+    call psb_errpush(info, name, i_err = ierr)
+    goto 9999
+  end if
+
+  if((m > 0) .and. (n > 0)) call daxpby(m, n, alpha, x, lx, beta, y, ly, info)
 
   call psb_erractionrestore(err_act)
   return
@@ -606,14 +604,14 @@ subroutine psi_daxpby2(m, n, alpha, x, beta, y, z, info)
     goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -624,30 +622,28 @@ subroutine psi_daxpby2(m, n, alpha, x, beta, y, z, info)
   ly = size(y, 1)
   lz = size(z, 1)
 
-  if (lx < m) then
+  if(lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (ly < m) then
+  if(ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (lz < m) then
+  if(lz < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if ((m>0).and.(n>0)) then
-    call daxpbyv2(m, n, alpha, x, lx, beta, y, ly, z, lz, info)
-  endif
+  if((m > 0) .and. (n > 0)) call daxpbyv2(m, n, alpha, x, lx, beta, y, ly, z, lz, info)
 
   call psb_erractionrestore(err_act)
   return
@@ -680,14 +676,14 @@ subroutine psi_daxpby3(m, n, alpha, x, beta, y, gamma, z, info)
     goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -698,30 +694,28 @@ subroutine psi_daxpby3(m, n, alpha, x, beta, y, gamma, z, info)
   ly = size(y, 1)
   lz = size(z, 1)
 
-  if (lx < m) then
+  if(lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (ly < m) then
+  if(ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (lz < m) then
+  if(lz < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if ((m>0).and.(n>0)) then
-    call daxpbyv3(m, n, alpha, x, lx, beta, y, ly, gamma, z, lz, info)
-  endif
+  if((m > 0) .and. (n > 0)) call daxpbyv3(m, n, alpha, x, lx, beta, y, ly, gamma, z, lz, info)
 
   call psb_erractionrestore(err_act)
   return
@@ -745,134 +739,132 @@ subroutine psi_daxpbyv(m, alpha, x, beta, y, info)
   integer(psb_ipk_) :: i
   character(len=20) :: name, ch_err
 
-  name='psb_geaxpby'
-  info=psb_success_
+  name = 'psb_geaxpby'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  lx = size(x,1)
-  ly = size(y,1)
-  if (lx < m) then
+  lx = size(x, 1)
+  ly = size(y, 1)
+  if(lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 3; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (ly < m) then
+  if(ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 5; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  !  if (m>0) call daxpby(m,ione,alpha,x,lx,beta,y,ly,info)
+  ! if(m>0) call daxpby(m, ione, alpha, x, lx, beta, y, ly, info)
 
-  if (alpha.eq.dzero) then
-    if (beta.eq.dzero) then
+  if(alpha.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = dzero
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !
       !        Do nothing!
       !
 
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) =  beta*y(i)
       enddo
     endif
 
-  else if (alpha.eq.done) then
+  else if(alpha.eq.done) then
 
-    if (beta.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = x(i)
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = x(i) + y(i)
       enddo
 
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = x(i) - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = x(i) + beta*y(i)
       enddo
     endif
 
-  else if (alpha.eq.-done) then
+  else if(alpha.eq.-done) then
 
-    if (beta.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = -x(i)
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = -x(i) + y(i)
       enddo
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = -x(i) - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = -x(i) + beta*y(i)
       enddo
     endif
 
   else
 
-    if (beta.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = alpha*x(i)
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = alpha*x(i) + y(i)
       enddo
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = alpha*x(i) - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         y(i) = alpha*x(i) + beta*y(i)
       enddo
     endif
-
   endif
-
 
   call psb_erractionrestore(err_act)
   return
@@ -896,139 +888,138 @@ subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
   integer(psb_ipk_) :: ierr(5)
   character(len=20)        :: name, ch_err
 
-  name='psb_geaxpby'
-  info=psb_success_
+  name = 'psb_geaxpby'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  lx = size(x,1)
-  ly = size(y,1)
-  lz = size(z,1)
-  if (lx < m) then
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+  if(lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 3; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (ly < m) then
+  if(ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 5; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (lz < m) then
+  if(lz < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 5; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (alpha.eq.dzero) then
-    if (beta.eq.dzero) then
+  if(alpha.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = dzero
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !
       !        Do nothing!
       !
 
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) =  beta*y(i)
       enddo
     endif
 
-  else if (alpha.eq.done) then
+  else if(alpha.eq.done) then
 
-    if (beta.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = x(i)
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = x(i) + y(i)
       enddo
 
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
           Z(i) = x(i) - y(i)
         enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = x(i) + beta*y(i)
       enddo
     endif
 
-  else if (alpha.eq.-done) then
+  else if(alpha.eq.-done) then
 
-    if (beta.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = -x(i)
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = -x(i) + y(i)
       enddo
 
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = -x(i) - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = -x(i) + beta*y(i)
       enddo
     endif
 
   else
 
-    if (beta.eq.dzero) then
+    if(beta.eq.dzero) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = alpha*x(i)
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = alpha*x(i) + y(i)
       enddo
 
-    else if (beta.eq.-done) then
+    else if(beta.eq.-done) then
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
         Z(i) = alpha*x(i) - y(i)
       enddo
     else
       !$omp parallel do private(i)
-      do i=1,m
+      do i = 1, m
           Z(i) = alpha*x(i) + beta*y(i)
       enddo
     endif
-
   endif
 
   call psb_erractionrestore(err_act)
@@ -1039,6 +1030,7 @@ subroutine psi_daxpbyv2(m, alpha, x, beta, y, z, info)
 end subroutine psi_daxpbyv2
 
 subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
+  use psi_d_serial_mod, psb_protect_name => psi_daxpbyv3
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -1053,38 +1045,38 @@ subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
   integer(psb_ipk_) :: ierr(5)
   character(len=20) :: name, ch_err
 
-  name='psb_geaxpby'
-  info=psb_success_
+  name = 'psb_geaxpby'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  lx = size(x,1)
-  ly = size(y,1)
-  lz = size(z,1)
-  if (lx < m) then
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+  if(lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 3; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (ly < m) then
+  if(ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 5; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (lz < m) then
+  if(lz < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 5; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
@@ -1423,6 +1415,7 @@ subroutine psi_daxpbyv3(m, alpha, x, beta, y, gamma, z, info)
 end subroutine psi_daxpbyv3
 
 subroutine psi_daxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
+  use psi_d_serial_mod, psb_protect_name => psi_daxpbyv3_out
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -1441,42 +1434,42 @@ subroutine psi_daxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
   name = 'psb_geaxpby'
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  lx = size(x,1)
-  ly = size(y,1)
-  lz = size(z,1)
-  lw = size(w,1)
-  if (lx < m) then
+  lx = size(x, 1)
+  ly = size(y, 1)
+  lz = size(z, 1)
+  lw = size(w, 1)
+  if(lx < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 3; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (ly < m) then
+  if(ly < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 5; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (lz < m) then
+  if(lz < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 7; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if (lw < m) then
+  if(lw < m) then
     info = psb_err_input_asize_small_i_
     ierr(1) = 8; ierr(2) = m
-    call psb_errpush(info,name,i_err=ierr)
+    call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
@@ -1843,6 +1836,7 @@ subroutine psi_daxpbymvc(m, n, alpha, x, beta, y, info)
 end subroutine psi_daxpbymvc
 
 subroutine psi_dmlt(m, n, alpha, x, y, beta, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmlt
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -1854,23 +1848,23 @@ subroutine psi_dmlt(m, n, alpha, x, y, beta, info)
 
   integer(psb_ipk_) :: lx, ly, i, j, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -1997,7 +1991,7 @@ subroutine psi_dmlt(m, n, alpha, x, y, beta, info)
             y(i, j) = -y(i, j)
         end do
       end do
-    case(15) ! (alpha, beta,) = (-1, -1)
+    case(15) ! (alpha, beta) = (-1, -1)
       do j = 1, n
         !$omp parallel do private(i)
         do i = 1, m
@@ -2014,6 +2008,7 @@ subroutine psi_dmlt(m, n, alpha, x, y, beta, info)
 end subroutine psi_dmlt 
 
 subroutine psi_dmlt2(m, n, alpha, x, y, beta, z, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmlt2
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2026,23 +2021,23 @@ subroutine psi_dmlt2(m, n, alpha, x, y, beta, z, info)
 
   integer(psb_ipk_) :: lx, ly, lz, i, j, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -2194,6 +2189,7 @@ subroutine psi_dmlt2(m, n, alpha, x, y, beta, z, info)
 end subroutine psi_dmlt2 
 
 subroutine psi_dmltv(m, alpha, x, y, beta, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmltv
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2205,16 +2201,16 @@ subroutine psi_dmltv(m, alpha, x, y, beta, info)
 
   integer(psb_ipk_) :: lx, ly, i, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
@@ -2328,6 +2324,7 @@ subroutine psi_dmltv(m, alpha, x, y, beta, info)
 end subroutine psi_dmltv 
 
 subroutine psi_dmltv2(m, alpha, x, y, beta, z, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmltv2
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2340,16 +2337,16 @@ subroutine psi_dmltv2(m, alpha, x, y, beta, z, info)
 
   integer(psb_ipk_) :: lx, ly, lz, i, j, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
   
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
@@ -2471,6 +2468,7 @@ subroutine psi_dmltv2(m, alpha, x, y, beta, z, info)
 end subroutine psi_dmltv2
 
 subroutine psi_dmltx(m, n, alpha, x, y, beta, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmltx
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2482,23 +2480,23 @@ subroutine psi_dmltx(m, n, alpha, x, y, beta, info)
 
   integer(psb_ipk_) :: lx, ly, i, j, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -2625,7 +2623,7 @@ subroutine psi_dmltx(m, n, alpha, x, y, beta, info)
             y(i, j) = -y(i, j)
         end do
       end do
-    case(15) ! (alpha, beta,) = (-1, -1)
+    case(15) ! (alpha, beta) = (-1, -1)
       do j = 1, n
         !$omp parallel do private(i)
         do i = 1, m
@@ -2642,6 +2640,7 @@ subroutine psi_dmltx(m, n, alpha, x, y, beta, info)
 end subroutine psi_dmltx
 
 subroutine psi_dmltx2(m, n, alpha, x, y, beta, z, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmltx2
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2654,23 +2653,23 @@ subroutine psi_dmltx2(m, n, alpha, x, y, beta, z, info)
 
   integer(psb_ipk_) :: lx, ly, lz, i, j, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -2822,6 +2821,7 @@ subroutine psi_dmltx2(m, n, alpha, x, y, beta, z, info)
 end subroutine psi_dmltx2
 
 subroutine psi_dmlte2(m, n, alpha, x, y, beta, z, info)
+  use psi_d_serial_mod, psb_protect_name => psi_dmlte2
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -2834,23 +2834,23 @@ subroutine psi_dmlte2(m, n, alpha, x, y, beta, z, info)
 
   integer(psb_ipk_) :: lx, ly, lz, i, j, code
   integer(psb_ipk_) :: ierr(5), err_act
-  character  name*20
+  character name*20
   name = 'dmlt'
 
   info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
+  if(psb_errstatus_fatal()) then
     info = psb_err_internal_error_ ;    goto 9999
   end if
 
-  if (m < 0) then
+  if(m < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 1; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
 
-  if (n < 0) then
+  if(n < 0) then
     info = psb_err_iarg_neg_
     ierr(1) = 2; ierr(2) = n
     call psb_errpush(info, name, i_err = ierr)
@@ -3001,279 +3001,258 @@ subroutine psi_dmlte2(m, n, alpha, x, y, beta, z, info)
   return
 end subroutine psi_dmlte2 
 
-
-subroutine psi_dgthmv(n,k,idx,alpha,x,beta,y)
+subroutine psi_dgthmv(n, k, idx, alpha, x, beta, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n, k
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: x(:,:), y(:),alpha,beta
+  real(psb_dpk_)    :: alpha, x(:, :), beta, y(:)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  if (beta == dzero) then
-    if (alpha == dzero) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
+  if(beta == dzero) then
+    if(alpha == dzero) then
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
           y(pt) = dzero
         end do
       end do
-    else if (alpha == done) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(pt) = x(idx(i),j)
+    else if(alpha == done) then
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
+          y(pt) = x(idx(i), j)
         end do
       end do
-    else if (alpha == -done) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(pt) = -x(idx(i),j)
+    else if(alpha == -done) then
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
+          y(pt) = -x(idx(i), j)
         end do
       end do
     else
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(pt) = alpha*x(idx(i),j)
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
+          y(pt) = alpha*x(idx(i), j)
         end do
       end do
     end if
   else
-    if (beta == done) then
+    if(beta == done) then
       ! Do nothing
-    else if (beta == -done) then
+    else if(beta == -done) then
       y(1:n*k) = -y(1:n*k)
     else
       y(1:n*k) = beta*y(1:n*k)
     end if
 
-    if (alpha == dzero) then
+    if(alpha == dzero) then
       ! do nothing
-    else if (alpha == done) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(pt) = y(pt) + x(idx(i),j)
+    else if(alpha == done) then
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
+          y(pt) = y(pt) + x(idx(i), j)
         end do
       end do
-    else if (alpha == -done) then
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(pt) = y(pt) - x(idx(i),j)
+    else if(alpha == -done) then
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
+          y(pt) = y(pt) - x(idx(i), j)
         end do
       end do
     else
-      pt=0
-      do j=1,k
-        do i=1,n
-          pt=pt+1
-          y(pt) = y(pt) + alpha*x(idx(i),j)
+      pt = 0
+      do j = 1, k
+        do i = 1, n
+          pt = pt + 1 
+          y(pt) = y(pt) + alpha*x(idx(i), j)
         end do
       end do
     end if
   end if
-
 end subroutine psi_dgthmv
 
-subroutine psi_dgthv(n,idx,alpha,x,beta,y)
-
+subroutine psi_dgthv(n, idx, alpha, x, beta, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: x(:), y(:),alpha,beta
+  real(psb_dpk_)    :: alpha, x(:), beta, y(:)
 
   ! Locals
   integer(psb_ipk_) :: i
-  if (beta == dzero) then
-    if (alpha == dzero) then
-      do i=1,n
+
+  if(beta == dzero) then
+    if(alpha == dzero) then
+      do i = 1, n
         y(i) = dzero
       end do
-    else if (alpha == done) then
-      do i=1,n
+    else if(alpha == done) then
+      do i = 1, n
         y(i) = x(idx(i))
       end do
-    else if (alpha == -done) then
-      do i=1,n
+    else if(alpha == -done) then
+      do i = 1, n
         y(i) = -x(idx(i))
       end do
     else
-      do i=1,n
+      do i = 1, n
         y(i) = alpha*x(idx(i))
       end do
     end if
   else
-    if (beta == done) then
+    if(beta == done) then
       ! Do nothing
-    else if (beta == -done) then
+    else if(beta == -done) then
       y(1:n) = -y(1:n)
     else
       y(1:n) = beta*y(1:n)
     end if
 
-    if (alpha == dzero) then
+    if(alpha == dzero) then
       ! do nothing
-    else if (alpha == done) then
-      do i=1,n
+    else if(alpha == done) then
+      do i = 1, n
         y(i) = y(i) + x(idx(i))
       end do
-    else if (alpha == -done) then
-      do i=1,n
+    else if(alpha == -done) then
+      do i = 1, n
         y(i) = y(i) - x(idx(i))
       end do
     else
-      do i=1,n
+      do i = 1, n
         y(i) = y(i) + alpha*x(idx(i))
       end do
     end if
   end if
-
 end subroutine psi_dgthv
 
-subroutine psi_dgthzmm(n,k,idx,x,y)
-
+subroutine psi_dgthzmm(n, k, idx, x, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n, k
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: x(:,:), y(:,:)
+  real(psb_dpk_)    :: x(:, :), y(:, :)
 
   ! Locals
   integer(psb_ipk_) :: i
 
-
-  do i=1,n
-    y(i,1:k)=x(idx(i),1:k)
+  do i = 1, n
+    y(i, 1:k) = x(idx(i), 1:k)
   end do
-
 end subroutine psi_dgthzmm
 
-subroutine psi_dgthzmv(n,k,idx,x,y)
-
+subroutine psi_dgthzmv(n, k, idx, x, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n, k
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: x(:,:), y(:)
+  real(psb_dpk_)    :: x(:, :), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  pt=0
-  do j=1,k
-    do i=1,n
-      pt=pt+1
-      y(pt)=x(idx(i),j)
+  pt = 0
+  do j = 1, k
+    do i = 1, n
+      pt = pt + 1 
+      y(pt) = x(idx(i), j)
     end do
   end do
-
 end subroutine psi_dgthzmv
 
-subroutine psi_dgthzv(n,idx,x,y)
-
+subroutine psi_dgthzv(n, idx, x, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: x(:), y(:)
+  real(psb_dpk_)    :: x(:), y(:)
 
   ! Locals
   integer(psb_ipk_) :: i
 
-  do i=1,n
-    y(i)=x(idx(i))
+  do i = 1, n
+    y(i) = x(idx(i))
   end do
-
 end subroutine psi_dgthzv
 
-subroutine psi_dsctmm(n,k,idx,x,beta,y)
-
+subroutine psi_dsctmm(n, k, idx, x, beta, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n, k
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: beta, x(:,:), y(:,:)
+  real(psb_dpk_)    :: x(:, :), beta, y(:, :)
 
   ! Locals
   integer(psb_ipk_) :: i, j
 
-  if (beta == dzero) then
-    do i=1,n
-      y(idx(i),1:k) = x(i,1:k)
+  if(beta == dzero) then
+    do i = 1, n
+      y(idx(i), 1:k) = x(i, 1:k)
     end do
-  else if (beta == done) then
-    do i=1,n
-      y(idx(i),1:k) = y(idx(i),1:k)+x(i,1:k)
+  else if(beta == done) then
+    do i = 1, n
+      y(idx(i), 1:k) = y(idx(i), 1:k)+x(i, 1:k)
     end do
   else
-    do i=1,n
-      y(idx(i),1:k) = beta*y(idx(i),1:k)+x(i,1:k)
+    do i = 1, n
+      y(idx(i), 1:k) = beta*y(idx(i), 1:k)+x(i, 1:k)
     end do
   end if
 end subroutine psi_dsctmm
 
-subroutine psi_dsctmv(n,k,idx,x,beta,y)
-
+subroutine psi_dsctmv(n, k, idx, x, beta, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n, k
   integer(psb_ipk_) :: idx(:)
-  real(psb_dpk_) :: beta, x(:), y(:,:)
+  real(psb_dpk_)    :: x(:), beta, y(:, :)
 
   ! Locals
   integer(psb_ipk_) :: i, j, pt
 
-  if (beta == dzero) then
-    pt=0
-    do j=1,k
-      do i=1,n
-        pt=pt+1
-        y(idx(i),j) = x(pt)
+  if(beta == dzero) then
+    pt = 0
+    do j = 1, k
+      do i = 1, n
+        pt = pt + 1 
+        y(idx(i), j) = x(pt)
       end do
     end do
-  else if (beta == done) then
-    pt=0
-    do j=1,k
-      do i=1,n
-        pt=pt+1
-        y(idx(i),j) = y(idx(i),j)+x(pt)
+  else if(beta == done) then
+    pt = 0
+    do j = 1, k
+      do i = 1, n
+        pt = pt + 1 
+        y(idx(i), j) = y(idx(i), j)+x(pt)
       end do
     end do
   else
-    pt=0
-    do j=1,k
-      do i=1,n
-        pt=pt+1
-        y(idx(i),j) = beta*y(idx(i),j)+x(pt)
+    pt = 0
+    do j = 1, k
+      do i = 1, n
+        pt = pt + 1 
+        y(idx(i), j) = beta*y(idx(i), j)+x(pt)
       end do
     end do
   end if
 end subroutine psi_dsctmv
 
-subroutine psi_dsctv(n,idx,x,beta,y)
-
+subroutine psi_dsctv(n, idx, x, beta, y)
   use psb_const_mod
   implicit none
-
   integer(psb_mpk_) :: n
   integer(psb_ipk_) :: idx(:)
   real(psb_dpk_) :: beta, x(:), y(:)
@@ -3281,16 +3260,16 @@ subroutine psi_dsctv(n,idx,x,beta,y)
   ! Locals
   integer(psb_ipk_) :: i
 
-  if (beta == dzero) then
-    do i=1,n
+  if(beta == dzero) then
+    do i = 1, n
       y(idx(i)) = x(i)
     end do
-  else if (beta == done) then
-    do i=1,n
+  else if(beta == done) then
+    do i = 1, n
       y(idx(i)) = y(idx(i))+x(i)
     end do
   else
-    do i=1,n
+    do i = 1, n
       y(idx(i)) = beta*y(idx(i))+x(i)
     end do
   end if
@@ -3301,178 +3280,175 @@ subroutine daxpby(m, n, alpha, X, lldx, beta, Y, lldy, info)
   use psb_error_mod
   implicit none
   integer(psb_ipk_) :: n, m, lldx, lldy, info
-  real(psb_dpk_) X(lldx,*), Y(lldy,*)
+  real(psb_dpk_) X(lldx, *), Y(lldy, *)
   real(psb_dpk_) alpha, beta
   integer(psb_ipk_) :: i, j
   integer(psb_ipk_) :: int_err(5)
-  character  name*20
-  name='daxpby'
-
+  character name*20
+  name = 'daxpby'
 
   !
   !     Error handling
   !
   info = psb_success_
-  if (m.lt.0) then
-    info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=m
-    call fcpsb_errpush(info,name,int_err)
+  if(m .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (n.lt.0) then
-    info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=n
-    call fcpsb_errpush(info,name,int_err)
+  else if(n .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = n
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (lldx.lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=5
-    int_err(2)=1
-    int_err(3)=lldx
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(lldx .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 5
+    int_err(2) = 1
+    int_err(3) = lldx
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (lldy.lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=8
-    int_err(2)=1
-    int_err(3)=lldy
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(lldy .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = lldy
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
   endif
 
-  if (alpha.eq.dzero) then
-    if (beta.eq.dzero) then
-      do j=1, n
+  if(alpha.eq.dzero) then
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = dzero
+        do i = 1, m
+          y(i, j) = dzero
         enddo
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !
       !        Do nothing!
       !
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = - y(i,j)
+        do i = 1, m
+          y(i, j) = - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) =  beta*y(i,j)
+        do i = 1, m
+          y(i, j) =  beta*y(i, j)
         enddo
       enddo
     endif
 
-  else if (alpha.eq.done) then
+  else if(alpha.eq.done) then
 
-    if (beta.eq.dzero) then
-      do j=1,n
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = x(i,j)
+        do i = 1, m
+          y(i, j) = x(i, j)
         enddo
       enddo
-    else if (beta.eq.done) then
-      do j=1,n
+    else if(beta.eq.done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = x(i,j) + y(i,j)
+        do i = 1, m
+          y(i, j) = x(i, j) + y(i, j)
         enddo
       enddo
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = x(i,j) - y(i,j)
+        do i = 1, m
+          y(i, j) = x(i, j) - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = x(i,j) + beta*y(i,j)
+        do i = 1, m
+          y(i, j) = x(i, j) + beta*y(i, j)
         enddo
       enddo
     endif
 
-  else if (alpha.eq.-done) then
+  else if(alpha.eq.-done) then
 
-    if (beta.eq.dzero) then
-      do j=1,n
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = -x(i,j)
+        do i = 1, m
+          y(i, j) = -x(i, j)
         enddo
       enddo
-    else if (beta.eq.done) then
-      do j=1,n
+    else if(beta.eq.done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = -x(i,j) + y(i,j)
+        do i = 1, m
+          y(i, j) = -x(i, j) + y(i, j)
         enddo
       enddo
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = -x(i,j) - y(i,j)
+        do i = 1, m
+          y(i, j) = -x(i, j) - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = -x(i,j) + beta*y(i,j)
+        do i = 1, m
+          y(i, j) = -x(i, j) + beta*y(i, j)
         enddo
       enddo
     endif
 
   else
 
-    if (beta.eq.dzero) then
-      do j=1,n
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = alpha*x(i,j)
+        do i = 1, m
+          y(i, j) = alpha*x(i, j)
         enddo
       enddo
-    else if (beta.eq.done) then
-      do j=1,n
+    else if(beta.eq.done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = alpha*x(i,j) + y(i,j)
+        do i = 1, m
+          y(i, j) = alpha*x(i, j) + y(i, j)
         enddo
       enddo
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = alpha*x(i,j) - y(i,j)
+        do i = 1, m
+          y(i, j) = alpha*x(i, j) - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          y(i,j) = alpha*x(i,j) + beta*y(i,j)
+        do i = 1, m
+          y(i, j) = alpha*x(i, j) + beta*y(i, j)
         enddo
       enddo
     endif
-
   endif
-
   return
 
 9999 continue
@@ -3489,179 +3465,178 @@ subroutine daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
   real(psb_dpk_)    :: alpha, beta
   integer(psb_ipk_) :: i, j
   integer(psb_ipk_) :: int_err(5)
-  character  name*20
-  name='daxpby'
+  character name*20
+  name = 'daxpby'
 
   !
   !     Error handling
   !
   info = psb_success_
-  if (m.lt.0) then
-    info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=m
-    call fcpsb_errpush(info,name,int_err)
+  if(m .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (n.lt.0) then
-    info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=n
-    call fcpsb_errpush(info,name,int_err)
+  else if(n .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = n
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (lldx.lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=5
-    int_err(2)=1
-    int_err(3)=lldx
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(lldx .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 5
+    int_err(2) = 1
+    int_err(3) = lldx
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (lldy.lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=8
-    int_err(2)=1
-    int_err(3)=lldy
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(lldy .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = lldy
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (lldz.lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=8
-    int_err(2)=1
-    int_err(3)=lldz
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(lldz .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = lldz
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
   endif
 
-  if (alpha.eq.dzero) then
-    if (beta.eq.dzero) then
-      do j=1, n
-        do i=1,m
-          Z(i,j) = dzero
+  if(alpha.eq.dzero) then
+    if(beta.eq.dzero) then
+      do j = 1, n
+        do i = 1, m
+          Z(i, j) = dzero
         enddo
       enddo
-    else if (beta.eq.done) then
+    else if(beta.eq.done) then
       !
       !        Do nothing!
       !
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = - y(i,j)
+        do i = 1, m
+          Z(i, j) = - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) =  beta*y(i,j)
+        do i = 1, m
+          Z(i, j) =  beta*y(i, j)
         enddo
       enddo
     endif
 
-  else if (alpha.eq.done) then
+  else if(alpha.eq.done) then
 
-    if (beta.eq.dzero) then
-      do j=1,n
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = x(i,j)
+        do i = 1, m
+          Z(i, j) = x(i, j)
         enddo
       enddo
-    else if (beta.eq.done) then
-      do j=1,n
+    else if(beta.eq.done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = x(i,j) + y(i,j)
+        do i = 1, m
+          Z(i, j) = x(i, j) + y(i, j)
         enddo
       enddo
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = x(i,j) - y(i,j)
+        do i = 1, m
+          Z(i, j) = x(i, j) - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = x(i,j) + beta*y(i,j)
+        do i = 1, m
+          Z(i, j) = x(i, j) + beta*y(i, j)
         enddo
       enddo
     endif
 
-  else if (alpha.eq.-done) then
+  else if(alpha.eq.-done) then
 
-    if (beta.eq.dzero) then
-      do j=1,n
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = -x(i,j)
+        do i = 1, m
+          Z(i, j) = -x(i, j)
         enddo
       enddo
-    else if (beta.eq.done) then
-      do j=1,n
+    else if(beta.eq.done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = -x(i,j) + y(i,j)
+        do i = 1, m
+          Z(i, j) = -x(i, j) + y(i, j)
         enddo
       enddo
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = -x(i,j) - y(i,j)
+        do i = 1, m
+          Z(i, j) = -x(i, j) - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = -x(i,j) + beta*y(i,j)
+        do i = 1, m
+          Z(i, j) = -x(i, j) + beta*y(i, j)
         enddo
       enddo
     endif
 
   else
 
-    if (beta.eq.dzero) then
-      do j=1,n
+    if(beta.eq.dzero) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = alpha*x(i,j)
+        do i = 1, m
+          Z(i, j) = alpha*x(i, j)
         enddo
       enddo
-    else if (beta.eq.done) then
-      do j=1,n
+    else if(beta.eq.done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = alpha*x(i,j) + y(i,j)
+        do i = 1, m
+          Z(i, j) = alpha*x(i, j) + y(i, j)
         enddo
       enddo
 
-    else if (beta.eq.-done) then
-      do j=1,n
+    else if(beta.eq.-done) then
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = alpha*x(i,j) - y(i,j)
+        do i = 1, m
+          Z(i, j) = alpha*x(i, j) - y(i, j)
         enddo
       enddo
     else
-      do j=1,n
+      do j = 1, n
         !$omp parallel do private(i)
-        do i=1,m
-          Z(i,j) = alpha*x(i,j) + beta*y(i,j)
+        do i = 1, m
+          Z(i, j) = alpha*x(i, j) + beta*y(i, j)
         enddo
       enddo
     endif
   endif
-
   return
 
 9999 continue
@@ -3670,6 +3645,7 @@ subroutine daxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 end subroutine daxpbyv2
 
 subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
+  use psi_d_serial_mod, psb_protect_name => psi_daxpbyv3
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -3678,14 +3654,14 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
   real(psb_dpk_)    :: alpha, beta, gamma
   integer(psb_ipk_) :: i, j, code
   integer(psb_ipk_) :: int_err(5)
-  character  name*20
+  character name*20
   name = 'daxpby'
 
   !
   !     Error handling
   !
   info = psb_success_
-  if (m .lt. 0) then
+  if(m .lt. 0) then
     info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = m
@@ -3693,7 +3669,7 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
     goto 9999
   endif
 
-  if (n .lt. 0) then
+  if(n .lt. 0) then
     info = psb_err_iarg_neg_
     int_err(1) = 1
     int_err(2) = n
@@ -3701,7 +3677,7 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
     goto 9999
   endif
 
-  if (lldx .lt. max(1,m)) then
+  if(lldx .lt. max(1, m)) then
     info = psb_err_iarg_not_gtia_ii_
     int_err(1) = 5
     int_err(2) = 1
@@ -3711,17 +3687,17 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
     goto 9999
   endif
 
-  if (lldy .lt. max(1,m)) then
+  if(lldy .lt. max(1, m)) then
     info = psb_err_iarg_not_gtia_ii_
     int_err(1) = 8
     int_err(2) = 1
     int_err(3) = lldy
     int_err(4) = m
-    call fcpsb_errpush(info,name,int_err)
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
   endif
 
-  if (lldz .lt. max(1,m)) then
+  if(lldz .lt. max(1, m)) then
     info = psb_err_iarg_not_gtia_ii_
     int_err(1) = 8
     int_err(2) = 1
@@ -4182,7 +4158,6 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
       call psb_errpush(info, name)
       goto 9999
   end select
-
   return
 
 9999 continue
@@ -4190,7 +4165,7 @@ subroutine daxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
   return
 end subroutine daxpbyv3
 
-subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+subroutine psi_d_upd_xyz(m, alpha, beta, gamma, delta, x, y, z, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -4203,161 +4178,156 @@ subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
 
   integer(psb_ipk_) :: i
   integer(psb_ipk_) :: int_err(5)
-  character  name*20
-  name='d_upd_xyz'
+  character name*20
+  name = 'd_upd_xyz'
 
   info = psb_success_
-  if (m.lt.0) then
-    info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=m
-    call fcpsb_errpush(info,name,int_err)
+  if(m .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (size(x).lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=6
-    int_err(2)=1
-    int_err(3)=size(x)
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(size(x) .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 6
+    int_err(2) = 1
+    int_err(3) = size(x)
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (size(y).lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=7
-    int_err(2)=1
-    int_err(3)=size(y)
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(size(y) .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 7
+    int_err(2) = 1
+    int_err(3) = size(y)
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (size(z).lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=8
-    int_err(2)=1
-    int_err(3)=size(z)
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(size(z) .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = size(z)
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
   endif
  
-  if (beta == dzero) then
-    if (gamma == dzero) then
-      if (alpha == dzero) then
-        if (delta == dzero) then
+  if(beta == dzero) then
+    if(gamma == dzero) then
+      if(alpha == dzero) then
+        if(delta == dzero) then
           !  a 0   b 0 g 0 d 0 
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = dzero
             z(i) = dzero
           end do
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a 0   b 0 g 0 d n 
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = dzero
             z(i) = delta*z(i)
           end do
         end if
-      else if (alpha /= dzero) then
-        if (delta == dzero) then
+      else if(alpha /= dzero) then
+        if(delta == dzero) then
           !  a n   b 0 g 0 d 0 
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)
             z(i) = dzero
           end do
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a n   b 0 g 0 d n 
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)
             z(i) = delta*z(i)
           end do
-          
         end if
-
       end if
 
-    else  if (gamma /= dzero) then
+    else  if(gamma /= dzero) then
 
-      if (alpha == dzero) then
+      if(alpha == dzero) then
       
-        if (delta == dzero) then
+        if(delta == dzero) then
           !  a 0   b 0 g n d 0
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = dzero
             z(i) = dzero  ! gamma*y(i)
           end do
           
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a 0   b 0 g n d n
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = dzero
             z(i) = delta*z(i)
           end do
-          
         end if
 
-      else if (alpha /= dzero) then
+      else if(alpha /= dzero) then
         
-        if (delta == dzero) then
+        if(delta == dzero) then
           !  a n   b 0 g n d 0
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)
             z(i) = gamma*y(i)
           end do
           
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a n   b 0 g n d n
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)
             z(i) = gamma*y(i)+delta*z(i)
           end do
           
         end if
-
       end if
-
     end if
 
-  else  if (beta /= dzero) then
+  else  if(beta /= dzero) then
     
-    if (gamma == dzero) then
-      if (alpha == dzero) then
-        if (delta == dzero) then
+    if(gamma == dzero) then
+      if(alpha == dzero) then
+        if(delta == dzero) then
           !  a 0   b n g 0 d 0
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = beta*y(i)
             z(i) = dzero
           end do
           
-        else  if (delta /= dzero) then
+        else  if(delta /= dzero) then
           !  a 0   b n g 0 d n
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = beta*y(i)
             z(i) = delta*z(i)
           end do
           
         end if
 
-      else  if (alpha /= dzero) then
-        if (delta == dzero) then
+      else  if(alpha /= dzero) then
+        if(delta == dzero) then
           !  a n  b n g 0 d 0
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)+beta*y(i)
             z(i) = dzero
           end do
           
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a n  b n g 0 d n
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)+beta*y(i)
             z(i) = delta*z(i)
           end do
@@ -4365,39 +4335,39 @@ subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
         end if
 
       end if
-    else  if (gamma /= dzero) then
-      if (alpha == dzero) then
-        if (delta == dzero) then
+    else  if(gamma /= dzero) then
+      if(alpha == dzero) then
+        if(delta == dzero) then
           !  a 0  b n g n d 0
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = beta*y(i)
             z(i) = gamma*y(i)
           end do
           
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a 0  b n g n d n
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = beta*y(i)
             z(i) = gamma*y(i)+delta*z(i)
           end do
 
         end if
 
-      else if (alpha /= dzero) then
-        if (delta == dzero) then
+      else if(alpha /= dzero) then
+        if(delta == dzero) then
           !  a n b n g n d 0
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)+beta*y(i)
             z(i) = gamma*y(i)
           end do
           
-        else if (delta /= dzero) then
+        else if(delta /= dzero) then
           !  a n b n g n d n
           !$omp parallel do private(i)
-          do i=1,m
+          do i = 1, m
             y(i) = alpha*x(i)+beta*y(i)
             z(i) = gamma*y(i)+delta*z(i)
           end do
@@ -4414,7 +4384,7 @@ subroutine psi_d_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
   return
 end subroutine psi_d_upd_xyz
 
-subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+subroutine psi_dxyzw(m, a, b, c, d, e, f, x, y, z, w, info)
   use psb_const_mod
   use psb_error_mod
   implicit none
@@ -4423,61 +4393,59 @@ subroutine psi_dxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
   real(psb_dpk_), intent(inout)    :: y(:)
   real(psb_dpk_), intent(inout)    :: z(:)
   real(psb_dpk_), intent(inout)    :: w(:)
-  real(psb_dpk_), intent(in)       :: a,b,c,d,e,f
+  real(psb_dpk_), intent(in)       :: a, b, c, d, e, f
   integer(psb_ipk_), intent(out)     :: info
 
   integer(psb_ipk_) :: i
   integer(psb_ipk_) :: int_err(5)
-  character  name*20
-  name='d_xyzw'
+  character name*20
+  name = 'd_xyzw'
 
   info = psb_success_
-  if (m.lt.0) then
-    info=psb_err_iarg_neg_
-    int_err(1)=1
-    int_err(2)=m
-    call fcpsb_errpush(info,name,int_err)
+  if(m .lt. 0) then
+    info = psb_err_iarg_neg_
+    int_err(1) = 1
+    int_err(2) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (size(x).lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=6
-    int_err(2)=1
-    int_err(3)=size(x)
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(size(x) .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 6
+    int_err(2) = 1
+    int_err(3) = size(x)
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (size(y).lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=7
-    int_err(2)=1
-    int_err(3)=size(y)
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(size(y) .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 7
+    int_err(2) = 1
+    int_err(3) = size(y)
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
-  else if (size(z).lt.max(1,m)) then
-    info=psb_err_iarg_not_gtia_ii_
-    int_err(1)=8
-    int_err(2)=1
-    int_err(3)=size(z)
-    int_err(4)=m
-    call fcpsb_errpush(info,name,int_err)
+  else if(size(z) .lt. max(1, m)) then
+    info = psb_err_iarg_not_gtia_ii_
+    int_err(1) = 8
+    int_err(2) = 1
+    int_err(3) = size(z)
+    int_err(4) = m
+    call fcpsb_errpush(info, name, int_err)
     goto 9999
   endif
 
-  if ((a==dzero).or.(b==dzero).or. &
-       & (c==dzero).or.(d==dzero).or.&
-       & (e==dzero).or.(f==dzero)) then
-    write(0,*) 'XYZW assumes  a,b,c,d,e,f are all nonzero'
+  if((a == dzero) .or. (b == dzero) .or. &
+       & (c == dzero) .or. (d == dzero) .or. &
+       & (e == dzero) .or. (f == dzero)) then
+    write(0, *) 'XYZW assumes  a, b, c, d, e, f are all nonzero'
   else
     !$omp parallel do private(i)
-    do i=1,m
-      y(i) = a*x(i)+b*y(i)
-      z(i) = c*y(i)+d*z(i)
-      w(i) = e*z(i)+f*w(i)
+    do i = 1, m
+      y(i) = a*x(i) + b*y(i)
+      z(i) = c*y(i) + d*z(i)
+      w(i) = e*z(i) + f*w(i)
     end do
-    
   end if
-
   return
 
 9999 continue

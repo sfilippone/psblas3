@@ -49,11 +49,8 @@ subroutine psb_d_diag_dump(prec, info, prefix, head)
   ctxt = prec%get_ctxt()
   call psb_info(ctxt, iam, np)
 
-  if(present(prefix)) then 
-    prefix_ = trim(prefix(1 : min(len(prefix), len(prefix_))))
-  else
-    prefix_ = "dump_diag_d"
-  end if
+  prefix_ = "dump_diag_d"
+  if(present(prefix)) prefix_ = trim(prefix(1 : min(len(prefix), len(prefix_))))
 
   lname = len_trim(prefix_)
   fname = trim(prefix_)
@@ -66,13 +63,13 @@ subroutine psb_d_diag_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, des
   use psb_base_mod
   use psb_d_diagprec, psb_protect_name =>  psb_d_diag_apply_mvect_col
   implicit none 
-  type(psb_desc_type), intent(in)             :: desc_data
+  real(psb_dpk_), intent(in)                  :: alpha, beta
   class(psb_d_diag_prec_type), intent(inout)  :: prec
   type(psb_d_multivect_type), intent(inout)   :: x, y
   integer(psb_ipk_), intent(in)               :: idx_x, idx_y
-  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_desc_type), intent(in)             :: desc_data
   integer(psb_ipk_), intent(out)              :: info
-  character(len=1), optional                  :: trans
+  character(len=1), optional                      :: trans
   real(psb_dpk_), intent(inout), optional, target :: work(:)
 
   integer(psb_ipk_) :: err_act, nrow, ierr(5)
@@ -125,12 +122,12 @@ subroutine psb_d_diag_apply_mvect(alpha, prec, x, beta, y, desc_data, info, tran
   use psb_base_mod
   use psb_d_diagprec, psb_protect_name =>  psb_d_diag_apply_mvect
   implicit none 
-  type(psb_desc_type), intent(in)             :: desc_data
+  real(psb_dpk_), intent(in)                  :: alpha, beta
   class(psb_d_diag_prec_type), intent(inout)  :: prec
   type(psb_d_multivect_type), intent(inout)   :: x, y
-  real(psb_dpk_), intent(in)                  :: alpha, beta
+  type(psb_desc_type), intent(in)             :: desc_data
   integer(psb_ipk_), intent(out)              :: info
-  character(len=1), optional                  :: trans
+  character(len=1), optional                      :: trans
   real(psb_dpk_), intent(inout), optional, target :: work(:)
 
   integer(psb_ipk_) :: err_act, nrow, ierr(5)
@@ -183,25 +180,24 @@ subroutine psb_d_diag_apply_vect(alpha, prec, x, beta, y, desc_data, info, trans
   use psb_base_mod
   use psb_d_diagprec, psb_protect_name =>  psb_d_diag_apply_vect
   implicit none 
-  type(psb_desc_type), intent(in)    :: desc_data
+  real(psb_dpk_), intent(in)                  :: alpha, beta
   class(psb_d_diag_prec_type), intent(inout)  :: prec
-  type(psb_d_vect_type), intent(inout)   :: x
-  real(psb_dpk_), intent(in)         :: alpha, beta
-  type(psb_d_vect_type), intent(inout)   :: y
+  type(psb_d_vect_type), intent(inout)        :: x, y
+  type(psb_desc_type), intent(in)             :: desc_data
   integer(psb_ipk_), intent(out)              :: info
-  character(len=1), optional        :: trans
+  character(len=1), optional                      :: trans
   real(psb_dpk_), intent(inout), optional, target :: work(:)
-  integer(psb_ipk_) :: err_act, nrow, ierr(5)
-  character(len=20)  :: name='d_diag_prec_apply'
-  real(psb_dpk_), pointer :: ww(:)
-  class(psb_d_base_vect_type), allocatable :: dw !TO DO: Why is here? Seems never used...
 
-  call psb_erractionsave(err_act)
+  integer(psb_ipk_) :: err_act, nrow, ierr(5)
+  character(len=20) :: name = 'd_diag_prec_apply'
+  real(psb_dpk_), pointer                  :: ww(:)
+  class(psb_d_base_vect_type), allocatable :: dw !TO DO: Why is here? Seems never used...
 
   !
   ! This is the base version and we should throw an error. 
   ! Or should it be the DIAG preonditioner???
   !
+  call psb_erractionsave(err_act)
   info = psb_success_
 
   nrow = desc_data%get_local_rows()
@@ -215,7 +211,7 @@ subroutine psb_d_diag_apply_vect(alpha, prec, x, beta, y, desc_data, info, trans
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
-  if(.not.allocated(prec%d)) then
+  if(.not. allocated(prec%d)) then
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name, a_err = "preconditioner: D")
     goto 9999
@@ -226,12 +222,10 @@ subroutine psb_d_diag_apply_vect(alpha, prec, x, beta, y, desc_data, info, trans
     goto 9999
   end if
 
-
-  call y%mlt(alpha, prec%dv, x, beta, info, conjgx=trans)
+  call y%mlt(alpha, prec%dv, x, beta, info, conjgx = trans)
 
   if(info /= psb_success_) then 
-    call psb_errpush(psb_err_from_subroutine_, &
-         & name, a_err = 'vect%mlt')
+    call psb_errpush(psb_err_from_subroutine_, name, a_err = 'vect%mlt')
     goto 9999      
   end if
 
@@ -283,11 +277,9 @@ subroutine psb_d_diag_apply(alpha, prec, x, beta, y, desc_data, info, trans, wor
     call psb_errpush(info, name, a_err = "preconditioner: D")
     goto 9999
   end if
-  if(present(trans)) then 
-    trans_ = psb_toupper(trans)
-  else
-    trans_='N'
-  end if
+
+  trans_='N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   select case(trans_)
     case('N', 'T', 'C')
@@ -345,7 +337,7 @@ subroutine psb_d_diag_precbld(a, desc_a, prec, info, amold, vmold, imold)
   class(psb_i_base_vect_type), intent(in), optional   :: imold
 
   integer(psb_ipk_) :: err_act, nrow, ncol, i
-  character(len=20) :: name='d_diag_precbld'
+  character(len=20) :: name = 'd_diag_precbld'
 
   call psb_erractionsave(err_act)
 
@@ -354,7 +346,7 @@ subroutine psb_d_diag_precbld(a, desc_a, prec, info, amold, vmold, imold)
   nrow = desc_a%get_local_rows()
   ncol = desc_a%get_local_cols()
   
-  prec%d=a%get_diag(info) 
+  prec%d = a%get_diag(info) 
   if(info /= psb_success_) then 
     info = psb_err_from_subroutine_
     call psb_errpush(info, name, a_err = 'get_diag')
@@ -367,7 +359,7 @@ subroutine psb_d_diag_precbld(a, desc_a, prec, info, amold, vmold, imold)
     if(prec%d(i) == dzero) then
       prec%d(i) = done
     else
-      prec%d(i) = done/prec%d(i)
+      prec%d(i) = done / prec%d(i)
     endif
   end do
   !$omp parallel do private(i)

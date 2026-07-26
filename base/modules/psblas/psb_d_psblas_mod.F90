@@ -37,8 +37,7 @@ module psb_d_psblas_mod
 
   interface psb_gedot
     function psb_ddot_vect(x, y, desc_a,info, global) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_d_vect_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_d_vect_type), intent(inout) :: x, y
       type(psb_desc_type), intent(in)      :: desc_a
       integer(psb_ipk_), intent(out)       :: info
@@ -320,8 +319,7 @@ module psb_d_psblas_mod
     end function psb_damaxv
 
     function psb_damax_vect(x, desc_a, info, global) result(res)
-      import :: psb_desc_type, psb_d_vect_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, psb_d_vect_type, psb_dpk_, psb_ipk_
       type(psb_d_vect_type), intent(inout)  :: x
       type(psb_desc_type), intent(in)       :: desc_a
       integer(psb_ipk_), intent(out)        :: info
@@ -334,6 +332,7 @@ module psb_d_psblas_mod
   interface psb_genrmi
     procedure psb_damax, psb_damaxv, psb_damax_vect
   end interface
+
   interface psb_normi
     procedure psb_damax, psb_damaxv, psb_damax_vect
   end interface
@@ -362,8 +361,7 @@ module psb_d_psblas_mod
 
   interface psb_gemin
     function psb_dmin_vect(x, desc_a, info, global) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_d_vect_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_d_vect_type), intent(inout)  :: x
       type(psb_desc_type), intent(in)       :: desc_a
       integer(psb_ipk_), intent(out)        :: info
@@ -393,8 +391,7 @@ module psb_d_psblas_mod
     end function psb_dasumv
   
     function psb_dasum_vect(x, desc_a, info, global) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_d_vect_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_d_vect_type), intent(inout)  :: x
       type(psb_desc_type), intent(in)       :: desc_a
       integer(psb_ipk_), intent(out)        :: info
@@ -423,10 +420,11 @@ module psb_d_psblas_mod
     end subroutine psb_dmasum
   end interface
 
-#if ! defined(PSB_HAVE_BUGGY_GENERICS)
+#if !defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_genrm1
     procedure psb_dasum, psb_dasumv, psb_dasum_vect
   end interface
+  
   interface psb_norm1
     procedure psb_dasum, psb_dasumv, psb_dasum_vect
   end interface
@@ -453,8 +451,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2v
 
     function psb_dnrm2_vect(x, desc_a, info, global) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_vect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_vect_type), intent(inout)  :: x
       type(psb_desc_type), intent(in)       :: desc_a
       integer(psb_ipk_), intent(out)        :: info
@@ -463,8 +460,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2_vect
 
     function psb_dnrm2_mvect_full(x, desc_a, info, global) result(res)
-      import :: psb_d_multivect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_multivect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_multivect_type), intent(inout) :: x
       type(psb_desc_type), intent(in)           :: desc_a
       integer(psb_ipk_), intent(out)            :: info
@@ -473,8 +469,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2_mvect_full
 
     function psb_dnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
-      import :: psb_d_multivect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_multivect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_multivect_type), intent(inout) :: x
       integer(psb_ipk_), intent(in)             :: idx_x
       type(psb_desc_type), intent(in)           :: desc_a
@@ -484,8 +479,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2_mvect_idxs
 
     function psb_dnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_vect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_vect_type), intent(inout)  :: x
       type(psb_d_vect_type), intent(inout)  :: w
       type(psb_desc_type), intent(in)       :: desc_a
@@ -496,8 +490,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2_weight_vect
 
     function psb_dnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_vect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_vect_type), intent(inout)  :: x
       type(psb_d_vect_type), intent(inout)  :: w
       type(psb_d_vect_type), intent(inout)  :: idv
@@ -509,7 +502,7 @@ module psb_d_psblas_mod
     end function psb_dnrm2_weightmask_vect
   end interface
 
-#if ! defined(PSB_HAVE_BUGGY_GENERICS)
+#if !defined(PSB_HAVE_BUGGY_GENERICS)
   interface psb_norm2
     procedure psb_dnrm2, psb_dnrm2v, psb_dnrm2_vect, psb_dnrm2_mvect_full, psb_dnrm2_mvect_idxs, & 
             & psb_dnrm2_weight_vect, psb_dnrm2_weightmask_vect
@@ -529,8 +522,7 @@ module psb_d_psblas_mod
 
   interface psb_spnrmi
     function psb_dnrmi(a, desc_a, info, global)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_dspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(out)    :: info
@@ -547,8 +539,7 @@ module psb_d_psblas_mod
 
   interface psb_spnrm1
     function psb_dspnrm1(a, desc_a, info, global)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_dspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(out)    :: info
@@ -566,8 +557,7 @@ module psb_d_psblas_mod
   interface psb_spmm
     subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
                         & trans, k, jx, jy, work, doswap)
-      import :: psb_desc_type, psb_dspmat_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_dspmat_type), intent(in)     :: a
       real(psb_dpk_), intent(inout), target :: x(:, :), y(:, :)
@@ -581,8 +571,7 @@ module psb_d_psblas_mod
     
     subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
                         & trans, work, doswap)
-      import :: psb_desc_type, psb_dspmat_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_ipk_
       real(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_dspmat_type), intent(in)     :: a
       real(psb_dpk_), intent(inout), target :: x(:), y(:)
@@ -626,9 +615,8 @@ module psb_d_psblas_mod
 
     subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, &
                             & trans, work, doswap)
-      import :: psb_desc_type, psb_dspmat_type, &
-              & psb_d_vect_type, psb_d_multivect_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_dspmat_type, &
+              & psb_d_vect_type, psb_d_multivect_type
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_dspmat_type), intent(in)         :: a
       type(psb_d_multivect_type), intent(inout) :: x
@@ -643,8 +631,7 @@ module psb_d_psblas_mod
 
     subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, &
                                 & trans, work, doswap)
-      import :: psb_desc_type, psb_dspmat_type, psb_d_multivect_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_dspmat_type, psb_d_multivect_type
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_dspmat_type), intent(in)         :: a
       type(psb_d_multivect_type), intent(inout) :: x, y
@@ -673,8 +660,7 @@ module psb_d_psblas_mod
   interface psb_spsm
     subroutine psb_dspsm(alpha, t, x, beta, y, desc_a, info, &
                         & trans, scale, choice, diag, n, jx, jy, work)
-      import :: psb_desc_type, psb_dspmat_type, &
-              & psb_dpk_, psb_ipk_ 
+      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_ipk_ 
       implicit none
       real(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_dspmat_type), intent(in)     :: t
@@ -691,8 +677,7 @@ module psb_d_psblas_mod
 
     subroutine psb_dspsv(alpha, t, x, beta, y, desc_a, info, &
                         & trans, scale, choice, diag, work)
-      import :: psb_desc_type, psb_dspmat_type, &
-              & psb_dpk_, psb_ipk_ 
+      import :: psb_desc_type, psb_dspmat_type, psb_dpk_, psb_ipk_
       implicit none
       real(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_dspmat_type), intent(in)     :: t
@@ -708,8 +693,7 @@ module psb_d_psblas_mod
 
     subroutine psb_dspsv_vect(alpha, t, x, beta, y, desc_a, info, &
                             & trans, scale, choice, diag, work)
-      import :: psb_desc_type, psb_d_vect_type, psb_dspmat_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_desc_type, psb_d_vect_type, psb_dspmat_type, psb_dpk_, psb_ipk_
       implicit none
       real(psb_dpk_), intent(in)            :: alpha, beta
       type(psb_dspmat_type), intent(inout)  :: t
@@ -724,8 +708,8 @@ module psb_d_psblas_mod
 
     subroutine psb_dspsv_mv(alpha, t, x, idx_x, beta, y, desc_a, info, &
                             & trans, scale, choice, diag, work)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-              & psb_dspmat_type, psb_d_multivect_type, psb_d_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_dspmat_type, &
+              & psb_d_multivect_type, psb_d_vect_type
       implicit none
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_dspmat_type), intent(inout)      :: t
@@ -742,8 +726,8 @@ module psb_d_psblas_mod
 
     subroutine psb_dspsv_vm(alpha, t, x, beta, y, idx_y, desc_a, info, &
                             & trans, scale, choice, diag, work)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-              & psb_dspmat_type, psb_d_multivect_type, psb_d_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_dspmat_type, &
+              & psb_d_multivect_type, psb_d_vect_type
       implicit none
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_dspmat_type), intent(inout)      :: t
@@ -760,8 +744,8 @@ module psb_d_psblas_mod
 
     subroutine psb_dspsv_mm_full(alpha, t, x, beta, y, desc_a, info, &
                             & trans, scale, choice, diag, work)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-              & psb_dspmat_type, psb_d_multivect_type, psb_d_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_dspmat_type, &
+              & psb_d_multivect_type, psb_d_vect_type
       implicit none
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_dspmat_type), intent(inout)      :: t
@@ -776,8 +760,8 @@ module psb_d_psblas_mod
 
     subroutine psb_dspsv_mm_idxs(alpha, t, x, idx_x, beta, y, idx_y, desc_a, info, &
                             & trans, scale, choice, diag, work)
-      import :: psb_desc_type, psb_dpk_, psb_ipk_, &
-              & psb_dspmat_type, psb_d_multivect_type, psb_d_vect_type
+      import :: psb_desc_type, psb_dpk_, psb_ipk_, psb_dspmat_type, &
+              & psb_d_multivect_type, psb_d_vect_type
       implicit none
       real(psb_dpk_), intent(in)                :: alpha, beta
       type(psb_dspmat_type), intent(inout)      :: t
@@ -1014,8 +998,7 @@ module psb_d_psblas_mod
 
   interface psb_gecmp
     subroutine psb_dcmp_vect(x, c, z, desc_a, info)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_d_vect_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_d_vect_type), intent(inout) :: x, z
       real(psb_dpk_), intent(in)           :: c
       type(psb_desc_type), intent(in)      :: desc_a
@@ -1023,18 +1006,17 @@ module psb_d_psblas_mod
     end subroutine psb_dcmp_vect
 
     subroutine psb_dcmp_spmatval(a, val, tol, desc_a, res, info)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_, psb_lpk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
       type(psb_dspmat_type), intent(inout)  :: a
-      real(psb_dpk_), intent(in)            :: val, tol
+      real(psb_dpk_), intent(in)            :: val
+      real(psb_dpk_), intent(in)            :: tol
       type(psb_desc_type), intent(in)       :: desc_a
       logical, intent(out)                  :: res
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dcmp_spmatval
 
     subroutine psb_dcmp_spmat(a, b, tol, desc_a, res, info)
-      import :: psb_dspmat_type, psb_desc_type, &
-           & psb_dpk_, psb_lpk_, psb_ipk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_lpk_, psb_ipk_
       type(psb_dspmat_type), intent(inout)  :: a, b
       real(psb_dpk_), intent(in)            :: tol
       type(psb_desc_type), intent(in)       :: desc_a
@@ -1045,8 +1027,7 @@ module psb_d_psblas_mod
 
   interface psb_geaddconst
     subroutine psb_daddconst_vect(x, b, z, desc_a, info)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_vect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_vect_type), intent(inout) :: x, z
       real(psb_dpk_), intent(in)           :: b
       type(psb_desc_type), intent(in)      :: desc_a
@@ -1056,8 +1037,7 @@ module psb_d_psblas_mod
 
   interface psb_mask
     subroutine psb_dmask_vect(c, x, m, t, desc_a, info)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_vect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_vect_type), intent(inout)  :: c, x, m
       logical, intent(out)                  :: t
       type(psb_desc_type), intent(in)       :: desc_a
@@ -1067,8 +1047,7 @@ module psb_d_psblas_mod
   
   interface psb_minquotient
     function psb_dminquotient_vect(x, y, desc_a, info, global) result(res)
-      import :: psb_d_vect_type, psb_desc_type, &
-              & psb_ipk_, psb_dpk_
+      import :: psb_d_vect_type, psb_desc_type, psb_ipk_, psb_dpk_
       type(psb_d_vect_type), intent(inout)  :: x, y
       type(psb_desc_type), intent(in)       :: desc_a
       integer(psb_ipk_), intent(out)        :: info
@@ -1079,8 +1058,7 @@ module psb_d_psblas_mod
 
   interface psb_nnz
     function psb_dget_nnz(a, desc_a, info) result(res)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_, psb_lpk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_, psb_lpk_
       type(psb_dspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(out)    :: info
@@ -1090,8 +1068,7 @@ module psb_d_psblas_mod
 
   interface psb_is_matupd
     function psb_d_is_matupd(a, desc_a, info) result(res)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_dspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(out)    :: info
@@ -1101,8 +1078,7 @@ module psb_d_psblas_mod
 
   interface psb_is_matasb
     function psb_d_is_matasb(a, desc_a, info) result(res)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_dspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(out)    :: info
@@ -1112,8 +1088,7 @@ module psb_d_psblas_mod
 
   interface psb_is_matbld
     function psb_d_is_matbld(a, desc_a, info) result(res)
-      import :: psb_dspmat_type, psb_desc_type, &
-              & psb_dpk_, psb_ipk_
+      import :: psb_dspmat_type, psb_desc_type, psb_dpk_, psb_ipk_
       type(psb_dspmat_type), intent(in) :: a
       type(psb_desc_type), intent(in)   :: desc_a
       integer(psb_ipk_), intent(out)    :: info

@@ -80,7 +80,8 @@ module psb_d_base_prec_mod
     procedure(psb_d_base_precclone), pass(prec), deferred :: clone       
   end type psb_d_base_prec_type
 
-  private :: psb_d_base_set_ctxt, psb_d_base_get_ctxt, psb_d_base_get_nzeros
+  private :: psb_d_base_set_ctxt, psb_d_base_get_ctxt, &
+            & psb_d_base_get_nzeros
 
   abstract interface 
     subroutine psb_d_base_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
@@ -230,6 +231,7 @@ contains
     integer(psb_ipk_), intent(in)               :: what 
     integer(psb_ipk_), intent(in)               :: val 
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: err_act, nrow
     character(len=20) :: name = 'd_base_precseti'
 
@@ -281,11 +283,11 @@ contains
     integer(psb_ipk_) :: err_act
     character(len=20)   :: name
     
-    info=psb_success_
+    info = psb_success_
     name = 'psb_d_allocate_wrk'
     call psb_erractionsave(err_act)
     
-    if (psb_get_errstatus() .ne. 0) goto 9999
+    if(psb_get_errstatus() .ne. 0) goto 9999
 
     ! Base version does nothing.
     info = psb_success_
@@ -311,7 +313,7 @@ contains
     name = 'psb_d_allocate_wrk'
     call psb_erractionsave(err_act)
     
-    if (psb_get_errstatus().ne.0) goto 9999
+    if(psb_get_errstatus().ne.0) goto 9999
     ! Base version does nothing.
     info = psb_success_ 
 
@@ -378,8 +380,8 @@ contains
     call psb_info(ctxt, iam, np)
     
     res = ''
-    if (iam /= psb_root_) then
-      ni  = floor(log10(1.0 * np)) + 1
+    if(iam /= psb_root_) then
+      ni = floor(log10(1.0 * np)) + 1
       write(frmtv, '(a, i8.8, a)') '(a, i', ni, ', a)'
       write(res, frmtv) 'Process ', iam, ': Preconditioner: '
     else

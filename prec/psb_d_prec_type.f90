@@ -30,11 +30,10 @@
 !
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!	Module to   define PREC_DATA,           !!
+!!	Module to   define PREC_DATA,               !!
 !!      structure for preconditioning.          !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module psb_d_prec_type
-
   use psb_prec_const_mod
   use psb_d_base_prec_mod
 
@@ -77,21 +76,21 @@ module psb_d_prec_type
   end interface
 
   interface psb_precinit
-    subroutine psb_dprecinit(ctxt,prec,ptype,info)
+    subroutine psb_dprecinit(ctxt, prec, ptype, info)
       import :: psb_ipk_, psb_dprec_type, psb_ctxt_type
       implicit none
-      type(psb_ctxt_type), intent(in) :: ctxt
-      class(psb_dprec_type), intent(inout)   :: prec
-      character(len=*), intent(in)           :: ptype
-      integer(psb_ipk_), intent(out)         :: info
+      type(psb_ctxt_type), intent(in)       :: ctxt
+      class(psb_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: ptype
+      integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dprecinit
   end interface
 
   interface psb_precbld
-    subroutine psb_dprecbld(a,desc_a,prec,info,amold,vmold,imold)
-      import :: psb_ipk_, psb_desc_type, psb_dspmat_type,&
-           & psb_d_base_sparse_mat, psb_dpk_, psb_d_base_vect_type, &
-           & psb_dprec_type, psb_i_base_vect_type
+    subroutine psb_dprecbld(a, desc_a, prec, info, amold, vmold, imold)
+      import :: psb_ipk_, psb_desc_type, psb_dspmat_type, &
+              & psb_d_base_sparse_mat, psb_dpk_, psb_d_base_vect_type, &
+              & psb_dprec_type, psb_i_base_vect_type
       implicit none
       type(psb_dspmat_type), intent(inout), target :: a
       type(psb_desc_type), intent(inout), target     :: desc_a
@@ -114,7 +113,6 @@ module psb_d_prec_type
   interface psb_sizeof
     module procedure psb_dprec_sizeof
   end interface
-
 
   interface
     subroutine psb_d_apply2_mvect_col(prec, x, idx_x, y, idx_y, desc_data, info, trans, work)
@@ -145,11 +143,11 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply2_mvect(prec, x, y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
-      type(psb_desc_type), intent(in)           :: desc_data
       class(psb_dprec_type), intent(inout)      :: prec
       type(psb_d_multivect_type), intent(inout) :: x, y
+      type(psb_desc_type), intent(in)           :: desc_data
       integer(psb_ipk_), intent(out)            :: info
-      character(len=1), optional                :: trans
+      character(len=1), optional                      :: trans
       real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2_mvect
   end interface
@@ -157,11 +155,11 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply1_mvect(prec, x, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_multivect_type, psb_dpk_
-      type(psb_desc_type), intent(in)           :: desc_data
       class(psb_dprec_type), intent(inout)      :: prec
       type(psb_d_multivect_type), intent(inout) :: x
+      type(psb_desc_type), intent(in)           :: desc_data
       integer(psb_ipk_), intent(out)            :: info
-      character(len=1), optional                :: trans
+      character(len=1), optional                      :: trans
       real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply1_mvect
   end interface
@@ -169,24 +167,23 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply2_vect(prec, x, y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type), intent(in)       :: desc_data
       class(psb_dprec_type), intent(inout)  :: prec
-      type(psb_d_vect_type), intent(inout)  :: x
-      type(psb_d_vect_type), intent(inout)  :: y
+      type(psb_d_vect_type), intent(inout)  :: x, y
+      type(psb_desc_type), intent(in)       :: desc_data
       integer(psb_ipk_), intent(out)        :: info
-      character(len=1), optional            :: trans
-      real(psb_dpk_),intent(inout), optional, target :: work(:)
+      character(len=1), optional                      :: trans
+      real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2_vect
   end interface
 
   interface
     subroutine psb_d_apply1_vect(prec, x, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type), intent(in)       :: desc_data
       class(psb_dprec_type), intent(inout)  :: prec
       type(psb_d_vect_type), intent(inout)  :: x
+      type(psb_desc_type), intent(in)       :: desc_data
       integer(psb_ipk_), intent(out)        :: info
-      character(len=1), optional            :: trans
+      character(len=1), optional                      :: trans
       real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply1_vect
   end interface
@@ -194,12 +191,11 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply2v(prec, x, y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type), intent(in)       :: desc_data
       class(psb_dprec_type), intent(inout)  :: prec
-      real(psb_dpk_), intent(inout)         :: x(:)
-      real(psb_dpk_), intent(inout)         :: y(:)
+      real(psb_dpk_), intent(inout)         :: x(:), y(:)
+      type(psb_desc_type), intent(in)       :: desc_data
       integer(psb_ipk_), intent(out)        :: info
-      character(len=1), optional            :: trans
+      character(len=1), optional                      :: trans
       real(psb_dpk_), intent(inout), optional, target :: work(:)
     end subroutine psb_d_apply2v
   end interface
@@ -207,134 +203,122 @@ module psb_d_prec_type
   interface
     subroutine psb_d_apply1v(prec, x, desc_data, info, trans)
       import :: psb_ipk_, psb_desc_type, psb_dprec_type, psb_d_vect_type, psb_dpk_
-      type(psb_desc_type), intent(in)       :: desc_data
       class(psb_dprec_type), intent(inout)  :: prec
       real(psb_dpk_), intent(inout)         :: x(:)
+      type(psb_desc_type), intent(in)       :: desc_data
       integer(psb_ipk_), intent(out)        :: info
-      character(len=1), optional            :: trans
+      character(len=1), optional  :: trans
     end subroutine psb_d_apply1v
   end interface
 
-  
-
   interface
-  subroutine psb_dcprecseti(prec,what,val,info,ilev,ilmax,pos,idx)
-    import :: psb_dprec_type, psb_dspmat_type, psb_desc_type, psb_dpk_, &
-      & psb_ipk_
-    class(psb_dprec_type), intent(inout)   :: prec
-    character(len=*), intent(in)             :: what
-    integer(psb_ipk_), intent(in)            :: val
-    integer(psb_ipk_), intent(out)           :: info
-    integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
-    character(len=*), optional, intent(in)   :: pos
-  end subroutine psb_dcprecseti
+    subroutine psb_dcprecseti(prec, what, val, info, ilev, ilmax, pos, idx)
+      import :: psb_dprec_type, psb_desc_type, psb_dpk_, psb_ipk_
+      class(psb_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: what
+      integer(psb_ipk_), intent(in)         :: val
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax, idx
+      character(len=*), optional, intent(in)  :: pos
+    end subroutine psb_dcprecseti
 
-  subroutine psb_dcprecsetr(prec,what,val,info,ilev,ilmax,pos,idx)
-    import :: psb_dprec_type, psb_dspmat_type, psb_desc_type, psb_dpk_, &
-      & psb_ipk_
-    class(psb_dprec_type), intent(inout)   :: prec
-    character(len=*), intent(in)             :: what
-    real(psb_dpk_), intent(in)             :: val
-    integer(psb_ipk_), intent(out)           :: info
-    integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
-    character(len=*), optional, intent(in)   :: pos
-  end subroutine psb_dcprecsetr
+    subroutine psb_dcprecsetr(prec, what, val, info, ilev, ilmax, pos, idx)
+      import :: psb_dprec_type, psb_desc_type, psb_dpk_, psb_ipk_
+      class(psb_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: what
+      real(psb_dpk_), intent(in)          :: val
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax, idx
+      character(len=*), optional, intent(in)  :: pos
+    end subroutine psb_dcprecsetr
 
-  subroutine psb_dcprecsetc(prec,what,string,info,ilev,ilmax,pos,idx)
-    import :: psb_dprec_type, psb_dspmat_type, psb_desc_type, psb_dpk_, &
-      & psb_ipk_
-    class(psb_dprec_type), intent(inout)   :: prec
-    character(len=*), intent(in)             :: what
-    character(len=*), intent(in)             :: string
-    integer(psb_ipk_), intent(out)           :: info
-    integer(psb_ipk_), optional, intent(in)  :: ilev,ilmax,idx
-    character(len=*), optional, intent(in)   :: pos
-  end subroutine psb_dcprecsetc
-end interface
+    subroutine psb_dcprecsetc(prec, what, string, info, ilev, ilmax, pos, idx)
+      import :: psb_dprec_type, psb_desc_type, psb_dpk_, psb_ipk_
+      class(psb_dprec_type), intent(inout)  :: prec
+      character(len=*), intent(in)          :: what
+      character(len=*), intent(in)          :: string
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in) :: ilev, ilmax, idx
+      character(len=*), optional, intent(in)  :: pos
+    end subroutine psb_dcprecsetc
+  end interface
 
 contains
-
-  !
   !
   ! verbosity:
   !        -1: suppress all messages
   !         0: normal
   !        >1: increased details 
   !
-  subroutine psb_dfile_prec_descr(prec,info,iout, root,verbosity,prefix)
+  subroutine psb_dfile_prec_descr(prec, info, iout, root, verbosity, prefix)
     use psb_base_mod
     implicit none
-    class(psb_dprec_type), intent(in)       :: prec
-    integer(psb_ipk_), intent(out) :: info
+    class(psb_dprec_type), intent(in) :: prec
+    integer(psb_ipk_), intent(out)    :: info
     integer(psb_ipk_), intent(in), optional :: iout
     integer(psb_ipk_), intent(in), optional :: root
     integer(psb_ipk_), intent(in), optional :: verbosity
     character(len=*), intent(in), optional  :: prefix
 
     integer(psb_ipk_) :: iout_, verbosity_
-    character(len=20) :: name='prec_descr'
+    character(len=20) :: name = 'prec_descr'
 
-    info = 0
-    if (present(iout)) then
-      iout_ = iout
-    else
-      iout_ = 6
-    end if
-    if (.not.allocated(prec%prec)) then
+    info = psb_success_
+    
+    iout_ = 6
+    if(present(iout)) iout_ = iout
+    
+    if(.not. allocated(prec%prec)) then
       info = 1124
-      call psb_errpush(info,name,a_err="preconditioner")
+      call psb_errpush(info, name, a_err = "preconditioner")
     end if
-    call prec%prec%descr(iout=iout,root=root, verbosity=verbosity,prefix=prefix)
-
+    call prec%prec%descr(iout=iout, root = root, verbosity = verbosity, prefix = prefix)
   end subroutine psb_dfile_prec_descr
 
-  subroutine psb_d_prec_dump(prec,info,prefix,head)
+  subroutine psb_d_prec_dump(prec, info, prefix, head)
     implicit none
-    type(psb_dprec_type), intent(in) :: prec
-    integer(psb_ipk_), intent(out)             :: info
-    character(len=*), intent(in), optional :: prefix,head
+    type(psb_dprec_type), intent(in)  :: prec
+    integer(psb_ipk_), intent(out)    :: info
+    character(len=*), intent(in), optional :: prefix, head
+
     !  len of prefix_
+    info = psb_success_
 
-    info = 0
-
-    if (.not.allocated(prec%prec)) then
+    if(.not. allocated(prec%prec)) then
       info = -1
-      write(psb_err_unit,*) 'Trying to dump a non-built preconditioner'
+      write(psb_err_unit, *) 'Trying to dump a non-built preconditioner'
       return
     end if
 
-    call prec%prec%dump(info,prefix,head)
-
-
+    call prec%prec%dump(info, prefix, head)
   end subroutine psb_d_prec_dump
 
-  subroutine psb_d_allocate_wrk(prec,info,vmold,desc)
+  subroutine psb_d_allocate_wrk(prec, info, vmold, desc)
     use psb_base_mod
     implicit none
-
     ! Arguments
-    class(psb_dprec_type), intent(inout) :: prec
+    class(psb_dprec_type), intent(inout)  :: prec
     integer(psb_ipk_), intent(out)        :: info
-    class(psb_d_base_vect_type), intent(in), optional  :: vmold
-    type(psb_desc_type), intent(in), optional :: desc
+    class(psb_d_base_vect_type), intent(in), optional :: vmold
+    type(psb_desc_type), intent(in), optional         :: desc
 
     ! Local variables
     integer(psb_ipk_) :: err_act
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'psb_d_allocate_wrk'
     call psb_erractionsave(err_act)
 
-    if (psb_get_errstatus().ne.0) goto 9999
+    if(psb_get_errstatus() .ne. 0) goto 9999
 
-    if (.not.allocated(prec%prec)) then
+    if(.not. allocated(prec%prec)) then
       info = -1
-      write(psb_err_unit,*) 'Trying to allocate wrk to a non-built preconditioner'
+      write(psb_err_unit, *) 'Trying to allocate wrk to a non-built preconditioner'
       return
     end if
 
-    call prec%prec%allocate_wrk(info,vmold=vmold,desc=desc)
+    call prec%prec%allocate_wrk(info, vmold=vmold, desc=desc)
 
     call psb_erractionrestore(err_act)
     return
@@ -343,27 +327,26 @@ contains
     return
   end subroutine psb_d_allocate_wrk
 
-  subroutine psb_d_free_wrk(prec,info)
+  subroutine psb_d_free_wrk(prec, info)
     use psb_base_mod
     implicit none
-
     ! Arguments
-    class(psb_dprec_type), intent(inout) :: prec
+    class(psb_dprec_type), intent(inout)  :: prec
     integer(psb_ipk_), intent(out)        :: info
 
     ! Local variables
     integer(psb_ipk_) :: err_act
     character(len=20)   :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'psb_d_free_wrk'
     call psb_erractionsave(err_act)
 
-    if (psb_get_errstatus().ne.0) goto 9999
+    if(psb_get_errstatus().ne.0) goto 9999
 
-    if (.not.allocated(prec%prec)) then
+    if(.not. allocated(prec%prec)) then
       info = -1
-      write(psb_err_unit,*) 'Trying to free a non-built preconditioner'
+      write(psb_err_unit, *) 'Trying to free a non-built preconditioner'
       return
     end if
 
@@ -378,37 +361,35 @@ contains
 
   function psb_d_is_allocated_wrk(prec) result(res)
     implicit none
-
     ! Arguments
     class(psb_dprec_type), intent(in) :: prec
     logical :: res
 
-    if (.not.allocated(prec%prec)) then
-      res = .false.
-    else
-      res = prec%prec%is_allocated_wrk()
-    end if
-
+    res = .false.
+    if(allocated(prec%prec)) res = prec%prec%is_allocated_wrk()
   end function psb_d_is_allocated_wrk
 
-  subroutine psb_d_precfree(p,info)
+  subroutine psb_d_precfree(p, info)
     use psb_base_mod
     implicit none
     type(psb_dprec_type), intent(inout) :: p
-    integer(psb_ipk_), intent(out)                :: info
-    integer(psb_ipk_) :: me, err_act,i
-    character(len=20)   :: name
-    info=psb_success_
+    integer(psb_ipk_), intent(out)      :: info
+
+    integer(psb_ipk_) :: me, err_act, i
+    character(len=20) :: name
+
+    info = psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_ ;      goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
 
-    me=-1
+    me = -1
     call p%free(info)
+    if(info /= psb_success_) goto 9999
 
-    if (info /= 0) goto 9999
     call psb_erractionrestore(err_act)
     return
 
@@ -416,28 +397,31 @@ contains
     return
   end subroutine psb_d_precfree
 
-  subroutine psb_d_prec_free(prec,info)
+  subroutine psb_d_prec_free(prec, info)
     use psb_base_mod
     implicit none
     class(psb_dprec_type), intent(inout) :: prec
     integer(psb_ipk_), intent(out)         :: info
-    integer(psb_ipk_) :: me, err_act,i
+
+    integer(psb_ipk_) :: me, err_act, i
     character(len=20)   :: name
-    info=psb_success_
+    
+    info = psb_success_
     name = 'psb_precfree'
     call psb_erractionsave(err_act)
-    if (psb_errstatus_fatal()) then
-      info = psb_err_internal_error_ ;      goto 9999
+    if(psb_errstatus_fatal()) then
+      info = psb_err_internal_error_
+      goto 9999
     end if
 
     me=-1
-
-    if (allocated(prec%prec)) then
+    if(allocated(prec%prec)) then
       call prec%prec%free(info)
-      if (info /= psb_success_) goto 9999
-      deallocate(prec%prec,stat=info)
-      if (info /= psb_success_) goto 9999
+      if(info /= psb_success_) goto 9999
+      deallocate(prec%prec, stat=info)
+      if(info /= psb_success_) goto 9999
     end if
+
     call psb_erractionrestore(err_act)
     return
 
@@ -451,37 +435,30 @@ contains
     class(psb_dprec_type), intent(in) :: prec
     logical, intent(in), optional :: global
     integer(psb_epk_) :: val    
-    integer(psb_ipk_)        :: i
+
+    integer(psb_ipk_)   :: i
     type(psb_ctxt_type) :: ctxt
-    logical :: global_
+    logical             :: global_
 
-    if (present(global)) then
-      global_ = global
-    else
-      global_ = .false.
-    end if
+    global_ = .false.
+    if(present(global)) global_ = global
 
-    val = 0    
+    val = 0  
     val = val + prec%prec%sizeof()
-    if (global_) then
+    if(global_) then
       ctxt = prec%ctxt
-      call psb_sum(ctxt,val)
+      call psb_sum(ctxt, val)
     end if
-
   end function psb_dprec_sizeof
 
-  subroutine psb_d_prec_clone(prec,precout,info)
+  subroutine psb_d_prec_clone(prec, precout, info)
     implicit none
-    class(psb_dprec_type), intent(inout) :: prec
-    class(psb_dprec_type), intent(inout) :: precout
-    integer(psb_ipk_), intent(out)             :: info
+    class(psb_dprec_type), intent(inout)  :: prec
+    class(psb_dprec_type), intent(inout)  :: precout
+    integer(psb_ipk_), intent(out)        :: info
 
     info = psb_success_
     call prec%free(info)
-    if (allocated(prec%prec)) then
-      call prec%prec%clone(precout%prec,info)
-    end if
-
+    if(allocated(prec%prec)) call prec%prec%clone(precout%prec, info)
   end subroutine psb_d_prec_clone
-
 end module psb_d_prec_type

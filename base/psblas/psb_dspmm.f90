@@ -32,7 +32,7 @@
 ! File: psb_dspmm.f90
 !
 !
-! Subroutine: psb_dspm_vect
+! Subroutine: psb_dspmv_vect
 !     Performs one of the distributed matrix-vector operations
 !
 !     Y := alpha * Pr * A * Pc * X  + beta * Y,  or
@@ -43,19 +43,19 @@
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha   -  real                The scalar alpha.
-!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
-!    x       -  type(psb_d_vect_type) The input vector containing the entries of ( X ).
-!    beta    -  real                The scalar beta.
-!    y       -  type(psb_d_vect_type) The input vector containing the entries of ( Y ).
-!    desc_a  -  type(psb_desc_type).   The communication descriptor.
-!    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. Default:  'N' 
-!    work(:) -  real,(optional).    Working area.
-!    doswap  -  logical(optional).     Whether to performe halo updates.
+!    alpha   -  real                   The scalar alpha.
+!    a       -  type(psb_dspmat_type)  The sparse matrix containing A.
+!    x       -  type(psb_d_vect_type)  The input vector containing the entries of ( X ).
+!    beta    -  real                   The scalar beta.
+!    y       -  type(psb_d_vect_type)  The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type)    The communication descriptor.
+!    info    -  integer                Return code
+!    trans   -  character, optional    Whether A or A'. Default:  'N' 
+!    work(:) -  real, optional         Working area.
+!    doswap  -  logical, optional      Whether to performe halo updates.
 ! 
 subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
-                        & trans, work, doswap)   
+                          & trans, work, doswap)   
   use psb_base_mod, psb_protect_name => psb_dspmv_vect
   use psi_mod
   implicit none
@@ -108,17 +108,11 @@ subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
     goto 9999
   endif
 
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N') .and. (trans_ /= 'T') .and. (trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -176,8 +170,7 @@ subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
     iwork => work
   endif
 
-  if(debug_level >= psb_debug_comp_) &
-       & write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
+  if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
 
   if(trans_ == 'N') then
     !  Matrix is not transposed
@@ -186,7 +179,7 @@ subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
       block
         logical, parameter :: do_timings = .false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
-        !if(me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
         if(doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
@@ -239,8 +232,7 @@ subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
     !  local Matrix-vector product
     if(info == psb_success_) call psb_csmm(alpha, a, x, beta, y, info, trans = trans_)
 
-    if(debug_level >= psb_debug_comp_) &
-         & write(debug_unit, *) me, ' ', trim(name), ' csmm ', info
+    if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' csmm ', info
 
     if(info == psb_success_) call psi_ovrl_restore(x%v, xvsave, desc_a, info)
     if(info /= psb_success_) then
@@ -252,8 +244,8 @@ subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
 
     if(doswap_) then
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
-      if(info == psb_success_) & 
-        & call psi_swapdata(ior(psb_swap_send_,  psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_,  psb_swap_recv_), done, y%v, desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
       if(debug_level >= psb_debug_comp_) &
            & write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
@@ -267,8 +259,7 @@ subroutine psb_dspmv_vect(alpha, a, x, beta, y, desc_a, info, &
   end if
 
   if(aliw) deallocate(iwork, stat = info)
-  if(debug_level >= psb_debug_comp_) &
-       & write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
+  if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'Deallocate iwork'
@@ -306,19 +297,19 @@ end subroutine psb_dspmv_vect
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha   -  real                The scalar alpha.
-!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
-!    x(:, :)  -  real                The input vector containing the entries of ( X ).
-!    beta    -  real                The scalar beta.
-!    y(:, :)  -  real                The input vector containing the entries of ( Y ).
-!    desc_a  -  type(psb_desc_type).   The communication descriptor.
+!    alpha   -  real                   The scalar alpha.
+!    a       -  type(psb_dspmat_type)  The sparse matrix containing A.
+!    x(:, :) -  real                   The input vector containing the entries of ( X ).
+!    beta    -  real                   The scalar beta.
+!    y(:, :) -  real                   The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type)    The communication descriptor.
 !    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. Default: 'N' 
-!    k       -  integer(optional).     The number of right-hand sides.
-!    jx      -  integer(optional).     The column offset for ( X ). Default:  1
-!    jy      -  integer(optional).     The column offset for ( Y ). Default:  1
-!    work(:) -  real,(optional).    Working area.
-!    doswap  -  logical(optional).     Whether to performe halo updates.
+!    trans   -  character, optional    Whether A or A'. Default: 'N' 
+!    k       -  integer, optional      The number of right-hand sides.
+!    jx      -  integer, optional      The column offset for ( X ). Default:  1
+!    jy      -  integer, optional      The column offset for ( Y ). Default:  1
+!    work(:) -  real, optional         Working area.
+!    doswap  -  logical, optional      Whether to performe halo updates.
 ! 
 subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
                     & trans, k, jx, jy, work, doswap)   
@@ -373,24 +364,12 @@ subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
   ja = 1
 
   ix = 1
-  if(present(jx)) then
-    ijx = jx
-  else
-    ijx = 1
-  endif
+  ijx = 1
+  if(present(jx)) ijx = jx
 
   iy = 1
-  if(present(jy)) then
-    ijy = jy
-  else
-    ijy = 1
-  endif
-
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  ijy = 1
+  if(present(jy)) ijy = jy
 
   if(present(k)) then     
     lik = min(k, size(x, 2) - ijx + 1)
@@ -399,11 +378,11 @@ subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
     lik = min(size(x, 2) - ijx + 1, size(y, 2) - ijy + 1)
   endif
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N') .and. (trans_ /= 'T') .and. (trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -551,8 +530,7 @@ subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
     y(nrow + 1 : ncol, 1 : lik) = dzero
     if(info == psb_success_) call psb_csmm(alpha, a, x(:, 1 : lik), beta, y(:, 1 : lik), info, trans = trans_)
 
-    if(debug_level >= psb_debug_comp_) &
-         & write(debug_unit, *) me, ' ', trim(name), ' csmm ', info
+    if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' csmm ', info
 
     if(info /= psb_success_) then
       info = psb_err_from_subroutine_
@@ -566,11 +544,10 @@ subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
       ik = lik ! This should not be an issue, we are expecting the values
       ! to be small, within PSB_IPK
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), ik, done, y(:, 1 : ik), desc_a, iwork, info)
-      if(info == psb_success_) &
-        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), ik, done, y(:, 1:ik), desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), ik, done, y(:, 1:ik), desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
-      if(debug_level >= psb_debug_comp_) &
-           & write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
+      if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
       if(info /= psb_success_) then
         info = psb_err_from_subroutine_
         ch_err = 'PSI_dSwapTran'
@@ -581,8 +558,7 @@ subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
   end if
 
   if(aliw) deallocate(iwork, stat = info)
-  if(debug_level >= psb_debug_comp_) &
-       & write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
+  if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ', aliw, info
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'Deallocate iwork'
@@ -597,6 +573,7 @@ subroutine psb_dspmm(alpha, a, x, beta, y, desc_a, info, &
 9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspmm
+
 !!$ 
 !!$              Parallel Sparse BLAS  version 3.5
 !!$    (C) Copyright 2006-2018
@@ -640,16 +617,16 @@ end subroutine psb_dspmm
 !  vectors and A is a M-by-N distributed matrix.
 !
 ! Arguments:   
-!    alpha   -  real                The scalar alpha.
-!    a       -  type(psb_dspmat_type). The sparse matrix containing A.
-!    x(:)    -  real                The input vector containing the entries of ( X ).
-!    beta    -  real                The scalar beta.
-!    y(:)    -  real                The input vector containing the entries of ( Y ).
-!    desc_a  -  type(psb_desc_type).   The communication descriptor.
-!    info    -  integer.               Return code
-!    trans   -  character(optional).   Whether A or A'. Default:  'N' 
-!    work(:) -  real,(optional).    Working area.
-!    doswap  -  logical(optional).     Whether to performe halo updates.
+!    alpha   -  real                   The scalar alpha.
+!    a       -  type(psb_dspmat_type)  The sparse matrix containing A.
+!    x(:)    -  real                   The input vector containing the entries of ( X ).
+!    beta    -  real                   The scalar beta.
+!    y(:)    -  real                   The input vector containing the entries of ( Y ).
+!    desc_a  -  type(psb_desc_type)    The communication descriptor.
+!    info    -  integer                Return code
+!    trans   -  character, optional    Whether A or A'. Default:  'N' 
+!    work(:) -  real, optional         Working area.
+!    doswap  -  logical, optional      Whether to performe halo updates.
 ! 
 subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
                     & trans, work, doswap)   
@@ -708,17 +685,11 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
   lik = 1
   ib = 1
 
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N') .and. (trans_ /= 'T') .and. (trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -759,8 +730,7 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
     iwork => work
   endif
 
-  if(debug_level >= psb_debug_comp_) &
-       & write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
+  if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
   
   ! checking for matrix correctness
   call psb_chkmat(m, n, ia, ja, desc_a, info, iia, jja)
@@ -771,8 +741,8 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
     goto 9999
   end if
 
-  if(debug_level >= psb_debug_comp_) &
-       & write(debug_unit, *) me, ' ', trim(name), ' Checkmat ', info
+  if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Checkmat ', info
+
   if(trans_ == 'N') then
     !  Matrix is not transposed
     if((ja /= ix) .or. (ia /= iy)) then
@@ -851,8 +821,7 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
     !  local Matrix-vector product
     if(info == psb_success_) call psb_csmm(alpha, a, x, beta, y, info, trans = trans_)
 
-    if(debug_level >= psb_debug_comp_) &
-         & write(debug_unit, *) me, ' ', trim(name), ' csmm ', info
+    if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' csmm ', info
 
     if(info == psb_success_) call psi_ovrl_restore(x, xvsave, desc_a, info)
     if(info /= psb_success_) then
@@ -864,12 +833,10 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
 
     if(doswap_) then
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, yp, desc_a, iwork, info)
-      if(info == psb_success_) & 
-        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, yp, desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, yp, desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
-      if(debug_level >= psb_debug_comp_) &
-           & write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
-
+      if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
       if(info /= psb_success_) then
         info = psb_err_from_subroutine_
         ch_err = 'PSI_dSwapTran'
@@ -880,8 +847,7 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
   end if
 
   if(aliw) deallocate(iwork, stat = info)
-  if(debug_level >= psb_debug_comp_) &
-       & write(debug_unit, *) me, ' ', trim(name), ' deallocat ',aliw, info
+  if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' deallocat ',aliw, info
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
     ch_err = 'Deallocate iwork'
@@ -902,9 +868,7 @@ subroutine psb_dspmv(alpha, a, x, beta, y, desc_a, info, &
   return
 end subroutine psb_dspmv
 
-
 ! Multivector version of dspmv
-
 subroutine psb_dspmv_mv(alpha, a, x, beta, y, idx_y, desc_a, info, trans, work, doswap)
   use psb_base_mod, psb_protect_name => psb_dspmv_mv
   use psi_mod
@@ -965,17 +929,11 @@ subroutine psb_dspmv_mv(alpha, a, x, beta, y, idx_y, desc_a, info, trans, work, 
     goto 9999
   endif
 
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N').and.(trans_ /= 'T') .and.(trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -1034,7 +992,7 @@ subroutine psb_dspmv_mv(alpha, a, x, beta, y, idx_y, desc_a, info, trans, work, 
       block
         logical, parameter :: do_timings = .false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
-        !if(me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
         if(doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
@@ -1097,8 +1055,8 @@ subroutine psb_dspmv_mv(alpha, a, x, beta, y, idx_y, desc_a, info, trans, work, 
 
     if(doswap_) then
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
-      if(info == psb_success_) &
-        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
       if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
       if(info /= psb_success_) then
@@ -1150,9 +1108,8 @@ subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, &
-        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
-        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_ipk_) :: np, me, err_act, iia, jja, iix, jjx, iiy, jjy, &
+                      & nrow, ncol, lldx, lldy, liwork, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter  :: nb = 4
   real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
@@ -1194,17 +1151,11 @@ subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
     goto 9999
   endif
 
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N').and.(trans_ /= 'T').and.(trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -1261,7 +1212,6 @@ subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
 
   if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
 
-
   if(trans_ == 'N') then
     !  Matrix is not transposed
     
@@ -1269,7 +1219,7 @@ subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
       block
         logical, parameter :: do_timings = .false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
-        !if(me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
         if(doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
@@ -1333,8 +1283,8 @@ subroutine psb_dspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
 
     if(doswap_) then
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
-      if(info == psb_success_) &
-        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
       if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
       if(info /= psb_success_) then
@@ -1386,9 +1336,8 @@ subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, &
-        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
-        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_ipk_) :: np, me, err_act, iia, jja, iix, jjx, iiy, jjy, &
+                      & nrow, ncol, lldx, lldy, liwork, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter  :: nb = 4
   real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
@@ -1425,17 +1374,11 @@ subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
     goto 9999
   endif
 
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N').and.(trans_ /= 'T') .and.(trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -1487,7 +1430,6 @@ subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
 
   if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
 
-
   if(trans_ == 'N') then
     !  Matrix is not transposed
     
@@ -1495,7 +1437,7 @@ subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
       block
         logical, parameter :: do_timings = .false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
-        !if(me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
         if(doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
@@ -1559,8 +1501,8 @@ subroutine psb_dspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
 
     if(doswap_) then
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
-      if(info == psb_success_) &
-        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
       if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
       if(info /= psb_success_) then
@@ -1611,9 +1553,8 @@ subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, do
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me, err_act, &
-        & iix, jjx, iia, jja, nrow, ncol, lldx, lldy, &
-        & liwork, iiy, jjy, ib, ip, idx
+  integer(psb_ipk_) :: np, me, err_act, iia, jja, iix, jjx, iiy, jjy, &
+                      & nrow, ncol, lldx, lldy, liwork, ib, ip, idx
   integer(psb_lpk_) :: ix, ijx, iy, ijy, m, n, ia, ja
   integer(psb_ipk_), parameter  :: nb = 4
   real(psb_dpk_), pointer       :: iwork(:), xp(:), yp(:)
@@ -1650,17 +1591,11 @@ subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, do
     goto 9999
   endif
 
-  if(present(doswap)) then
-    doswap_ = doswap
-  else
-    doswap_ = .true.
-  endif
+  doswap_ = .true.
+  if(present(doswap)) doswap_ = doswap
 
-  if(present(trans)) then     
-    trans_ = psb_toupper(trans)
-  else
-    trans_ = 'N'
-  endif
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
 
   if((trans_ /= 'N').and.(trans_ /= 'T') .and.(trans_ /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -1712,7 +1647,6 @@ subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, do
 
   if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' Allocated work ', info
 
-
   if(trans_ == 'N') then
     !  Matrix is not transposed
     
@@ -1720,7 +1654,7 @@ subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, do
       block
         logical, parameter :: do_timings = .false.
         real(psb_dpk_) :: t1, t2, t3, t4, t5
-        !if(me==0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
+        !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
         if(doswap_) call psi_swapdata(psb_swap_send_, dzero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
@@ -1784,8 +1718,8 @@ subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, do
 
     if(doswap_) then
       call psi_swaptran(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info)
-      if(info == psb_success_) &
-        & call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, data = psb_comm_ovr_)
+      if(info == psb_success_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), done, y%v, desc_a, iwork, info, &
+                                                & data = psb_comm_ovr_)
 
       if(debug_level >= psb_debug_comp_) write(debug_unit, *) me, ' ', trim(name), ' swaptran ', info
       if(info /= psb_success_) then
@@ -1814,7 +1748,7 @@ subroutine psb_dspmv_mm_full(alpha, a, x, beta, y, desc_a, info, trans, work, do
     write(debug_unit, *) me, ' ', trim(name), ' Returning '
   endif
 
-  return  
+  return
 
 9999 call psb_error_handler(ctxt, err_act)
   return

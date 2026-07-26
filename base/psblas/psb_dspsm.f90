@@ -61,14 +61,13 @@
 ! Arguments:   
 !    alpha   -  real                  The scalar alpha
 !    a       -  type(psb_dspmat_type) The sparse matrix containing A
-!    x(:, :)  -  real                 The input vector containing the entries of ( X )
+!    x(:, :) -  real                 The input vector containing the entries of ( X )
 !    beta    -  real                  The scalar beta
-!    y(:, :)  -  real                 The input vector containing the entries of ( Y )
+!    y(:, :) -  real                 The input vector containing the entries of ( Y )
 !    desc_a  -  type(psb_desc_type)   The communication descriptor
 !    info    -  integer               Return code
 !    trans   -  character, optional   Whether A or A' If not present 'N' is assumed
-!    scale   -  character, optional   Specify some type of operation with
-!                                       the diagonal matrix D
+!    scale   -  character, optional   Specify some type of operation with the diagonal matrix D
 !    choice  -  integer, optional     The kind of update to perform on overlap elements
 !    d(:)    -  real, optional        Matrix for diagonal scaling
 !    k       -  integer, optional     The number of right-hand sides
@@ -128,18 +127,12 @@ subroutine psb_dspsm(alpha, a, x, beta, y, desc_a, info, &
   ja = 1
 
   ix = 1
-  if(present(jx)) then
-    ijx = jx
-  else
-    ijx = 1
-  endif
+  ijx = 1
+  if(present(jx)) ijx = jx
 
   iy = 1
-  if(present(jy)) then
-    ijy = jy
-  else
-    ijy = 1
-  endif
+  ijy = 1
+  if(present(jy)) ijy = jy
 
   if(present(k)) then
     lik = min(k, size(x, 2) - ijx + 1)
@@ -148,28 +141,20 @@ subroutine psb_dspsm(alpha, a, x, beta, y, desc_a, info, &
     lik = min(size(x, 2)-ijx+1, size(y, 2) - ijy + 1)
   endif
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-    if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
-      info = psb_err_iarg_invalid_value_
-      call psb_errpush(info, name)
-      goto 9999
-    end if
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
+  
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
 
   m    = desc_a%get_global_rows()
   nrow = desc_a%get_local_rows()
@@ -280,6 +265,7 @@ subroutine psb_dspsm(alpha, a, x, beta, y, desc_a, info, &
 9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_dspsm
+
 !
 ! Subroutine: psb_dspsv
 !  Performs one of the distributed matrix-vector operations
@@ -371,28 +357,20 @@ subroutine psb_dspsv(alpha, a, x, beta, y, desc_a, info, &
   jx = 1
   jy = 1
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-    if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
-      info = psb_err_iarg_invalid_value_
-      call psb_errpush(info, name)
-      goto 9999
-    end if
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
+  
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
 
   m    = desc_a%get_global_rows()
   nrow = desc_a%get_local_rows()
@@ -589,28 +567,20 @@ subroutine psb_dspsv_vect(alpha, a, x, beta, y, desc_a, info, &
     goto 9999
   endif
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-    if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
-      info = psb_err_iarg_invalid_value_
-      call psb_errpush(info, name)
-      goto 9999
-    end if
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
+  
+  if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
+    info = psb_err_iarg_invalid_value_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
 
   m    = desc_a%get_global_rows()
   nrow = desc_a%get_local_rows()
@@ -752,23 +722,14 @@ subroutine psb_dspsv_mv(alpha, t, x, idx_x, beta, y, desc_a, info, &
     goto 9999
   endif
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
   
   if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -913,23 +874,14 @@ subroutine psb_dspsv_vm(alpha, t, x, beta, y, idx_y, desc_a, info, &
     goto 9999
   endif
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
   
   if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -1066,23 +1018,14 @@ subroutine psb_dspsv_mm_full(alpha, t, x, beta, y, desc_a, info, &
     goto 9999
   endif
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
   
   if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
     info = psb_err_iarg_invalid_value_
@@ -1219,23 +1162,14 @@ subroutine psb_dspsv_mm_idxs(alpha, t, x, idx_x, beta, y, idx_y, desc_a, info, &
     goto 9999
   endif
 
-  if(present(choice)) then     
-    choice_ = choice
-  else
-    choice_ = psb_avg_
-  endif
+  choice_ = psb_avg_
+  if(present(choice)) choice_ = choice
 
-  if(present(scale)) then     
-    lscale = psb_toupper(scale)
-  else
-    lscale = 'U'
-  endif
+  lscale = 'U'
+  if(present(scale)) lscale = psb_toupper(scale)
 
-  if(present(trans)) then     
-    itrans = psb_toupper(trans)
-  else
-    itrans = 'N'
-  endif
+  itrans = 'N'
+  if(present(trans)) itrans = psb_toupper(trans)
   
   if((itrans /= 'N') .and. (itrans /= 'T') .and. (itrans /= 'C')) then
     info = psb_err_iarg_invalid_value_

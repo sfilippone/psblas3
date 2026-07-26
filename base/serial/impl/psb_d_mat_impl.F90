@@ -906,8 +906,7 @@ subroutine psb_d_tril(a, l, info, diag, imin, imax, &
     if(info == psb_success_) call u%cscnv(info, mold = a%a)
   else
     if(info == psb_success_) then
-      call a%a%tril(lcoo, info, diag, imin, imax, &
-                  & jmin, jmax, rscale, cscale)
+      call a%a%tril(lcoo, info, diag, imin, imax, jmin, jmax, rscale, cscale)
     else
       info = psb_err_alloc_dealloc_
     end if
@@ -963,8 +962,7 @@ subroutine psb_d_triu(a, u, info, diag, imin, imax, &
     if(info == psb_success_) call l%cscnv(info, mold = a%a)
   else
     if(info == psb_success_) then
-      call a%a%triu(ucoo, info, diag, imin, imax, &
-                  & jmin, jmax, rscale, cscale)
+      call a%a%triu(ucoo, info, diag, imin, imax, jmin, jmax, rscale, cscale)
     else
       info = psb_err_alloc_dealloc_
     end if
@@ -1011,8 +1009,7 @@ subroutine psb_d_csclip(a, b, info, &
   allocate(acoo, stat = info)
   call b%free()
   if(info == psb_success_) then
-    call a%a%csclip(acoo, info, &
-                  & imin, imax, jmin, jmax, rscale, cscale)
+    call a%a%csclip(acoo, info, imin, imax, jmin, jmax, rscale, cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
@@ -1027,8 +1024,7 @@ subroutine psb_d_csclip(a, b, info, &
   return
 end subroutine psb_d_csclip
 
-subroutine psb_d_csclip_ip(a, info, &
-                          & imin, imax, jmin, jmax, rscale, cscale)
+subroutine psb_d_csclip_ip(a, info, imin, imax, jmin, jmax, rscale, cscale)
   ! Output is always in  COO format
   use psb_error_mod
   use psb_const_mod
@@ -1055,8 +1051,7 @@ subroutine psb_d_csclip_ip(a, info, &
 
   allocate(acoo, stat = info)
   if(info == psb_success_) then
-    call a%a%csclip(acoo, info, &
-                  & imin, imax, jmin, jmax, rscale, cscale)
+    call a%a%csclip(acoo, info, imin, imax, jmin, jmax, rscale, cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
@@ -1098,8 +1093,7 @@ subroutine psb_d_b_csclip(a, b, info, &
     goto 9999
   endif
 
-  call a%a%csclip(b, info, &
-       & imin, imax, jmin, jmax, rscale, cscale)
+  call a%a%csclip(b, info, imin, imax, jmin, jmax, rscale, cscale)
   if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -4030,8 +4024,7 @@ subroutine psb_ld_csgetblk(imin, imax, a, b, info, &
   end if
 
   if(info == psb_success_) then
-    call a%a%csget(imin, imax, acoo, info, &
-                & jmin, jmax, iren, append, rscale, cscale)
+    call a%a%csget(imin, imax, acoo, info, jmin, jmax, iren, append, rscale, cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
@@ -4084,8 +4077,7 @@ subroutine psb_ld_tril(a, l, info, diag, imin, imax, &
     if(info == psb_success_) call u%cscnv(info, mold = a%a)
   else
     if(info == psb_success_) then
-      call a%a%tril(lcoo, info, diag, imin, imax, &
-                  & jmin, jmax, rscale, cscale)
+      call a%a%tril(lcoo, info, diag, imin, imax, jmin, jmax, rscale, cscale)
     else
       info = psb_err_alloc_dealloc_
     end if
@@ -4140,8 +4132,7 @@ subroutine psb_ld_triu(a, u, info, diag, imin, imax, &
     if(info == psb_success_) call l%cscnv(info, mold = a%a)
   else
     if(info == psb_success_) then
-      call a%a%triu(ucoo, info, diag, imin, imax, &
-           & jmin, jmax, rscale, cscale)
+      call a%a%triu(ucoo, info, diag, imin, imax, jmin, jmax, rscale, cscale)
     else
       info = psb_err_alloc_dealloc_
     end if
@@ -4187,8 +4178,7 @@ subroutine psb_ld_csclip(a, b, info, &
   allocate(acoo, stat = info)
   call b%free()
   if(info == psb_success_) then
-    call a%a%csclip(acoo, info, &
-                  & imin, imax, jmin, jmax, rscale, cscale)
+    call a%a%csclip(acoo, info, imin, imax, jmin, jmax, rscale, cscale)
   else
     info = psb_err_alloc_dealloc_
   end if
@@ -4274,8 +4264,7 @@ subroutine psb_ld_b_csclip(a, b, info, &
     goto 9999
   endif
 
-  call a%a%csclip(b, info, &
-                & imin, imax, jmin, jmax, rscale, cscale)
+  call a%a%csclip(b, info, imin, imax, jmin, jmax, rscale, cscale)
   if(info /= psb_success_) goto 9999
 
   call psb_erractionrestore(err_act)
@@ -4350,8 +4339,7 @@ subroutine psb_ld_cscnv(a, b, info, type, mold, upd, dupl)
     call altmp%set_dupl(psb_dupl_def_)
   end if
 
-  if(debug) write(psb_err_unit, *) 'Converting from ', &
-                      & a%get_fmt(), ' to ', altmp%get_fmt()
+  if(debug) write(psb_err_unit, *) 'Converting from ', a%get_fmt(), ' to ', altmp%get_fmt()
 
   call altmp%cp_from_fmt(a%a, info)
 

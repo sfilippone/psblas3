@@ -43,7 +43,6 @@
 !
 !
 module psb_z_base_vect_mod
-
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
@@ -64,7 +63,7 @@ module psb_z_base_vect_mod
     !> Values.
     complex(psb_dpk_), allocatable :: v(:)
     complex(psb_dpk_), allocatable :: combuf(:)
-    integer(psb_mpk_), allocatable :: comid(:,:)
+    integer(psb_mpk_), allocatable :: comid(:, :)
     !> vector bldstate:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -87,6 +86,7 @@ module psb_z_base_vect_mod
     generic, public    :: bld      => bld_x, bld_mn, bld_en
     procedure, pass(x) :: all      => z_base_all
     procedure, pass(x) :: mold     => z_base_mold
+    
     !
     ! Insert/set. Assembly and free.
     ! Assembly does almost nothing here, but is important
@@ -116,6 +116,7 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: is_upd    => z_base_is_upd
     procedure, pass(x) :: is_asb    => z_base_is_asb
     procedure, pass(x) :: base_cpy  => z_base_cpy
+    
     !
     ! Sync: centerpiece of handling of external storage.
     ! Any derived class having extra storage upon sync
@@ -148,6 +149,7 @@ module psb_z_base_vect_mod
     procedure, pass(x) :: get_nrows => z_base_get_nrows
     procedure, pass(x) :: sizeof    => z_base_sizeof
     procedure, nopass  :: get_fmt   => z_base_get_fmt
+    
     !
     ! Set/get data from/to an external array; also
     ! overload assignment.
@@ -158,6 +160,7 @@ module psb_z_base_vect_mod
     generic, public    :: set      => set_vect, set_scal
     procedure, pass(x) :: get_entry=> z_base_get_entry
     procedure, pass(x) :: set_entry=> z_base_set_entry
+
     !
     ! Gather/scatter. These are needed for MPI interfacing.
     ! May have to be reworked.
@@ -173,8 +176,6 @@ module psb_z_base_vect_mod
     generic, public    :: sct      => sctb, sctb_x, sctb_buf
 
     procedure, pass(x) :: check_addr  => z_base_check_addr
-
-
 
     !
     ! Dot product and AXPBY
@@ -218,6 +219,7 @@ module psb_z_base_vect_mod
     procedure, pass(y) :: inv_a2   => z_base_inv_a2
     procedure, pass(y) :: inv_a2_check => z_base_inv_a2_check
     generic, public    :: inv      => inv_v, inv_v_check, inv_a2, inv_a2_check
+    
     !
     ! Scaling and norms
     !
@@ -234,14 +236,13 @@ module psb_z_base_vect_mod
     !
     procedure, pass(z) :: acmp_a2   => z_base_acmp_a2
     procedure, pass(z) :: acmp_v2   => z_base_acmp_v2
-    generic, public    :: acmp      => acmp_a2,acmp_v2
+    generic, public    :: acmp      => acmp_a2, acmp_v2
     !
     ! Add constant value to all entry of a vector
     !
     procedure, pass(z) :: addconst_a2   => z_base_addconst_a2
     procedure, pass(z) :: addconst_v2   => z_base_addconst_v2
-    generic, public    :: addconst      => addconst_a2,addconst_v2
-
+    generic, public    :: addconst      => addconst_a2, addconst_v2
 
   end type psb_z_base_vect_type
 
@@ -252,14 +253,13 @@ module psb_z_base_vect_mod
   end interface psb_z_base_vect
 
 contains
-
   !
   ! Constructors.
   !
 
   !> Function  constructor:
   !! \brief     Constructor from an array
-  !!  \param   x(:)  input array to be copied
+  !! \param   x(:)  input array to be copied
   !!
   function constructor(x) result(this)
     complex(psb_dpk_)   :: x(:)
@@ -267,21 +267,19 @@ contains
     integer(psb_ipk_) :: info
 
     this%v = x
-    call this%asb(size(x,kind=psb_ipk_),info)
+    call this%asb(size(x, kind=psb_ipk_), info)
   end function constructor
-
 
   !> Function  constructor:
   !! \brief     Constructor from size
-  !!  \param    n   Size of vector to be built.
+  !! \param    n   Size of vector to be built.
   !!
   function size_const(n) result(this)
     integer(psb_ipk_), intent(in) :: n
     type(psb_z_base_vect_type) :: this
     integer(psb_ipk_) :: info
 
-    call this%asb(n,info)
-
+    call this%asb(n, info)
   end function size_const
 
   !
@@ -291,9 +289,9 @@ contains
   !> Function  bld_x:
   !! \memberof  psb_z_base_vect_type
   !! \brief     Build method from an array
-  !!  \param   x(:)  input array to be copied
+  !! \param   x(:)  input array to be copied
   !!
-  subroutine z_base_bld_x(x,this,scratch)
+  subroutine z_base_bld_x(x, this, scratch)
     use psb_realloc_mod
     implicit none
     complex(psb_dpk_), intent(in) :: this(:)
@@ -304,14 +302,14 @@ contains
     integer(psb_ipk_) :: info
     integer(psb_ipk_) :: i
     
-    if (present(scratch)) then
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    call psb_realloc(size(this),x%v,info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_vect_bld')
+    call psb_realloc(size(this), x%v, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'base_vect_bld')
       return
     end if
 #if defined (PSB_OPENMP)
@@ -320,7 +318,7 @@ contains
       x%v(i) = this(i)
     end do
 #else
-    x%v(:)  = this(:)
+    x%v(:) = this(:)
 #endif
   end subroutine z_base_bld_x
 
@@ -331,9 +329,9 @@ contains
   !> Function  bld_mn:
   !! \memberof  psb_z_base_vect_type
   !! \brief     Build method with size (uninitialized data)
-  !!  \param    n    size to be allocated.
+  !! \param    n    size to be allocated.
   !!
-  subroutine z_base_bld_mn(x,n,scratch)
+  subroutine z_base_bld_mn(x, n, scratch)
     use psb_realloc_mod
     implicit none
     integer(psb_mpk_), intent(in) :: n
@@ -343,22 +341,21 @@ contains
     logical :: scratch_
     integer(psb_ipk_) :: info
 
-    if (present(scratch)) then
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    call psb_realloc(n,x%v,info)
-    call x%asb(n,info,scratch=scratch_)
-
+    call psb_realloc(n, x%v, info)
+    call x%asb(n, info, scratch = scratch_)
   end subroutine z_base_bld_mn
 
   !> Function  bld_en:
   !! \memberof  psb_z_base_vect_type
   !! \brief     Build method with size (uninitialized data)
-  !!  \param    n    size to be allocated.
+  !! \param    n    size to be allocated.
   !!
-  subroutine z_base_bld_en(x,n,scratch)
+  subroutine z_base_bld_en(x, n, scratch)
     use psb_realloc_mod
     implicit none
     integer(psb_epk_), intent(in) :: n
@@ -368,22 +365,21 @@ contains
     logical :: scratch_
     integer(psb_ipk_) :: info
 
-    if (present(scratch)) then
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    call psb_realloc(n,x%v,info)
-    call x%asb(n,info,scratch=scratch_)
-
+    call psb_realloc(n, x%v, info)
+    call x%asb(n, info, scratch = scratch_)
   end subroutine z_base_bld_en
 
   !> Function  base_all:
   !! \memberof  psb_z_base_vect_type
   !! \brief     Build method with size (uninitialized data) and
   !!            allocation return code.
-  !!  \param    n    size to be allocated.
-  !!  \param info  return code
+  !! \param    n    size to be allocated.
+  !! \param info  return code
   !!
   subroutine z_base_all(n, x, info)
     use psi_serial_mod
@@ -393,55 +389,52 @@ contains
     class(psb_z_base_vect_type), intent(out)    :: x
     integer(psb_ipk_), intent(out)              :: info
 
-    call psb_realloc(n,x%v,info)
-    if (try_newins) then
-      call psb_realloc(n,x%iv,info)
+    call psb_realloc(n, x%v, info)
+    if(try_newins) then
+      call psb_realloc(n, x%iv, info)
       call x%set_ncfs(0)
     end if
-
   end subroutine z_base_all
 
   !> Function  base_mold:
   !! \memberof  psb_z_base_vect_type
   !! \brief     Mold method: return a variable with the same dynamic type
-  !!  \param    y returned variable
-  !!  \param info  return code
+  !! \param    y returned variable
+  !! \param info  return code
   !!
   subroutine z_base_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_z_base_vect_type), intent(in)   :: x
+    class(psb_z_base_vect_type), intent(in)               :: x
     class(psb_z_base_vect_type), intent(out), allocatable :: y
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(out)                        :: info
 
-    allocate(psb_z_base_vect_type :: y, stat=info)
-
+    allocate(psb_z_base_vect_type :: y, stat = info)
   end subroutine z_base_mold
 
-  subroutine z_base_reinit(x, info,clear)
+  subroutine z_base_reinit(x, info, clear)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)    :: x
+    class(psb_z_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
     logical, intent(in), optional               :: clear
     logical :: clear_
 
-    info =  0
-    if (present(clear)) then
+    info = psb_success_
+    if(present(clear)) then
       clear_ = clear
     else
       clear_ = .true.
     end if
 
-    if (allocated(x%v)) then 
-      if (x%is_dev()) call x%sync()
-      if (clear_) x%v(:) = zzero
+    if(allocated(x%v)) then 
+      if(x%is_dev()) call x%sync()
+      if(clear_) x%v(:) = zzero
       call x%set_host()
       call x%set_upd()
     end if
-
   end subroutine z_base_reinit
 
   !
@@ -451,52 +444,50 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief Insert coefficients.
   !!
-  !!
-  !!         Given  a list of N pairs
-  !!           (IRL(i),VAL(i))
+  !!         Given a list of N pairs
+  !!           (IRL(i), VAL(i))
   !!         record a new coefficient in X such that
   !!            X(IRL(1:N)) = VAL(1:N).
   !!
   !!         - the update operation will perform either
   !!               X(IRL(1:n)) = VAL(1:N)
   !!           or
-  !!               X(IRL(1:n)) = X(IRL(1:n))+VAL(1:N)
+  !!               X(IRL(1:n)) = X(IRL(1:n)) + VAL(1:N)
   !!           according to the value of DUPLICATE.
   !!
-  !!
-  !!  \param n     number of pairs in input
-  !!  \param irl(:)  the input row indices
-  !!  \param val(:)  the input coefficients
-  !!  \param dupl    how to treat duplicate entries
-  !!  \param info  return code
+  !! \param n     number of pairs in input
+  !! \param irl(:)  the input row indices
+  !! \param val(:)  the input coefficients
+  !! \param dupl    how to treat duplicate entries
+  !! \param info  return code
   !!
   !
-  subroutine z_base_ins_a(n,irl,val,dupl,x,maxr,info)
+  subroutine z_base_ins_a(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(in)               :: n, dupl, maxr
     integer(psb_ipk_), intent(in)               :: irl(:)
-    complex(psb_dpk_), intent(in)        :: val(:)
+    complex(psb_dpk_), intent(in)                  :: val(:)
+    class(psb_z_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
 
     integer(psb_ipk_) :: i, isz, dupl_, ncfs_, k
 
-    info = 0
-    if (psb_errstatus_fatal()) return
+    info = psb_success_
+    if(psb_errstatus_fatal()) return
 
-    if (try_newins) then 
-      if (x%is_bld()) then
+    if(try_newins) then 
+      if(x%is_bld()) then
         ncfs_ = x%get_ncfs()
         isz = ncfs_ + n
-        call psb_ensure_size(isz,x%v,info)
-        call psb_ensure_size(isz,x%iv,info)
-        k   = ncfs_
+        call psb_ensure_size(isz, x%v, info)
+        call psb_ensure_size(isz, x%iv, info)
+        k = ncfs_
         do i = 1, n
           !loop over all val's rows
           ! row actual block row
-          if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-            k  = k + 1 
+          if((1 <= irl(i)) .and. (irl(i) <= maxr)) then
+            k = k + 1 
             ! this row belongs to me
             ! copy i-th row of block val in x
             x%v(k)  = val(i)
@@ -505,21 +496,60 @@ contains
         enddo
         call x%set_ncfs(k)      
 
-      else if (x%is_upd()) then
+      else if(x%is_upd()) then
 
         dupl_ = x%get_dupl()
-        if (.not.allocated(x%v)) then
+        if(.not. allocated(x%v)) then
           info = psb_err_invalid_vect_state_
-        else if (n > min(size(irl),size(val))) then
+        else if(n > min(size(irl), size(val))) then
           info = psb_err_invalid_input_
         else
           isz = size(x%v)
           select case(dupl_)
+            case(psb_dupl_ovwrt_)
+              do i = 1, n
+                !loop over all val's rows
+                ! row actual block row
+                if((1 <= irl(i)) .and. (irl(i) <= maxr)) then
+                  ! this row belongs to me
+                  ! copy i-th row of block val in x
+                  x%v(irl(i)) = val(i)
+                end if
+              enddo
+
+            case(psb_dupl_add_)
+              do i = 1, n
+                !loop over all val's rows
+                if((1 <= irl(i)) .and. (irl(i) <= maxr)) then
+                  ! this row belongs to me
+                  ! copy i-th row of block val in x
+                  x%v(irl(i)) = x%v(irl(i)) + val(i)
+                end if
+              enddo
+
+            case default
+              info = 321
+              ! !$      call psb_errpush(info, name)
+              ! !$      goto 9999
+          end select
+        end if
+      else
+        info = psb_err_invalid_vect_state_
+      end if
+    else
+      if(.not. allocated(x%v)) then
+        info = psb_err_invalid_vect_state_
+      else if(n > min(size(irl), size(val))) then
+        info = psb_err_invalid_input_
+
+      else
+        isz = size(x%v)
+        select case(dupl)
           case(psb_dupl_ovwrt_)
             do i = 1, n
               !loop over all val's rows
               ! row actual block row
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+              if((1 <= irl(i)) .and. (irl(i) <= isz)) then
                 ! this row belongs to me
                 ! copy i-th row of block val in x
                 x%v(irl(i)) = val(i)
@@ -527,72 +557,30 @@ contains
             enddo
 
           case(psb_dupl_add_)
-
             do i = 1, n
               !loop over all val's rows
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
+              if((1 <= irl(i)) .and. (irl(i) <= isz)) then
                 ! this row belongs to me
                 ! copy i-th row of block val in x
-                x%v(irl(i)) = x%v(irl(i)) +  val(i)
+                x%v(irl(i)) = x%v(irl(i)) + val(i)
               end if
             enddo
 
           case default
             info = 321
-            ! !$      call psb_errpush(info,name)
+            ! !$      call psb_errpush(info, name)
             ! !$      goto 9999
-          end select
-        end if
-      else
-        info = psb_err_invalid_vect_state_
-      end if
-    else
-      if (.not.allocated(x%v)) then
-        info = psb_err_invalid_vect_state_
-      else if (n > min(size(irl),size(val))) then
-        info = psb_err_invalid_input_
-
-      else
-        isz = size(x%v)
-        select case(dupl)
-        case(psb_dupl_ovwrt_)
-          do i = 1, n
-            !loop over all val's rows
-            ! row actual block row
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i)) = val(i)
-            end if
-          enddo
-
-        case(psb_dupl_add_)
-
-          do i = 1, n
-            !loop over all val's rows
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i)) = x%v(irl(i)) +  val(i)
-            end if
-          enddo
-
-        case default
-          info = 321
-          ! !$      call psb_errpush(info,name)
-          ! !$      goto 9999
         end select
       end if
     end if
     call x%set_host()
-    if (info /= 0) then
-      call psb_errpush(info,'base_vect_ins')
+    if(info /= psb_success_) then
+      call psb_errpush(info, 'base_vect_ins')
       return
     end if
-
   end subroutine z_base_ins_a
 
-  subroutine z_base_ins_v(n,irl,val,dupl,x,maxr,info)
+  subroutine z_base_ins_v(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
@@ -603,21 +591,19 @@ contains
 
     integer(psb_ipk_) :: isz
 
-    info = 0
-    if (psb_errstatus_fatal()) return
+    info = psb_success_
+    if(psb_errstatus_fatal()) return
 
-    if (irl%is_dev()) call irl%sync()
-    if (val%is_dev()) call val%sync()
-    if (x%is_dev())   call x%sync()
-    call x%ins(n,irl%v,val%v,dupl,maxr,info)
+    if(irl%is_dev()) call irl%sync()
+    if(val%is_dev()) call val%sync()
+    if(x%is_dev())   call x%sync()
+    call x%ins(n, irl%v, val%v, dupl, maxr, info)
 
-    if (info /= 0) then
-      call psb_errpush(info,'base_vect_ins')
+    if(info /= psb_success_) then
+      call psb_errpush(info, 'base_vect_ins')
       return
     end if
-
   end subroutine z_base_ins_v
-
 
   !
   !> Function  base_zero
@@ -630,14 +616,13 @@ contains
     implicit none
     class(psb_z_base_vect_type), intent(inout)    :: x
 
-    if (allocated(x%v)) then
+    if(allocated(x%v)) then
       !$omp workshare
-      x%v(:)=zzero
+      x%v(:) = zzero
       !$omp end workshare
     end if
     call x%set_host()
   end subroutine z_base_zero
-
 
   !
   ! Assembly.
@@ -648,11 +633,10 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief Assemble vector: reallocate as necessary.
   !!
-  !!  \param n     final size
-  !!  \param info  return code
+  !! \param n     final size
+  !! \param info  return code
   !!
   !
-
   subroutine z_base_asb_m(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
@@ -666,56 +650,52 @@ contains
     integer(psb_ipk_) :: i, ncfs, xvsz
     complex(psb_dpk_), allocatable ::  vv(:)
 
-    info = 0
-    if (present(scratch)) then
+    info = psb_success_
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    if (try_newins) then 
-      if (x%is_bld()) then
+    if(try_newins) then 
+      if(x%is_bld()) then
         ncfs = x%get_ncfs()
         xvsz = psb_size(x%v)
-        call psb_realloc(n,vv,info)
+        call psb_realloc(n, vv, info)
         vv(:) = zzero
         select case(x%get_dupl())
         case(psb_dupl_add_)
-          do i=1,ncfs
+          do i = 1, ncfs
             vv(x%iv(i)) = vv(x%iv(i)) + x%v(i)
           end do
         case(psb_dupl_ovwrt_)
-          do i=1,ncfs
+          do i = 1, ncfs
             vv(x%iv(i)) = x%v(i)
           end do
         case(psb_dupl_err_)
-          do i=1,ncfs
-            if (vv(x%iv(i)).ne. zzero) then
-              call psb_errpush(psb_err_duplicate_coo,'vect-asb')
+          do i = 1, ncfs
+            if(vv(x%iv(i)).ne. zzero) then
+              call psb_errpush(psb_err_duplicate_coo, 'vect-asb')
               return
             else
               vv(x%iv(i)) = x%v(i)
             end if
           end do
         case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
+          write(psb_err_unit, *) 'Error in vect_asb: unsafe dupl', x%get_dupl()
           info =-7
         end select
-        call psb_move_alloc(vv,x%v,info)
-        if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < n) &
-             & call psb_realloc(n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+        call psb_move_alloc(vv, x%v, info)
+        if(allocated(x%iv)) deallocate(x%iv, stat = info)
+      else if(x%is_upd() .or. x%is_asb() .or. scratch_) then
+        if(x%get_nrows() < n) call psb_realloc(n, x%v, info)
+        if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_asb')
       else
         info = psb_err_invalid_vect_state_        
-        call psb_errpush(info,'vect_asb')
+        call psb_errpush(info, 'vect_asb')
       end if
     else
-      if (x%get_nrows() < n) &
-           & call psb_realloc(n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      if(x%get_nrows() < n) call psb_realloc(n, x%v, info)
+      if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_asb')
     end if
     call x%set_host()
     call x%set_asb()
@@ -731,11 +711,10 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief Assemble vector: reallocate as necessary.
   !!
-  !!  \param n     final size
-  !!  \param info  return code
+  !! \param n     final size
+  !! \param info  return code
   !!
   !
-
   subroutine z_base_asb_e(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
@@ -749,56 +728,51 @@ contains
     integer(psb_ipk_) :: i, ncfs, xvsz
     complex(psb_dpk_), allocatable ::  vv(:)
 
-    info = 0
-    if (present(scratch)) then
+    info = psb_success_
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    if (try_newins) then
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb unhandled')    
-      if (x%is_bld()) then
-        call psb_realloc(n,vv,info)
+    if(try_newins) then
+      if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_asb unhandled')   
+      if(x%is_bld()) then
+        call psb_realloc(n, vv, info)
         vv(:) =  zzero
         select case(x%get_dupl())
         case(psb_dupl_add_)
-          do i=1,x%get_ncfs()
+          do i = 1, x%get_ncfs()
             vv(x%iv(i)) = vv(x%iv(i)) + x%v(i)
           end do
         case(psb_dupl_ovwrt_)
-          do i=1,x%get_ncfs()
+          do i = 1, x%get_ncfs()
             vv(x%iv(i)) = x%v(i)
           end do
         case(psb_dupl_err_)
-          do i=1,x%get_ncfs()
-            if (vv(x%iv(i)).ne. zzero) then
-              call psb_errpush(psb_err_duplicate_coo,'vect_asb')
+          do i = 1, x%get_ncfs()
+            if(vv(x%iv(i)).ne. zzero) then
+              call psb_errpush(psb_err_duplicate_coo, 'vect_asb')
               return
             else
               vv(x%iv(i)) = x%v(i)
             end if
           end do
         case default
-          write(psb_err_unit,*) 'Error in vect_asb: unsafe dupl',x%get_dupl()
-          info =-7
+          write(psb_err_unit, *) 'Error in vect_asb: unsafe dupl', x%get_dupl()
+          info = -7
         end select
-        call psb_move_alloc(vv,x%v,info)
-        if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if (x%get_nrows() < n) &
-             & call psb_realloc(n,x%v,info)
-        if (info /= 0) &
-             & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+        call psb_move_alloc(vv, x%v, info)
+        if(allocated(x%iv)) deallocate(x%iv, stat = info)
+      else if(x%is_upd() .or. x%is_asb() .or. scratch_) then
+        if(x%get_nrows() < n) call psb_realloc(n, x%v, info)
+        if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_asb')
       else
         info = psb_err_invalid_vect_state_        
-        call psb_errpush(info,'vect_asb')
+        call psb_errpush(info, 'vect_asb')
       end if
     else
-      if (x%get_nrows() < n) &
-           & call psb_realloc(n,x%v,info)
-      if (info /= 0) &
-           & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb')
+      if(x%get_nrows() < n) call psb_realloc(n, x%v, info)
+      if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_asb')
     end if
     call x%set_host()
     call x%set_asb()
@@ -810,7 +784,7 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief Free vector
   !!
-  !!  \param info  return code
+  !! \param info  return code
   !!
   !
   subroutine z_base_free(x, info)
@@ -820,13 +794,12 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
 
-    info = 0
-    if (allocated(x%v)) deallocate(x%v, stat=info)
-    if ((info == 0).and.allocated(x%combuf)) call x%free_buffer(info)
-    if ((info == 0).and.allocated(x%comid)) call x%free_comid(info)
-    if ((info == 0).and.allocated(x%iv)) deallocate(x%iv, stat=info)    
-    if (info /= 0) call &
-         & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
+    info = psb_success_
+    if(allocated(x%v)) deallocate(x%v, stat = info)
+    if((info == psb_success_) .and. allocated(x%combuf)) call x%free_buffer(info)
+    if((info == psb_success_) .and. allocated(x%comid)) call x%free_comid(info)
+    if((info == psb_success_) .and. allocated(x%iv)) deallocate(x%iv, stat = info)    
+    if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_free')
     call x%set_null()
   end subroutine z_base_free
 
@@ -835,40 +808,37 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief Free aux buffer
   !!
-  !!  \param info  return code
+  !! \param info  return code
   !!
   !
-  subroutine z_base_free_buffer(x,info)
+  subroutine z_base_free_buffer(x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
-    if (allocated(x%combuf)) &
-         &  deallocate(x%combuf,stat=info)
+    if(allocated(x%combuf)) deallocate(x%combuf, stat = info)
   end subroutine z_base_free_buffer
 
   !
   !> Function  base_maybe_free_buffer:
   !! \memberof  psb_z_base_vect_type
   !! \brief Conditionally Free aux buffer.
-  !!        In some derived classes, e.g. GPU,
+  !!        In some derived classes, e.g. GPU, 
   !!        does not really frees to avoid  runtime
   !!        costs
   !!
-  !!  \param info  return code
+  !! \param info  return code
   !!
   !
-  subroutine z_base_maybe_free_buffer(x,info)
+  subroutine z_base_maybe_free_buffer(x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
-    info = 0
-    if (psb_get_maybe_free_buffer())&
-         &  call x%free_buffer(info)
-
+    info = psb_success_
+    if(psb_get_maybe_free_buffer()) call x%free_buffer(info)
   end subroutine z_base_maybe_free_buffer
 
   !
@@ -876,17 +846,16 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief Free aux MPI communication id buffer
   !!
-  !!  \param info  return code
+  !! \param info  return code
   !!
   !
-  subroutine z_base_free_comid(x,info)
+  subroutine z_base_free_comid(x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
 
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
+    if(allocated(x%comid)) deallocate(x%comid, stat = info)
   end subroutine z_base_free_comid
   
   function z_base_get_ncfs(x) result(res)
@@ -938,49 +907,49 @@ contains
     res = (x%bldstate == psb_vect_asb_)
   end function z_base_is_asb
 
-  subroutine  z_base_set_ncfs(n,x)
+  subroutine z_base_set_ncfs(n, x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: n
     x%ncfs = n
   end subroutine z_base_set_ncfs
 
-  subroutine  z_base_set_dupl(n,x)
+  subroutine z_base_set_dupl(n, x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: n
     x%dupl = n
   end subroutine z_base_set_dupl
 
-  subroutine  z_base_set_state(n,x)
+  subroutine z_base_set_state(n, x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: n
     x%bldstate = n
   end subroutine z_base_set_state
 
-  subroutine  z_base_set_null(x)
+  subroutine z_base_set_null(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_null_
   end subroutine z_base_set_null
 
-  subroutine  z_base_set_bld(x)
+  subroutine z_base_set_bld(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_bld_
   end subroutine z_base_set_bld
 
-  subroutine  z_base_set_upd(x)
+  subroutine z_base_set_upd(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_upd_
   end subroutine z_base_set_upd
 
-  subroutine  z_base_set_asb(x)
+  subroutine z_base_set_asb(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
 
@@ -1000,7 +969,6 @@ contains
   subroutine z_base_sync(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
-
   end subroutine z_base_sync
 
   !
@@ -1012,7 +980,6 @@ contains
   subroutine z_base_set_host(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
-
   end subroutine z_base_set_host
 
   !
@@ -1024,7 +991,6 @@ contains
   subroutine z_base_set_dev(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
-
   end subroutine z_base_set_dev
 
   !
@@ -1036,7 +1002,6 @@ contains
   subroutine z_base_set_sync(x)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
-
   end subroutine z_base_set_sync
 
   !
@@ -1048,7 +1013,7 @@ contains
   function z_base_is_dev(x) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = .false.
   end function z_base_is_dev
@@ -1062,7 +1027,7 @@ contains
   function z_base_is_host(x) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = .true.
   end function z_base_is_host
@@ -1076,15 +1041,15 @@ contains
   function z_base_is_sync(x) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = .true.
   end function z_base_is_sync
 
   !> Function  base_cpy:
-  !! \memberof  psb_d_base_vect_type
+  !! \memberof  psb_z_base_vect_type
   !! \brief     base_cpy: copy base contents
-  !!  \param    y returned variable
+  !! \param    y returned variable
   !!
   subroutine z_base_cpy(x, y)
     use psi_serial_mod
@@ -1093,11 +1058,11 @@ contains
     class(psb_z_base_vect_type), intent(in)   :: x
     class(psb_z_base_vect_type), intent(out)  :: y
 
-    if (allocated(x%v)) call y%bld(x%v)
+    if(allocated(x%v)) call y%bld(x%v)
     call y%set_state(x%get_state())
     call y%set_dupl(x%get_dupl())
     call y%set_ncfs(x%get_ncfs())
-    if (allocated(x%iv)) y%iv = x%iv
+    if(allocated(x%iv)) y%iv = x%iv
   end subroutine z_base_cpy
 
   !
@@ -1115,8 +1080,7 @@ contains
     integer(psb_ipk_) :: res
 
     res = 0
-    if (allocated(x%v)) res = size(x%v)
-
+    if(allocated(x%v)) res = size(x%v)
   end function z_base_get_nrows
 
   !
@@ -1132,7 +1096,6 @@ contains
 
     ! Force 8-byte integers.
     res = (1_psb_epk_ * (2*psb_sizeof_dp)) * x%get_nrows()
-
   end function z_base_sizeof
 
   !
@@ -1147,16 +1110,13 @@ contains
     res = 'BASE'
   end function z_base_get_fmt
 
-
-  !
-  !
   !
   !> Function  base_get_vect
   !! \memberof  psb_z_base_vect_type
   !! \brief  Extract a copy of the contents
   !!
   !
-  function  z_base_get_vect(x,n) result(res)
+  function z_base_get_vect(x, n) result(res)
     class(psb_z_base_vect_type), intent(inout) :: x
     complex(psb_dpk_), allocatable                 :: res(:)
     integer(psb_ipk_) :: info
@@ -1164,24 +1124,23 @@ contains
     ! Local variables
     integer(psb_ipk_) :: isz, i
 
-    if (.not.allocated(x%v)) return
-    if (.not.x%is_host()) call x%sync()
+    if(.not. allocated(x%v)) return
+    if(.not.x%is_host()) call x%sync()
     isz = x%get_nrows()
-    if (present(n)) isz = max(0,min(isz,n))
-    allocate(res(isz),stat=info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_get_vect')
+    if(present(n)) isz = max(0, min(isz, n))
+    allocate(res(isz), stat = info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'base_get_vect')
       return
     end if
-    if (.false.) then 
+    if(.false.) then 
       res(1:isz) = x%v(1:isz)
     else
       !$omp parallel do private(i)
-      do i=1, isz
+      do i = 1, isz
         res(i) = x%v(i)
       end do
     end if
-    
   end function z_base_get_vect
 
   !
@@ -1193,7 +1152,7 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine z_base_set_scal(x,val,first,last)
+  subroutine z_base_set_scal(x, val, first, last)
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val
@@ -1201,12 +1160,12 @@ contains
 
     integer(psb_ipk_) :: first_, last_, i
 
-    first_=1
-    last_=size(x%v)
-    if (present(first)) first_ = max(1,first)
-    if (present(last))  last_  = min(last,last_)
+    first_ = 1
+    last_  = size(x%v)
+    if(present(first)) first_ = max(first_, first)
+    if(present(last))  last_  = min(last, last_)
 
-    if (x%is_dev()) call x%sync()
+    if(x%is_dev()) call x%sync()
 #if defined(PSB_OPENMP)
     !$omp parallel do private(i)
     do i = first_, last_        
@@ -1216,9 +1175,7 @@ contains
     x%v(first_:last_) = val
 #endif
     call x%set_host()
-
   end subroutine z_base_set_scal
-
 
   !
   !> Function  base_set_vect
@@ -1226,7 +1183,7 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in
   !!
-  subroutine z_base_set_vect(x,val,first,last)
+  subroutine z_base_set_vect(x, val, first, last)
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val(:)
@@ -1234,36 +1191,31 @@ contains
 
     integer(psb_ipk_) :: first_, last_, i,  info
 
-    if (.not.allocated(x%v)) then
-      call psb_realloc(size(val),x%v,info)
-    end if
+    if(.not. allocated(x%v)) call psb_realloc(size(val), x%v, info)
     
-    first_                     = 1
-    if (present(first)) first_ = max(1,first)
-    last_                      = min(psb_size(x%v),first_+size(val)-1)
-    if (present(last))  last_  = min(last,last_)
+    first_ = 1
+    if(present(first)) first_ = max(first_, first)
+    last_ = min(psb_size(x%v), first_ + size(val) - 1)
+    if(present(last))  last_  = min(last, last_)
 
-    if (x%is_dev()) call x%sync()
+    if(x%is_dev()) call x%sync()
 
 #if defined(PSB_OPENMP)
       !$omp parallel do private(i)
       do i  = first_, last_
-        x%v(i) = val(i-first_+1)
+        x%v(i) = val(i - first_ + 1)
       end do
 #else
-      x%v(first_:last_) = val(1:last_-first_+1)
+      x%v(first_:last_) = val(1 : (last_ - first_ + 1))
 #endif
     call x%set_host()
-
   end subroutine z_base_set_vect
 
   subroutine z_base_check_addr(x)
     class(psb_z_base_vect_type), intent(inout) :: x
 
-    write(0,*) 'Check addr: base version, do nothing'
-
+    write(0, *) 'Check addr: base version, do nothing'
   end subroutine z_base_check_addr
-
 
   !
   ! Get entry.
@@ -1281,11 +1233,10 @@ contains
     complex(psb_dpk_)                           :: res
 
     res = 0
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
+    if(allocated(x%v)) then
+      if(x%is_dev()) call x%sync()
       res = x%v(index)
     end if
-
   end function z_base_get_entry
 
   subroutine z_base_set_entry(x, index, val)
@@ -1294,13 +1245,11 @@ contains
     integer(psb_ipk_), intent(in)             :: index
     complex(psb_dpk_)                           :: val
 
-
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
-      x%v(index) =val
+    if(allocated(x%v)) then
+      if(x%is_dev()) call x%sync()
+      x%v(index) = val
       call x%set_host()
     end if
-
   end subroutine z_base_set_entry
 
   !
@@ -1317,11 +1266,11 @@ contains
 
     integer(psb_ipk_) :: i
     
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
+    if(allocated(x%v)) then
+      if(x%is_dev()) call x%sync()
 #if defined(PSB_OPENMP)
       !$omp parallel do private(i)
-      do i=1, size(x%v)
+      do i = 1, size(x%v)
         x%v(i) =  abs(x%v(i))
       end do
 #else
@@ -1329,20 +1278,18 @@ contains
 #endif
       call x%set_host()
     end if
-
   end subroutine z_base_absval1
 
-  subroutine z_base_absval2(x,y)
+  subroutine z_base_absval2(x, y)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     class(psb_z_base_vect_type), intent(inout) :: y
     integer(psb_ipk_) :: info
-    if (.not.x%is_host()) call x%sync()
-    if (allocated(x%v)) then
-      call y%axpby(ione*min(x%get_nrows(),y%get_nrows()),zone,x,zzero,info)
+    if(.not.x%is_host()) call x%sync()
+    if(allocated(x%v)) then
+      call y%axpby(ione*min(x%get_nrows(), y%get_nrows()), zone, x, zzero, info)
       call y%absval()
     end if
-
   end subroutine z_base_absval2
 
   !
@@ -1355,28 +1302,28 @@ contains
   !! \param n    Number of entries to be considered
   !! \param y    The other (base_vect) to be multiplied by
   !!
-  function z_base_dot_v(n,x,y) result(res)
+  function z_base_dot_v(n, x, y) result(res)
     implicit none
-    class(psb_z_base_vect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    complex(psb_dpk_)                :: res
-    complex(psb_dpk_), external      :: zdotc
+    integer(psb_ipk_), intent(in)               :: n
+    class(psb_z_base_vect_type), intent(inout)  :: x, y
+    complex(psb_dpk_) :: res
+    complex(psb_dpk_), external :: zdotc
 
     res = zzero
     !
     ! Note: this is the base implementation.
-    !  When we get here, we are sure that X is of
-    !  TYPE psb_z_base_vect.
-    !  If Y is not, throw the burden on it, implicitly
-    !  calling dot_a
+    ! When we get here, we are sure that X is of
+    ! TYPE psb_z_base_vect.
+    ! If Y is not, throw the burden on it, implicitly
+    ! calling dot_a
     !
     select type(yy => y)
-    type is (psb_z_base_vect_type)
-      res = zdotc(n,x%v,1,y%v,1)
-    class default
-      res = y%dot(n,x%v)
-    end select
+      type is (psb_z_base_vect_type)
+        res = zdotc(n, x%v, 1, y%v, 1)
 
+      class default
+        res = y%dot(n, x%v)
+    end select
   end function z_base_dot_v
 
   !
@@ -1389,16 +1336,15 @@ contains
   !! \param n    Number of entries to be considered
   !! \param y(:) The array to be multiplied by
   !!
-  function z_base_dot_a(n,x,y) result(res)
+  function z_base_dot_a(n, x, y) result(res)
     implicit none
-    class(psb_z_base_vect_type), intent(inout) :: x
-    complex(psb_dpk_), intent(in)    :: y(:)
-    integer(psb_ipk_), intent(in)           :: n
-    complex(psb_dpk_)                :: res
-    complex(psb_dpk_), external      :: zdotc
+    integer(psb_ipk_), intent(in)               :: n
+    class(psb_z_base_vect_type), intent(inout)  :: x
+    complex(psb_dpk_), intent(in)                  :: y(:)
+    complex(psb_dpk_) :: res
+    complex(psb_dpk_), external :: zdotc
 
-    res = zdotc(n,y,1,x%v,1)
-
+    res = zdotc(n, y, 1, x%v, 1)
   end function z_base_dot_a
 
   !
@@ -1415,24 +1361,20 @@ contains
   !! \param beta scalar beta
   !! \param info   return code
   !!
-  subroutine z_base_axpby_v(m,alpha, x, beta, y, info)
+  subroutine z_base_axpby_v(m, alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent (in)       :: alpha, beta
+    complex(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)  :: x, y
     integer(psb_ipk_), intent(out)              :: info
 
-    if (x%is_dev()) call x%sync()
-
-    call y%axpby(m,alpha,x%v,beta,info)
-
+    if(x%is_dev()) call x%sync()
+    call y%axpby(m, alpha, x%v, beta, info)
   end subroutine z_base_axpby_v
 
   !
   ! AXPBY is invoked via Z, hence the structure below.
-  !
   !
   !
   !> Function  base_axpby_v2
@@ -1446,20 +1388,16 @@ contains
   !! \param z     The class(base_vect) to be returned
   !! \param info   return code
   !!
-  subroutine z_base_axpby_v2(m,alpha, x, beta, y, z, info)
+  subroutine z_base_axpby_v2(m, alpha, x, beta, y, z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
-    complex(psb_dpk_), intent (in)       :: alpha, beta
+    complex(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)  :: x, y, z
     integer(psb_ipk_), intent(out)              :: info
 
-    if (x%is_dev()) call x%sync()
-
-    call z%axpby(m,alpha,x%v,beta,y%v,info)
-
+    if(x%is_dev()) call x%sync()
+    call z%axpby(m, alpha, x%v, beta, y%v, info)
   end subroutine z_base_axpby_v2
 
   !
@@ -1475,19 +1413,18 @@ contains
   !! \param beta scalar beta
   !! \param info   return code
   !!
-  subroutine z_base_axpby_a(m,alpha, x, beta, y, info)
+  subroutine z_base_axpby_a(m, alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    complex(psb_dpk_), intent(in)        :: x(:)
+    complex(psb_dpk_), intent(in)                  :: alpha, beta
+    complex(psb_dpk_), intent(in)                  :: x(:)
     class(psb_z_base_vect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent (in)       :: alpha, beta
     integer(psb_ipk_), intent(out)              :: info
 
-    if (y%is_dev()) call y%sync()
-    call psb_geaxpby(m,alpha,x,beta,y%v,info)
+    if(y%is_dev()) call y%sync()
+    call psb_geaxpby(m, alpha, x, beta, y%v, info)
     call y%set_host()
-
   end subroutine z_base_axpby_a
 
   !
@@ -1504,20 +1441,19 @@ contains
   !! \param y(:) The array to be added
   !! \param info   return code
   !!
-  subroutine z_base_axpby_a2(m,alpha, x, beta, y, z, info)
+  subroutine z_base_axpby_a2(m, alpha, x, beta, y, z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)                :: m
     complex(psb_dpk_), intent(in)                  :: x(:)
     complex(psb_dpk_), intent(in)                  :: y(:)
     class(psb_z_base_vect_type), intent(inout) :: z
-    complex(psb_dpk_), intent (in)                 :: alpha, beta
+    complex(psb_dpk_), intent(in)                 :: alpha, beta
     integer(psb_ipk_), intent(out)               :: info
 
-    if (z%is_dev()) call z%sync()
-    call psb_geaxpby(m,alpha,x,beta,y,z%v,info)
+    if(z%is_dev()) call z%sync()
+    call psb_geaxpby(m, alpha, x, beta, y, z%v, info)
     call z%set_host()
-
   end subroutine z_base_axpby_a2
 
   !
@@ -1537,47 +1473,39 @@ contains
   !! \param z     The class(base_vect) to be added
   !! \param info   return code
   !!
-  subroutine z_base_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+  subroutine z_base_upd_xyz(m, alpha, beta, gamma, delta, x, y, z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
-    complex(psb_dpk_), intent (in)       :: alpha, beta, gamma, delta
+    complex(psb_dpk_), intent(in)                  :: alpha, beta, gamma, delta
+    class(psb_z_base_vect_type), intent(inout)  :: x, y, z
     integer(psb_ipk_), intent(out)              :: info
 
-    if (x%is_dev().and.(alpha/=zzero)) call x%sync()
-    if (y%is_dev().and.(beta/=zzero))   call y%sync()
-    if (z%is_dev().and.(delta/=zzero))  call z%sync()
-    call psi_upd_xyz(m,alpha, beta, gamma,delta,x%v, y%v, z%v, info)
+    if(x%is_dev() .and. (alpha /= zzero)) call x%sync()
+    if(y%is_dev() .and. (beta  /= zzero)) call y%sync()
+    if(z%is_dev() .and. (delta /= zzero)) call z%sync()
+    call psi_upd_xyz(m, alpha, beta, gamma, delta, x%v, y%v, z%v, info)
     call y%set_host()
-    call z%set_host()
-        
+    call z%set_host()   
   end subroutine z_base_upd_xyz
 
-  subroutine z_base_xyzw(m,a,b,c,d,e,f,x, y, z, w,info)
+  subroutine z_base_xyzw(m, a, b, c, d, e, f, x, y, z, w, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
-    class(psb_z_base_vect_type), intent(inout)  :: w
-    complex(psb_dpk_), intent (in)                :: a,b,c,d,e,f
+    complex(psb_dpk_), intent(in)                :: a, b, c, d, e, f
+    class(psb_z_base_vect_type), intent(inout)  :: x, y, z, w
     integer(psb_ipk_), intent(out)              :: info
 
-    if (x%is_dev().and.(a/=zzero)) call x%sync()
-    if (y%is_dev().and.(b/=zzero)) call y%sync()
-    if (z%is_dev().and.(d/=zzero)) call z%sync()
-    if (w%is_dev().and.(f/=zzero)) call w%sync()
-    call psi_xyzw(m,a,b,c,d,e,f,x%v, y%v, z%v, w%v, info)
+    if(x%is_dev() .and. (a /= zzero)) call x%sync()
+    if(y%is_dev() .and. (b /= zzero)) call y%sync()
+    if(z%is_dev() .and. (d /= zzero)) call z%sync()
+    if(w%is_dev() .and. (f /= zzero)) call w%sync()
+    call psi_xyzw(m, a, b, c, d, e, f, x%v, y%v, z%v, w%v, info)
     call y%set_host()
     call z%set_host()
     call w%set_host()
-    
   end subroutine z_base_xyzw
-
 
   !
   !  Multiple variants of two operations:
@@ -1597,15 +1525,13 @@ contains
   subroutine z_base_mlt_v(x, y, info)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_z_base_vect_type), intent(inout)  :: x, y
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
-
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call y%mlt(x%v, info)
   end subroutine z_base_mlt_v
 
   !
@@ -1618,22 +1544,21 @@ contains
   subroutine z_base_mlt_a(x, y, info)
     use psi_serial_mod
     implicit none
-    complex(psb_dpk_), intent(in)        :: x(:)
+    complex(psb_dpk_), intent(in)                  :: x(:)
     class(psb_z_base_vect_type), intent(inout)  :: y
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (y%is_dev()) call y%sync()
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
     n = min(size(y%v), size(x))
     !$omp parallel do private(i)    
-    do i=1, n
-      y%v(i) = y%v(i)*x(i)
+    do i = 1, n
+      y%v(i) = y%v(i) * x(i)
     end do
     call y%set_host()
-
   end subroutine z_base_mlt_a
-
 
   !
   !> Function  base_mlt_a_2
@@ -1646,160 +1571,155 @@ contains
   !! \param y(:) The array to be multiplied by
   !! \param info   return code
   !!
-  subroutine z_base_mlt_a_2(alpha,x,y,beta,z,info)
+  subroutine z_base_mlt_a_2(alpha, x, y, beta, z, info)
     use psi_serial_mod
     implicit none
-    complex(psb_dpk_), intent(in)        :: alpha,beta
-    complex(psb_dpk_), intent(in)        :: y(:)
-    complex(psb_dpk_), intent(in)        :: x(:)
+    complex(psb_dpk_), intent(in)                  :: alpha, beta
+    complex(psb_dpk_), intent(in)                  :: x(:), y(:)
     class(psb_z_base_vect_type), intent(inout)  :: z
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (z%is_dev()) call z%sync()
+    info = psb_success_
+    if(z%is_dev()) call z%sync()
 
     n = min(size(z%v), size(x), size(y))
-    if (alpha == zzero) then
-      if (beta == zone) then
+    if(alpha == zzero) then
+      if(beta == zone) then
         return
       else
-        !$omp parallel do private(i)     shared(beta)
-        do i=1, n
+        !$omp parallel do private(i) shared(beta)
+        do i = 1, n
           z%v(i) = beta*z%v(i)
         end do
       end if
     else
-      if (alpha == zone) then
-        if (beta == zzero) then
+      if(alpha == zone) then
+        if(beta == zzero) then
           !$omp parallel do private(i)    
-          do i=1, n
-            z%v(i) = y(i)*x(i)
+          do i = 1, n
+            z%v(i) = y(i) * x(i)
           end do
-        else if (beta == zone) then
+        else if(beta == zone) then
           !$omp parallel do private(i)
-          do i=1, n
+          do i = 1, n
             z%v(i) = z%v(i) + y(i)*x(i)
           end do
         else
-          !$omp parallel do private(i)     shared(beta)
-          do i=1, n
+          !$omp parallel do private(i) shared(beta)
+          do i = 1, n
             z%v(i) = beta*z%v(i) + y(i)*x(i)
           end do
         end if
-      else if (alpha == -zone) then
-        if (beta == zzero) then
+      else if(alpha == -zone) then
+        if(beta == zzero) then
           !$omp parallel do private(i)
-          do i=1, n
+          do i = 1, n
             z%v(i) = -y(i)*x(i)
           end do
-        else if (beta == zone) then
+        else if(beta == zone) then
           !$omp parallel do private(i)
-          do i=1, n
+          do i = 1, n
             z%v(i) = z%v(i) - y(i)*x(i)
           end do
         else
           !$omp parallel do private(i)    shared(beta)
-          do i=1, n
+          do i = 1, n
             z%v(i) = beta*z%v(i) - y(i)*x(i)
           end do
         end if
       else
-        if (beta == zzero) then
+        if(beta == zzero) then
           !$omp parallel do private(i)    shared(alpha)
-          do i=1, n
+          do i = 1, n
             z%v(i) = alpha*y(i)*x(i)
           end do
-        else if (beta == zone) then
+        else if(beta == zone) then
           !$omp parallel do private(i)  shared(alpha)
-          do i=1, n
+          do i = 1, n
             z%v(i) = z%v(i) + alpha*y(i)*x(i)
           end do
         else
           !$omp parallel do private(i)  shared(alpha, beta)
-          do i=1, n
+          do i = 1, n
             z%v(i) = beta*z%v(i) + alpha*y(i)*x(i)
           end do
         end if
       end if
     end if
     call z%set_host()
-
   end subroutine z_base_mlt_a_2
 
   !
   !> Function  base_mlt_v_2
   !! \memberof  psb_z_base_vect_type
   !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_vect)
-  !!        z=beta*z+alpha*x*y
+  !!        z  =beta*z + alpha*x*y
   !! \param alpha
   !! \param beta
   !! \param x  The class(base_vect) to be multiplied b
   !! \param y  The class(base_vect) to be multiplied by
   !! \param info   return code
   !!
-  subroutine z_base_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
+  subroutine z_base_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
     use psi_serial_mod
     use psb_string_mod
     implicit none
-    complex(psb_dpk_), intent(in)        :: alpha,beta
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
+    complex(psb_dpk_), intent(in)                  :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)  :: x, y, z
     integer(psb_ipk_), intent(out)              :: info
-    character(len=1), intent(in), optional     :: conjgx, conjgy
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
     integer(psb_ipk_) :: i, n
     logical :: conjgx_, conjgy_
 
-    info = 0
-    if (y%is_dev()) call y%sync()
-    if (x%is_dev()) call x%sync()
-    if (.not.psb_z_is_complex_) then
-      call z%mlt(alpha,x%v,y%v,beta,info)
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
+    if(x%is_dev()) call x%sync()
+    if(.not.psb_z_is_complex_) then
+      call z%mlt(alpha, x%v, y%v, beta, info)
     else
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-      if (conjgx_) x%v=conjg(x%v)
-      if (conjgy_) y%v=conjg(y%v)
-      call z%mlt(alpha,x%v,y%v,beta,info)
-      if (conjgx_) x%v=conjg(x%v)
-      if (conjgy_) y%v=conjg(y%v)
+      conjgx_ = .false.
+      if(present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
+      conjgy_ = .false.
+      if(present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
+      if(conjgx_) x%v = conjg(x%v)
+      if(conjgy_) y%v = conjg(y%v)
+      call z%mlt(alpha, x%v, y%v, beta, info)
+      if(conjgx_) x%v = conjg(x%v)
+      if(conjgy_) y%v = conjg(y%v)
     end if
   end subroutine z_base_mlt_v_2
 
-  subroutine z_base_mlt_av(alpha,x,y,beta,z,info)
+  subroutine z_base_mlt_av(alpha, x, y, beta, z, info)
     use psi_serial_mod
     implicit none
-    complex(psb_dpk_), intent(in)        :: alpha,beta
-    complex(psb_dpk_), intent(in)        :: x(:)
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
+    complex(psb_dpk_), intent(in)                  :: alpha, beta
+    complex(psb_dpk_), intent(in)                  :: x(:)
+    class(psb_z_base_vect_type), intent(inout)  :: y, z
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (y%is_dev()) call y%sync()
-    call z%mlt(alpha,x,y%v,beta,info)
-
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
+    call z%mlt(alpha, x, y%v, beta, info)
   end subroutine z_base_mlt_av
 
-  subroutine z_base_mlt_va(alpha,x,y,beta,z,info)
+  subroutine z_base_mlt_va(alpha, x, y, beta, z, info)
     use psi_serial_mod
     implicit none
-    complex(psb_dpk_), intent(in)        :: alpha,beta
+    complex(psb_dpk_), intent(in)        :: alpha, beta
     complex(psb_dpk_), intent(in)        :: y(:)
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: z
+    class(psb_z_base_vect_type), intent(inout)  :: x, z
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call z%mlt(alpha,y,x,beta,info)
-
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call z%mlt(alpha, y, x, beta, info)
   end subroutine z_base_mlt_va
+  
   !
   !> Function  base_div_v
   !! \memberof  psb_z_base_vect_type
@@ -1810,16 +1730,15 @@ contains
   subroutine z_base_div_v(x, y, info)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_z_base_vect_type), intent(inout)  :: x, y
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call x%div(x%v,y%v,info)
-
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call x%div(x%v, y%v, info)
   end subroutine z_base_div_v
+  
   !
   !> Function  base_div_v2
   !! \memberof  psb_z_base_vect_type
@@ -1830,18 +1749,15 @@ contains
   subroutine z_base_div_v2(x, y, z, info)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
+    class(psb_z_base_vect_type), intent(inout)  :: x, y, z
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (z%is_dev()) call z%sync()
-    call z%div(x%v,y%v,info)
-
-
+    info = psb_success_
+    if(z%is_dev()) call z%sync()
+    call z%div(x%v, y%v, info)
   end subroutine z_base_div_v2
+  
   !
   !> Function  base_div_v_check
   !! \memberof  psb_z_base_vect_type
@@ -1852,17 +1768,16 @@ contains
   subroutine z_base_div_v_check(x, y, info, flag)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_z_base_vect_type), intent(inout)  :: x, y
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
     logical, intent(in) :: flag
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call x%div(x%v,y%v,info,flag)
-
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call x%div(x%v, y%v, info, flag)
   end subroutine z_base_div_v_check
+  
   !
   !> Function  base_div_v2_check
   !! \memberof  psb_z_base_vect_type
@@ -1873,18 +1788,16 @@ contains
   subroutine z_base_div_v2_check(x, y, z, info, flag)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
-    class(psb_z_base_vect_type), intent(inout)  :: z
+    class(psb_z_base_vect_type), intent(inout)  :: x, y, z
     integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
     logical, intent(in) :: flag
 
-    info = 0
-    if (z%is_dev()) call z%sync()
-    call z%div(x%v,y%v,info,flag)
-
+    info = psb_success_
+    if(z%is_dev()) call z%sync()
+    call z%div(x%v, y%v, info, flag)
   end subroutine z_base_div_v2_check
+  
   !
   !> Function  base_div_a2
   !! \memberof  psb_z_base_vect_type
@@ -1895,22 +1808,22 @@ contains
   subroutine z_base_div_a2(x, y, z, info)
     use psi_serial_mod
     implicit none
+    complex(psb_dpk_), intent(in)                  :: x(:)
+    complex(psb_dpk_), intent(in)                  :: y(:)
     class(psb_z_base_vect_type), intent(inout)  :: z
-    complex(psb_dpk_), intent(in) :: x(:)
-    complex(psb_dpk_), intent(in)    :: y(:)
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (z%is_dev()) call z%sync()
-
+    info = psb_success_
+    if(z%is_dev()) call z%sync()
     n = min(size(y), size(x))
     !$omp parallel do private(i)
-    do i=1, n
+    do i = 1, n
       z%v(i) = x(i)/y(i)
     end do
-
   end subroutine z_base_div_a2
+
   !
   !> Function  base_div_a2_check
   !! \memberof  psb_z_base_vect_type
@@ -1922,23 +1835,23 @@ contains
   subroutine z_base_div_a2_check(x, y, z, info, flag)
     use psi_serial_mod
     implicit none
+    complex(psb_dpk_), intent(in)                  :: x(:), y(:)
     class(psb_z_base_vect_type), intent(inout)  :: z
-    complex(psb_dpk_), intent(in) :: x(:)
-    complex(psb_dpk_), intent(in)    :: y(:)
     integer(psb_ipk_), intent(out)              :: info
-    logical, intent(in)              :: flag
+    logical, intent(in)                         :: flag
+
     integer(psb_ipk_) :: i, n
 
-    if (flag .eqv. .false.) then
+    if(flag .eqv. .false.) then
       call z_base_div_a2(x, y, z, info)
     else
-      info = 0
-      if (z%is_dev()) call z%sync()
+      info = psb_success_
+      if(z%is_dev()) call z%sync()
 
       n = min(size(y), size(x))
-      !  $omp parallel do private(i)
-      do i=1, n
-        if (y(i) /= 0) then
+      ! $omp parallel do private(i)
+      do i = 1, n
+        if(y(i) /= 0) then
           z%v(i) = x(i)/y(i)
         else
           info = 1
@@ -1946,8 +1859,8 @@ contains
         end if
       end do
     end if
-
   end subroutine z_base_div_a2_check
+  
   !
   !> Function  base_inv_v
   !! \memberof  psb_z_base_vect_type
@@ -1958,17 +1871,16 @@ contains
   subroutine z_base_inv_v(x, y, info)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_vect_type), intent(inout)  :: y
+    class(psb_z_base_vect_type), intent(inout)  :: x, y
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (y%is_dev()) call y%sync()
-    call y%inv(x%v,info)
-
-
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
+    call y%inv(x%v, info)
   end subroutine z_base_inv_v
+  
   !
   !> Function  base_inv_v_check
   !! \memberof  psb_z_base_vect_type
@@ -1983,18 +1895,19 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: x
     class(psb_z_base_vect_type), intent(inout)  :: y
     integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in)                         :: flag
+
     integer(psb_ipk_) :: i, n
-    logical, intent(in) :: flag
 
-    info = 0
-    if (y%is_dev()) call y%sync()
-    call y%inv(x%v,info,flag)
-
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
+    call y%inv(x%v, info, flag)
   end subroutine z_base_inv_v_check
+  
   !
   !> Function  base_inv_a2
   !! \memberof  psb_z_base_vect_type
-  !! \brief Compute the entry-by-entry inverse of x and put it in y,
+  !! \brief Compute the entry-by-entry inverse of x and put it in y, 
   !! \param x(:) The array to be inverted
   !! \param y The vector containing the inverted vector
   !! \param info return code
@@ -2002,21 +1915,21 @@ contains
   subroutine z_base_inv_a2(x, y, info)
     use psi_serial_mod
     implicit none
+    complex(psb_dpk_), intent(in)                  :: x(:)
     class(psb_z_base_vect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent(in) :: x(:)
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: i, n
 
-    info = 0
-    if (y%is_dev()) call y%sync()
-
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
     n = size(x)
     !$omp parallel do private(i)
-    do i=1, n
-      y%v(i) = 1_psb_dpk_/x(i)
+    do i = 1, n
+      y%v(i) = zone / x(i)
     end do
-
   end subroutine z_base_inv_a2
+  
   !
   !> Function  base_inv_a2_check
   !! \memberof  psb_z_base_vect_type
@@ -2029,31 +1942,30 @@ contains
   subroutine z_base_inv_a2_check(x, y, info, flag)
     use psi_serial_mod
     implicit none
+    complex(psb_dpk_), intent(inout)               :: x(:)
     class(psb_z_base_vect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent(inout) :: x(:)
     integer(psb_ipk_), intent(out)              :: info
-    logical, intent(in)              :: flag
+    logical, intent(in)                         :: flag
+
     integer(psb_ipk_) :: i, n
 
-    if (flag .eqv. .false.) then
+    if(flag .eqv. .false.) then
       call z_base_inv_a2(x, y, info)
     else
-      info = 0
-      if (y%is_dev()) call y%sync()
+      info = psb_success_
+      if(y%is_dev()) call y%sync()
 
       n = size(x)
       !$omp parallel do private(i)
-      do i=1, n
-        if (x(i) /= 0) then
-          y%v(i) = 1_psb_dpk_/x(i)
+      do i = 1, n
+        if(x(i) /= 0) then
+          y%v(i) = zone / x(i)
         else
           info = 1
-          y%v(i) = 0_psb_dpk_
+          y%v(i) = zzero
         end if
       end do
     end if
-
-
   end subroutine z_base_inv_a2_check
 
   !
@@ -2065,29 +1977,29 @@ contains
   !! \param c The comparison term
   !! \param info return code
   !
-  subroutine z_base_acmp_a2(x,c,z,info)
+  subroutine z_base_acmp_a2(x, c, z, info)
     use psi_serial_mod
     implicit none
-    real(psb_dpk_), intent(in)             :: c
-    complex(psb_dpk_), intent(inout)           :: x(:)
+    complex(psb_dpk_), intent(inout)               :: x(:)
+    real(psb_dpk_), intent(in)                 :: c
     class(psb_z_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)           :: info
+    integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: i, n
 
-    if (z%is_dev()) call z%sync()
-
+    if(z%is_dev()) call z%sync()
     n = size(x)
     !$omp parallel do private(i)
     do i = 1, n, 1
-      if ( abs(x(i)).ge.c ) then
-        z%v(i) = 1_psb_dpk_
+      if(abs(x(i)) .ge. c) then
+        z%v(i) = zone
       else
-        z%v(i) = 0_psb_dpk_
+        z%v(i) = zzero
       end if
     end do
-    info = 0
-
+    info = psb_success_
   end subroutine z_base_acmp_a2
+  
   !
   !> Function  base_cmp_v2
   !! \memberof  psb_z_base_vect_type
@@ -2097,7 +2009,7 @@ contains
   !! \param c The comparison term
   !! \param info return code
   !
-  subroutine z_base_acmp_v2(x,c,z,info)
+  subroutine z_base_acmp_v2(x, c, z, info)
     use psi_serial_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
@@ -2105,9 +2017,9 @@ contains
     class(psb_z_base_vect_type), intent(inout)  :: z
     integer(psb_ipk_), intent(out)           :: info
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call z%acmp(x%v,c,info)
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call z%acmp(x%v, c, info)
   end subroutine z_base_acmp_v2
 
   !
@@ -2122,13 +2034,13 @@ contains
     use psi_serial_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
-    complex(psb_dpk_), intent (in)       :: alpha
+    complex(psb_dpk_), intent(in)       :: alpha
     integer(psb_ipk_) :: i
 
-    if (allocated(x%v)) then
+    if(allocated(x%v)) then
 #if defined(PSB_OPENMP)
       !$omp parallel do private(i)
-      do i=1,size(x%v)
+      do i = 1, size(x%v)
         x%v(i) = alpha*x%v(i)
       end do
 #else
@@ -2145,16 +2057,15 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief 2-norm |x(1:n)|_2
   !! \param n  how many entries to consider
-  function z_base_nrm2(n,x) result(res)
+  function z_base_nrm2(n, x) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     real(psb_dpk_), external      :: dznrm2
 
-    if (x%is_dev()) call x%sync()
-    res =  dznrm2(n,x%v,1)
-
+    if(x%is_dev()) call x%sync()
+    res =  dznrm2(n, x%v, 1)
   end function z_base_nrm2
 
   !
@@ -2162,51 +2073,48 @@ contains
   !! \memberof  psb_z_base_vect_type
   !! \brief infinity-norm |x(1:n)|_\infty
   !! \param n  how many entries to consider
-  function z_base_amax(n,x) result(res)
+  function z_base_amax(n, x) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     integer(psb_ipk_) :: i
 
-    if (x%is_dev()) call x%sync()
+    if(x%is_dev()) call x%sync()
 #if defined(PSB_OPENMP)
     res = dzero
     !$omp parallel do private(i) reduction(max: res)
-    do i=1, n
-      res = max(res,abs(x%v(i)))
+    do i = 1, n
+      res = max(res, abs(x%v(i)))
     end do
 #else
     res =  maxval(abs(x%v(1:n)))
 #endif
   end function z_base_amax
 
-
   !
   !> Function  base_asum
   !! \memberof  psb_z_base_vect_type
   !! \brief 1-norm |x(1:n)|_1
   !! \param n  how many entries to consider
-  function z_base_asum(n,x) result(res)
+  function z_base_asum(n, x) result(res)
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)           :: n
     real(psb_dpk_)                :: res
     integer(psb_ipk_) :: i
     
-    if (x%is_dev()) call x%sync()
+    if(x%is_dev()) call x%sync()
 #if defined(PSB_OPENMP)
     res=dzero
     !$omp parallel do private(i) reduction(+: res)
-    do i= 1, size(x%v)
+    do i =  1, size(x%v)
       res = res + abs(x%v(i))
     end do
 #else
     res =  sum(abs(x%v(1:n)))
 #endif
   end function z_base_asum
-
-
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
   !
@@ -2219,7 +2127,7 @@ contains
   !! \param idx(:) indices
   !! \param alpha
   !! \param beta
-  subroutine z_base_gthab(n,idx,alpha,x,beta,y)
+  subroutine z_base_gthab(n, idx, alpha, x, beta, y)
     use psi_serial_mod
     implicit none
     integer(psb_mpk_) :: n
@@ -2227,10 +2135,10 @@ contains
     complex(psb_dpk_) :: alpha, beta, y(:)
     class(psb_z_base_vect_type) :: x
 
-    if (x%is_dev()) call x%sync()
-    call psi_gth(n,idx,alpha,x%v,beta,y)
-
+    if(x%is_dev()) call x%sync()
+    call psi_gth(n, idx, alpha, x%v, beta, y)
   end subroutine z_base_gthab
+  
   !
   ! shortcut alpha=1 beta=0
   !
@@ -2240,7 +2148,7 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine z_base_gthzv_x(i,n,idx,x,y)
+  subroutine z_base_gthzv_x(i, n, idx, x, y)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_) :: i
@@ -2249,15 +2157,14 @@ contains
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_vect_type) :: x
 
-    if (idx%is_dev()) call idx%sync()
-    call x%gth(n,idx%v(i:),y)
-
+    if(idx%is_dev()) call idx%sync()
+    call x%gth(n, idx%v(i:), y)
   end subroutine z_base_gthzv_x
 
   !
   ! New comm internals impl.
   !
-  subroutine z_base_gthzbuf(i,n,idx,x)
+  subroutine z_base_gthzbuf(i, n, idx, x)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_) :: i
@@ -2265,15 +2172,15 @@ contains
     class(psb_i_base_vect_type) :: idx
     class(psb_z_base_vect_type) :: x
 
-    if (.not.allocated(x%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf')
       return
     end if
-    if (idx%is_dev()) call idx%sync()
-    if (x%is_dev()) call x%sync()
-    call x%gth(n,idx%v(i:),x%combuf(i:))
-
+    if(idx%is_dev()) call idx%sync()
+    if(x%is_dev()) call x%sync()
+    call x%gth(n, idx%v(i:), x%combuf(i:))
   end subroutine z_base_gthzbuf
+  
   !
   !> Function  base_device_wait:
   !! \memberof  psb_z_base_vect_type
@@ -2282,7 +2189,6 @@ contains
   !
   subroutine z_base_device_wait()
     implicit none
-
   end subroutine z_base_device_wait
 
   function z_base_use_buffer() result(res)
@@ -2291,26 +2197,25 @@ contains
     res = .true.
   end function z_base_use_buffer
 
-  subroutine z_base_new_buffer(n,x,info)
+  subroutine z_base_new_buffer(n, x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
 
-    call psb_realloc(n,x%combuf,info)
+    call psb_realloc(n, x%combuf, info)
   end subroutine z_base_new_buffer
 
-  subroutine z_base_new_comid(n,x,info)
+  subroutine z_base_new_comid(n, x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in)              :: n
     integer(psb_ipk_), intent(out)             :: info
 
-    call psb_realloc(n,2_psb_ipk_,x%comid,info)
+    call psb_realloc(n, 2_psb_ipk_, x%comid, info)
   end subroutine z_base_new_comid
-
 
   !
   ! shortcut alpha=1 beta=0
@@ -2321,7 +2226,7 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine z_base_gthzv(n,idx,x,y)
+  subroutine z_base_gthzv(n, idx, x, y)
     use psi_serial_mod
     implicit none
     integer(psb_mpk_) :: n
@@ -2329,9 +2234,8 @@ contains
     complex(psb_dpk_) ::  y(:)
     class(psb_z_base_vect_type) :: x
 
-    if (x%is_dev()) call x%sync()
-    call psi_gth(n,idx,x%v,y)
-
+    if(x%is_dev()) call x%sync()
+    call psi_gth(n, idx, x%v, y)
   end subroutine z_base_gthzv
 
   !
@@ -2342,62 +2246,56 @@ contains
   !> Function  base_sctb
   !! \memberof  psb_z_base_vect_type
   !! \brief scatter into a class(base_vect)
-  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
+  !!    Y(IDX(:)) = beta * Y(IDX(:)) + X(:)
   !! \param n  how many entries to consider
   !! \param idx(:) indices
   !! \param beta
   !! \param x(:)
-  subroutine z_base_sctb(n,idx,x,beta,y)
+  subroutine z_base_sctb(n, idx, x, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_dpk_) :: beta, x(:)
+    integer(psb_mpk_)          :: n
+    integer(psb_ipk_)           :: idx(:)
+    complex(psb_dpk_)              :: beta, x(:)
     class(psb_z_base_vect_type) :: y
 
-    if (y%is_dev()) call y%sync()
-    call psi_sct(n,idx,x,beta,y%v)
+    if(y%is_dev()) call y%sync()
+    call psi_sct(n, idx, x, beta, y%v)
     call y%set_host()
-
   end subroutine z_base_sctb
 
-  subroutine z_base_sctb_x(i,n,idx,x,beta,y)
+  subroutine z_base_sctb_x(i, n, idx, x, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_)           :: i
+    integer(psb_mpk_)           :: n
     class(psb_i_base_vect_type) :: idx
-    complex(psb_dpk_) :: beta, x(:)
+    complex(psb_dpk_)              :: beta, x(:)
     class(psb_z_base_vect_type) :: y
 
-    if (idx%is_dev()) call idx%sync()
-    call y%sct(n,idx%v(i:),x,beta)
+    if(idx%is_dev()) call idx%sync()
+    call y%sct(n, idx%v(i:), x, beta)
     call y%set_host()
-
   end subroutine z_base_sctb_x
 
-  subroutine z_base_sctb_buf(i,n,idx,beta,y)
+  subroutine z_base_sctb_buf(i, n, idx, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_)           :: i
+    integer(psb_mpk_)           :: n
     class(psb_i_base_vect_type) :: idx
-    complex(psb_dpk_) :: beta
+    complex(psb_dpk_)              :: beta
     class(psb_z_base_vect_type) :: y
 
-
-    if (.not.allocated(y%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+    if(.not. allocated(y%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf')
       return
     end if
-    if (y%is_dev()) call y%sync()
-    if (idx%is_dev()) call idx%sync()
-    call y%sct(n,idx%v(i:),y%combuf(i:),beta)
+    if(y%is_dev()) call y%sync()
+    if(idx%is_dev()) call idx%sync()
+    call y%sct(n, idx%v(i:), y%combuf(i:), beta)
     call y%set_host()
-
   end subroutine z_base_sctb_buf
-
-
   !
   !> Function  _base_addconst_a2
   !! \memberof  psb_z_base_vect_type
@@ -2407,16 +2305,16 @@ contains
   !! \param b The added term
   !! \param info return code
   !
-  subroutine z_base_addconst_a2(x,b,z,info)
+  subroutine z_base_addconst_a2(x, b, z, info)
     use psi_serial_mod
     implicit none
     real(psb_dpk_), intent(in)                  :: b
-    complex(psb_dpk_), intent(inout)                :: x(:)
+    complex(psb_dpk_), intent(inout)               :: x(:)
     class(psb_z_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_), intent(out)              :: info
     integer(psb_ipk_) :: i, n
 
-    if (z%is_dev()) call z%sync()
+    if(z%is_dev()) call z%sync()
 #if defined(PSB_OPENMP)
     n = size(x)
     !$omp parallel do private(i)
@@ -2426,9 +2324,9 @@ contains
 #else
     z%v = x + b
 #endif
-    info = 0
-    
+    info = psb_success_
   end subroutine z_base_addconst_a2
+  
   !
   !> Function  _base_addconst_v2
   !! \memberof  psb_z_base_vect_type
@@ -2438,23 +2336,22 @@ contains
   !! \param b The added term
   !! \param info return code
   !
-  subroutine z_base_addconst_v2(x,b,z,info)
+  subroutine z_base_addconst_v2(x, b, z, info)
     use psi_serial_mod
     implicit none
     class(psb_z_base_vect_type), intent(inout)  :: x
     real(psb_dpk_), intent(in)                  :: b
     class(psb_z_base_vect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)                :: info
+    integer(psb_ipk_), intent(out)              :: info
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call z%addconst(x%v,b,info)
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call z%addconst(x%v, b, info)
   end subroutine z_base_addconst_v2
 end module psb_z_base_vect_mod
 
 
 module psb_z_base_multivect_mod
-
   use psb_const_mod
   use psb_error_mod
   use psb_realloc_mod
@@ -2475,9 +2372,9 @@ module psb_z_base_multivect_mod
 
   type psb_z_base_multivect_type
     !> Values.
-    complex(psb_dpk_), allocatable :: v(:,:)
+    complex(psb_dpk_), allocatable :: v(:, :)
     complex(psb_dpk_), allocatable :: combuf(:)
-    integer(psb_mpk_), allocatable :: comid(:,:)
+    integer(psb_mpk_), allocatable :: comid(:, :)
     !> vector bldstate:
     !!    null:   pristine;
     !!    build:  it's being filled with entries;
@@ -2541,10 +2438,12 @@ module psb_z_base_multivect_mod
 
     !
     ! Basic info
+    !
     procedure, pass(x) :: get_nrows => z_base_mlv_get_nrows
     procedure, pass(x) :: get_ncols => z_base_mlv_get_ncols
     procedure, pass(x) :: sizeof    => z_base_mlv_sizeof
     procedure, nopass  :: get_fmt   => z_base_mlv_get_fmt
+    
     !
     ! Set/get data from/to an external array; also
     ! overload assignment.
@@ -2552,36 +2451,83 @@ module psb_z_base_multivect_mod
     procedure, pass(x) :: get_vect => z_base_mlv_get_vect
     procedure, pass(x) :: set_scal => z_base_mlv_set_scal
     procedure, pass(x) :: set_vect => z_base_mlv_set_vect
-    generic, public    :: set      => set_vect, set_scal
+    procedure, pass(x) :: set_colm => z_base_mlv_set_colm
+    generic, public    :: set      => set_vect, set_scal, set_colm
+    
+    !! 
+    !! AXPY - like operations 
+    !! 
+    ! single column export as vector
+    procedure, pass(x) :: extract_col   => z_base_mvect_extract_col
+    ! two term operations - indexed and full versions
+    procedure, pass(y) :: axpby_v_i     => z_base_mvect_axpby_v_idxs
+    procedure, pass(y) :: axpby_v_f     => z_base_mvect_axpby_v_full
+    procedure, pass(y) :: axpby_m_i     => z_base_mvect_axpby_m_idxs
+    procedure, pass(y) :: axpby_m_f     => z_base_mvect_axpby_m_full
+    ! two term operations with separate output mv
+    procedure, pass(z) :: axpby_m_f_o   => z_base_mvect_axpby_m_full_out
+    ! three term operations
+    procedure, pass(z) :: axpbycz_vv    => z_base_mvect_axpbycz_vv
+    procedure, pass(z) :: axpbycz_mv    => z_base_mvect_axpbycz_mv
+    procedure, pass(z) :: axpbycz_mm_i  => z_base_mvect_axpbycz_mm_idxs
+    procedure, pass(z) :: axpbycz_mm_f  => z_base_mvect_axpbycz_mm_full
+    ! three term operations with separate output mv
+    procedure, pass(w) :: axpbycz_mm_o  => z_base_mvect_axpbycz_mm_out
+    ! linear combinations of columns of the multivector (rename?)
+    procedure, pass(x) :: colspan1D     => z_base_mvect_colspan1D
+    procedure, pass(x) :: colspan2D     => z_base_mvect_colspan2D
+    ! all generics exported as axpby
+    generic, public    :: axpby         => extract_col, &
+                                            axpby_v_i, axpby_v_f, &
+                                            axpby_m_i, axpby_m_f, &
+                                            axpby_m_f_o, &
+                                            axpbycz_vv, axpbycz_mv, axpbycz_mm_i, &
+                                            axpbycz_mm_f, axpbycz_mm_o, &
+                                            colspan1D, colspan2D
 
-    !
-    ! Dot product and AXPBY
-    !
-    procedure, pass(x) :: dot_v    => z_base_mlv_dot_v
-    procedure, pass(x) :: dot_a    => z_base_mlv_dot_a
-    generic, public    :: dot      => dot_v, dot_a
-    procedure, pass(y) :: axpby_v  => z_base_mlv_axpby_v
-    procedure, pass(y) :: axpby_a  => z_base_mlv_axpby_a
-    generic, public    :: axpby    => axpby_v, axpby_a
-    !
-    ! MultiVector by vector/multivector multiplication. Need all variants
-    ! to handle multiple requirements from preconditioners
-    !
-    procedure, pass(y) :: mlt_mv   => z_base_mlv_mlt_mv
-    procedure, pass(y) :: mlt_mv_v => z_base_mlv_mlt_mv_v
-    procedure, pass(y) :: mlt_ar1  => z_base_mlv_mlt_ar1
-    procedure, pass(y) :: mlt_ar2  => z_base_mlv_mlt_ar2
-    procedure, pass(z) :: mlt_a_2  => z_base_mlv_mlt_a_2
-    procedure, pass(z) :: mlt_v_2  => z_base_mlv_mlt_v_2
-!!$    procedure, pass(z) :: mlt_va   => z_base_mlv_mlt_va
-!!$    procedure, pass(z) :: mlt_av   => z_base_mlv_mlt_av
-    generic, public    :: mlt      => mlt_mv, mlt_mv_v, mlt_ar1, mlt_ar2, &
-         & mlt_a_2, mlt_v_2 !, mlt_av, mlt_va
+    !! 
+    !! DOT - like operations 
+    !!
+    ! only full-full version for now
+    procedure, pass(x) :: dot_mm   => z_base_mvect_dot_mm
+    procedure, pass(x) :: dot_mv   => z_base_mvect_dot_mv
+    generic, public    :: dotsbr   => dot_mm, dot_mv
+
+    !! 
+    !! Element wise multiplications 
+    !!
+    ! two input with in place output
+    procedure, pass(y) :: mlt_v_f    => z_base_mvect_mlt_v_full
+    procedure, pass(y) :: mlt_v_i    => z_base_mvect_mlt_v_idxs
+    procedure, pass(y) :: mlt_m_f    => z_base_mvect_mlt_m_full
+    procedure, pass(y) :: mlt_m_i    => z_base_mvect_mlt_m_idxs
+    ! two input with separate output
+    procedure, pass(z) :: mlt_vv_f_o  => z_base_mvect_mlt_vv_full_out
+    procedure, pass(z) :: mlt_vv_i_o  => z_base_mvect_mlt_vv_idxs_out
+    procedure, pass(z) :: mlt_vm_f_o  => z_base_mvect_mlt_vm_full_out
+    procedure, pass(z) :: mlt_vm_i_o  => z_base_mvect_mlt_vm_idxs_out
+    procedure, pass(z) :: mlt_mm_f_o  => z_base_mvect_mlt_mm_full_out
+    procedure, pass(z) :: mlt_mm_i_o  => z_base_mvect_mlt_mm_idxs_out
+    ! Element wise multiplication operations with externel vector output
+    procedure, pass(y) :: mlt_vm_e    => z_base_mvect_mlt_vm_ext
+    procedure, pass(y) :: mlt_mm_e    => z_base_mvect_mlt_mm_ext
+    ! All procedures exported as mlt
+    generic, public    :: mlt         => mlt_v_f, mlt_v_i, &
+                                          mlt_m_f, mlt_m_i, &
+                                          mlt_vv_f_o, mlt_vv_i_o, &
+                                          mlt_vm_f_o, mlt_vm_i_o, &
+                                          mlt_mm_f_o, mlt_mm_i_o, &
+                                          mlt_vm_e, mlt_mm_e
+
     !
     ! Scaling and norms
     !
+    procedure, pass(x)  :: nrm2_f => z_base_mvect_nrm2_full
+    procedure, pass(x)  :: nrm2_i => z_base_mvect_nrm2_idxs
+    generic, public     :: nrm2   => nrm2_f, nrm2_i
+
+    ! OLD ones
     procedure, pass(x) :: scal     => z_base_mlv_scal
-    procedure, pass(x) :: nrm2     => z_base_mlv_nrm2
     procedure, pass(x) :: amax     => z_base_mlv_amax
     procedure, pass(x) :: asum     => z_base_mlv_asum
     procedure, pass(x) :: absval1  => z_base_mlv_absval1
@@ -2622,37 +2568,34 @@ module psb_z_base_multivect_mod
   end interface psb_z_base_multivect
 
 contains
-
   !
   ! Constructors.
   !
 
   !> Function  constructor:
   !! \brief     Constructor from an array
-  !!  \param   x(:)  input array to be copied
+  !! \param   x(:)  input array to be copied
   !!
   function constructor(x) result(this)
-    complex(psb_dpk_)   :: x(:,:)
+    complex(psb_dpk_) :: x(:, :)
     type(psb_z_base_multivect_type) :: this
+
     integer(psb_ipk_) :: info
-
     this%v = x
-    call this%asb(size(x,dim=1,kind=psb_ipk_),&
-         & size(x,dim=2,kind=psb_ipk_),info)
+    call this%asb(size(x, dim = 1, kind = psb_ipk_), &
+                & size(x, dim = 2, kind = psb_ipk_), info)
   end function constructor
-
 
   !> Function  constructor:
   !! \brief     Constructor from size
-  !!  \param    n   Size of vector to be built.
+  !! \param    n   Size of vector to be built.
   !!
-  function size_const(m,n) result(this)
-    integer(psb_ipk_), intent(in) :: m,n
+  function size_const(m, n) result(this)
+    integer(psb_ipk_), intent(in) :: m, n
     type(psb_z_base_multivect_type) :: this
     integer(psb_ipk_) :: info
 
-    call this%asb(m,n,info)
-
+    call this%asb(m, n, info)
   end function size_const
 
   !
@@ -2662,21 +2605,21 @@ contains
   !> Function  bld_x:
   !! \memberof  psb_z_base_multivect_type
   !! \brief     Build method from an array
-  !!  \param   x(:)  input array to be copied
+  !! \param   x(:)  input array to be copied
   !!
-  subroutine z_base_mlv_bld_x(x,this)
+  subroutine z_base_mlv_bld_x(x, this)
     use psb_realloc_mod
-    complex(psb_dpk_), intent(in) :: this(:,:)
     class(psb_z_base_multivect_type), intent(inout) :: x
+    complex(psb_dpk_), intent(in)                      :: this(:, :)
+
     integer(psb_ipk_) :: info
 
-    call psb_realloc(size(this,1),size(this,2),x%v,info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_vect_bld')
+    call psb_realloc(size(this, 1), size(this, 2), x%v, info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'base_mlv_vect_bld')
       return
     end if
-    x%v(:,:)  = this(:,:)
-
+    x%v(:, :) = this(:, :)
   end subroutine z_base_mlv_bld_x
 
   !
@@ -2686,76 +2629,72 @@ contains
   !> Function  bld_n:
   !! \memberof  psb_z_base_multivect_type
   !! \brief     Build method with size (uninitialized data)
-  !!  \param    n    size to be allocated.
+  !! \param    n    size to be allocated.
   !!
-  subroutine z_base_mlv_bld_n(x,m,n,scratch)
+  subroutine z_base_mlv_bld_n(x, m, n, scratch)
     use psb_realloc_mod
-    integer(psb_ipk_), intent(in) :: m,n
+    integer(psb_ipk_), intent(in) :: m, n
     class(psb_z_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_) :: info
     logical, intent(in), optional        :: scratch
 
-    call psb_realloc(m,n,x%v,info)
-    call x%asb(m,n,info,scratch=scratch)
-
+    call psb_realloc(m, n, x%v, info)
+    call x%asb(m, n, info, scratch = scratch)
   end subroutine z_base_mlv_bld_n
 
   !> Function  base_mlv_all:
   !! \memberof  psb_z_base_multivect_type
   !! \brief     Build method with size (uninitialized data) and
   !!            allocation return code.
-  !!  \param    n    size to be allocated.
-  !!  \param info  return code
+  !! \param    n    size to be allocated.
+  !! \param info  return code
   !!
-  subroutine z_base_mlv_all(m,n, x, info)
+  subroutine z_base_mlv_all(m, n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m,n
+    integer(psb_ipk_), intent(in)               :: m, n
     class(psb_z_base_multivect_type), intent(out) :: x
     integer(psb_ipk_), intent(out)              :: info
 
-    call psb_realloc(m,n,x%v,info)
-    if (try_newins) then
-      call psb_realloc(n,x%iv,info)
+    call psb_realloc(m, n, x%v, info)
+    if(try_newins) then
+      call psb_realloc(n, x%iv, info)
       call x%set_ncfs(0)
     end if
-
   end subroutine z_base_mlv_all
 
   !> Function  base_mlv_mold:
   !! \memberof  psb_z_base_multivect_type
   !! \brief     Mold method: return a variable with the same dynamic type
-  !!  \param    y returned variable
-  !!  \param info  return code
+  !! \param    y returned variable
+  !! \param info  return code
   !!
   subroutine z_base_mlv_mold(x, y, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_z_base_multivect_type), intent(in)   :: x
-    class(psb_z_base_multivect_type), intent(out), allocatable :: y
-    integer(psb_ipk_), intent(out)              :: info
+    class(psb_z_base_multivect_type), intent(in)                :: x
+    class(psb_z_base_multivect_type), intent(out), allocatable  :: y
+    integer(psb_ipk_), intent(out)                                :: info
 
-    allocate(psb_z_base_multivect_type :: y, stat=info)
-
+    allocate(psb_z_base_multivect_type :: y, stat = info)
   end subroutine z_base_mlv_mold
 
   subroutine z_base_mlv_reinit(x, info)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    class(psb_z_base_multivect_type), intent(out)    :: x
-    integer(psb_ipk_), intent(out)              :: info
+    class(psb_z_base_multivect_type), intent(out) :: x
+    integer(psb_ipk_), intent(out)                :: info
 
-    info = 0
-    if (allocated(x%v)) then 
+    info = psb_success_
+    if(allocated(x%v)) then 
       call x%sync()
-      x%v(:,:) = zzero
+      x%v(:, :) = zzero
       call x%set_host()
       call x%set_upd()
     end if
-
   end subroutine z_base_mlv_reinit
 
   !
@@ -2765,148 +2704,142 @@ contains
   !! \memberof  psb_z_base_multivect_type
   !! \brief Insert coefficients.
   !!
-  !!
-  !!         Given  a list of N pairs
-  !!           (IRL(i),VAL(i))
+  !!         Given a list of N pairs
+  !!           (IRL(i), VAL(i))
   !!         record a new coefficient in X such that
   !!            X(IRL(1:N)) = VAL(1:N).
   !!
   !!         - the update operation will perform either
   !!               X(IRL(1:n)) = VAL(1:N)
   !!           or
-  !!               X(IRL(1:n)) = X(IRL(1:n))+VAL(1:N)
+  !!               X(IRL(1:n)) = X(IRL(1:n)) + VAL(1:N)
   !!           according to the value of DUPLICATE.
   !!
-  !!
-  !!  \param n     number of pairs in input
-  !!  \param irl(:)  the input row indices
-  !!  \param val(:)  the input coefficients
-  !!  \param dupl    how to treat duplicate entries
-  !!  \param info  return code
+  !! \param n     number of pairs in input
+  !! \param irl(:)  the input row indices
+  !! \param val(:)  the input coefficients
+  !! \param dupl    how to treat duplicate entries
+  !! \param info  return code
   !!
   !
-  subroutine z_base_mlv_ins(n,irl,val,dupl,x,maxr,info)
+  subroutine z_base_mlv_ins(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_multivect_type), intent(inout)  :: x
-    integer(psb_ipk_), intent(in)               :: n, dupl,maxr
-    integer(psb_ipk_), intent(in)               :: irl(:)
-    complex(psb_dpk_), intent(in)        :: val(:,:)
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in)                   :: n, dupl, maxr
+    integer(psb_ipk_), intent(in)                   :: irl(:)
+    complex(psb_dpk_), intent(in)                      :: val(:, :)
+    class(psb_z_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(out)                  :: info
 
     integer(psb_ipk_) :: i, isz, nc, dupl_, ncfs_, k
 
-    info = 0
-    if (psb_errstatus_fatal()) return
+    info = psb_success_
+    if(psb_errstatus_fatal()) return
 
-    if (try_newins) then 
-      if (x%is_bld()) then
-        nc = size(x%v,2)
+    if(try_newins) then 
+      if(x%is_bld()) then
+        nc = size(x%v, 2)
         ncfs_ = x%get_ncfs()
         isz = ncfs_ + n
-        call psb_realloc(isz,nc,x%v,info)
-        call psb_ensure_size(isz,x%iv,info)
-        k   = ncfs_
+        call psb_realloc(isz, nc, x%v, info)
+        call psb_ensure_size(isz, x%iv, info)
+        k = ncfs_
         do i = 1, n
           !loop over all val's rows
           ! row actual block row
-          if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-            k  = k + 1 
+          if((1 <= irl(i)) .and. (irl(i) <= maxr)) then
+            k = k + 1 
             ! this row belongs to me
             ! copy i-th row of block val in x
-            x%v(k,:)  = val(i,:)
+            x%v(k, :)  = val(i, :)
             x%iv(k) = irl(i)
           end if
         enddo
         call x%set_ncfs(k)      
 
-      else if (x%is_upd()) then
+      else if(x%is_upd()) then
 
         dupl_ = x%get_dupl()
-        if (.not.allocated(x%v)) then
+        if(.not. allocated(x%v)) then
           info = psb_err_invalid_vect_state_
-        else if (n > min(size(irl),size(val))) then
+        else if(n > min(size(irl), size(val))) then
           info = psb_err_invalid_input_
         else
-          isz = size(x%v,1)
-          nc = size(x%v,2)
+          isz = size(x%v, 1)
+          nc = size(x%v, 2)
           select case(dupl_)
-          case(psb_dupl_ovwrt_)
-            do i = 1, n
-              !loop over all val's rows
-              ! row actual block row
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-                ! this row belongs to me
-                ! copy i-th row of block val in x
-                x%v(irl(i),:) = val(i,:)
-              end if
-            enddo
+            case(psb_dupl_ovwrt_)
+              do i = 1, n
+                !loop over all val's rows
+                ! row actual block row
+                if((1 <= irl(i)) .and. (irl(i) <= maxr)) then
+                  ! this row belongs to me
+                  ! copy i-th row of block val in x
+                  x%v(irl(i), :) = val(i, :)
+                end if
+              enddo
 
-          case(psb_dupl_add_)
+            case(psb_dupl_add_)
+              do i = 1, n
+                !loop over all val's rows
+                if((1 <= irl(i)) .and. (irl(i) <= maxr)) then
+                  ! this row belongs to me
+                  ! copy i-th row of block val in x
+                  x%v(irl(i), :) = x%v(irl(i), :) + val(i, :)
+                end if
+              enddo
 
-            do i = 1, n
-              !loop over all val's rows
-              if ((1 <= irl(i)).and.(irl(i) <= maxr)) then
-                ! this row belongs to me
-                ! copy i-th row of block val in x
-                x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
-              end if
-            enddo
-
-          case default
-            info = 321
-            ! !$      call psb_errpush(info,name)
-            ! !$      goto 9999
+            case default
+              info = 321
+              ! !$      call psb_errpush(info, name)
+              ! !$      goto 9999
           end select
         end if
       else
         info = psb_err_invalid_vect_state_
       end if
     else
-      if (.not.allocated(x%v)) then
+      if(.not. allocated(x%v)) then
         info = psb_err_invalid_vect_state_
-      else if (n > min(size(irl),size(val))) then
+      else if(n > min(size(irl), size(val))) then
         info = psb_err_invalid_input_
-
       else
-        isz = size(x%v,1)
-        nc = size(x%v,2)
+        isz = size(x%v, 1)
+        nc = size(x%v, 2)
         select case(dupl)
-        case(psb_dupl_ovwrt_)
-          do i = 1, n
-            !loop over all val's rows
-            ! row actual block row
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i),:) = val(i,:)
-            end if
-          enddo
+          case(psb_dupl_ovwrt_)
+            do i = 1, n
+              !loop over all val's rows
+              ! row actual block row
+              if((1 <= irl(i)) .and. (irl(i) <= isz)) then
+                ! this row belongs to me
+                ! copy i-th row of block val in x
+                x%v(irl(i), :) = val(i, :)
+              end if
+            enddo
 
-        case(psb_dupl_add_)
+          case(psb_dupl_add_)
+            do i = 1, n
+              !loop over all val's rows
+              if((1 <= irl(i)) .and. (irl(i) <= isz)) then
+                ! this row belongs to me
+                ! copy i-th row of block val in x
+                x%v(irl(i), :) = x%v(irl(i), :) + val(i, :)
+              end if
+            enddo
 
-          do i = 1, n
-            !loop over all val's rows
-            if ((1 <= irl(i)).and.(irl(i) <= isz)) then
-              ! this row belongs to me
-              ! copy i-th row of block val in x
-              x%v(irl(i),:) = x%v(irl(i),:) +  val(i,:)
-            end if
-          enddo
-
-        case default
-          info = 321
-          ! !$      call psb_errpush(info,name)
-          ! !$      goto 9999
+          case default
+            info = 321
+            ! !$      call psb_errpush(info, name)
+            ! !$      goto 9999
         end select
       end if
     end if
     call x%set_host()
-    if (info /= 0) then
-      call psb_errpush(info,'base_mlv_vect_ins')
+    if(info /= psb_success_) then
+      call psb_errpush(info, 'base_mlv_vect_ins')
       return
     end if
-
   end subroutine z_base_mlv_ins
 
   !
@@ -2918,13 +2851,11 @@ contains
   subroutine z_base_mlv_zero(x)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_multivect_type), intent(inout)    :: x
+    class(psb_z_base_multivect_type), intent(inout) :: x
 
-    if (allocated(x%v)) x%v=zzero
+    if(allocated(x%v)) x%v = zzero
     call x%set_host()
-
   end subroutine z_base_mlv_zero
-
 
   !
   ! Assembly.
@@ -2935,78 +2866,79 @@ contains
   !! \memberof  psb_z_base_multivect_type
   !! \brief Assemble vector: reallocate as necessary.
   !!
-  !!  \param n     final size
-  !!  \param info  return code
+  !! \param n     final size
+  !! \param info  return code
   !!
   !
-
-  subroutine z_base_mlv_asb(m,n, x, info, scratch)
+  subroutine z_base_mlv_asb(m, n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
     implicit none
-    integer(psb_ipk_), intent(in)              :: m,n
+    integer(psb_ipk_), intent(in)                   :: m, n
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
-    logical, intent(in), optional        :: scratch
+    integer(psb_ipk_), intent(out)                  :: info
+    logical, intent(in), optional :: scratch
 
     logical :: scratch_
     integer(psb_ipk_) :: i, ncfs, xvsz
-    complex(psb_dpk_), allocatable ::  vv(:,:)
+    complex(psb_dpk_), allocatable ::  vv(:, :)
 
-    info = 0
-    if (present(scratch)) then
+    info = psb_success_
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    if (try_newins) then 
-      if (x%is_bld()) then
+    if(try_newins) then 
+      if(x%is_bld()) then
         ncfs = x%get_ncfs()
         xvsz = psb_size(x%v)
-        call psb_realloc(m,n,vv,info)
-        vv(:,:) = zzero
+        call psb_realloc(m, n, vv, info)
+        vv(:, :) = zzero
         select case(x%get_dupl())
-        case(psb_dupl_add_)
-          do i=1,ncfs
-            vv(x%iv(i),:) = vv(x%iv(i),:) + x%v(i,:)
-          end do
-        case(psb_dupl_ovwrt_)
-          do i=1,ncfs
-            vv(x%iv(i),:) = x%v(i,:)
-          end do
-        case(psb_dupl_err_)
-          do i=1,ncfs
-            if (any(vv(x%iv(i),:).ne.zzero)) then
-              info = psb_err_duplicate_coo
-              call psb_errpush(info,'mvect-asb')
-              return
-            else
-              vv(x%iv(i),:) = x%v(i,:)
-            end if
-          end do
-        case default
-          write(psb_err_unit,*) 'Error in mvect_asb: unsafe dupl',x%get_dupl()
-          info =-7
+          case(psb_dupl_add_)
+            do i = 1, ncfs
+              vv(x%iv(i), :) = vv(x%iv(i), :) + x%v(i, :)
+            end do
+
+          case(psb_dupl_ovwrt_)
+            do i = 1, ncfs
+              vv(x%iv(i), :) = x%v(i, :)
+            end do
+
+          case(psb_dupl_err_)
+            do i = 1, ncfs
+              if(any(vv(x%iv(i), :).ne.zzero)) then
+                info = psb_err_duplicate_coo
+                call psb_errpush(info, 'mvect-asb')
+                return
+              else
+                vv(x%iv(i), :) = x%v(i, :)
+              end if
+            end do
+
+          case default
+            write(psb_err_unit, *) 'Error in mvect_asb: unsafe dupl', x%get_dupl()
+            info = -7
         end select
-        call psb_move_alloc(vv,x%v,info)
-        if (allocated(x%iv)) deallocate(x%iv,stat=info)
-      else if (x%is_upd().or.x%is_asb().or.scratch_) then
-        if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
-             & call psb_realloc(m,n,x%v,info)
-        if (info /= 0) then
+
+        call psb_move_alloc(vv, x%v, info)
+        if(allocated(x%iv)) deallocate(x%iv, stat = info)
+      else if(x%is_upd() .or. x%is_asb() .or. scratch_) then
+        if((x%get_nrows() < m) .or. (x%get_ncols() < n)) call psb_realloc(m, n, x%v, info)
+        if(info /= psb_success_) then
           info = psb_err_alloc_dealloc_
-          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+          call psb_errpush(psb_err_alloc_dealloc_, 'mvect_asb')
         end if
       else
         info = psb_err_invalid_vect_state_        
-        call psb_errpush(info,'vect_asb')
+        call psb_errpush(info, 'vect_asb')
       end if
     else
-      if ((x%get_nrows() < m).or.(x%get_ncols()<n)) &
-           & call psb_realloc(m,n,x%v,info)
-      if (info /= 0) then
+      if((x%get_nrows() < m) .or. (x%get_ncols() < n)) call psb_realloc(m, n, x%v, info)
+      if(info /= psb_success_) then
           info = psb_err_alloc_dealloc_
-          call psb_errpush(psb_err_alloc_dealloc_,'mvect_asb')
+          call psb_errpush(psb_err_alloc_dealloc_, 'mvect_asb')
         end if
     end if
     call x%set_host()
@@ -3014,13 +2946,12 @@ contains
     call x%sync()
   end subroutine z_base_mlv_asb
 
-
   !
   !> Function  base_mlv_free:
   !! \memberof  psb_z_base_multivect_type
   !! \brief Free vector
   !!
-  !!  \param info  return code
+  !! \param info  return code
   !!
   !
   subroutine z_base_mlv_free(x, info)
@@ -3030,11 +2961,9 @@ contains
     class(psb_z_base_multivect_type), intent(inout)  :: x
     integer(psb_ipk_), intent(out)              :: info
 
-    info = 0
-    if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (info /= 0) call &
-         & psb_errpush(psb_err_alloc_dealloc_,'vect_free')
-
+    info = psb_success_
+    if(allocated(x%v)) deallocate(x%v, stat = info)
+    if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'vect_free')
   end subroutine z_base_mlv_free
 
   function z_base_mlv_get_ncfs(x) result(res)
@@ -3086,55 +3015,54 @@ contains
     res = (x%bldstate == psb_vect_asb_)
   end function z_base_mlv_is_asb
 
-  subroutine  z_base_mlv_set_ncfs(n,x)
+  subroutine z_base_mlv_set_ncfs(n, x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: n
     x%ncfs = n
   end subroutine z_base_mlv_set_ncfs
 
-  subroutine  z_base_mlv_set_dupl(n,x)
+  subroutine z_base_mlv_set_dupl(n, x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: n
     x%dupl = n
   end subroutine z_base_mlv_set_dupl
 
-  subroutine  z_base_mlv_set_state(n,x)
+  subroutine z_base_mlv_set_state(n, x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
     integer(psb_ipk_), intent(in) :: n
     x%bldstate = n
   end subroutine z_base_mlv_set_state
 
-  subroutine  z_base_mlv_set_null(x)
+  subroutine z_base_mlv_set_null(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_null_
   end subroutine z_base_mlv_set_null
 
-  subroutine  z_base_mlv_set_bld(x)
+  subroutine z_base_mlv_set_bld(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_bld_
   end subroutine z_base_mlv_set_bld
 
-  subroutine  z_base_mlv_set_upd(x)
+  subroutine z_base_mlv_set_upd(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_upd_
   end subroutine z_base_mlv_set_upd
 
-  subroutine  z_base_mlv_set_asb(x)
+  subroutine z_base_mlv_set_asb(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
 
     x%bldstate = psb_vect_asb_
   end subroutine z_base_mlv_set_asb
-
 
   !
   ! The base version of SYNC & friends does nothing, it's just
@@ -3149,7 +3077,6 @@ contains
   subroutine z_base_mlv_sync(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-
   end subroutine z_base_mlv_sync
 
   !
@@ -3161,7 +3088,6 @@ contains
   subroutine z_base_mlv_set_host(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-
   end subroutine z_base_mlv_set_host
 
   !
@@ -3173,7 +3099,6 @@ contains
   subroutine z_base_mlv_set_dev(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-
   end subroutine z_base_mlv_set_dev
 
   !
@@ -3185,7 +3110,6 @@ contains
   subroutine z_base_mlv_set_sync(x)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-
   end subroutine z_base_mlv_set_sync
 
   !
@@ -3197,7 +3121,7 @@ contains
   function z_base_mlv_is_dev(x) result(res)
     implicit none
     class(psb_z_base_multivect_type), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = .false.
   end function z_base_mlv_is_dev
@@ -3211,7 +3135,7 @@ contains
   function z_base_mlv_is_host(x) result(res)
     implicit none
     class(psb_z_base_multivect_type), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = .true.
   end function z_base_mlv_is_host
@@ -3225,15 +3149,15 @@ contains
   function z_base_mlv_is_sync(x) result(res)
     implicit none
     class(psb_z_base_multivect_type), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = .true.
   end function z_base_mlv_is_sync
 
   !> Function  base_cpy:
-  !! \memberof  psb_d_base_vect_type
+  !! \memberof  psb_z_base_vect_type
   !! \brief     base_cpy: copy base contents
-  !!  \param    y returned variable
+  !! \param    y returned variable
   !!
   subroutine z_base_mlv_cpy(x, y)
     use psi_serial_mod
@@ -3242,13 +3166,12 @@ contains
     class(psb_z_base_multivect_type), intent(in)   :: x
     class(psb_z_base_multivect_type), intent(out)  :: y
 
-    if (allocated(x%v)) call y%bld(x%v)
+    if(allocated(x%v)) call y%bld(x%v)
     call y%set_state(x%get_state())
     call y%set_dupl(x%get_dupl())
     call y%set_ncfs(x%get_ncfs())
-    if (allocated(x%iv)) y%iv = x%iv
+    if(allocated(x%iv)) y%iv = x%iv
   end subroutine z_base_mlv_cpy
-
 
   !
   ! Size info.
@@ -3265,8 +3188,7 @@ contains
     integer(psb_ipk_) :: res
 
     res = 0
-    if (allocated(x%v)) res = size(x%v,1)
-
+    if(allocated(x%v)) res = size(x%v, 1)
   end function z_base_mlv_get_nrows
 
   function z_base_mlv_get_ncols(x) result(res)
@@ -3275,8 +3197,7 @@ contains
     integer(psb_ipk_) :: res
 
     res = 0
-    if (allocated(x%v)) res = size(x%v,2)
-
+    if(allocated(x%v)) res = size(x%v, 2)
   end function z_base_mlv_get_ncols
 
   !
@@ -3292,7 +3213,6 @@ contains
 
     ! Force 8-byte integers.
     res = (1_psb_epk_ * (2*psb_sizeof_dp)) * x%get_nrows() * x%get_ncols()
-
   end function z_base_mlv_sizeof
 
   !
@@ -3307,30 +3227,29 @@ contains
     res = 'BASE'
   end function z_base_mlv_get_fmt
 
-
-  !
-  !
   !
   !> Function  base_mlv_get_vect
   !! \memberof  psb_z_base_multivect_type
   !! \brief  Extract a copy of the contents
   !!
   !
-  function  z_base_mlv_get_vect(x) result(res)
+  function z_base_mlv_get_vect(x) result(res)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-    complex(psb_dpk_), allocatable                 :: res(:,:)
-    integer(psb_ipk_) :: info,m,n
+    complex(psb_dpk_), allocatable  :: res(:, :)
+
+    integer(psb_ipk_) :: info, m, n
+
     m = x%get_nrows()
     n = x%get_ncols()
-    if (.not.allocated(x%v)) return
+    if(.not. allocated(x%v)) return
     call x%sync()
-    allocate(res(m,n),stat=info)
-    if (info /= 0) then
-      call psb_errpush(psb_err_alloc_dealloc_,'base_mlv_get_vect')
+    allocate(res(m, n), stat = info)
+    if(info /= psb_success_) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'base_mlv_get_vect')
       return
     end if
-    res(1:m,1:n) = x%v(1:m,1:n)
+    res(1:m, 1:n) = x%v(1:m, 1:n)
   end function z_base_mlv_get_vect
 
   !
@@ -3342,14 +3261,19 @@ contains
   !! \brief  Set all entries
   !! \param val   The value to set
   !!
-  subroutine z_base_mlv_set_scal(x,val)
+  subroutine z_base_mlv_set_scal(x, val, rfirst, rlast)
     implicit none
     class(psb_z_base_multivect_type), intent(inout)  :: x
     complex(psb_dpk_), intent(in) :: val
+    integer(psb_ipk_), optional   :: rfirst, rlast
 
-    integer(psb_ipk_) :: info
-    x%v = val
+    integer(psb_ipk_) :: info, rfirst_, rlast_
+    rfirst_ = 1
+    rlast_  = size(x%v, 1)
+    if(present(rfirst)) rfirst_ = max(rfirst_, rfirst)
+    if(present(rlast))  rlast_  = min(rlast_, rlast)
 
+    x%v(rfirst_ : rlast_, :) = val
   end subroutine z_base_mlv_set_scal
 
   !
@@ -3358,388 +3282,655 @@ contains
   !! \brief  Set all entries
   !! \param val(:)  The vector to be copied in
   !!
-  subroutine z_base_mlv_set_vect(x,val)
+  subroutine z_base_mlv_set_vect(x, val)
     implicit none
-    class(psb_z_base_multivect_type), intent(inout)  :: x
-    complex(psb_dpk_), intent(in) :: val(:,:)
-    integer(psb_ipk_) :: nr, nc
-    integer(psb_ipk_) :: info
+    class(psb_z_base_multivect_type), intent(inout) :: x
+    complex(psb_dpk_), intent(in)                      :: val(:, :)
 
-    if (allocated(x%v)) then
-      nr = min(size(x%v,1),size(val,1))
-      nc = min(size(x%v,2),size(val,2))
+    integer(psb_ipk_) :: nr, nc, info
 
-      x%v(1:nr,1:nc) = val(1:nr,1:nc)
+    if(allocated(x%v)) then
+      nr = min(size(x%v, 1), size(val, 1))
+      nc = min(size(x%v, 2), size(val, 2))
+      x%v(1:nr, 1:nc) = val(1:nr, 1:nc)
     else
       x%v = val
     end if
-
   end subroutine z_base_mlv_set_vect
-
-  !
-  ! Dot products
-  !
-  !
-  !> Function  base_mlv_dot_v
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief  Dot product by another base_mlv_vector
-  !! \param n    Number of entries to be considered
-  !! \param y    The other (base_mlv_vect) to be multiplied by
-  !!
-  function z_base_mlv_dot_v(n,x,y) result(res)
-    implicit none
-    class(psb_z_base_multivect_type), intent(inout) :: x, y
-    integer(psb_ipk_), intent(in)           :: n
-    complex(psb_dpk_), allocatable   :: res(:)
-    complex(psb_dpk_), external      :: zdotc
-    integer(psb_ipk_) :: j,nc
-
-    if (x%is_dev()) call x%sync()
-    res = zzero
-    !
-    ! Note: this is the base implementation.
-    !  When we get here, we are sure that X is of
-    !  TYPE psb_z_base_mlv_vect (or its class does not care).
-    !  If Y is not, throw the burden on it, implicitly
-    !  calling dot_a
-    !
-    select type(yy => y)
-    type is (psb_z_base_multivect_type)
-      if (y%is_dev()) call y%sync()
-      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
-      allocate(res(nc))
-      do j=1,nc
-        res(j) = zdotc(n,x%v(:,j),1,y%v(:,j),1)
-      end do
-      class default
-      res = y%dot(n,x%v)
-    end select
-
-  end function z_base_mlv_dot_v
-
-  !
-  ! Base workhorse is good old BLAS1
-  !
-  !
-  !> Function  base_mlv_dot_a
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief  Dot product by a normal array
-  !! \param n    Number of entries to be considered
-  !! \param y(:) The array to be multiplied by
-  !!
-  function z_base_mlv_dot_a(n,x,y) result(res)
+  
+  subroutine z_base_mlv_set_colm(x, cidx, val, rfirst, rlast)
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-    complex(psb_dpk_), intent(in)    :: y(:,:)
-    integer(psb_ipk_), intent(in)           :: n
-    complex(psb_dpk_), allocatable     :: res(:)
-    complex(psb_dpk_), external      :: zdotc
-    integer(psb_ipk_) :: j,nc
+    integer(psb_ipk_), intent(in)                   :: cidx
+    complex(psb_dpk_), intent(in)                      :: val
+    integer(psb_ipk_), optional :: rfirst, rlast
 
-    if (x%is_dev()) call x%sync()
-    nc = min(psb_size(x%v,2_psb_ipk_),size(y,2_psb_ipk_))
-    allocate(res(nc))
-    do j=1,nc
-      res(j) = zdotc(n,x%v(:,j),1,y(:,j),1)
+    integer(psb_ipk_) :: rfirst_, rlast_, i
+    rfirst_ = 1
+    rlast_  = size(x%v, 1)
+    if(present(rfirst)) rfirst_ = max(rfirst_, rfirst)
+    if(present(rlast))  rlast_  = min(rlast_, rlast)
+
+    if(x%is_dev()) call x%sync()
+
+#if defined(PSB_OPENMP)
+    !$omp parallel do private(i)
+    do i = rfirst_, rlast_        
+      x%v(i, cidx) = val
     end do
+#else
+    x%v(rfirst_ : rlast_, cidx) = val
+#endif
 
-  end function z_base_mlv_dot_a
+    call x%set_host()
+  end subroutine z_base_mlv_set_colm
 
   !
-  ! AXPBY is invoked via Y, hence the structure below.
+  ! New implementations of "axpy-like" operation
   !
-  !
-  !
-  !> Function  base_mlv_axpby_v
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief AXPBY  by a (base_mlv_vect) y=alpha*x+beta*y
-  !! \param m    Number of entries to be considered
-  !! \param alpha scalar alpha
-  !! \param x     The class(base_mlv_vect) to be added
-  !! \param beta scalar alpha
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_axpby_v(m,alpha, x, beta, y, info, n)
+  subroutine z_base_mvect_extract_col(m, alpha, x, idx_x, beta, y, info)
     use psi_serial_mod
+    use psb_z_base_vect_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    class(psb_z_base_multivect_type), intent(inout)  :: x
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_), intent(in), optional     :: n
-    integer(psb_ipk_)  :: nc
+    integer(psb_ipk_), intent(in)                   :: m, idx_x
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x
+    class(psb_z_base_vect_type), intent(inout)      :: y
+    integer(psb_ipk_), intent(out)                  :: info
 
-    if (present(n)) then
-      nc = n
-    else
-      nc = min(psb_size(x%v,2_psb_ipk_),psb_size(y%v,2_psb_ipk_))
-    end if
-    select type(xx => x)
-    type is (psb_z_base_multivect_type)
-      call psb_geaxpby(m,nc,alpha,x%v,beta,y%v,info)
+    select type(x)
+      type is (psb_z_base_multivect_type)
+        call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v, info)
       class default
-      call y%axpby(m,alpha,x%v,beta,info,n=n)
+        info = psb_err_invalid_input_
     end select
+  end subroutine z_base_mvect_extract_col
 
-  end subroutine z_base_mlv_axpby_v
+  subroutine z_base_mvect_axpby_v_idxs(m, alpha, x, beta, y, idx_y, info)
+    use psi_serial_mod
+    use psb_z_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_y
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(out)                  :: info
 
-  !
-  ! AXPBY is invoked via Y, hence the structure below.
-  !
-  !
-  !> Function  base_mlv_axpby_a
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief AXPBY  by a normal array y=alpha*x+beta*y
-  !! \param m    Number of entries to be considered
-  !! \param alpha scalar alpha
-  !! \param x(:) The array to be added
-  !! \param beta scalar alpha
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_axpby_a(m,alpha, x, beta, y, info,n)
+    select type(x)
+      type is (psb_z_base_vect_type)
+        call psb_geaxpby(m, alpha, x%v, beta, y%v(:, idx_y), info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine z_base_mvect_axpby_v_idxs
+
+  subroutine z_base_mvect_axpby_v_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    use psb_z_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_z_base_vect_type)
+        call psb_geaxpby(m, y%get_ncols(), alpha, x%v, beta, y%v, info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine z_base_mvect_axpby_v_full
+
+  subroutine z_base_mvect_axpby_m_idxs(m, alpha, x, idx_x, beta, y, idx_y, info)
+    use psi_serial_mod
+    use psb_z_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_z_base_multivect_type)
+        call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine z_base_mvect_axpby_m_idxs
+
+  subroutine z_base_mvect_axpby_m_full(m, alpha, x, beta, y, info)
     use psi_serial_mod
     implicit none
-    integer(psb_ipk_), intent(in)               :: m
-    complex(psb_dpk_), intent(in)        :: x(:,:)
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    complex(psb_dpk_), intent (in)       :: alpha, beta
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_), intent(in), optional     :: n
-    integer(psb_ipk_)  :: nc
-    if (present(n)) then
-      nc = n
-    else
-      nc = min(size(x,2),psb_size(y%v,2_psb_ipk_))
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_z_base_multivect_type)
+        call psb_geaxpby(m, y%get_ncols(), alpha, x%v, beta, y%v, info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine z_base_mvect_axpby_m_full
+
+  subroutine z_base_mvect_axpby_m_full_out(m, alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_z_base_multivect_type)
+        call psb_geaxpby(m, y%get_ncols(), alpha, x%v, beta, y%v, z%v, info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine z_base_mvect_axpby_m_full_out
+
+  subroutine z_base_mvect_axpbycz_vv(m, alpha, x, beta, y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    use psb_z_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_z
+    complex(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    type(psb_z_base_vect_type), intent(inout)       :: x, y
+    class(psb_z_base_multivect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    ! TEMP: the type check is enforced via the argument types
+    call psb_geaxpby(m, alpha, x%v, beta, y%v, gamma, z%v(:, idx_z), info)
+  end subroutine z_base_mvect_axpbycz_vv
+
+  subroutine z_base_mvect_axpbycz_mv(m, alpha, x, beta, y, idx_y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    use psb_z_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_y, idx_z
+    complex(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    type(psb_z_base_vect_type), intent(inout)       :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y, z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    ! TEMP: the type check is enforced via the argument types
+    call psb_geaxpby(m, alpha, x%v, beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
+  end subroutine z_base_mvect_axpbycz_mv
+
+  subroutine z_base_mvect_axpbycz_mm_idxs(m, alpha, x, idx_x, beta, y, idx_y, z, gamma, idx_z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z
+    complex(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_z_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    ! TEMP: the type check is enforced via the argument types
+    call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), gamma, z%v(:, idx_z), info)
+  end subroutine z_base_mvect_axpbycz_mm_idxs
+
+  subroutine z_base_mvect_axpbycz_mm_full(m, alpha, x, beta, y, z, gamma, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_z_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is (psb_z_base_multivect_type)
+        call psb_geaxpby(m, z%get_ncols(), alpha, x%v, beta, y%v, gamma, z%v, info)
+      class default
+        info = psb_err_invalid_input_
+    end select
+  end subroutine z_base_mvect_axpbycz_mm_full
+
+  subroutine z_base_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z, idx_w
+    complex(psb_dpk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_z_base_multivect_type), intent(inout) :: x, y, z, w
+    integer(psb_ipk_), intent(out)                  :: info
+
+    ! TEMP: the type check is enforced via the argument types
+    call psb_geaxpby(m, alpha, x%v(:, idx_x), beta, y%v(:, idx_y), gamma, z%v(:, idx_z), w%v(:, idx_w), info)
+  end subroutine z_base_mvect_axpbycz_mm_out
+
+  subroutine z_base_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    use psb_z_base_vect_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                    :: m
+    class(psb_z_base_multivect_type), intent(inout)  :: x
+    complex(psb_dpk_), intent(in)                       :: coeff(:)
+    class(psb_z_base_vect_type), intent(inout)       :: y 
+    integer(psb_ipk_), intent(out)                   :: info
+    logical, intent(in)                              :: upd_flag
+ 
+    integer(psb_ipk_) :: nc
+    complex(psb_dpk_) :: beta
+    beta = merge(zone, zzero, upd_flag)
+
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    nc = x%get_ncols()
+    if(nc /= size(coeff)) then
+      info = psb_err_invalid_mvect_size_
+      return
     end if
 
-    call psb_geaxpby(m,nc,alpha,x,beta,y%v,info)
+    ! BUG? Why ONLY here needs size as leading dimension?
+    call zgemv('N', m, nc, zone, x%v, size(x%v, 1), coeff, 1, beta, y%v, 1)
+  end subroutine z_base_mvect_colspan1D
 
-  end subroutine z_base_mlv_axpby_a
-
-
-  !
-  !  Multiple variants of two operations:
-  !  Simple multiplication  Y(:.:) = X(:,:)*Y(:,:)
-  !  blas-like:   Z(:) = alpha*X(:)*Y(:)+beta*Z(:)
-  !
-  !  Variants expanded according to the dynamic type
-  !  of the involved entities
-  !
-  !
-  !> Function  base_mlv_mlt_mv
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief Multivector entry-by-entry multiply  by a base_mlv_multivect  y=x*y
-  !! \param x   The class(base_mlv_vect) to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_mlt_mv(x, y, info)
+  subroutine z_base_mvect_colspan2D(m, x, coeff, y, info, upd_flag)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_multivect_type), intent(inout)  :: x
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    complex(psb_dpk_), intent(in)                      :: coeff(:, :)
+    integer(psb_ipk_), intent(out)                  :: info
+    logical, intent(in)                             :: upd_flag
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
+    integer(psb_ipk_) :: nci, nco
+    complex(psb_dpk_) :: beta
+    beta = merge(zone, zzero, upd_flag)
 
-  end subroutine z_base_mlv_mlt_mv
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+    nci = x%get_ncols()
+    nco = y%get_ncols()
+    if((nci /= size(coeff, 1)) .or. (nco /= size(coeff, 2))) then
+      info = psb_err_invalid_mvect_size_
+      return
+    end if
 
-  subroutine z_base_mlv_mlt_mv_v(x, y, info)
+    ! BUG? Why ONLY here needs size as leading dimension?
+    call zgemm('N', 'N', m, nco, nci, zone, x%v, size(x%v, 1), coeff, nci, beta, y%v, size(y%v, 1))
+  end subroutine z_base_mvect_colspan2D
+
+  subroutine z_base_mvect_dot_mm(m, x, y, res, info)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    complex(psb_dpk_), intent(out)                     :: res(:, :)
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_) :: nrx, nry, ncx, ncy
+
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    nrx = x%get_nrows()
+    nry = y%get_nrows()
+
+    if(nrx /= nry) then
+      info = psb_err_invalid_mvect_size_
+      return
+    endif
+
+    ncx = x%get_ncols()
+    ncy = y%get_ncols()
+
+    call zgemm('T', 'N', ncx, ncy, nrx, zone, x%v, nrx, y%v, nry, zzero, res, ncx)
+  end subroutine z_base_mvect_dot_mm
+
+  subroutine z_base_mvect_dot_mv(m, x, y, res, info)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_z_base_multivect_type), intent(inout) :: x
+    class(psb_z_base_vect_type), intent(inout)      :: y
+    complex(psb_dpk_), intent(out)                     :: res(:)
+    integer(psb_ipk_), intent(out)                  :: info
+    integer(psb_ipk_) :: nrx, nry, ncx 
+
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    endif
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    endif
+
+    nrx = x%get_nrows()
+    nry = y%get_nrows()
+
+    if(nry /= nrx) then
+      info = psb_err_invalid_vect_size_
+      return
+    endif
+
+    ncx = x%get_ncols()
+
+    call zgemv('T', nrx, ncx, zone, x%v, nrx, y%v, 1, zzero, res, 1)
+  end subroutine z_base_mvect_dot_mv
+
+  subroutine z_base_mvect_mlt_v_full(m, alpha, x, y, beta, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_vect_type), intent(inout)  :: x
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
 
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call y%mlt(x%v,info)
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
 
-  end subroutine z_base_mlv_mlt_mv_v
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
 
-  !
-  !> Function  base_mlv_mlt_ar1
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief MultiVector entry-by-entry multiply  by a rank 1 array y=x*y
-  !! \param x(:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_mlt_ar1(x, y, info)
+    call psb_gemlt(m, y%get_ncols(), alpha, x%v, y%v, beta, info)
+  end subroutine z_base_mvect_mlt_v_full
+
+  subroutine z_base_mvect_mlt_v_idxs(m, alpha, x, y, idx_y, beta, info, conjgx, conjgy)
     use psi_serial_mod
     implicit none
-    complex(psb_dpk_), intent(in)        :: x(:)
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, n
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)                   :: idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
 
-    info = 0
-    n = min(psb_size(y%v,1_psb_ipk_), size(x))
-    do i=1, n
-      y%v(i,:) = y%v(i,:)*x(i)
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, info)
+  end subroutine z_base_mvect_mlt_v_idxs
+
+  subroutine z_base_mvect_mlt_m_full(m, alpha, x, y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, y%get_ncols(), alpha, x%v, y%v, beta, info)
+  end subroutine z_base_mvect_mlt_m_full
+
+  subroutine z_base_mvect_mlt_m_idxs(m, alpha, x, idx_x, y, idx_y, beta, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, info)
+  end subroutine z_base_mvect_mlt_m_idxs
+
+  subroutine z_base_mvect_mlt_vv_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x, y
+    class(psb_z_base_multivect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)    
+  end subroutine z_base_mvect_mlt_vv_full_out
+
+  subroutine z_base_mvect_mlt_vv_idxs_out(m, alpha, x, y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x, y
+    class(psb_z_base_multivect_type), intent(inout) :: z
+    integer(psb_ipk_), intent(in)                   :: idx_z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v, y%v, beta, z%v(:, idx_z), info)
+  end subroutine z_base_mvect_mlt_vv_idxs_out
+
+  subroutine z_base_mvect_mlt_vm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y, z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)    
+  end subroutine z_base_mvect_mlt_vm_full_out
+
+  subroutine z_base_mvect_mlt_vm_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x
+    class(psb_z_base_multivect_type), intent(inout) :: y, z
+    integer(psb_ipk_), intent(in)                   :: idx_y, idx_z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if((.not. allocated(y%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, z%v(:, idx_z), info)
+  end subroutine z_base_mvect_mlt_vm_idxs_out
+
+  subroutine z_base_mvect_mlt_mm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) &
+          .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+    
+    call psb_gemlt(m, z%get_ncols(), alpha, x%v, y%v, beta, z%v, info)
+  end subroutine z_base_mvect_mlt_mm_full_out
+
+  subroutine z_base_mvect_mlt_mm_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y, z
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y, idx_z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v)) &
+          .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, z%v(:, idx_z), info)
+  end subroutine z_base_mvect_mlt_mm_idxs_out
+
+  subroutine z_base_mvect_mlt_vm_ext(m, alpha, x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_vect_type), intent(inout)      :: x, z
+    class(psb_z_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)                   :: idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(z%v))) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+
+    if(.not. allocated(y%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+    
+    call psb_gemlt(m, alpha, x%v, y%v(:, idx_y), beta, z%v, info)
+  end subroutine z_base_mvect_mlt_vm_ext
+
+  subroutine z_base_mvect_mlt_mm_ext(m, alpha, x, idx_x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_dpk_), intent(in)                      :: alpha, beta
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+    class(psb_z_base_vect_type), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy   !TO DO: remove from real cases?
+
+    info = psb_success_
+    if((.not. allocated(x%v)) .or. (.not. allocated(y%v))) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    if(.not. allocated(z%v)) then
+      info = psb_err_invalid_vect_state_
+      return
+    end if
+    
+    call psb_gemlt(m, alpha, x%v(:, idx_x), y%v(:, idx_y), beta, z%v, info)
+  end subroutine z_base_mvect_mlt_mm_ext
+
+  function z_base_mvect_nrm2_full(m, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_z_base_multivect_type), intent(inout) :: x
+    complex(psb_dpk_), allocatable :: res(:)
+
+    complex(psb_dpk_), external  :: dznrm2
+    integer(psb_ipk_) :: j, nc
+
+    if(x%is_dev()) call x%sync()
+
+    nc = psb_size(x%v, itwo)
+    allocate(res(nc))
+
+    do j = 1, nc
+      res(j) = dznrm2(m, x%v(:, j), 1)
     end do
-
-  end subroutine z_base_mlv_mlt_ar1
-
-  !
-  !> Function  base_mlv_mlt_ar2
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief MultiVector entry-by-entry multiply  by a rank 2 array y=x*y
-  !! \param x(:,:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_mlt_ar2(x, y, info)
-    use psi_serial_mod
+  end function z_base_mvect_nrm2_full
+  
+  function z_base_mvect_nrm2_idxs(m, x, idx) result(res)
     implicit none
-    complex(psb_dpk_), intent(in)        :: x(:,:)
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, nr,nc
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_z_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)                   :: idx
+    complex(psb_dpk_)  :: res
 
-    info = 0
-    nr   = min(psb_size(y%v,1_psb_ipk_), size(x,1))
-    nc   = min(psb_size(y%v,2_psb_ipk_), size(x,2))
-    y%v(1:nr,1:nc) = y%v(1:nr,1:nc)*x(1:nr,1:nc)
+    complex(psb_dpk_), external  :: dznrm2
+    integer(psb_ipk_) :: nc
 
-  end subroutine z_base_mlv_mlt_ar2
+    if(x%is_dev()) call x%sync()
 
+    nc = psb_size(x%v, itwo)
+    if(idx > nc) return   ! Improve error handling?
+        
+    res = dznrm2(m, x%v(:, idx), 1)
+  end function z_base_mvect_nrm2_idxs
 
-  !
-  !> Function  base_mlv_mlt_a_2
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief AXPBY-like Vector entry-by-entry multiply  by normal arrays
-  !!        z=beta*z+alpha*x*y
-  !! \param alpha
-  !! \param beta
-  !! \param x(:) The array to be multiplied b
-  !! \param y(:) The array to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_mlt_a_2(alpha,x,y,beta,z,info)
-    use psi_serial_mod
-    implicit none
-    complex(psb_dpk_), intent(in)        :: alpha,beta
-    complex(psb_dpk_), intent(in)        :: y(:,:)
-    complex(psb_dpk_), intent(in)        :: x(:,:)
-    class(psb_z_base_multivect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: i, nr, nc
-
-    info = 0
-    nr = min(psb_size(z%v,1_psb_ipk_), size(x,1), size(y,1))
-    nc = min(psb_size(z%v,2_psb_ipk_), size(x,2), size(y,2))
-    if (alpha == zzero) then
-      if (beta == zone) then
-        return
-      else
-        z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc)
-      end if
-    else
-      if (alpha == zone) then
-        if (beta == zzero) then
-          z%v(1:nr,1:nc) = y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == zone) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      else if (alpha == -zone) then
-        if (beta == zzero) then
-          z%v(1:nr,1:nc) = -y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == zone) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) - y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      else
-        if (beta == zzero) then
-          z%v(1:nr,1:nc) = alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        else if (beta == zone) then
-          z%v(1:nr,1:nc) = z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        else
-          z%v(1:nr,1:nc) = beta*z%v(1:nr,1:nc) + alpha*y(1:nr,1:nc)*x(1:nr,1:nc)
-        end if
-      end if
-    end if
-  end subroutine z_base_mlv_mlt_a_2
-
-  !
-  !> Function  base_mlv_mlt_v_2
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief AXPBY-like Vector entry-by-entry multiply  by class(base_mlv_vect)
-  !!        z=beta*z+alpha*x*y
-  !! \param alpha
-  !! \param beta
-  !! \param x  The class(base_mlv_vect) to be multiplied b
-  !! \param y  The class(base_mlv_vect) to be multiplied by
-  !! \param info   return code
-  !!
-  subroutine z_base_mlv_mlt_v_2(alpha,x,y,beta,z,info,conjgx,conjgy)
-    use psi_serial_mod
-    use psb_string_mod
-    implicit none
-    complex(psb_dpk_), intent(in)        :: alpha,beta
-    class(psb_z_base_multivect_type), intent(inout)  :: x
-    class(psb_z_base_multivect_type), intent(inout)  :: y
-    class(psb_z_base_multivect_type), intent(inout)  :: z
-    integer(psb_ipk_), intent(out)              :: info
-    character(len=1), intent(in), optional     :: conjgx, conjgy
-    integer(psb_ipk_) :: i, n
-    logical :: conjgx_, conjgy_
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    if (y%is_dev()) call y%sync()
-    if (z%is_dev()) call z%sync()
-    if (.not.psb_z_is_complex_) then
-      call z%mlt(alpha,x%v,y%v,beta,info)
-    else
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-      if (conjgx_) x%v=conjg(x%v)
-      if (conjgy_) y%v=conjg(y%v)
-      call z%mlt(alpha,x%v,y%v,beta,info)
-      if (conjgx_) x%v=conjg(x%v)
-      if (conjgy_) y%v=conjg(y%v)
-    end if
-  end subroutine z_base_mlv_mlt_v_2
-!!$
-!!$  subroutine z_base_mlv_mlt_av(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none
-!!$    complex(psb_dpk_), intent(in)        :: alpha,beta
-!!$    complex(psb_dpk_), intent(in)        :: x(:)
-!!$    class(psb_z_base_multivect_type), intent(inout)  :: y
-!!$    class(psb_z_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$
-!!$    call z%mlt(alpha,x,y%v,beta,info)
-!!$
-!!$  end subroutine z_base_mlv_mlt_av
-!!$
-!!$  subroutine z_base_mlv_mlt_va(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none
-!!$    complex(psb_dpk_), intent(in)        :: alpha,beta
-!!$    complex(psb_dpk_), intent(in)        :: y(:)
-!!$    class(psb_z_base_multivect_type), intent(inout)  :: x
-!!$    class(psb_z_base_multivect_type), intent(inout)  :: z
-!!$    integer(psb_ipk_), intent(out)              :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$
-!!$    info = 0
-!!$
-!!$    call z%mlt(alpha,y,x,beta,info)
-!!$
-!!$  end subroutine z_base_mlv_mlt_va
-!!$
-!!$
   !
   ! Simple scaling
   !
@@ -3751,57 +3942,32 @@ contains
   subroutine z_base_mlv_scal(alpha, x)
     use psi_serial_mod
     implicit none
-    class(psb_z_base_multivect_type), intent(inout)  :: x
-    complex(psb_dpk_), intent (in)       :: alpha
-
-    if (x%is_dev()) call x%sync()
-    if (allocated(x%v)) x%v = alpha*x%v
-
-  end subroutine z_base_mlv_scal
-
-  !
-  ! Norms 1, 2 and infinity
-  !
-  !> Function  base_mlv_nrm2
-  !! \memberof  psb_z_base_multivect_type
-  !! \brief 2-norm |x(1:n)|_2
-  !! \param n  how many entries to consider
-  function z_base_mlv_nrm2(n,x) result(res)
-    implicit none
+    complex(psb_dpk_), intent(in)                     :: alpha
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
-    real(psb_dpk_), external      :: dznrm2
-    integer(psb_ipk_) :: j, nc
 
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
-    allocate(res(nc))
-    do j=1,nc
-      res(j) =  dznrm2(n,x%v(:,j),1)
-    end do
-
-  end function z_base_mlv_nrm2
+    if(x%is_dev()) call x%sync()
+    if(allocated(x%v)) x%v = alpha * x%v
+  end subroutine z_base_mlv_scal
 
   !
   !> Function  base_mlv_amax
   !! \memberof  psb_z_base_multivect_type
   !! \brief infinity-norm |x(1:n)|_\infty
   !! \param n  how many entries to consider
-  function z_base_mlv_amax(n,x) result(res)
+  function z_base_mlv_amax(n, x) result(res)
     implicit none
+    integer(psb_ipk_), intent(in)                   :: n
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
+    real(psb_dpk_), allocatable :: res(:)
+
     integer(psb_ipk_) :: j, nc
 
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
+    if(x%is_dev()) call x%sync()
+    nc = psb_size(x%v, 2_psb_ipk_)
     allocate(res(nc))
-    do j=1,nc
-      res(j) =  maxval(abs(x%v(1:n,j)))
+    do j = 1, nc
+      res(j) = maxval(abs(x%v(1:n, j)))
     end do
-
   end function z_base_mlv_amax
 
   !
@@ -3809,21 +3975,22 @@ contains
   !! \memberof  psb_z_base_multivect_type
   !! \brief 1-norm |x(1:n)|_1
   !! \param n  how many entries to consider
-  function z_base_mlv_asum(n,x) result(res)
+  function z_base_mlv_asum(n, x) result(res)
     implicit none
+    integer(psb_ipk_), intent(in)                   :: n
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)           :: n
-    real(psb_dpk_), allocatable    :: res(:)
+    real(psb_dpk_), allocatable :: res(:)
+
     integer(psb_ipk_) :: j, nc
 
-    if (x%is_dev()) call x%sync()
-    nc = psb_size(x%v,2_psb_ipk_)
+    if(x%is_dev()) call x%sync()
+    nc = psb_size(x%v, 2_psb_ipk_)
     allocate(res(nc))
-    do j=1,nc
-      res(j) =  sum(abs(x%v(1:n,j)))
+    do j = 1, nc
+      res(j) = sum(abs(x%v(1:n, j)))
     end do
-
   end function z_base_mlv_asum
+
   !
   ! Overwrite with absolute value
   !
@@ -3834,31 +4001,27 @@ contains
   !!
   subroutine z_base_mlv_absval1(x)
     implicit none
-    class(psb_z_base_multivect_type), intent(inout)  :: x
+    class(psb_z_base_multivect_type), intent(inout) :: x
 
-    if (allocated(x%v)) then
-      if (x%is_dev()) call x%sync()
-      x%v =  abs(x%v)
+    if(allocated(x%v)) then
+      if(x%is_dev()) call x%sync()
+      x%v = abs(x%v)
       call x%set_host()
     end if
-
   end subroutine z_base_mlv_absval1
 
-  subroutine z_base_mlv_absval2(x,y)
+  subroutine z_base_mlv_absval2(x, y)
     implicit none
-    class(psb_z_base_multivect_type), intent(inout) :: x
-    class(psb_z_base_multivect_type), intent(inout) :: y
+    class(psb_z_base_multivect_type), intent(inout) :: x, y
     integer(psb_ipk_) :: info
 
-    if (x%is_dev()) call x%sync()
-    if (allocated(x%v)) then
-      call y%axpby(min(x%get_nrows(),y%get_nrows()),zone,x,zzero,info)
+    if(x%is_dev()) call x%sync()
+    if(allocated(x%v)) then
+      call y%axpby(min(x%get_nrows(), y%get_nrows()), zone, x, zzero, info)
       call y%absval()
     end if
-
   end subroutine z_base_mlv_absval2
-
-
+  
   function z_base_mlv_use_buffer() result(res)
     implicit none
     logical :: res
@@ -3866,62 +4029,56 @@ contains
     res = .true.
   end function z_base_mlv_use_buffer
 
-  subroutine z_base_mlv_new_buffer(n,x,info)
+  subroutine z_base_mlv_new_buffer(n, x, info)
     use psb_realloc_mod
     implicit none
+    integer(psb_ipk_), intent(in)                   :: n
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
-    integer(psb_ipk_)               :: nc
+    integer(psb_ipk_) :: nc
+
     nc = x%get_ncols()
-    call psb_realloc(n*nc,x%combuf,info)
+    call psb_realloc(n*nc, x%combuf, info)
   end subroutine z_base_mlv_new_buffer
 
-  subroutine z_base_mlv_new_comid(n,x,info)
+  subroutine z_base_mlv_new_comid(n, x, info)
     use psb_realloc_mod
     implicit none
+    integer(psb_ipk_), intent(in)                   :: n
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
-    call psb_realloc(n,2_psb_ipk_,x%comid,info)
+    call psb_realloc(n, 2_psb_ipk_, x%comid, info)
   end subroutine z_base_mlv_new_comid
 
-
-  subroutine z_base_mlv_maybe_free_buffer(x,info)
+  subroutine z_base_mlv_maybe_free_buffer(x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
-
-    info = 0
-    if (psb_get_maybe_free_buffer())&
-         &  call x%free_buffer(info)
-
+    info = psb_success_
+    if(psb_get_maybe_free_buffer()) call x%free_buffer(info)
   end subroutine z_base_mlv_maybe_free_buffer
 
-  subroutine z_base_mlv_free_buffer(x,info)
+  subroutine z_base_mlv_free_buffer(x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
-    if (allocated(x%combuf)) &
-         &  deallocate(x%combuf,stat=info)
+    if(allocated(x%combuf)) deallocate(x%combuf, stat = info)
   end subroutine z_base_mlv_free_buffer
 
-  subroutine z_base_mlv_free_comid(x,info)
+  subroutine z_base_mlv_free_comid(x, info)
     use psb_realloc_mod
     implicit none
     class(psb_z_base_multivect_type), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)                  :: info
 
-    if (allocated(x%comid)) &
-         &  deallocate(x%comid,stat=info)
+    if(allocated(x%comid)) deallocate(x%comid, stat = info)
   end subroutine z_base_mlv_free_comid
-
 
   !
   ! Gather: Y = beta * Y + alpha * X(IDX(:))
@@ -3935,23 +4092,22 @@ contains
   !! \param idx(:) indices
   !! \param alpha
   !! \param beta
-  subroutine z_base_mlv_gthab(n,idx,alpha,x,beta,y)
+  subroutine z_base_mlv_gthab(n, idx, alpha, x, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_dpk_) :: alpha, beta, y(:)
-    class(psb_z_base_multivect_type) :: x
+    integer(psb_mpk_)                 :: n
+    integer(psb_ipk_)                 :: idx(:)
+    complex(psb_dpk_)                    :: alpha, beta, y(:)
+    class(psb_z_base_multivect_type)  :: x
     integer(psb_mpk_) :: nc
 
-    if (x%is_dev()) call x%sync()
-    if (.not.allocated(x%v)) then
-      return
-    end if
-    nc = psb_size(x%v,2_psb_ipk_)
-    call psi_gth(n,nc,idx,alpha,x%v,beta,y)
+    if(x%is_dev()) call x%sync()
+    if(.not. allocated(x%v)) return
 
+    nc = psb_size(x%v, 2_psb_ipk_)
+    call psi_gth(n, nc, idx, alpha, x%v, beta, y)
   end subroutine z_base_mlv_gthab
+
   !
   ! shortcut alpha=1 beta=0
   !
@@ -3961,18 +4117,17 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine z_base_mlv_gthzv_x(i,n,idx,x,y)
+  subroutine z_base_mlv_gthzv_x(i, n, idx, x, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
-    class(psb_i_base_vect_type) :: idx
-    complex(psb_dpk_) ::  y(:)
-    class(psb_z_base_multivect_type) :: x
+    integer(psb_ipk_)                 :: i
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    complex(psb_dpk_)                    :: y(:)
+    class(psb_z_base_multivect_type)  :: x
 
-    if (x%is_dev()) call x%sync()
-    call x%gth(n,idx%v(i:),y)
-
+    if(x%is_dev()) call x%sync()
+    call x%gth(n, idx%v(i:), y)
   end subroutine z_base_mlv_gthzv_x
 
   !
@@ -3984,24 +4139,22 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine z_base_mlv_gthzv(n,idx,x,y)
+  subroutine z_base_mlv_gthzv(n, idx, x, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_dpk_) ::  y(:)
-    class(psb_z_base_multivect_type) :: x
+    integer(psb_mpk_)                 :: n
+    integer(psb_ipk_)                 :: idx(:)
+    complex(psb_dpk_)                    :: y(:)
+    class(psb_z_base_multivect_type)  :: x
+
     integer(psb_mpk_) :: nc
 
-    if (x%is_dev()) call x%sync()
-    if (.not.allocated(x%v)) then
-      return
-    end if
-    nc = psb_size(x%v,2_psb_ipk_)
-
-    call psi_gth(n,nc,idx,x%v,y)
-
+    if(x%is_dev()) call x%sync()
+    if(.not. allocated(x%v)) return
+    nc = psb_size(x%v, 2_psb_ipk_)
+    call psi_gth(n, nc, idx, x%v, y)
   end subroutine z_base_mlv_gthzv
+  
   !
   ! shortcut alpha=1 beta=0
   !
@@ -4011,126 +4164,122 @@ contains
   !!    Y = X(IDX(:))
   !! \param n  how many entries to consider
   !! \param idx(:) indices
-  subroutine z_base_mlv_gthzm(n,idx,x,y)
+  subroutine z_base_mlv_gthzm(n, idx, x, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_dpk_) ::  y(:,:)
-    class(psb_z_base_multivect_type) :: x
+    integer(psb_mpk_)                 :: n
+    integer(psb_ipk_)                 :: idx(:)
+    complex(psb_dpk_)                    :: y(:, :)
+    class(psb_z_base_multivect_type)  :: x
+
     integer(psb_mpk_) :: nc
 
-    if (x%is_dev()) call x%sync()
-    if (.not.allocated(x%v)) then
-      return
-    end if
-    nc = psb_size(x%v,2_psb_ipk_)
-
-    call psi_gth(n,nc,idx,x%v,y)
-
+    if(x%is_dev()) call x%sync()
+    if(.not. allocated(x%v)) return
+    nc = psb_size(x%v, 2_psb_ipk_)
+    call psi_gth(n, nc, idx, x%v, y)
   end subroutine z_base_mlv_gthzm
 
   !
   ! New comm internals impl.
   !
-  subroutine z_base_mlv_gthzbuf(i,ixb,n,idx,x)
+  subroutine z_base_mlv_gthzbuf(i, ixb, n, idx, x)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i, ixb
-    class(psb_i_base_vect_type) :: idx
-    class(psb_z_base_multivect_type) :: x
+    integer(psb_ipk_)                 :: i, ixb
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    class(psb_z_base_multivect_type)  :: x
+
     integer(psb_ipk_) :: nc
 
-    if (.not.allocated(x%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf')
       return
     end if
-    if (idx%is_dev()) call idx%sync()
-    if (x%is_dev()) call x%sync()
+    if(idx%is_dev()) call idx%sync()
+    if(x%is_dev()) call x%sync()
     nc = x%get_ncols()
-    call x%gth(n,idx%v(i:),x%combuf(ixb:))
-
+    call x%gth(n, idx%v(i:), x%combuf(ixb:))
   end subroutine z_base_mlv_gthzbuf
 
   !
   ! Scatter:
-  ! Y(IDX(:),:) = beta*Y(IDX(:),:) + X(:)
+  ! Y(IDX(:), :) = beta*Y(IDX(:), :) + X(:)
   !
   !
   !> Function  base_mlv_sctb
   !! \memberof  psb_z_base_multivect_type
   !! \brief scatter into a class(base_mlv_vect)
-  !!    Y(IDX(:)) = beta * Y(IDX(:)) +  X(:)
+  !!    Y(IDX(:)) = beta * Y(IDX(:)) + X(:)
   !! \param n  how many entries to consider
   !! \param idx(:) indices
   !! \param beta
   !! \param x(:)
-  subroutine z_base_mlv_sctb(n,idx,x,beta,y)
+  subroutine z_base_mlv_sctb(n, idx, x, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_dpk_) :: beta, x(:)
-    class(psb_z_base_multivect_type) :: y
+    integer(psb_mpk_)                 :: n
+    integer(psb_ipk_)                 :: idx(:)
+    complex(psb_dpk_)                      :: beta, x(:)
+    class(psb_z_base_multivect_type)  :: y
+
     integer(psb_mpk_) :: nc
 
-    if (y%is_dev()) call y%sync()
-    nc = psb_size(y%v,2_psb_ipk_)
-    call psi_sct(n,nc,idx,x,beta,y%v)
+    if(y%is_dev()) call y%sync()
+    nc = psb_size(y%v, 2_psb_ipk_)
+    call psi_sct(n, nc, idx, x, beta, y%v)
     call y%set_host()
-
   end subroutine z_base_mlv_sctb
 
-  subroutine z_base_mlv_sctbr2(n,idx,x,beta,y)
+  subroutine z_base_mlv_sctbr2(n, idx, x, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_dpk_) :: beta, x(:,:)
-    class(psb_z_base_multivect_type) :: y
+    integer(psb_mpk_)                 :: n
+    integer(psb_ipk_)                 :: idx(:)
+    complex(psb_dpk_)                    :: beta, x(:, :)
+    class(psb_z_base_multivect_type)  :: y
+
     integer(psb_mpk_) :: nc
 
-    if (y%is_dev()) call y%sync()
+    if(y%is_dev()) call y%sync()
     nc = y%get_ncols()
-    call psi_sct(n,nc,idx,x,beta,y%v)
+    call psi_sct(n, nc, idx, x, beta, y%v)
     call y%set_host()
-
   end subroutine z_base_mlv_sctbr2
 
-  subroutine z_base_mlv_sctb_x(i,n,idx,x,beta,y)
+  subroutine z_base_mlv_sctb_x(i, n, idx, x, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
-    class(psb_i_base_vect_type) :: idx
-    complex( psb_dpk_) :: beta, x(:)
-    class(psb_z_base_multivect_type) :: y
+    integer(psb_ipk_)                 :: i
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    complex(psb_dpk_)                      :: beta, x(:)
+    class(psb_z_base_multivect_type)  :: y
 
-    call y%sct(n,idx%v(i:),x,beta)
-
+    call y%sct(n, idx%v(i:), x, beta)
   end subroutine z_base_mlv_sctb_x
 
-  subroutine z_base_mlv_sctb_buf(i,iyb,n,idx,beta,y)
+  subroutine z_base_mlv_sctb_buf(i, iyb, n, idx, beta, y)
     use psi_serial_mod
     implicit none
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i, iyb
-    class(psb_i_base_vect_type) :: idx
-    complex(psb_dpk_) :: beta
+    integer(psb_ipk_)                 :: i, iyb
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    complex(psb_dpk_)                    :: beta
     class(psb_z_base_multivect_type) :: y
+    
     integer(psb_ipk_) :: nc
 
-    if (.not.allocated(y%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+    if(.not. allocated(y%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf')
       return
     end if
-    if (y%is_dev()) call y%sync()
-    if (idx%is_dev()) call idx%sync()
+    if(y%is_dev()) call y%sync()
+    if(idx%is_dev()) call idx%sync()
     nc = y%get_ncols()
-    call y%sct(n,idx%v(i:),y%combuf(iyb:),beta)
+    call y%sct(n, idx%v(i:), y%combuf(iyb:), beta)
     call y%set_host()
-
   end subroutine z_base_mlv_sctb_buf
 
   !
@@ -4141,7 +4290,5 @@ contains
   !
   subroutine z_base_mlv_device_wait()
     implicit none
-
   end subroutine z_base_mlv_device_wait
-
 end module psb_z_base_multivect_mod

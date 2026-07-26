@@ -4,7 +4,7 @@ module psb_eigsolve_mod
   
   interface psb_powermethod
     subroutine psb_s_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, tol)
-      use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_sspmat_type, psb_dpk_, psb_s_vect_type
+      use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_sspmat_type, psb_spk_, psb_s_vect_type
       use psb_prec_mod, only : psb_sprec_type
       type(psb_sspmat_type), intent(in)     :: a
       class(psb_sprec_type), intent(inout)  :: prec 
@@ -50,7 +50,7 @@ module psb_eigsolve_mod
 
     subroutine psb_z_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, tol)
       use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_zspmat_type, psb_dpk_, psb_z_vect_type
-      use psb_prec_mod, only : psb_dprec_type
+      use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)     :: a
       class(psb_zprec_type), intent(inout)  :: prec 
       real(psb_dpk_), intent(out)           :: lambda

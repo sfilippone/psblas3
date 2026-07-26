@@ -29,7 +29,6 @@
 !    POSSIBILITY OF SUCH DAMAGE.
 !
 !
-
 subroutine psb_d_bjac_dump(prec, info, prefix, head)
   use psb_base_mod
   use psb_d_bjacprec, psb_protect_name => psb_d_bjac_dump
@@ -49,11 +48,8 @@ subroutine psb_d_bjac_dump(prec, info, prefix, head)
   ctxt = prec%get_ctxt()
   call psb_info(ctxt, iam, np)
 
-  if(present(prefix)) then
-    prefix_ = trim(prefix(1 : min(len(prefix), len(prefix_))))
-  else
-    prefix_ = "dump_fact_d"
-  end if
+  prefix_ = "dump_fact_d"
+  if(present(prefix)) prefix_ = trim(prefix(1 : min(len(prefix), len(prefix_))))
 
   lname = len_trim(prefix_)
   fname = trim(prefix_)
@@ -647,7 +643,7 @@ subroutine psb_d_bjac_apply(alpha, prec, x, beta, y, desc_data, info, trans, wor
   end if
 
   if(n_col <= size(work)) then
-    ww => work(1  :n_col)
+    ww => work(1 : n_col)
     if((4*n_col+n_col) <= size(work)) then
       aux => work(n_col+1:)
     else
@@ -809,7 +805,7 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
   integer(psb_ipk_)   :: nztota, err_act, n_row, nrow_a, n_col, nhalo
   integer(psb_ipk_)   :: ierr(5)
   character           :: trans, unitd
-  real(psb_dpk_)      :: fact_eps, inv_thresh
+  real(psb_dpk_)     :: fact_eps, inv_thresh
   character(len=20)   :: name = 'd_bjac_precbld'
   character(len=20)   :: ch_err
   type(psb_dspmat_type), allocatable  :: lf, uf
@@ -954,7 +950,6 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
 
       nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
-
       n_col  = desc_a%get_local_cols()
       nhalo  = n_col - nrow_a
       n_row  = nrow_a
@@ -1028,7 +1023,6 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
 
       nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
-
       n_col  = desc_a%get_local_cols()
       nhalo  = n_col - nrow_a
       n_row  = nrow_a
@@ -1100,7 +1094,6 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
 
       nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
-
       n_col  = desc_a%get_local_cols()
       nhalo  = n_col - nrow_a
       n_row  = nrow_a
@@ -1172,7 +1165,6 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
 
       nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
-
       n_col  = desc_a%get_local_cols()
       nhalo  = n_col - nrow_a
       n_row  = nrow_a
@@ -1244,7 +1236,6 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
 
       nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
-
       n_col  = desc_a%get_local_cols()
       nhalo  = n_col - nrow_a
       n_row  = nrow_a
@@ -1316,7 +1307,6 @@ subroutine psb_d_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
 
       nrow_a = desc_a%get_local_rows()
       nztota = a%get_nzeros()
-
       n_col  = desc_a%get_local_cols()
       nhalo  = n_col - nrow_a
       n_row  = nrow_a

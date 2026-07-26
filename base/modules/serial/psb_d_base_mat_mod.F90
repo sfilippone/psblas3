@@ -28,9 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-!
-!
-!
 module psb_d_base_mat_mod
   use psb_base_mat_mod
   use psb_d_base_vect_mod
@@ -420,7 +417,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: set_sort_status => ld_coo_set_sort_status
     procedure, pass(a) :: get_sort_status => ld_coo_get_sort_status
 
-
+    !
     ! Computational methods: defined here but not implemented.
     !
     procedure, pass(a) :: scals      => psb_ld_coo_scals
@@ -436,6 +433,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: spaxpby    => psb_ld_coo_spaxpby
     procedure, pass(a) :: cmpval     => psb_ld_coo_cmpval
     procedure, pass(a) :: cmpmat     => psb_ld_coo_cmpmat
+
     !
     ! This is COO specific
     !
@@ -455,13 +453,11 @@ module psb_d_base_mat_mod
     !
     procedure, pass(a) :: transp_1mat => ld_coo_transp_1mat
     procedure, pass(a) :: transc_1mat => ld_coo_transc_1mat
-
-
   end type psb_ld_coo_sparse_mat
 
   private :: ld_coo_get_nzeros, ld_coo_iset_nzeros, &
-       & ld_coo_get_fmt, ld_coo_free, ld_coo_sizeof, &
-       & ld_coo_transp_1mat, ld_coo_transc_1mat
+            & ld_coo_get_fmt, ld_coo_free, ld_coo_sizeof, &
+            & ld_coo_transp_1mat, ld_coo_transc_1mat
 #if defined(PSB_IPK4) && defined(PSB_LPK8)
   private :: ld_coo_lset_nzeros
 #endif
@@ -735,7 +731,6 @@ module psb_d_base_mat_mod
       class(psb_d_coo_sparse_mat), optional, intent(out)  :: l
     end subroutine psb_d_base_triu
   end interface
-
 
   !
   !> Function get_diag:
@@ -1095,7 +1090,6 @@ module psb_d_base_mat_mod
       integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_from_lfmt
   end interface
-
 
   !
   !>
@@ -1764,7 +1758,6 @@ module psb_d_base_mat_mod
   end interface
 
   !
-  !
   !> Function base_colsum:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Sum along the columns
@@ -2267,8 +2260,7 @@ module psb_d_base_mat_mod
   interface
     subroutine psb_d_coo_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
-      integer(psb_ipk_), intent(in)               :: nz, ia(:), ja(:), &
-                                                    & imin, imax, jmin, jmax
+      integer(psb_ipk_), intent(in)               :: nz, ia(:), ja(:), imin, imax, jmin, jmax
       class(psb_d_coo_sparse_mat), intent(inout)  :: a
       real(psb_dpk_), intent(in)                  :: val(:)
       integer(psb_ipk_), intent(out)              :: info
@@ -3345,7 +3337,8 @@ module psb_d_base_mat_mod
       function psb_ld_base_cmpval(a, val, tol, info) result(res)
           import
           class(psb_ld_base_sparse_mat), intent(inout)  :: a
-          real(psb_dpk_), intent(in)                    :: val, tol
+          real(psb_dpk_), intent(in)                    :: val
+          real(psb_dpk_), intent(in)                    :: tol
           integer(psb_ipk_), intent(out)                :: info
           logical :: res
       end function psb_ld_base_cmpval
@@ -4047,7 +4040,6 @@ module psb_d_base_mat_mod
   end interface
 
 contains
-
   function psb_d_get_print_frmt(nr, nc, nz, iv, ivr, ivc) result(frmt)
     implicit none
     integer(psb_ipk_), intent(in) :: nr, nc, nz
@@ -4059,12 +4051,12 @@ contains
     integer(psb_lpk_) :: nmx
     integer(psb_ipk_) :: ni
     nmx = max(nr, nc, ione)
-    if (present(iv))  nmx = max(nmx, maxval(abs(iv(1 : nc))))
-    if (present(ivr)) nmx = max(nmx, maxval(abs(ivr(1 : nr))))
-    if (present(ivc)) nmx = max(nmx, maxval(abs(ivc(1 : nc))))
+    if(present(iv))  nmx = max(nmx, maxval(abs(iv(1 : nc))))
+    if(present(ivr)) nmx = max(nmx, maxval(abs(ivr(1 : nr))))
+    if(present(ivc)) nmx = max(nmx, maxval(abs(ivc(1 : nc))))
     ni = floor(log10(1.0 * nmx)) + 2
 
-    if (datatype == 'complex') then
+    if(datatype == 'complex') then
       write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), 2(es26.18, 1x), 2(i', ni, ', 1x))'
     else
       write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), es26.18, 1x, 2(i', ni, ', 1x))'
@@ -4082,12 +4074,12 @@ contains
     integer(psb_lpk_) :: nmx, ni
     
     nmx = max(nr, nc, lone)
-    if (present(iv))  nmx = max(nmx, maxval(abs(iv(1 : nc))))
-    if (present(ivr)) nmx = max(nmx, maxval(abs(ivr(1 : nr))))
-    if (present(ivc)) nmx = max(nmx, maxval(abs(ivc(1 : nc))))
+    if(present(iv))  nmx = max(nmx, maxval(abs(iv(1 : nc))))
+    if(present(ivr)) nmx = max(nmx, maxval(abs(ivr(1 : nr))))
+    if(present(ivc)) nmx = max(nmx, maxval(abs(ivc(1 : nc))))
     ni = floor(log10(1.0 * nmx)) + 2
 
-    if (datatype=='complex') then
+    if(datatype=='complex') then
       write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), 2(es26.18, 1x), 2(i', ni, ', 1x))'
     else
       write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), es26.18, 1x, 2(i', ni, ', 1x))'
@@ -4127,16 +4119,16 @@ contains
     integer(psb_ipk_) :: res
     res = -1
 
-    if (allocated(a%ia)) res = size(a%ia)
-    if (allocated(a%ja)) then
-      if (res >= 0) then
+    if(allocated(a%ia)) res = size(a%ia)
+    if(allocated(a%ja)) then
+      if(res >= 0) then
         res = min(res, size(a%ja))
       else
         res = size(a%ja)
       end if
     end if
-    if (allocated(a%val)) then
-      if (res >= 0) then
+    if(allocated(a%val)) then
+      if(res >= 0) then
         res = min(res, size(a%val))
       else
         res = size(a%val)
@@ -4206,7 +4198,7 @@ contains
 
     a%sort_status = ist
     call a%set_sorted((a%sort_status == psb_row_major_) &
-                      & .or. (a%sort_status == psb_col_major_))
+                    & .or. (a%sort_status == psb_col_major_))
   end subroutine d_coo_set_sort_status
 
   subroutine d_coo_set_by_rows(a)
@@ -4239,9 +4231,9 @@ contains
     implicit none
     class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
-    if (allocated(a%ia)) deallocate(a%ia)
-    if (allocated(a%ja)) deallocate(a%ja)
-    if (allocated(a%val)) deallocate(a%val)
+    if(allocated(a%ia)) deallocate(a%ia)
+    if(allocated(a%ja)) deallocate(a%ja)
+    if(allocated(a%val)) deallocate(a%val)
     call a%set_null()
     call a%set_nrows(0_psb_ipk_)
     call a%set_ncols(0_psb_ipk_)
@@ -4270,7 +4262,6 @@ contains
     call move_alloc(a%ia, itemp)
     call move_alloc(a%ja, a%ia)
     call move_alloc(itemp, a%ja)
-
     call a%set_sorted(.false.)
     call a%set_sort_status(psb_unsorted_)
     return
@@ -4284,7 +4275,7 @@ contains
     ! This will morph into conjg() for C and Z
     ! and into a no-op for S and D, so a conditional
     ! on a constant ought to take it out completely.
-    if (psb_d_is_complex_) a%val(:) = (a%val(:))
+    if(psb_d_is_complex_) a%val(:) = (a%val(:))
   end subroutine d_coo_transc_1mat
 
   ! == ==================================
@@ -4318,18 +4309,18 @@ contains
     implicit none
     class(psb_ld_coo_sparse_mat), intent(in)  :: a
     integer(psb_lpk_) :: res
-
+    
     res = -1
-    if (allocated(a%ia)) res = size(a%ia)
-    if (allocated(a%ja)) then
-      if (res >= 0) then
+    if(allocated(a%ia)) res = size(a%ia)
+    if(allocated(a%ja)) then
+      if(res >= 0) then
         res = min(res, size(a%ja))
       else
         res = size(a%ja)
       end if
     end if
-    if (allocated(a%val)) then
-      if (res >= 0) then
+    if(allocated(a%val)) then
+      if(res >= 0) then
         res = min(res, size(a%val))
       else
         res = size(a%val)
@@ -4442,9 +4433,9 @@ contains
     implicit none
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
-    if (allocated(a%ia)) deallocate(a%ia)
-    if (allocated(a%ja)) deallocate(a%ja)
-    if (allocated(a%val)) deallocate(a%val)
+    if(allocated(a%ia)) deallocate(a%ia)
+    if(allocated(a%ja)) deallocate(a%ja)
+    if(allocated(a%val)) deallocate(a%val)
     call a%set_null()
     call a%set_nrows(0_psb_lpk_)
     call a%set_ncols(0_psb_lpk_)
@@ -4474,7 +4465,6 @@ contains
     call move_alloc(a%ia, itemp)
     call move_alloc(a%ja, a%ia)
     call move_alloc(itemp, a%ja)
-
     call a%set_sorted(.false.)
     call a%set_sort_status(psb_unsorted_)
     return
@@ -4488,6 +4478,6 @@ contains
     ! This will morph into conjg() for C and Z
     ! and into a no-op for S and D, so a conditional
     ! on a constant ought to take it out completely.
-    if (psb_ld_is_complex_) a%val(:) = (a%val(:))
+    if(psb_ld_is_complex_) a%val(:) = (a%val(:))
   end subroutine ld_coo_transc_1mat
 end module psb_d_base_mat_mod

@@ -82,13 +82,13 @@ module psb_d_mat_mod
   use psb_d_multivect_mod
   use psb_d_base_mat_mod
   use psb_d_csr_mat_mod, only : psb_d_csr_sparse_mat, psb_ld_csr_sparse_mat, &
-                              & psb_d_ecsr_sparse_mat
+                                & psb_d_ecsr_sparse_mat
   use psb_d_csc_mat_mod, only : psb_d_csc_sparse_mat, psb_ld_csc_sparse_mat
 
   type :: psb_dspmat_type
     class(psb_d_base_sparse_mat), allocatable  :: a   
     class(psb_d_base_sparse_mat), allocatable  :: ad, and    
-    integer(psb_ipk_) :: remote_build=psb_matbld_noremote_
+    integer(psb_ipk_) :: remote_build = psb_matbld_noremote_
     type(psb_ld_coo_sparse_mat), allocatable  :: rmta
 
   contains
@@ -270,7 +270,7 @@ module psb_d_mat_mod
     generic, public    :: spcmp    => cmpval, cmpmat
   end type psb_dspmat_type
 
-  private :: psb_d_get_nrows, psb_d_get_ncols, &
+  private ::  psb_d_get_nrows, psb_d_get_ncols, &
             & psb_d_get_nzeros, psb_d_get_size, &
             & psb_d_get_dupl, psb_d_is_null, psb_d_is_bld, &
             & psb_d_is_upd, psb_d_is_asb, psb_d_is_sorted, &
@@ -454,7 +454,7 @@ module psb_d_mat_mod
     generic, public    :: spcmp    => cmpval, cmpmat
   end type psb_ldspmat_type
 
-  private :: psb_ld_get_nrows, psb_ld_get_ncols, &
+  private ::  psb_ld_get_nrows, psb_ld_get_ncols, &
             & psb_ld_get_nzeros, psb_ld_get_size, &
             & psb_ld_get_dupl, psb_ld_is_null, psb_ld_is_bld, &
             & psb_ld_is_upd, psb_ld_is_asb, psb_ld_is_sorted, &
@@ -1043,7 +1043,6 @@ module psb_d_mat_mod
       integer(psb_ipk_), intent(out)        :: info
     end subroutine psb_dspmat_clone
   end interface
-
 
   ! == ===================================
   !
@@ -2017,7 +2016,8 @@ module psb_d_mat_mod
     function psb_ld_cmpval(a, val, tol, info) result(res)
       import :: psb_ipk_, psb_lpk_, psb_ldspmat_type, psb_dpk_
       class(psb_ldspmat_type), intent(inout)  :: a
-      real(psb_dpk_), intent(in)              :: val, tol
+      real(psb_dpk_), intent(in)              :: val
+      real(psb_dpk_), intent(in)              :: tol
       integer(psb_ipk_), intent(out)          :: info
       logical :: res
     end function psb_ld_cmpval
@@ -2032,15 +2032,12 @@ module psb_d_mat_mod
   end interface
 
 contains
-
   subroutine psb_d_set_mat_default(a)
     implicit none
     class(psb_d_base_sparse_mat), intent(in) :: a
 
-    if(allocated(psb_d_base_mat_default)) & 
-      & deallocate(psb_d_base_mat_default)
-
-    allocate(psb_d_base_mat_default, mold=a)
+    if(allocated(psb_d_base_mat_default)) deallocate(psb_d_base_mat_default)
+    allocate(psb_d_base_mat_default, mold = a)
   end subroutine psb_d_set_mat_default
 
   function psb_d_get_mat_default(a) result(res)
@@ -2064,8 +2061,7 @@ contains
   subroutine psb_d_clear_mat_default() 
     implicit none 
     
-    if(allocated(psb_d_base_mat_default)) &
-      & deallocate(psb_d_base_mat_default)
+    if(allocated(psb_d_base_mat_default)) deallocate(psb_d_base_mat_default)
   end subroutine psb_d_clear_mat_default
 
   ! == ===================================
@@ -2415,7 +2411,7 @@ contains
     class(psb_dspmat_type), intent(inout) :: a
     integer(psb_ipk_), intent(out)        :: info
 
-    info = 0
+    info = psb_success_
     if(allocated(a%a)) call a%a%clean_zeros(info)
   end subroutine psb_d_clean_zeros
 
@@ -2853,9 +2849,7 @@ contains
     integer(psb_lpk_) :: res
 
     res = 0
-    if(allocated(a%a)) then
-      res = a%a%get_size()
-    end if
+    if(allocated(a%a)) res = a%a%get_size()
   end function psb_ld_get_size
 
   function psb_ld_get_nz_row(idx, a) result(res)
@@ -2873,7 +2867,7 @@ contains
     class(psb_ldspmat_type), intent(inout)  :: a
     integer(psb_ipk_), intent(out)          :: info
 
-    info = 0
+    info = psb_success_
     if(allocated(a%a)) call a%a%clean_zeros(info)
   end subroutine psb_ld_clean_zeros
 
@@ -2916,7 +2910,6 @@ contains
   !!$    if(info == psb_success_) ia(:) = lia(:)
   !!$    call psb_ensure_size(size(lja), ja, info)
   !!$    if(info == psb_success_) ja(:) = lja(:)
-  !!$
   !!$  end subroutine psb_ld_icsgetptn
   !!$
   !!$  subroutine psb_ld_icsgetrow(imin, imax, a, nz, ia, ja, val, info, &
@@ -2952,13 +2945,11 @@ contains
   !!$    lnz = nz
   !!$    call a%csget(imin, imax, nz, lia, lja, val, info, &
   !!$       & jmin, jmax, iren, append, nzin, rscale, cscale)
-  !!$    nz=lnz
+  !!$    nz = lnz
   !!$    call psb_ensure_size(size(lia), ia, info)
   !!$    if(info == psb_success_) ia(:) = lia(:)
   !!$    call psb_ensure_size(size(lja), ja, info)
   !!$    if(info == psb_success_) ja(:) = lja(:)
-  !!$
   !!$  end subroutine psb_ld_icsgetrow
 #endif
-
 end module psb_d_mat_mod
