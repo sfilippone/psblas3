@@ -87,8 +87,8 @@ module psb_i_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet2_read
-  end interface mm_array_read
 #endif
+  end interface mm_array_read
 
   interface mm_array_write
     subroutine mm_ivet2_write(b, header, info, iunit, filename)   
@@ -146,8 +146,9 @@ module psb_i_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvect_write
-  end interface mm_array_write
 #endif
+  end interface mm_array_write
+
   interface mm_vet_write
     procedure mm_ivet1_write, mm_ivet2_write
   end interface
