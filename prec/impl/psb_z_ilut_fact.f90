@@ -757,7 +757,7 @@ contains
     complex(psb_dpk_), intent(inout)       :: row(:), uval(:),d(:)
 
     ! Local Variables
-    integer(psb_ipk_)               :: k,j,jj,lastk,iret
+    integer(psb_ipk_)               :: k,j,jj,lastk,iret, isz
     complex(psb_dpk_)      :: rwk
 
     info  = psb_success_
@@ -829,8 +829,11 @@ contains
       ! If we get here it is an index we need to keep on copyout.
       !
       nidx       = nidx + 1
-      call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)
-      if (info /= psb_success_) return
+      if (nidx > size(idxs)) then 
+        isz  = max(nidx,int(1.5*size(idxs)))
+        call psb_ensure_size(isz,idxs,info)
+        if (info /= psb_success_) return
+      end if
       idxs(nidx) = k
 
     end do
@@ -1045,7 +1048,7 @@ contains
         !
         ! Figure out a good reallocation size!
         !
-        isz  = (max((l1/i)*m,int(1.2*l1),l1+100))
+        isz  = (max((l1/i)*m,int(1.5*l1),l1+100))
         call psb_realloc(isz,lval,info)
         if (info == psb_success_) call psb_realloc(isz,lja,info)
         if (info /= psb_success_) then
@@ -1191,7 +1194,7 @@ contains
         !
         ! Figure out a good reallocation size!
         !
-        isz  = max((l2/i)*m,int(1.2*l2),l2+100)
+        isz  = max((l2/i)*m,int(1.5*l2),l2+100)
         call psb_realloc(isz,uval,info)
         if (info == psb_success_) call psb_realloc(isz,uja,info)
         if (info /= psb_success_) then

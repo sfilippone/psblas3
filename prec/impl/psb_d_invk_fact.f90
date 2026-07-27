@@ -372,7 +372,7 @@ subroutine psb_d_invk_copyout(fill_in,i,m,row,rowlevs,nidx,idxs,&
           !
           ! Figure out a good reallocation size!
           !
-          isz  = max(int(1.2*l2),l2+100)
+          isz  = max(int(1.5*l2),l2+100)
           call psb_realloc(isz,uaspk,info)
           if (info == psb_success_) call psb_realloc(isz,uia1,info)
           if (info /= psb_success_) then
@@ -426,8 +426,6 @@ subroutine psb_dinvk_inv(fill_in,i,row,rowlevs,heap,ja,irp,val,uplevs,&
 
   info = psb_success_
 
-  call psb_ensure_size(200, idxs,  info)
-  if (info /= psb_success_) return
   nidx    = 1
   idxs(1) = i
   lastk   = i

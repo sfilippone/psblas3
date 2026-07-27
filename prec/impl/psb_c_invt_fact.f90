@@ -602,7 +602,7 @@ subroutine psb_c_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       !
       ! Figure out a good reallocation size!
       !
-      isz  = max(int(1.2*l2),l2+100)
+      isz  = max(int(1.5*l2),l2+100)
       call psb_realloc(isz,val,info)
       if (info == psb_success_) call psb_realloc(isz,ja,info)
       if (info /= psb_success_) then
@@ -650,7 +650,7 @@ subroutine psb_c_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   complex(psb_spk_), intent(inout)       :: row(:)
 
   ! Local Variables
-  integer(psb_ipk_) :: k,j,jj,lastk,iret
+  integer(psb_ipk_) :: k,j,jj,lastk,iret, isz
   real(psb_dpk_)    :: rwk, alpha
 
   info  = psb_success_
@@ -729,8 +729,11 @@ subroutine psb_c_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
     !
 
     nidx       = nidx + 1
-    call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)
-    if (info /= psb_success_) return
+    if (nidx > size(idxs)) then 
+      isz  = max(nidx,int(1.5*size(idxs)))
+      call psb_ensure_size(isz,idxs,info)
+      if (info /= psb_success_) return
+    end if
     idxs(nidx) = k
     irwt(k)    = 0
   end do
