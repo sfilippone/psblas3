@@ -87,8 +87,8 @@ module psb_i_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet2_read
-  end interface mm_array_read
 #endif
+  end interface mm_array_read
 
   interface mm_array_write
     subroutine mm_ivet2_write(b, header, info, iunit, filename)   
@@ -109,6 +109,24 @@ module psb_i_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_ivet1_write
+    subroutine mm_ivect_write(b, header, info, iunit, filename)   
+      import :: psb_ipk_,psb_i_vect_type
+      implicit none
+      type(psb_i_vect_type), intent(inout)  :: b
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_ivect_write
+    subroutine mm_lvect_write(b, header, info, iunit, filename)   
+      import :: psb_ipk_,psb_l_vect_type
+      implicit none
+      type(psb_l_vect_type), intent(inout)  :: b
+      character(len=*), intent(in) :: header
+      integer(psb_ipk_), intent(out)        :: info
+      integer(psb_ipk_), optional, intent(in)          :: iunit
+      character(len=*), optional, intent(in) :: filename
+    end subroutine mm_lvect_write
 #if defined(PSB_IPK4) && defined(PSB_LPK8) 
     subroutine mm_lvet2_write(b, header, info, iunit, filename)   
       import :: psb_ipk_, psb_lpk_
@@ -128,26 +146,9 @@ module psb_i_mmio_mod
       integer(psb_ipk_), optional, intent(in)          :: iunit
       character(len=*), optional, intent(in) :: filename
     end subroutine mm_lvet1_write
-    subroutine mm_ivect_write(b, header, info, iunit, filename)   
-      import :: psb_ipk_,psb_i_vect_type
-      implicit none
-      type(psb_i_vect_type), intent(inout)  :: b
-      character(len=*), intent(in) :: header
-      integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_), optional, intent(in)          :: iunit
-      character(len=*), optional, intent(in) :: filename
-    end subroutine mm_ivect_write
-    subroutine mm_lvect_write(b, header, info, iunit, filename)   
-      import :: psb_ipk_,psb_l_vect_type
-      implicit none
-      type(psb_l_vect_type), intent(inout)  :: b
-      character(len=*), intent(in) :: header
-      integer(psb_ipk_), intent(out)        :: info
-      integer(psb_ipk_), optional, intent(in)          :: iunit
-      character(len=*), optional, intent(in) :: filename
-    end subroutine mm_lvect_write
-  end interface mm_array_write
 #endif
+  end interface mm_array_write
+
   interface mm_vet_write
     procedure mm_ivet1_write, mm_ivet2_write
   end interface
