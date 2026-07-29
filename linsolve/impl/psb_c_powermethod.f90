@@ -11,11 +11,11 @@ subroutine psb_c_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, 
     logical, intent(in), optional                   :: flag
     integer(psb_ipk_), intent(in), optional         :: itmax
     integer(psb_ipk_), intent(out), optional        :: iter
-    complex(psb_spk_), intent(in), optional            :: tol ! def 10^-3
+    real(psb_spk_), intent(in), optional            :: tol ! def 10^-3
 
     type(psb_c_vect_type)   :: z, q 
     integer(psb_ipk_)       :: i, itmax_
-    complex(psb_spk_)          :: tol_
+    real(psb_spk_)          :: tol_
     complex(psb_spk_)          :: lambda_old, norm_factor
     
     if(present(itmax)) then

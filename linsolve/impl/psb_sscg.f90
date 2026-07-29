@@ -39,7 +39,7 @@ subroutine psb_sscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   integer(psb_ipk_)           :: itidx
   
   type(psb_itconv_type)         :: stopdat
-  real(psb_spk_)                :: derr
+  real(psb_dpk_)                :: derr
 
   type(psb_s_multivect_type), target  :: aux_mv
   real(psb_spk_), allocatable, target :: aux_fa(:)
@@ -400,7 +400,7 @@ subroutine psb_sscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   integer(psb_ipk_)           :: itidx
   
   type(psb_itconv_type)         :: stopdat
-  real(psb_spk_)                :: derr 
+  real(psb_dpk_)                :: derr 
 
   type(psb_s_multivect_type), target  :: aux_mv
   real(psb_spk_), allocatable, target :: aux_fa(:)

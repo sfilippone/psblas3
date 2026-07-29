@@ -39,7 +39,7 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   integer(psb_ipk_)           :: itidx
   
   type(psb_itconv_type)         :: stopdat
-  complex(psb_dpk_)                :: derr
+  real(psb_dpk_)                :: derr
 
   type(psb_z_multivect_type), target  :: aux_mv
   complex(psb_dpk_), allocatable, target :: aux_fa(:)
@@ -297,12 +297,12 @@ contains
       return
     end if
 
-    if(lambda_min < 0) then 
+    if((aimag(lambda_min) /= dzero) .or. (aimag(lambda_max) /= dzero)) then
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
 
-    if(lambda_max < lambda_min) then 
+    if((real(lambda_min) < 0) .or. (real(lambda_max) < real(lambda_min))) then 
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
@@ -400,7 +400,7 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   integer(psb_ipk_)           :: itidx
   
   type(psb_itconv_type)         :: stopdat
-  complex(psb_dpk_)                :: derr 
+  real(psb_dpk_)                :: derr 
 
   type(psb_z_multivect_type), target  :: aux_mv
   complex(psb_dpk_), allocatable, target :: aux_fa(:)
@@ -672,12 +672,12 @@ contains
       return
     end if
 
-    if(lambda_min < 0) then 
+    if((aimag(lambda_min) /= dzero) .or. (aimag(lambda_max) /= dzero)) then
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
 
-    if(lambda_max < lambda_min) then 
+    if((real(lambda_min) < 0) .or. (real(lambda_max) < real(lambda_min))) then 
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if

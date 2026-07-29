@@ -23,7 +23,7 @@ module psb_eigsolve_mod
       use psb_prec_mod, only : psb_cprec_type
       type(psb_cspmat_type), intent(in)     :: a
       class(psb_cprec_type), intent(inout)  :: prec 
-      real(psb_spk_), intent(out)           :: lambda
+      complex(psb_spk_), intent(out)        :: lambda
       type(psb_desc_type), intent(in)       :: desc
       integer(psb_ipk_), intent(out)        :: info
       type(psb_c_vect_type), intent(inout), optional  :: x
@@ -53,7 +53,7 @@ module psb_eigsolve_mod
       use psb_prec_mod, only : psb_zprec_type
       type(psb_zspmat_type), intent(in)     :: a
       class(psb_zprec_type), intent(inout)  :: prec 
-      real(psb_dpk_), intent(out)           :: lambda
+      complex(psb_dpk_), intent(out)        :: lambda
       type(psb_desc_type), intent(in)       :: desc
       integer(psb_ipk_), intent(out)        :: info
       type(psb_z_vect_type), intent(inout), optional  :: x
