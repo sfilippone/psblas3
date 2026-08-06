@@ -127,6 +127,14 @@ contains
 
     integer(psb_ipk_) :: i,j,ir
     complex(psb_spk_) :: acc
+    integer(psb_ipk_) :: ir0, ir1, navg
+    complex(psb_spk_) :: acc0, acc1, acc2, acc3
+    ! Whole-matrix dispatch on the mean row length: long-row matrices use
+    ! a 4-accumulator unrolled loop that breaks the FMA latency chain;
+    ! short-row matrices keep the original loop untouched. The branch sits
+    ! outside the row loop because a per-row branch mispredicts on
+    ! irregular matrices whose rows straddle the threshold.
+    integer(psb_ipk_), parameter :: ithresh = 16
 
     if (alpha == czero) then
       if (beta == czero) then
@@ -146,18 +154,46 @@ contains
 
     if ((.not.tra).and.(.not.ctra)) then
 
+      if (m > 0) then
+        navg = (irp(m+1)-irp(1))/m
+      else
+        navg = 0
+      end if
+
       if (beta == czero) then
 
         if (alpha == cone) then
-          !$omp parallel do private(i,j, acc) schedule(static)
-          do i=1,m
-            acc  = czero
-            !$omp  simd reduction(+:acc)
-            do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))
-            enddo
-            y(i) = acc
-          end do
+          if (navg >= ithresh) then
+            !$omp parallel do private(i,j,ir0,ir1,acc0,acc1,acc2,acc3) schedule(static)
+            do i=1,m
+              ir0  = irp(i)
+              ir1  = irp(i+1)-1
+              acc0 = czero
+              acc1 = czero
+              acc2 = czero
+              acc3 = czero
+              do j=ir0, ir1-3, 4
+                acc0 = acc0 + val(j)   * x(ja(j))
+                acc1 = acc1 + val(j+1) * x(ja(j+1))
+                acc2 = acc2 + val(j+2) * x(ja(j+2))
+                acc3 = acc3 + val(j+3) * x(ja(j+3))
+              enddo
+              do j=ir0 + 4*((ir1-ir0+1)/4), ir1
+                acc0 = acc0 + val(j) * x(ja(j))
+              enddo
+              y(i) = (acc0+acc1) + (acc2+acc3)
+            end do
+          else
+            !$omp parallel do private(i,j, acc) schedule(static)
+            do i=1,m
+              acc  = czero
+              !$omp  simd reduction(+:acc)
+              do j=irp(i), irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))
+              enddo
+              y(i) = acc
+            end do
+          end if
 
         else if (alpha == -cone) then
 
@@ -189,15 +225,37 @@ contains
       else if (beta == cone) then
 
         if (alpha == cone) then
-          !$omp parallel do private(i,j,acc)
-          do i=1,m
-            acc  = czero
-            !$omp  simd reduction(+:acc)
-            do j=irp(i), irp(i+1)-1
-              acc  = acc + val(j) * x(ja(j))
-            enddo
-            y(i) = y(i) + acc
-          end do
+          if (navg >= ithresh) then
+            !$omp parallel do private(i,j,ir0,ir1,acc0,acc1,acc2,acc3) schedule(static)
+            do i=1,m
+              ir0  = irp(i)
+              ir1  = irp(i+1)-1
+              acc0 = czero
+              acc1 = czero
+              acc2 = czero
+              acc3 = czero
+              do j=ir0, ir1-3, 4
+                acc0 = acc0 + val(j)   * x(ja(j))
+                acc1 = acc1 + val(j+1) * x(ja(j+1))
+                acc2 = acc2 + val(j+2) * x(ja(j+2))
+                acc3 = acc3 + val(j+3) * x(ja(j+3))
+              enddo
+              do j=ir0 + 4*((ir1-ir0+1)/4), ir1
+                acc0 = acc0 + val(j) * x(ja(j))
+              enddo
+              y(i) = y(i) + (acc0+acc1) + (acc2+acc3)
+            end do
+          else
+            !$omp parallel do private(i,j,acc)
+            do i=1,m
+              acc  = czero
+              !$omp  simd reduction(+:acc)
+              do j=irp(i), irp(i+1)-1
+                acc  = acc + val(j) * x(ja(j))
+              enddo
+              y(i) = y(i) + acc
+            end do
+          end if
 
         else if (alpha == -cone) then
 
