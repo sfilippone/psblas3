@@ -77,6 +77,7 @@ module psb_c_cuda_vect_mod
     procedure, pass(x) :: set_sync => c_cuda_set_sync
     procedure, pass(x) :: set_scal => c_cuda_set_scal
 !!$    procedure, pass(x) :: set_vect => c_cuda_set_vect
+    procedure, pass(x) :: gthzv    => c_cuda_gthzv
     procedure, pass(x) :: gthzv_x  => c_cuda_gthzv_x
     procedure, pass(y) :: sctb     => c_cuda_sctb
     procedure, pass(y) :: sctb_x   => c_cuda_sctb_x
@@ -230,6 +231,45 @@ contains
       write(0,*) 'Check addr: cuda  version, why am I here? '
     end select
   end subroutine c_cuda_check_addr
+
+  subroutine c_cuda_gthzv(n,idx,x,y)
+    ! GPU override of the plain-array-index gather  y(1:n) = x(idx(1:n)).
+    ! Without it the generic gth(n,idx(:),buf) -- used ONLY by the RMA swap path
+    ! (psi_c_swapdata, rma_pull/push) -- fell back to the host c_base_gthzv, which
+    ! calls x%sync() and copies the WHOLE vector device->host on EVERY swap. Here
+    ! we gather on the device straight from x%deviceVect (mirrors the class-default
+    ! branch of c_cuda_gthzv_x): only the n boundary indices move H2D, no full D2H.
+    use psb_cuda_env_mod
+    use psi_serial_mod
+    implicit none
+    integer(psb_mpk_) :: n
+    integer(psb_ipk_) :: idx(:)
+    complex(psb_spk_)    :: y(:)
+    class(psb_c_vect_cuda) :: x
+    integer :: info, ni
+
+    info = 0
+    if (x%is_host()) call x%sync()          ! ensure device copy is current (no D2H of the whole vector)
+    ni = size(idx)
+
+    if (x%i_buf_sz < ni) then
+      if (c_associated(x%i_buf)) then
+        call freeInt(x%i_buf); x%i_buf = c_null_ptr
+      end if
+      info = allocateInt(x%i_buf,ni); x%i_buf_sz = ni
+    end if
+    if (x%dt_buf_sz < n) then
+      if (c_associated(x%dt_buf)) then
+        call freeFloatComplex(x%dt_buf); x%dt_buf = c_null_ptr
+      end if
+      info = allocateFloatComplex(x%dt_buf,n); x%dt_buf_sz = n
+    end if
+
+    if (info == 0) info = writeInt(x%i_buf,idx,ni)
+    if (info == 0) info = igathMultiVecDeviceFloatComplex(x%deviceVect, 0, n, 1, x%i_buf, 1, x%dt_buf, 1)
+    if (info == 0) info = readFloatComplex(x%dt_buf,y,n)
+
+  end subroutine c_cuda_gthzv
 
   subroutine c_cuda_gthzv_x(i,n,idx,x,y)
     use psb_cuda_env_mod
@@ -1459,7 +1499,7 @@ contains
 !!$        allocate(x%buffer(n),stat=info)
 !!$        if (info == 0) info = inner_register(x%buffer,x%dt_buf)        
 !!$      endif
-!!$      info = igathMultiVecDeviceDouble(x%deviceVect,&
+!!$      info = igathMultiVecDeviceFloatComplex(x%deviceVect,&
 !!$           & 0, i, n, ii%deviceVect, x%dt_buf, 1)
 !!$      call psb_cudaSync()
 !!$      y(1:n) = x%buffer(1:n)
@@ -1514,7 +1554,7 @@ contains
 !!$        if (info == 0) info = inner_register(y%buffer,y%dt_buf)        
 !!$      endif
 !!$      y%buffer(1:n) = x(1:n) 
-!!$      info = iscatMultiVecDeviceDouble(y%deviceVect,&
+!!$      info = iscatMultiVecDeviceFloatComplex(y%deviceVect,&
 !!$           & 0, i, n, ii%deviceVect, y%dt_buf, 1,beta)
 !!$
 !!$      call y%set_dev()
