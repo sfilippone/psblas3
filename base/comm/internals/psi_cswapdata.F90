@@ -325,7 +325,7 @@ contains
           if (debug) write(*,*) my_rank,'Posting receive from',prcid(i),rcv_pt
           p2ptag = psb_double_swap_tag
           call mpi_irecv(y%combuf(rcv_pt),nerv,&
-            & psb_mpi_r_dpk_,prcid(i),&
+            & psb_mpi_c_spk_,prcid(i),&
             & p2ptag, icomm,baseline_comm_handle%comid(i,2),iret)
         end if
         pnti   = pnti + nerv + nesd + 3
@@ -378,7 +378,7 @@ contains
 
         if ((nesd>0).and.(proc_to_comm /= my_rank)) then 
           call mpi_isend(y%combuf(snd_pt),nesd,&
-            & psb_mpi_r_dpk_,prcid(i),&
+            & psb_mpi_c_spk_,prcid(i),&
             & p2ptag,icomm,baseline_comm_handle%comid(i,1),iret)
         end if
 
@@ -628,11 +628,11 @@ contains
           & y%combuf(1),                             &  ! send buffer (baseline/positional layout)
           & neighbor_comm_handle%send_counts,        &
           & neighbor_comm_handle%send_displs_v,      &  ! positional displacements (match gth layout)
-          & psb_mpi_r_spk_,                             &
+          & psb_mpi_c_spk_,                             &
           & y%combuf(1),                             &  ! recv buffer (baseline/positional layout)
           & neighbor_comm_handle%recv_counts,        &
           & neighbor_comm_handle%recv_displs_v,      &  ! positional displacements (match sct layout)
-          & psb_mpi_r_spk_,                             &
+          & psb_mpi_c_spk_,                             &
           & neighbor_comm_handle%graph_comm,         &
           & neighbor_comm_handle%comm_request, iret)
         if (iret /= mpi_success) then
@@ -891,11 +891,11 @@ contains
               & y%combuf(1),                            &  ! send buffer
               & neighbor_comm_handle%send_counts,       &
               & neighbor_comm_handle%send_displs_v,     &  ! positional (baseline layout)
-              & psb_mpi_r_dpk_,                         &
+              & psb_mpi_c_spk_,                         &
               & y%combuf(1),                            &  ! recv buffer (baseline layout)
               & neighbor_comm_handle%recv_counts,       &
               & neighbor_comm_handle%recv_displs_v,     &  ! positional (baseline layout)
-              & psb_mpi_r_dpk_,                         &
+              & psb_mpi_c_spk_,                         &
               & neighbor_comm_handle%graph_comm,        &
               & mpi_info_null,                          &
               & neighbor_comm_handle%persistent_request, iret)
@@ -1168,7 +1168,7 @@ contains
                 goto 9999
               end if
               remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
-              call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_r_spk_, prc_rank, remote_disp, recv_count, psb_mpi_r_spk_, &
+              call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_c_spk_, prc_rank, remote_disp, recv_count, psb_mpi_c_spk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
@@ -1414,7 +1414,7 @@ contains
 
             if (send_count > 0) then
               remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
-              call mpi_put(y%combuf(send_pos), send_count, psb_mpi_r_spk_, prc_rank, remote_disp, send_count, psb_mpi_r_spk_, &
+              call mpi_put(y%combuf(send_pos), send_count, psb_mpi_c_spk_, prc_rank, remote_disp, send_count, psb_mpi_c_spk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
@@ -1737,7 +1737,7 @@ subroutine psi_cswap_baseline_multivect(ctxt,swap_status,beta,y,comm_indexes, &
         if (debug) write(*,*) my_rank,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_double_swap_tag
            call mpi_irecv(y%combuf(rcv_pt),n*nerv,&
-             & psb_mpi_r_dpk_,prcid(i),&
+             & psb_mpi_c_spk_,prcid(i),&
              & p2ptag, icomm,baseline_comm_handle%comid(i,2),iret)
       end if
       rcv_pt = rcv_pt + n*nerv
@@ -1782,7 +1782,7 @@ subroutine psi_cswap_baseline_multivect(ctxt,swap_status,beta,y,comm_indexes, &
 
       if ((nesd>0).and.(proc_to_comm /= my_rank)) then 
            call mpi_isend(y%combuf(snd_pt),n*nesd,&
-             & psb_mpi_r_dpk_,prcid(i),&
+             & psb_mpi_c_spk_,prcid(i),&
              & p2ptag,icomm,baseline_comm_handle%comid(i,1),iret)
       end if
 
@@ -2012,11 +2012,11 @@ subroutine psi_cswap_neighbor_topology_multivect(ctxt,swap_status,beta,y,comm_in
           & y%combuf(1),                        &  ! send buffer
           & neighbor_comm_handle%send_counts,     &
           & neighbor_comm_handle%send_displs,     &
-          & psb_mpi_r_dpk_,                     &
+          & psb_mpi_c_spk_,                     &
           & y%combuf(total_send_ + 1),            &  ! recv buffer
           & n*neighbor_comm_handle%recv_counts,   &
           & n*neighbor_comm_handle%recv_displs,    &
-          & psb_mpi_r_dpk_,                     &
+          & psb_mpi_c_spk_,                     &
           & neighbor_comm_handle%graph_comm,      &
           & neighbor_comm_handle%comm_request, iret)
       if (iret /= mpi_success) then
@@ -2233,11 +2233,11 @@ subroutine psi_cswap_neighbor_topology_multivect_persistent(ctxt,swap_status,bet
             & y%combuf(1),                          &  ! send buffer
             & n*neighbor_comm_handle%send_counts,   &
             & n*neighbor_comm_handle%send_displs,    &
-            & psb_mpi_r_dpk_,                       &
+            & psb_mpi_c_spk_,                       &
             & y%combuf(total_send_ + 1),            &  ! recv buffer
             & n*neighbor_comm_handle%recv_counts,   &
             & n*neighbor_comm_handle%recv_displs,    &
-            & psb_mpi_r_dpk_,                       &
+            & psb_mpi_c_spk_,                       &
             & neighbor_comm_handle%graph_comm,      &
             & mpi_info_null,                        &
             & neighbor_comm_handle%persistent_request, iret)
@@ -2465,7 +2465,7 @@ end subroutine psi_cswap_neighbor_topology_multivect_persistent
                 goto 9999
               end if
               remote_disp = int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND)
-              call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_r_spk_, prc_rank, remote_disp, recv_count*n, psb_mpi_r_spk_, &
+              call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_c_spk_, prc_rank, remote_disp, recv_count*n, psb_mpi_c_spk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
@@ -2676,7 +2676,7 @@ end subroutine psi_cswap_neighbor_topology_multivect_persistent
             end if
             if (send_count > 0) then
               remote_disp = int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND)
-              call mpi_put(y%combuf(send_pos), send_count*n, psb_mpi_r_spk_, prc_rank, remote_disp, send_count*n, psb_mpi_r_spk_, &
+              call mpi_put(y%combuf(send_pos), send_count*n, psb_mpi_c_spk_, prc_rank, remote_disp, send_count*n, psb_mpi_c_spk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_

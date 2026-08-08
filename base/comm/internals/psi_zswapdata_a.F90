@@ -295,8 +295,8 @@ complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 
       ! swap elements using mpi_alltoallv
       call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-           & psb_mpi_r_dpk_,rcvbuf,rvsz,&
-           & brvidx,psb_mpi_r_dpk_,icomm,iret)
+           & psb_mpi_c_dpk_,rcvbuf,rvsz,&
+           & brvidx,psb_mpi_c_dpk_,icomm,iret)
       if(iret /= mpi_success) then
         info=psb_err_mpi_error_
         call psb_errpush(info,name,m_err=(/iret/))
@@ -352,7 +352,7 @@ complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
         if ((nerv>0).and.(proc_to_comm /= me)) then 
           p2ptag = psb_double_swap_tag
           call mpi_irecv(rcvbuf(rcv_pt),n*nerv,&
-               & psb_mpi_r_dpk_,prcid(i),&
+               & psb_mpi_c_dpk_,prcid(i),&
                & p2ptag, icomm,rvhd(i),iret)
         end if
         rcv_pt = rcv_pt + n*nerv
@@ -376,11 +376,11 @@ complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           if (usersend) then 
             call mpi_rsend(sndbuf(snd_pt),n*nesd,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag,icomm,iret)
           else
             call mpi_send(sndbuf(snd_pt),n*nesd,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag,icomm,iret)
           end if
 
@@ -779,8 +779,8 @@ complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
 
       ! swap elements using mpi_alltoallv
       call mpi_alltoallv(sndbuf,sdsz,bsdidx,&
-           & psb_mpi_r_dpk_,rcvbuf,rvsz,&
-           & brvidx,psb_mpi_r_dpk_,icomm,iret)
+           & psb_mpi_c_dpk_,rcvbuf,rvsz,&
+           & brvidx,psb_mpi_c_dpk_,icomm,iret)
       if(iret /= mpi_success) then
         info=psb_err_mpi_error_
         call psb_errpush(info,name,m_err=(/iret/))
@@ -836,7 +836,7 @@ complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
         if ((nerv>0).and.(proc_to_comm /= me)) then 
           p2ptag = psb_double_swap_tag
           call mpi_irecv(rcvbuf(rcv_pt),nerv,&
-               & psb_mpi_r_dpk_,prcid(i),&
+               & psb_mpi_c_dpk_,prcid(i),&
                & p2ptag, icomm,rvhd(i),iret)
         end if
         rcv_pt = rcv_pt + nerv
@@ -861,11 +861,11 @@ complex(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           if (usersend) then 
             call mpi_rsend(sndbuf(snd_pt),nesd,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag,icomm,iret)
           else
             call mpi_send(sndbuf(snd_pt),nesd,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag,icomm,iret)
           end if
 

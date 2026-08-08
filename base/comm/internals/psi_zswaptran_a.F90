@@ -307,8 +307,8 @@ contains
 
       ! swap elements using mpi_alltoallv
       call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-           & psb_mpi_r_dpk_,&
-           & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
+           & psb_mpi_c_dpk_,&
+           & sndbuf,sdsz,bsdidx,psb_mpi_c_dpk_,icomm,iret)
       if(iret /= mpi_success) then
         info=psb_err_mpi_error_
         call psb_errpush(info,name,m_err=(/iret/))
@@ -364,7 +364,7 @@ contains
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           p2ptag = psb_double_swap_tag
           call mpi_irecv(sndbuf(snd_pt),n*nesd,&
-               & psb_mpi_r_dpk_,prcid(i),&
+               & psb_mpi_c_dpk_,prcid(i),&
                & p2ptag,icomm,rvhd(i),iret)
         end if
         rcv_pt = rcv_pt + n*nerv
@@ -388,11 +388,11 @@ contains
           p2ptag = psb_double_swap_tag
           if (usersend) then 
             call mpi_rsend(rcvbuf(rcv_pt),n*nerv,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag,icomm,iret)
           else
             call mpi_send(rcvbuf(rcv_pt),n*nerv,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag,icomm,iret)
           end if
 
@@ -795,8 +795,8 @@ contains
 
       ! swap elements using mpi_alltoallv
       call mpi_alltoallv(rcvbuf,rvsz,brvidx,&
-           & psb_mpi_r_dpk_,&
-           & sndbuf,sdsz,bsdidx,psb_mpi_r_dpk_,icomm,iret)
+           & psb_mpi_c_dpk_,&
+           & sndbuf,sdsz,bsdidx,psb_mpi_c_dpk_,icomm,iret)
       if(iret /= mpi_success) then
         info=psb_err_mpi_error_
         call psb_errpush(info,name,m_err=(/iret/))
@@ -851,7 +851,7 @@ contains
         if ((nesd>0).and.(proc_to_comm /= me)) then 
           p2ptag = psb_double_swap_tag
           call mpi_irecv(sndbuf(snd_pt),nesd,&
-               & psb_mpi_r_dpk_,prcid(i),&
+               & psb_mpi_c_dpk_,prcid(i),&
                & p2ptag,icomm,rvhd(i),iret)
         end if
         rcv_pt = rcv_pt + nerv
@@ -875,11 +875,11 @@ contains
           p2ptag = psb_double_swap_tag
           if (usersend) then 
             call mpi_rsend(rcvbuf(rcv_pt),nerv,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag, icomm,iret)
           else
             call mpi_send(rcvbuf(rcv_pt),nerv,&
-                 & psb_mpi_r_dpk_,prcid(i),&
+                 & psb_mpi_c_dpk_,prcid(i),&
                  & p2ptag, icomm,iret)
           end if
 

@@ -1602,7 +1602,7 @@ contains
                 goto 9999
               end if
               remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
-              call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count, psb_mpi_r_dpk_, &
+              call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_c_dpk_, prc_rank, remote_disp, recv_count, psb_mpi_c_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
@@ -1824,7 +1824,7 @@ contains
             end if
             if (send_count > 0) then
               remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
-              call mpi_put(y%combuf(send_pos), send_count, psb_mpi_r_dpk_, prc_rank, remote_disp, send_count, psb_mpi_r_dpk_, &
+              call mpi_put(y%combuf(send_pos), send_count, psb_mpi_c_dpk_, prc_rank, remote_disp, send_count, psb_mpi_c_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
@@ -2268,7 +2268,7 @@ contains
                 goto 9999
               end if
               remote_disp = int((remote_base - 1)*n, kind=MPI_ADDRESS_KIND)
-              call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count*n, psb_mpi_r_dpk_, &
+              call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_c_dpk_, prc_rank, remote_disp, recv_count*n, psb_mpi_c_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
@@ -2491,7 +2491,7 @@ contains
             end if
             if (send_count > 0) then
               remote_disp = int((remote_base - 1)*n, kind=MPI_ADDRESS_KIND)
-              call mpi_put(y%combuf(send_pos), send_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, send_count*n, psb_mpi_r_dpk_, &
+              call mpi_put(y%combuf(send_pos), send_count*n, psb_mpi_c_dpk_, prc_rank, remote_disp, send_count*n, psb_mpi_c_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
