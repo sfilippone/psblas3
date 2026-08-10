@@ -39,6 +39,23 @@ module psb_comm_rma_mod
     integer(psb_mpk_), allocatable :: notify_buf(:)
     integer(psb_mpk_), allocatable :: notify_recv_reqs(:)
     integer(psb_mpk_), allocatable :: notify_send_reqs(:)
+    !
+    ! Dynamic-window support.
+    !
+    ! MPI_Win_create is collective over the whole communicator and has to be
+    ! repeated whenever the exposed buffer changes. Profiling on 448 ranks put
+    ! it at ~0.9 s per call, against milliseconds for the MPI_Get that actually
+    ! moves the data. With a dynamic window that collective is paid once and
+    ! buffers are attached and detached locally.
+    !
+    ! The price is that on a dynamic window the target displacement is an
+    ! absolute address in the target's address space rather than an offset in
+    ! window units, so every rank must publish the address of its own buffer to
+    ! its neighbours each time it (re)attaches.
+    !
+    logical :: buf_attached = .false.
+    integer(kind=MPI_ADDRESS_KIND) :: my_buf_addr = 0
+    integer(kind=MPI_ADDRESS_KIND), allocatable :: peer_buf_addr(:)
   contains
     procedure, pass :: init => psb_comm_rma_init
     procedure, pass :: free => psb_comm_rma_free
@@ -47,6 +64,7 @@ module psb_comm_rma_mod
     procedure, pass :: init_memory_buffer_layout_tran => psb_comm_rma_ini_memory_buffer_layout_tran
     procedure, pass :: set_swap_status => psb_comm_rma_set_swap_status
     procedure, pass :: get_swap_status => psb_comm_rma_get_swap_status
+    procedure, pass :: publish_buf_addr => psb_comm_rma_publish_buf_addr
   end type psb_comm_rma_handle
 
 contains
@@ -63,6 +81,9 @@ contains
     this%window_open = .false.
     this%win_base = c_null_ptr
     this%win_nelem = 0
+    this%buf_attached = .false.
+    this%my_buf_addr = 0
+    if (allocated(this%peer_buf_addr)) deallocate(this%peer_buf_addr)
     this%layout_ready = .false.
     this%layout_nnbr = -1
     this%layout_send = -1
@@ -278,6 +299,11 @@ contains
     end if
     this%win_base = c_null_ptr
     this%win_nelem = 0
+    ! Freeing the window drops whatever is attached to it, so the attachment
+    ! bookkeeping goes with it.
+    this%buf_attached = .false.
+    this%my_buf_addr = 0
+    if (allocated(this%peer_buf_addr)) deallocate(this%peer_buf_addr)
     this%window_ready = .false.
     this%layout_ready = .false.
     this%layout_nnbr = -1
@@ -285,6 +311,55 @@ contains
     this%layout_recv = -1
     call this%clear_memory_buffer_layout(info)
   end subroutine psb_comm_rma_free
+
+  !
+  ! Publish the address of the locally attached buffer to the neighbours, and
+  ! collect theirs. On a dynamic window MPI_Get/MPI_Put take an absolute address
+  ! in the target's address space, so this has to be redone whenever the buffer
+  ! is re-attached. Point-to-point over the neighbour list, reusing the metadata
+  ! tag already used for the displacement exchange: no collective.
+  !
+  subroutine psb_comm_rma_publish_buf_addr(this, icomm, info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+    class(psb_comm_rma_handle), intent(inout) :: this
+    integer(psb_mpk_), intent(in)  :: icomm
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: k, nnbr
+    integer(psb_mpk_) :: prc_rank, iret
+    integer(psb_mpk_) :: p2pstat(mpi_status_size)
+
+    info = psb_success_
+    if (.not.allocated(this%peer_mpi_rank)) return
+    nnbr = size(this%peer_mpi_rank)
+
+    if (allocated(this%peer_buf_addr)) then
+      if (size(this%peer_buf_addr) /= nnbr) deallocate(this%peer_buf_addr)
+    end if
+    if (.not.allocated(this%peer_buf_addr)) then
+      allocate(this%peer_buf_addr(nnbr), stat=info)
+      if (info /= 0) then
+        info = psb_err_alloc_dealloc_
+        return
+      end if
+    end if
+
+    do k = 1, nnbr
+      prc_rank = int(this%peer_mpi_rank(k), psb_mpk_)
+      call mpi_sendrecv(this%my_buf_addr,     1, mpi_aint, prc_rank, psb_rma_meta_tag, &
+           &            this%peer_buf_addr(k), 1, mpi_aint, prc_rank, psb_rma_meta_tag, &
+           &            icomm, p2pstat, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        return
+      end if
+    end do
+  end subroutine psb_comm_rma_publish_buf_addr
 
   ! Transpose variant: peer_send_* is filled from comm_list RECV area,
   ! peer_recv_* from comm_list SEND area. Metadata exchange tells peers our

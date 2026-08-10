@@ -1092,10 +1092,11 @@ contains
             call mpi_win_unlock_all(rma_handle%win, iret)
             rma_handle%window_open = .false.
           end if
-          if (rma_handle%window_ready) then
-            call mpi_win_free(rma_handle%win, iret)
-            rma_handle%win = mpi_win_null
-            rma_handle%window_ready = .false.
+          ! Dynamic window: detach the old buffer and keep the window. Detach
+          ! is a local call, so growing the buffer no longer costs a collective.
+          if (rma_handle%buf_attached) then
+            call mpi_win_detach(rma_handle%win, y%combuf, iret)
+            rma_handle%buf_attached = .false.
           end if
           call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= psb_success_) then
@@ -1103,17 +1104,42 @@ contains
           end if
         end if
 
+        element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          element_bytes = storage_size(y%combuf(1))/8
-          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          ! Created once and kept for the life of the handle. On a dynamic
+          ! window buffers come and go through local attach/detach, so this
+          ! collective is paid a single time instead of on every buffer change.
+          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
+               & rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
           rma_handle%window_ready = .true.
+        end if
+
+        if (.not. rma_handle%buf_attached) then
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_attach(rma_handle%win, y%combuf, exposed_bytes, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          ! Targets are addressed absolutely on a dynamic window, so neighbours
+          ! must be told the new base before any Get/Put can reference it.
+          call rma_handle%publish_buf_addr(ctxt%get_mpic(), info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
+          end if
+          rma_handle%buf_attached = .true.
         end if
       end if
 
@@ -1158,7 +1184,12 @@ contains
             end if
 
             if (recv_count > 0) then
-              remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
+              ! Dynamic window: disp_unit is 1 and the displacement is an
+              ! absolute address in the target's space, so the offset has to be
+              ! expressed in bytes rather than in window elements.
+              remote_disp = rma_handle%peer_buf_addr(neighbor_idx) &
+                   & + int(remote_base - 1, kind=MPI_ADDRESS_KIND) &
+                   &   * int(element_bytes, kind=MPI_ADDRESS_KIND)
               call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count, psb_mpi_r_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
@@ -1314,10 +1345,11 @@ contains
             call mpi_win_unlock_all(rma_handle%win, iret)
             rma_handle%window_open = .false.
           end if
-          if (rma_handle%window_ready) then
-            call mpi_win_free(rma_handle%win, iret)
-            rma_handle%win = mpi_win_null
-            rma_handle%window_ready = .false.
+          ! Dynamic window: detach the old buffer and keep the window. Detach
+          ! is a local call, so growing the buffer no longer costs a collective.
+          if (rma_handle%buf_attached) then
+            call mpi_win_detach(rma_handle%win, y%combuf, iret)
+            rma_handle%buf_attached = .false.
           end if
           call y%new_buffer(ione*size(comm_indexes%v), info)
           if (info /= psb_success_) then
@@ -1325,17 +1357,42 @@ contains
           end if
         end if
 
+        element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          element_bytes = storage_size(y%combuf(1))/8
-          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          ! Created once and kept for the life of the handle. On a dynamic
+          ! window buffers come and go through local attach/detach, so this
+          ! collective is paid a single time instead of on every buffer change.
+          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
+               & rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
           rma_handle%window_ready = .true.
+        end if
+
+        if (.not. rma_handle%buf_attached) then
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_attach(rma_handle%win, y%combuf, exposed_bytes, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          ! Targets are addressed absolutely on a dynamic window, so neighbours
+          ! must be told the new base before any Get/Put can reference it.
+          call rma_handle%publish_buf_addr(ctxt%get_mpic(), info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
+          end if
+          rma_handle%buf_attached = .true.
         end if
       end if
 
@@ -1381,7 +1438,12 @@ contains
             end if
 
             if (send_count > 0) then
-              remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
+              ! Dynamic window: disp_unit is 1 and the displacement is an
+              ! absolute address in the target's space, so the offset has to be
+              ! expressed in bytes rather than in window elements.
+              remote_disp = rma_handle%peer_buf_addr(neighbor_idx) &
+                   & + int(remote_base - 1, kind=MPI_ADDRESS_KIND) &
+                   &   * int(element_bytes, kind=MPI_ADDRESS_KIND)
               call mpi_put(y%combuf(send_pos), send_count, psb_mpi_r_dpk_, prc_rank, remote_disp, send_count, psb_mpi_r_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
@@ -2364,10 +2426,11 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
             call mpi_win_unlock_all(rma_handle%win, iret)
             rma_handle%window_open = .false.
           end if
-          if (rma_handle%window_ready) then
-            call mpi_win_free(rma_handle%win, iret)
-            rma_handle%win = mpi_win_null
-            rma_handle%window_ready = .false.
+          ! Dynamic window: detach the old buffer and keep the window. Detach
+          ! is a local call, so growing the buffer no longer costs a collective.
+          if (rma_handle%buf_attached) then
+            call mpi_win_detach(rma_handle%win, y%combuf, iret)
+            rma_handle%buf_attached = .false.
           end if
           call y%new_buffer(buffer_size, info)
           if (info /= psb_success_) then
@@ -2375,17 +2438,42 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
           end if
         end if
 
+        element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          element_bytes = storage_size(y%combuf(1))/8
-          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          ! Created once and kept for the life of the handle. On a dynamic
+          ! window buffers come and go through local attach/detach, so this
+          ! collective is paid a single time instead of on every buffer change.
+          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
+               & rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
           rma_handle%window_ready = .true.
+        end if
+
+        if (.not. rma_handle%buf_attached) then
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_attach(rma_handle%win, y%combuf, exposed_bytes, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          ! Targets are addressed absolutely on a dynamic window, so neighbours
+          ! must be told the new base before any Get/Put can reference it.
+          call rma_handle%publish_buf_addr(ctxt%get_mpic(), info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
+          end if
+          rma_handle%buf_attached = .true.
         end if
       end if
 
@@ -2424,7 +2512,10 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
               goto 9999
             end if
             if (recv_count > 0) then
-              remote_disp = int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND)
+              ! Dynamic window: absolute target address, offset in bytes.
+              remote_disp = rma_handle%peer_buf_addr(neighbor_idx) &
+                   & + int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND) &
+                   &   * int(element_bytes, kind=MPI_ADDRESS_KIND)
               call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, recv_count*n, psb_mpi_r_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
@@ -2578,10 +2669,11 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
             call mpi_win_unlock_all(rma_handle%win, iret)
             rma_handle%window_open = .false.
           end if
-          if (rma_handle%window_ready) then
-            call mpi_win_free(rma_handle%win, iret)
-            rma_handle%win = mpi_win_null
-            rma_handle%window_ready = .false.
+          ! Dynamic window: detach the old buffer and keep the window. Detach
+          ! is a local call, so growing the buffer no longer costs a collective.
+          if (rma_handle%buf_attached) then
+            call mpi_win_detach(rma_handle%win, y%combuf, iret)
+            rma_handle%buf_attached = .false.
           end if
           call y%new_buffer(buffer_size, info)
           if (info /= psb_success_) then
@@ -2589,17 +2681,42 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
           end if
         end if
 
+        element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          element_bytes = storage_size(y%combuf(1))/8
-          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
+          ! Created once and kept for the life of the handle. On a dynamic
+          ! window buffers come and go through local attach/detach, so this
+          ! collective is paid a single time instead of on every buffer change.
+          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
+               & rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
             goto 9999
           end if
           rma_handle%window_ready = .true.
+        end if
+
+        if (.not. rma_handle%buf_attached) then
+          exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
+          call mpi_win_attach(rma_handle%win, y%combuf, exposed_bytes, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          if (iret /= mpi_success) then
+            info = psb_err_mpi_error_
+            call psb_errpush(info,name,m_err=(/iret/))
+            goto 9999
+          end if
+          ! Targets are addressed absolutely on a dynamic window, so neighbours
+          ! must be told the new base before any Get/Put can reference it.
+          call rma_handle%publish_buf_addr(ctxt%get_mpic(), info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
+          end if
+          rma_handle%buf_attached = .true.
         end if
       end if
 
@@ -2639,7 +2756,10 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
               goto 9999
             end if
             if (send_count > 0) then
-              remote_disp = int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND)
+              ! Dynamic window: absolute target address, offset in bytes.
+              remote_disp = rma_handle%peer_buf_addr(neighbor_idx) &
+                   & + int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND) &
+                   &   * int(element_bytes, kind=MPI_ADDRESS_KIND)
               call mpi_put(y%combuf(send_pos), send_count*n, psb_mpi_r_dpk_, prc_rank, remote_disp, send_count*n, psb_mpi_r_dpk_, &
                    & rma_handle%win, iret)
               if (iret /= mpi_success) then
