@@ -86,7 +86,8 @@ submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
       & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_, &
       & psb_comm_handle_type
-  use psb_comm_rma_mod, only: psb_comm_rma_handle
+  use psb_comm_rma_mod, only: psb_comm_rma_handle, psb_comm_rma_get_window
+  use, intrinsic :: iso_c_binding, only: c_loc
   use psb_comm_factory_mod
 
 contains
@@ -997,7 +998,7 @@ contains
     type(psb_ctxt_type), intent(in)               :: ctxt
     integer(psb_ipk_), intent(in)                 :: swap_status
     real(psb_dpk_), intent(in)                    :: beta
-    class(psb_d_base_vect_type), intent(inout)    :: y
+    class(psb_d_base_vect_type), intent(inout), target    :: y
     class(psb_i_base_vect_type), intent(inout)    :: comm_indexes
     integer(psb_ipk_), intent(in)                 :: num_neighbors, total_send, total_recv
     class(psb_comm_handle_type), intent(inout)    :: comm_handle
@@ -1106,15 +1107,13 @@ contains
 
         element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          ! Created once and kept for the life of the handle. On a dynamic
-          ! window buffers come and go through local attach/detach, so this
-          ! collective is paid a single time instead of on every buffer change.
-          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
-               & rma_handle%win, iret)
-          if (iret /= mpi_success) then
-            info = psb_err_mpi_error_
-            call psb_errpush(info,name,m_err=(/iret/))
-            goto 9999
+          ! The window comes from the module pool, keyed by communicator: it is
+          ! created on the first request of the run and reused by every handle
+          ! afterwards. Creating it per handle, as before, meant paying a
+          ! communicator-wide collective (~0.9 s at 448 ranks) each time.
+          call psb_comm_rma_get_window(ctxt%get_mpic(), rma_handle%win, info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
           end if
           rma_handle%window_ready = .true.
         end if
@@ -1128,6 +1127,10 @@ contains
             goto 9999
           end if
           call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          ! Kept so that the handle can detach on free, when the buffer is no
+          ! longer reachable from here.
+          rma_handle%win_base  = c_loc(y%combuf(1))
+          rma_handle%win_nelem = size(y%combuf)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
@@ -1252,7 +1255,7 @@ contains
     type(psb_ctxt_type), intent(in)             :: ctxt
     integer(psb_ipk_), intent(in)               :: swap_status
     real(psb_dpk_), intent(in)                  :: beta
-    class(psb_d_base_vect_type), intent(inout)  :: y
+    class(psb_d_base_vect_type), intent(inout), target  :: y
     class(psb_i_base_vect_type), intent(inout)  :: comm_indexes
     integer(psb_ipk_), intent(in)               :: num_neighbors, total_send, total_recv
     class(psb_comm_handle_type), intent(inout)  :: comm_handle
@@ -1359,15 +1362,13 @@ contains
 
         element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          ! Created once and kept for the life of the handle. On a dynamic
-          ! window buffers come and go through local attach/detach, so this
-          ! collective is paid a single time instead of on every buffer change.
-          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
-               & rma_handle%win, iret)
-          if (iret /= mpi_success) then
-            info = psb_err_mpi_error_
-            call psb_errpush(info,name,m_err=(/iret/))
-            goto 9999
+          ! The window comes from the module pool, keyed by communicator: it is
+          ! created on the first request of the run and reused by every handle
+          ! afterwards. Creating it per handle, as before, meant paying a
+          ! communicator-wide collective (~0.9 s at 448 ranks) each time.
+          call psb_comm_rma_get_window(ctxt%get_mpic(), rma_handle%win, info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
           end if
           rma_handle%window_ready = .true.
         end if
@@ -1381,6 +1382,10 @@ contains
             goto 9999
           end if
           call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          ! Kept so that the handle can detach on free, when the buffer is no
+          ! longer reachable from here.
+          rma_handle%win_base  = c_loc(y%combuf(1))
+          rma_handle%win_nelem = size(y%combuf)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
@@ -2334,7 +2339,7 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
     type(psb_ctxt_type), intent(in)               :: ctxt
     integer(psb_ipk_), intent(in)                 :: swap_status
     real(psb_dpk_), intent(in)                  :: beta
-    class(psb_d_base_multivect_type), intent(inout) :: y
+    class(psb_d_base_multivect_type), intent(inout), target :: y
     class(psb_i_base_vect_type), intent(inout)    :: comm_indexes
     integer(psb_ipk_), intent(in)                 :: num_neighbors, total_send, total_recv
     class(psb_comm_handle_type), intent(inout)    :: comm_handle
@@ -2440,15 +2445,13 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
 
         element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          ! Created once and kept for the life of the handle. On a dynamic
-          ! window buffers come and go through local attach/detach, so this
-          ! collective is paid a single time instead of on every buffer change.
-          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
-               & rma_handle%win, iret)
-          if (iret /= mpi_success) then
-            info = psb_err_mpi_error_
-            call psb_errpush(info,name,m_err=(/iret/))
-            goto 9999
+          ! The window comes from the module pool, keyed by communicator: it is
+          ! created on the first request of the run and reused by every handle
+          ! afterwards. Creating it per handle, as before, meant paying a
+          ! communicator-wide collective (~0.9 s at 448 ranks) each time.
+          call psb_comm_rma_get_window(ctxt%get_mpic(), rma_handle%win, info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
           end if
           rma_handle%window_ready = .true.
         end if
@@ -2462,6 +2465,10 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
             goto 9999
           end if
           call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          ! Kept so that the handle can detach on free, when the buffer is no
+          ! longer reachable from here.
+          rma_handle%win_base  = c_loc(y%combuf(1))
+          rma_handle%win_nelem = size(y%combuf)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
@@ -2577,7 +2584,7 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
     type(psb_ctxt_type), intent(in)               :: ctxt
     integer(psb_ipk_), intent(in)                 :: swap_status
     real(psb_dpk_), intent(in)                  :: beta
-    class(psb_d_base_multivect_type), intent(inout) :: y
+    class(psb_d_base_multivect_type), intent(inout), target :: y
     class(psb_i_base_vect_type), intent(inout)    :: comm_indexes
     integer(psb_ipk_), intent(in)                 :: num_neighbors, total_send, total_recv
     class(psb_comm_handle_type), intent(inout)    :: comm_handle
@@ -2683,15 +2690,13 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
 
         element_bytes = storage_size(y%combuf(1))/8
         if (.not. rma_handle%window_ready) then
-          ! Created once and kept for the life of the handle. On a dynamic
-          ! window buffers come and go through local attach/detach, so this
-          ! collective is paid a single time instead of on every buffer change.
-          call mpi_win_create_dynamic(mpi_info_null, ctxt%get_mpic(), &
-               & rma_handle%win, iret)
-          if (iret /= mpi_success) then
-            info = psb_err_mpi_error_
-            call psb_errpush(info,name,m_err=(/iret/))
-            goto 9999
+          ! The window comes from the module pool, keyed by communicator: it is
+          ! created on the first request of the run and reused by every handle
+          ! afterwards. Creating it per handle, as before, meant paying a
+          ! communicator-wide collective (~0.9 s at 448 ranks) each time.
+          call psb_comm_rma_get_window(ctxt%get_mpic(), rma_handle%win, info)
+          if (info /= psb_success_) then
+            call psb_errpush(info,name); goto 9999
           end if
           rma_handle%window_ready = .true.
         end if
@@ -2705,6 +2710,10 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
             goto 9999
           end if
           call mpi_get_address(y%combuf, rma_handle%my_buf_addr, iret)
+          ! Kept so that the handle can detach on free, when the buffer is no
+          ! longer reachable from here.
+          rma_handle%win_base  = c_loc(y%combuf(1))
+          rma_handle%win_nelem = size(y%combuf)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))

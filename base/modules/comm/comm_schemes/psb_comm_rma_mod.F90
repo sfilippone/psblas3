@@ -3,7 +3,7 @@ module psb_comm_rma_mod
   use psb_desc_const_mod, only: psb_proc_id_, psb_n_elem_recv_, psb_elem_recv_, &
        & psb_n_elem_send_, psb_elem_send_
   use psb_error_mod
-  use, intrinsic :: iso_c_binding, only: c_ptr, c_null_ptr
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_null_ptr, c_associated, c_f_pointer
 #ifdef PSB_MPI_MOD
   use mpi
 #endif
@@ -11,6 +11,26 @@ module psb_comm_rma_mod
       & psb_comm_unknown_
   implicit none
   integer(psb_mpk_), parameter :: psb_rma_meta_tag = 913
+
+  !
+  ! Window pool.
+  !
+  ! MPI_Win_create and MPI_Win_create_dynamic are both collective over the whole
+  ! communicator, and profiling at 448 ranks put either at ~0.9 s per call: with
+  ! the window owned by the communication handle, every handle that came and
+  ! went paid one. Measured, that was ~1400-1700 s aggregated, against ~3.5 s for
+  ! the MPI_Get that actually moves the data.
+  !
+  ! So the window is owned by the module and keyed by communicator: created once
+  ! on first use and kept for the run. Handles attach and detach their own
+  ! buffers to it, which are local operations. This is the reuse policy PETSc
+  ! applies to its window flavors; the flavor alone buys nothing without it.
+  !
+  integer(psb_ipk_), parameter :: psb_rma_max_wins = 16
+  integer(psb_mpk_), private, save :: rma_pool_comm(psb_rma_max_wins) = mpi_comm_null
+  integer(psb_mpk_), private, save :: rma_pool_win(psb_rma_max_wins)  = mpi_win_null
+  integer(psb_ipk_), private, save :: rma_pool_n = 0
+  public :: psb_comm_rma_get_window, psb_comm_rma_free_windows
 #ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
@@ -68,6 +88,83 @@ module psb_comm_rma_mod
   end type psb_comm_rma_handle
 
 contains
+
+  !
+  ! Hand back the dynamic window for this communicator, creating it if this is
+  ! the first request. The collective is paid here, once per communicator per
+  ! run, instead of once per handle.
+  !
+  subroutine psb_comm_rma_get_window(icomm, win, info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_mpk_), intent(in)  :: icomm
+    integer(psb_mpk_), intent(out) :: win
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: k
+    integer(psb_mpk_) :: iret
+
+    info = psb_success_
+    win  = mpi_win_null
+
+    do k = 1, rma_pool_n
+      if (rma_pool_comm(k) == icomm) then
+        win = rma_pool_win(k)
+        return
+      end if
+    end do
+
+    if (rma_pool_n >= psb_rma_max_wins) then
+      ! More distinct communicators than the pool can hold. Raising the bound is
+      ! the fix; silently creating an unpooled window would reintroduce the very
+      ! per-handle collective this exists to remove.
+      info = psb_err_internal_error_
+      return
+    end if
+
+    call mpi_win_create_dynamic(mpi_info_null, icomm, win, iret)
+    if (iret /= mpi_success) then
+      info = psb_err_mpi_error_
+      win  = mpi_win_null
+      return
+    end if
+
+    rma_pool_n = rma_pool_n + 1
+    rma_pool_comm(rma_pool_n) = icomm
+    rma_pool_win(rma_pool_n)  = win
+  end subroutine psb_comm_rma_get_window
+
+  !
+  ! Release every pooled window. Collective on each communicator involved, so it
+  ! belongs at teardown, before MPI_Finalize.
+  !
+  subroutine psb_comm_rma_free_windows(info)
+#ifdef PSB_MPI_MOD
+    use mpi
+#endif
+    implicit none
+#ifdef PSB_MPI_H
+    include 'mpif.h'
+#endif
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_ipk_) :: k
+    integer(psb_mpk_) :: iret
+
+    info = psb_success_
+    do k = 1, rma_pool_n
+      if (rma_pool_win(k) /= mpi_win_null) then
+        call mpi_win_free(rma_pool_win(k), iret)
+        if (iret /= mpi_success) info = psb_err_mpi_error_
+      end if
+      rma_pool_win(k)  = mpi_win_null
+      rma_pool_comm(k) = mpi_comm_null
+    end do
+    rma_pool_n = 0
+  end subroutine psb_comm_rma_free_windows
 
   subroutine psb_comm_rma_init(this, info)
     class(psb_comm_rma_handle), intent(inout) :: this
@@ -287,16 +384,31 @@ contains
     class(psb_comm_rma_handle), intent(inout) :: this
     integer(psb_ipk_), intent(out) :: info
     integer(psb_mpk_) :: iret
+    real(psb_dpk_), pointer :: detach_p(:)
 
     info = 0
     if (this%window_open) then
       call mpi_win_unlock_all(this%win, iret)
       this%window_open = .false.
     end if
-    if (this%win /= mpi_win_null) then
-      call mpi_win_free(this%win, iret)
-      this%win = mpi_win_null
+    !
+    ! The window belongs to the module pool, not to this handle: it is not freed
+    ! here. What must go is the attachment, because the buffer behind it is about
+    ! to be deallocated with the vector, and leaving a dangling region attached
+    ! would also make the next attach of the same address overlap.
+    !
+    ! MPI_Win_detach wants the buffer, not its address, and this module is
+    ! type-generic; c_f_pointer on the stored c_ptr gives an array at the right
+    ! address, which is all detach looks at.
+    !
+    if (this%buf_attached .and. c_associated(this%win_base) &
+         & .and. (this%win /= mpi_win_null)) then
+      call c_f_pointer(this%win_base, detach_p, [1])
+      call mpi_win_detach(this%win, detach_p, iret)
+      if (iret /= mpi_success) info = psb_err_mpi_error_
     end if
+    this%buf_attached = .false.
+    this%win = mpi_win_null
     this%win_base = c_null_ptr
     this%win_nelem = 0
     ! Freeing the window drops whatever is attached to it, so the attachment
