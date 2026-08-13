@@ -3,7 +3,7 @@ module psb_comm_rma_mod
   use psb_desc_const_mod, only: psb_proc_id_, psb_n_elem_recv_, psb_elem_recv_, &
        & psb_n_elem_send_, psb_elem_send_
   use psb_error_mod
-  use, intrinsic :: iso_c_binding, only: c_ptr, c_null_ptr, c_associated, c_f_pointer
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_null_ptr
 #ifdef PSB_MPI_MOD
   use mpi
 #endif
@@ -11,29 +11,26 @@ module psb_comm_rma_mod
       & psb_comm_unknown_
   implicit none
   integer(psb_mpk_), parameter :: psb_rma_meta_tag = 913
-
-  !
-  ! Window pool.
-  !
-  ! MPI_Win_create and MPI_Win_create_dynamic are both collective over the whole
-  ! communicator, and profiling at 448 ranks put either at ~0.9 s per call: with
-  ! the window owned by the communication handle, every handle that came and
-  ! went paid one. Measured, that was ~1400-1700 s aggregated, against ~3.5 s for
-  ! the MPI_Get that actually moves the data.
-  !
-  ! So the window is owned by the module and keyed by communicator: created once
-  ! on first use and kept for the run. Handles attach and detach their own
-  ! buffers to it, which are local operations. This is the reuse policy PETSc
-  ! applies to its window flavors; the flavor alone buys nothing without it.
-  !
-  integer(psb_ipk_), parameter :: psb_rma_max_wins = 16
-  integer(psb_mpk_), private, save :: rma_pool_comm(psb_rma_max_wins) = mpi_comm_null
-  integer(psb_mpk_), private, save :: rma_pool_win(psb_rma_max_wins)  = mpi_win_null
-  integer(psb_ipk_), private, save :: rma_pool_n = 0
-  public :: psb_comm_rma_get_window, psb_comm_rma_free_windows
 #ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
+
+  ! Hints attached to every window created by the one-sided schemes.
+  !
+  ! Given no info at all, the implementation has to stay ready for the general
+  ! case: a passive-target lock could arrive at any moment, and ranks could have
+  ! passed different displacement units. Staying ready is not free -- it costs
+  ! metadata exchanged among all ranks on each creation -- and creation is where
+  ! these schemes spend most of their time. The assertions below hold here and
+  ! cost nothing to make.
+  !
+  ! Deliberately NOT asserted: same_size. Halo buffers are sized by the local
+  ! halo, which differs from rank to rank, so that assertion would be false.
+  !
+  ! Cached for the life of the program: the hints never change, and building an
+  ! info object per window would add to the very cost this is meant to remove.
+  integer(psb_mpk_), private, save :: rma_wininfo_pscw = mpi_info_null
+  integer(psb_mpk_), private, save :: rma_wininfo_gen  = mpi_info_null
 
   type, extends(psb_comm_handle_type) :: psb_comm_rma_handle
     integer(psb_mpk_) :: win = mpi_win_null
@@ -59,23 +56,6 @@ module psb_comm_rma_mod
     integer(psb_mpk_), allocatable :: notify_buf(:)
     integer(psb_mpk_), allocatable :: notify_recv_reqs(:)
     integer(psb_mpk_), allocatable :: notify_send_reqs(:)
-    !
-    ! Dynamic-window support.
-    !
-    ! MPI_Win_create is collective over the whole communicator and has to be
-    ! repeated whenever the exposed buffer changes. Profiling on 448 ranks put
-    ! it at ~0.9 s per call, against milliseconds for the MPI_Get that actually
-    ! moves the data. With a dynamic window that collective is paid once and
-    ! buffers are attached and detached locally.
-    !
-    ! The price is that on a dynamic window the target displacement is an
-    ! absolute address in the target's address space rather than an offset in
-    ! window units, so every rank must publish the address of its own buffer to
-    ! its neighbours each time it (re)attaches.
-    !
-    logical :: buf_attached = .false.
-    integer(kind=MPI_ADDRESS_KIND) :: my_buf_addr = 0
-    integer(kind=MPI_ADDRESS_KIND), allocatable :: peer_buf_addr(:)
   contains
     procedure, pass :: init => psb_comm_rma_init
     procedure, pass :: free => psb_comm_rma_free
@@ -84,87 +64,54 @@ module psb_comm_rma_mod
     procedure, pass :: init_memory_buffer_layout_tran => psb_comm_rma_ini_memory_buffer_layout_tran
     procedure, pass :: set_swap_status => psb_comm_rma_set_swap_status
     procedure, pass :: get_swap_status => psb_comm_rma_get_swap_status
-    procedure, pass :: publish_buf_addr => psb_comm_rma_publish_buf_addr
   end type psb_comm_rma_handle
 
 contains
 
-  !
-  ! Hand back the dynamic window for this communicator, creating it if this is
-  ! the first request. The collective is paid here, once per communicator per
-  ! run, instead of once per handle.
-  !
-  subroutine psb_comm_rma_get_window(icomm, win, info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
-    implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
-    integer(psb_mpk_), intent(in)  :: icomm
-    integer(psb_mpk_), intent(out) :: win
+  ! Return the MPI_Info to pass to mpi_win_create, building it on first use.
+  ! no_locks must be .true. only where the window is synchronized exclusively
+  ! with PSCW: it asserts that no passive-target epoch will ever be opened on
+  ! it, and a win_lock afterwards would be erroneous. Today that is the double
+  ! precision swapdata path; every other path still takes locks.
+  subroutine psb_comm_rma_get_wininfo(winfo, no_locks, info)
+    integer(psb_mpk_), intent(out) :: winfo
+    logical, intent(in) :: no_locks
     integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: k
-    integer(psb_mpk_) :: iret
 
     info = psb_success_
-    win  = mpi_win_null
-
-    do k = 1, rma_pool_n
-      if (rma_pool_comm(k) == icomm) then
-        win = rma_pool_win(k)
-        return
+    if (no_locks) then
+      if (rma_wininfo_pscw == mpi_info_null) then
+        call psb_comm_rma_build_wininfo(rma_wininfo_pscw, .true., info)
+        if (info /= psb_success_) return
       end if
-    end do
-
-    if (rma_pool_n >= psb_rma_max_wins) then
-      ! More distinct communicators than the pool can hold. Raising the bound is
-      ! the fix; silently creating an unpooled window would reintroduce the very
-      ! per-handle collective this exists to remove.
-      info = psb_err_internal_error_
-      return
+      winfo = rma_wininfo_pscw
+    else
+      if (rma_wininfo_gen == mpi_info_null) then
+        call psb_comm_rma_build_wininfo(rma_wininfo_gen, .false., info)
+        if (info /= psb_success_) return
+      end if
+      winfo = rma_wininfo_gen
     end if
+  end subroutine psb_comm_rma_get_wininfo
 
-    call mpi_win_create_dynamic(mpi_info_null, icomm, win, iret)
+  subroutine psb_comm_rma_build_wininfo(winfo, no_locks, info)
+    integer(psb_mpk_), intent(out) :: winfo
+    logical, intent(in) :: no_locks
+    integer(psb_ipk_), intent(out) :: info
+    integer(psb_mpk_) :: iret
+
+    info  = psb_success_
+    winfo = mpi_info_null
+    call mpi_info_create(winfo, iret)
     if (iret /= mpi_success) then
-      info = psb_err_mpi_error_
-      win  = mpi_win_null
+      info  = psb_err_mpi_error_
+      winfo = mpi_info_null
       return
     end if
-
-    rma_pool_n = rma_pool_n + 1
-    rma_pool_comm(rma_pool_n) = icomm
-    rma_pool_win(rma_pool_n)  = win
-  end subroutine psb_comm_rma_get_window
-
-  !
-  ! Release every pooled window. Collective on each communicator involved, so it
-  ! belongs at teardown, before MPI_Finalize.
-  !
-  subroutine psb_comm_rma_free_windows(info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
-    implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
-    integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: k
-    integer(psb_mpk_) :: iret
-
-    info = psb_success_
-    do k = 1, rma_pool_n
-      if (rma_pool_win(k) /= mpi_win_null) then
-        call mpi_win_free(rma_pool_win(k), iret)
-        if (iret /= mpi_success) info = psb_err_mpi_error_
-      end if
-      rma_pool_win(k)  = mpi_win_null
-      rma_pool_comm(k) = mpi_comm_null
-    end do
-    rma_pool_n = 0
-  end subroutine psb_comm_rma_free_windows
+    ! Every rank passes the size of one element of the same type.
+    call mpi_info_set(winfo, 'same_disp_unit', 'true', iret)
+    if (no_locks) call mpi_info_set(winfo, 'no_locks', 'true', iret)
+  end subroutine psb_comm_rma_build_wininfo
 
   subroutine psb_comm_rma_init(this, info)
     class(psb_comm_rma_handle), intent(inout) :: this
@@ -178,9 +125,6 @@ contains
     this%window_open = .false.
     this%win_base = c_null_ptr
     this%win_nelem = 0
-    this%buf_attached = .false.
-    this%my_buf_addr = 0
-    if (allocated(this%peer_buf_addr)) deallocate(this%peer_buf_addr)
     this%layout_ready = .false.
     this%layout_nnbr = -1
     this%layout_send = -1
@@ -384,38 +328,18 @@ contains
     class(psb_comm_rma_handle), intent(inout) :: this
     integer(psb_ipk_), intent(out) :: info
     integer(psb_mpk_) :: iret
-    real(psb_dpk_), pointer :: detach_p(:)
 
     info = 0
     if (this%window_open) then
       call mpi_win_unlock_all(this%win, iret)
       this%window_open = .false.
     end if
-    !
-    ! The window belongs to the module pool, not to this handle: it is not freed
-    ! here. What must go is the attachment, because the buffer behind it is about
-    ! to be deallocated with the vector, and leaving a dangling region attached
-    ! would also make the next attach of the same address overlap.
-    !
-    ! MPI_Win_detach wants the buffer, not its address, and this module is
-    ! type-generic; c_f_pointer on the stored c_ptr gives an array at the right
-    ! address, which is all detach looks at.
-    !
-    if (this%buf_attached .and. c_associated(this%win_base) &
-         & .and. (this%win /= mpi_win_null)) then
-      call c_f_pointer(this%win_base, detach_p, [1])
-      call mpi_win_detach(this%win, detach_p, iret)
-      if (iret /= mpi_success) info = psb_err_mpi_error_
+    if (this%win /= mpi_win_null) then
+      call mpi_win_free(this%win, iret)
+      this%win = mpi_win_null
     end if
-    this%buf_attached = .false.
-    this%win = mpi_win_null
     this%win_base = c_null_ptr
     this%win_nelem = 0
-    ! Freeing the window drops whatever is attached to it, so the attachment
-    ! bookkeeping goes with it.
-    this%buf_attached = .false.
-    this%my_buf_addr = 0
-    if (allocated(this%peer_buf_addr)) deallocate(this%peer_buf_addr)
     this%window_ready = .false.
     this%layout_ready = .false.
     this%layout_nnbr = -1
@@ -423,55 +347,6 @@ contains
     this%layout_recv = -1
     call this%clear_memory_buffer_layout(info)
   end subroutine psb_comm_rma_free
-
-  !
-  ! Publish the address of the locally attached buffer to the neighbours, and
-  ! collect theirs. On a dynamic window MPI_Get/MPI_Put take an absolute address
-  ! in the target's address space, so this has to be redone whenever the buffer
-  ! is re-attached. Point-to-point over the neighbour list, reusing the metadata
-  ! tag already used for the displacement exchange: no collective.
-  !
-  subroutine psb_comm_rma_publish_buf_addr(this, icomm, info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
-    implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
-    class(psb_comm_rma_handle), intent(inout) :: this
-    integer(psb_mpk_), intent(in)  :: icomm
-    integer(psb_ipk_), intent(out) :: info
-    integer(psb_ipk_) :: k, nnbr
-    integer(psb_mpk_) :: prc_rank, iret
-    integer(psb_mpk_) :: p2pstat(mpi_status_size)
-
-    info = psb_success_
-    if (.not.allocated(this%peer_mpi_rank)) return
-    nnbr = size(this%peer_mpi_rank)
-
-    if (allocated(this%peer_buf_addr)) then
-      if (size(this%peer_buf_addr) /= nnbr) deallocate(this%peer_buf_addr)
-    end if
-    if (.not.allocated(this%peer_buf_addr)) then
-      allocate(this%peer_buf_addr(nnbr), stat=info)
-      if (info /= 0) then
-        info = psb_err_alloc_dealloc_
-        return
-      end if
-    end if
-
-    do k = 1, nnbr
-      prc_rank = int(this%peer_mpi_rank(k), psb_mpk_)
-      call mpi_sendrecv(this%my_buf_addr,     1, mpi_aint, prc_rank, psb_rma_meta_tag, &
-           &            this%peer_buf_addr(k), 1, mpi_aint, prc_rank, psb_rma_meta_tag, &
-           &            icomm, p2pstat, iret)
-      if (iret /= mpi_success) then
-        info = psb_err_mpi_error_
-        return
-      end if
-    end do
-  end subroutine psb_comm_rma_publish_buf_addr
 
   ! Transpose variant: peer_send_* is filled from comm_list RECV area,
   ! peer_recv_* from comm_list SEND area. Metadata exchange tells peers our
