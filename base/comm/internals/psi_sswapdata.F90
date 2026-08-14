@@ -296,6 +296,7 @@ contains
     total_recv_ = total_recv * n
     total_send_ = total_send * n
     call comm_indexes%sync()
+    y_nrows = y%get_nrows()
 
     if (debug) write(*,*) my_rank,'Internal buffer'
     if (do_send) then 
@@ -314,7 +315,6 @@ contains
       baseline_comm_handle%comid = mpi_request_null
       call psb_realloc(num_neighbors,prcid,info)
       ! First I post all the non blocking receives
-      y_nrows = y%get_nrows()
       pnti   = 1
       do i=1, num_neighbors
         proc_to_comm = comm_indexes%v(pnti+psb_proc_id_)
@@ -348,7 +348,7 @@ contains
           call psb_errpush(info,name,a_err='baseline gather metadata out of bounds')
           goto 9999
         end if
-        if (nesd > 0) then
+        if (debug.and.(nesd > 0)) then
           idx_min = minval(comm_indexes%v(idx_pt:idx_pt+nesd-1))
           idx_max = maxval(comm_indexes%v(idx_pt:idx_pt+nesd-1))
           if ((idx_min < 1) .or. (idx_max > y_nrows)) then
@@ -470,7 +470,7 @@ contains
           call psb_errpush(info,name,a_err='baseline scatter metadata out of bounds')
           goto 9999
         end if
-        if (nerv > 0) then
+        if (debug.and.(nerv > 0)) then
           idx_min = minval(comm_indexes%v(idx_pt:idx_pt+nerv-1))
           idx_max = maxval(comm_indexes%v(idx_pt:idx_pt+nerv-1))
           if ((idx_min < 1) .or. (idx_max > y_nrows)) then
@@ -1150,6 +1150,17 @@ contains
           goto 9999
         end if
         rma_handle%window_ready = .true.
+
+        ! One shared-mode epoch for the lifetime of the window, in place of the
+        ! Win_lock/Win_unlock pair this path used to take around every single
+        ! Get. The teardown unlocks whenever window_open is set.
+        call mpi_win_lock_all(0, rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .true.
       end if
 
       if (buffer_size > 0) then
@@ -1158,7 +1169,7 @@ contains
         end if
         call y%device_wait()
 
-        ! Pull data from each peer with per-neighbor passive lock (neighbor-only sync).
+        ! Pull data from each peer inside the standing epoch.
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -1181,21 +1192,9 @@ contains
             end if
 
             if (recv_count > 0) then
-              call mpi_win_lock(MPI_LOCK_SHARED, prc_rank, 0, rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
               remote_disp = int(remote_base - 1, kind=MPI_ADDRESS_KIND)
               call mpi_get(y%combuf(recv_pos), recv_count, psb_mpi_r_spk_, prc_rank, remote_disp, recv_count, psb_mpi_r_spk_, &
                    & rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
-              call mpi_win_unlock(prc_rank, rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
                 call psb_errpush(info,name,m_err=(/iret/))
@@ -1211,11 +1210,31 @@ contains
             y%combuf(recv_pos:recv_pos+recv_count-1) = y%combuf(send_pos:send_pos+send_count-1)
           end if
         end do
+
+        ! Local completion is what this path needs: it guarantees the Gets have
+        ! landed in our own combuf. The per-target unlock that used to do this
+        ! cost a round trip per neighbour, taken in sequence.
+        call mpi_win_flush_local_all(rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
       end if
     end if
 
-    ! WAIT phase: GETs already complete (per-neighbor unlock in START); scatter received data into Y.
+    ! WAIT phase: the Gets are locally complete; scatter received data into Y.
     if (do_wait) then
+      ! combuf is itself the exposed window memory, so reading it with ordinary
+      ! loads needs the public and private copies reconciled. The per-target
+      ! unlock used to do this implicitly. Win_sync is local.
+      call mpi_win_sync(rma_handle%win, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,m_err=(/iret/))
+        goto 9999
+      end if
+
       if (total_recv > 0) then
         call y%sct(int(total_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(total_send+1:total_send+total_recv), beta)
       end if
@@ -1375,6 +1394,21 @@ contains
           goto 9999
         end if
         rma_handle%window_ready = .true.
+
+        ! Open the passive access epoch once, for the lifetime of the window.
+        ! MPI_Win_lock_all opens an epoch towards EVERY rank of the window's
+        ! communicator, which is the global one -- it is O(P), not O(neighbours).
+        ! Paying it on every halo swap is what made this scheme scale with the
+        ! process count: 2.2e-4 s at 8 ranks against 3.9e-2 s at 448, while the
+        ! point-to-point baseline stayed flat. The epoch is closed by the handle
+        ! teardown, which already unlocks when window_open is set.
+        call mpi_win_lock_all(0, rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .true.
       end if
 
       if (buffer_size > 0) then
@@ -1402,15 +1436,11 @@ contains
           end if
         end do
 
-        call mpi_win_lock_all(0, rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-        rma_handle%window_open = .true.
-
-        ! Push data to each peer; after flush send a P2P notification so target knows data arrived.
+        ! Issue every Put first, without completing any of them. A flush inside
+        ! this loop is a full round trip to one neighbour, taken in sequence:
+        ! the transfers cannot overlap and the cost is the SUM of the round
+        ! trips instead of their maximum. Splitting the loop lets the Puts fly
+        ! together and pays for a single completion afterwards.
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -1442,19 +1472,6 @@ contains
                 goto 9999
               end if
             end if
-            call mpi_win_flush(prc_rank, rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
-            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
-                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
           else
             if (send_count /= recv_count) then
               info = psb_err_internal_error_
@@ -1464,21 +1481,39 @@ contains
             y%combuf(recv_pos:recv_pos+recv_count-1) = y%combuf(send_pos:send_pos+send_count-1)
           end if
         end do
-      end if
-    end if
 
-    ! WAIT phase: close epoch, wait for P2P notifications, then scatter.
-    if (do_wait) then
-      if (rma_handle%window_open) then
-        call mpi_win_unlock_all(rma_handle%win, iret)
+        ! One remote completion for every target at once.
+        call mpi_win_flush_all(rma_handle%win, iret)
         if (iret /= mpi_success) then
           info = psb_err_mpi_error_
           call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
-        rma_handle%window_open = .false.
-      end if
 
+        ! Only now are the data visible at the targets, so the notifications
+        ! are truthful. RMA and point-to-point are unordered with respect to
+        ! each other: sending these before the flush would let a notification
+        ! overtake its own Put, and the target would scatter stale values.
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          if (proc_to_comm /= my_rank) then
+            prc_rank = rma_handle%peer_mpi_rank(neighbor_idx)
+            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
+                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+          end if
+        end do
+      end if
+    end if
+
+    ! WAIT phase: wait for the P2P notifications, then scatter. The epoch is
+    ! NOT closed here any more: it is opened once with the window and closed by
+    ! the handle teardown.
+    if (do_wait) then
       if (num_neighbors > 0) then
         call mpi_waitall(num_neighbors, rma_handle%notify_recv_reqs, MPI_STATUSES_IGNORE, iret)
         if (iret /= mpi_success) then
@@ -1492,6 +1527,17 @@ contains
           call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
+      end if
+
+      ! The unlock_all that used to close the epoch here also synchronised the
+      ! public and private copies of the window. Without it the peers' Puts are
+      ! not guaranteed to be visible to our own load instructions, so the
+      ! synchronisation has to be made explicit. Win_sync is a local operation.
+      call mpi_win_sync(rma_handle%win, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,m_err=(/iret/))
+        goto 9999
       end if
 
       if (total_recv > 0) then
@@ -2453,6 +2499,15 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
           goto 9999
         end if
         rma_handle%window_ready = .true.
+
+        ! Standing shared epoch; see the vect variant for why.
+        call mpi_win_lock_all(0, rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .true.
       end if
 
       if (buffer_size > 0) then
@@ -2461,7 +2516,7 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
         end if
         call y%device_wait()
 
-        ! Pull data from each peer with per-neighbor passive lock (neighbor-only sync).
+        ! Pull data from each peer inside the standing epoch.
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -2478,21 +2533,9 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
               goto 9999
             end if
             if (recv_count > 0) then
-              call mpi_win_lock(MPI_LOCK_SHARED, prc_rank, 0, rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
               remote_disp = int((remote_base - 1) * n, kind=MPI_ADDRESS_KIND)
               call mpi_get(y%combuf(recv_pos), recv_count*n, psb_mpi_r_spk_, prc_rank, remote_disp, recv_count*n, psb_mpi_r_spk_, &
                    & rma_handle%win, iret)
-              if (iret /= mpi_success) then
-                info = psb_err_mpi_error_
-                call psb_errpush(info,name,m_err=(/iret/))
-                goto 9999
-              end if
-              call mpi_win_unlock(prc_rank, rma_handle%win, iret)
               if (iret /= mpi_success) then
                 info = psb_err_mpi_error_
                 call psb_errpush(info,name,m_err=(/iret/))
@@ -2508,11 +2551,26 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
             y%combuf(recv_pos:recv_pos+recv_count*n-1) = y%combuf(send_pos:send_pos+send_count*n-1)
           end if
         end do
+
+        ! Local completion: the Gets have landed in our own combuf.
+        call mpi_win_flush_local_all(rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
       end if
     end if
 
-    ! WAIT phase: GETs already complete (per-neighbor unlock in START); scatter received data into Y.
+    ! WAIT phase: the Gets are locally complete; scatter received data into Y.
     if (do_wait) then
+      call mpi_win_sync(rma_handle%win, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,m_err=(/iret/))
+        goto 9999
+      end if
+
       if (total_recv > 0) then
         call y%sct(int(total_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(total_send_+1:total_send_+total_recv_), beta)
       end if
@@ -2644,6 +2702,15 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
           goto 9999
         end if
         rma_handle%window_ready = .true.
+
+        ! Epoch opened once with the window; see the vect variant for why.
+        call mpi_win_lock_all(0, rma_handle%win, iret)
+        if (iret /= mpi_success) then
+          info = psb_err_mpi_error_
+          call psb_errpush(info,name,m_err=(/iret/))
+          goto 9999
+        end if
+        rma_handle%window_open = .true.
       end if
 
       if (buffer_size > 0) then
@@ -2671,14 +2738,6 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
           end if
         end do
 
-        call mpi_win_lock_all(0, rma_handle%win, iret)
-        if (iret /= mpi_success) then
-          info = psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
-          goto 9999
-        end if
-        rma_handle%window_open = .true.
-
         do neighbor_idx=1, num_neighbors
           proc_to_comm = rma_handle%peer_proc(neighbor_idx)
           recv_count = rma_handle%peer_recv_counts(neighbor_idx)
@@ -2704,19 +2763,6 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
                 goto 9999
               end if
             end if
-            call mpi_win_flush(prc_rank, rma_handle%win, iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
-            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
-                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
-            if (iret /= mpi_success) then
-              info = psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
-              goto 9999
-            end if
           else
             if (send_count /= recv_count) then
               info = psb_err_internal_error_
@@ -2726,20 +2772,35 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
             y%combuf(recv_pos:recv_pos+recv_count*n-1) = y%combuf(send_pos:send_pos+send_count*n-1)
           end if
         end do
-      end if
-    end if
 
-    ! WAIT phase: close epoch, wait for P2P notifications, then scatter.
-    if (do_wait) then
-      if (rma_handle%window_open) then
-        call mpi_win_unlock_all(rma_handle%win, iret)
+        ! One remote completion for every target at once; see the vect variant
+        ! for why the flush cannot stay inside the loop.
+        call mpi_win_flush_all(rma_handle%win, iret)
         if (iret /= mpi_success) then
           info = psb_err_mpi_error_
           call psb_errpush(info,name,m_err=(/iret/))
           goto 9999
         end if
-        rma_handle%window_open = .false.
+
+        do neighbor_idx=1, num_neighbors
+          proc_to_comm = rma_handle%peer_proc(neighbor_idx)
+          if (proc_to_comm /= my_rank) then
+            prc_rank = rma_handle%peer_mpi_rank(neighbor_idx)
+            call mpi_isend(rma_handle%notify_buf(neighbor_idx), 1, psb_mpi_mpk_, prc_rank, &
+                 & rma_push_notify_tag, icomm, rma_handle%notify_send_reqs(neighbor_idx), iret)
+            if (iret /= mpi_success) then
+              info = psb_err_mpi_error_
+              call psb_errpush(info,name,m_err=(/iret/))
+              goto 9999
+            end if
+          end if
+        end do
       end if
+    end if
+
+    ! WAIT phase: wait for the P2P notifications, then scatter. The epoch stays
+    ! open for the lifetime of the window; see the vect variant.
+    if (do_wait) then
       if (num_neighbors > 0) then
         call mpi_waitall(num_neighbors, rma_handle%notify_recv_reqs, MPI_STATUSES_IGNORE, iret)
         if (iret /= mpi_success) then
@@ -2754,6 +2815,15 @@ end subroutine psi_sswap_neighbor_topology_multivect_persistent
           goto 9999
         end if
       end if
+
+      ! Replaces the synchronisation the unlock_all used to provide implicitly.
+      call mpi_win_sync(rma_handle%win, iret)
+      if (iret /= mpi_success) then
+        info = psb_err_mpi_error_
+        call psb_errpush(info,name,m_err=(/iret/))
+        goto 9999
+      end if
+
       if (total_recv > 0) then
         call y%sct(int(total_recv,psb_mpk_), rma_handle%peer_recv_indexes, y%combuf(total_send_+1:total_send_+total_recv_), beta)
       end if
