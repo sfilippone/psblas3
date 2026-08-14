@@ -86,7 +86,7 @@ submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
   use psb_comm_schemes_mod, only: psb_comm_isend_irecv_, psb_comm_ineighbor_alltoallv_, &
       & psb_comm_persistent_ineighbor_alltoallv_, psb_comm_rma_pull_, psb_comm_rma_push_, &
       & psb_comm_handle_type
-  use psb_comm_rma_mod, only: psb_comm_rma_handle, psb_comm_rma_get_wininfo
+  use psb_comm_rma_mod, only: psb_comm_rma_handle
   use psb_comm_factory_mod
 
 contains
@@ -1003,7 +1003,7 @@ contains
     class(psb_comm_handle_type), intent(inout)    :: comm_handle
     integer(psb_ipk_), intent(out)                :: info
 
-    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, win_info
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm
     integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
     integer(psb_mpk_) :: remote_base
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
@@ -1106,14 +1106,8 @@ contains
         if (.not. rma_handle%window_ready) then
           element_bytes = storage_size(y%combuf(1))/8
           exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          ! no_locks: this path synchronizes with PSCW only, never with win_lock.
-          call psb_comm_rma_get_wininfo(win_info, .true., info)
-          if (info /= psb_success_) then
-            call psb_errpush(info,name)
-            goto 9999
-          end if
           call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & win_info, ctxt%get_mpic(), rma_handle%win, iret)
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
@@ -1233,7 +1227,7 @@ contains
     class(psb_comm_handle_type), intent(inout)  :: comm_handle
     integer(psb_ipk_), intent(out)              :: info
 
-    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, win_info
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm
     integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
     integer(psb_mpk_) :: remote_base
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
@@ -1334,14 +1328,8 @@ contains
         if (.not. rma_handle%window_ready) then
           element_bytes = storage_size(y%combuf(1))/8
           exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          ! no_locks: this path synchronizes with PSCW only, never with win_lock.
-          call psb_comm_rma_get_wininfo(win_info, .true., info)
-          if (info /= psb_success_) then
-            call psb_errpush(info,name)
-            goto 9999
-          end if
           call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & win_info, ctxt%get_mpic(), rma_handle%win, iret)
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
@@ -2290,7 +2278,7 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
     class(psb_comm_handle_type), intent(inout)    :: comm_handle
     integer(psb_ipk_), intent(out)                :: info
 
-    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, n, win_info
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, n
     integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
     integer(psb_mpk_) :: remote_base
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
@@ -2390,14 +2378,8 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
         if (.not. rma_handle%window_ready) then
           element_bytes = storage_size(y%combuf(1))/8
           exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          ! no_locks: this path synchronizes with PSCW only, never with win_lock.
-          call psb_comm_rma_get_wininfo(win_info, .true., info)
-          if (info /= psb_success_) then
-            call psb_errpush(info,name)
-            goto 9999
-          end if
           call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & win_info, ctxt%get_mpic(), rma_handle%win, iret)
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))
@@ -2510,7 +2492,7 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
     class(psb_comm_handle_type), intent(inout)    :: comm_handle
     integer(psb_ipk_), intent(out)                :: info
 
-    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, n, win_info
+    integer(psb_mpk_) :: np, my_rank, iret, element_bytes, icomm, n
     integer(psb_mpk_) :: proc_to_comm, prc_rank, recv_count, send_count, send_pos, recv_pos, list_pos
     integer(psb_mpk_) :: remote_base
     integer(kind=MPI_ADDRESS_KIND) :: remote_disp, exposed_bytes
@@ -2610,14 +2592,8 @@ end subroutine psi_dswap_neighbor_topology_multivect_persistent
         if (.not. rma_handle%window_ready) then
           element_bytes = storage_size(y%combuf(1))/8
           exposed_bytes = int(size(y%combuf),kind=MPI_ADDRESS_KIND) * int(element_bytes,kind=MPI_ADDRESS_KIND)
-          ! no_locks: this path synchronizes with PSCW only, never with win_lock.
-          call psb_comm_rma_get_wininfo(win_info, .true., info)
-          if (info /= psb_success_) then
-            call psb_errpush(info,name)
-            goto 9999
-          end if
           call mpi_win_create(y%combuf, exposed_bytes, element_bytes, &
-               & win_info, ctxt%get_mpic(), rma_handle%win, iret)
+               & mpi_info_null, ctxt%get_mpic(), rma_handle%win, iret)
           if (iret /= mpi_success) then
             info = psb_err_mpi_error_
             call psb_errpush(info,name,m_err=(/iret/))

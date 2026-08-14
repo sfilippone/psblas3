@@ -15,23 +15,6 @@ module psb_comm_rma_mod
   include 'mpif.h'
 #endif
 
-  ! Hints attached to every window created by the one-sided schemes.
-  !
-  ! Given no info at all, the implementation has to stay ready for the general
-  ! case: a passive-target lock could arrive at any moment, and ranks could have
-  ! passed different displacement units. Staying ready is not free -- it costs
-  ! metadata exchanged among all ranks on each creation -- and creation is where
-  ! these schemes spend most of their time. The assertions below hold here and
-  ! cost nothing to make.
-  !
-  ! Deliberately NOT asserted: same_size. Halo buffers are sized by the local
-  ! halo, which differs from rank to rank, so that assertion would be false.
-  !
-  ! Cached for the life of the program: the hints never change, and building an
-  ! info object per window would add to the very cost this is meant to remove.
-  integer(psb_mpk_), private, save :: rma_wininfo_pscw = mpi_info_null
-  integer(psb_mpk_), private, save :: rma_wininfo_gen  = mpi_info_null
-
   type, extends(psb_comm_handle_type) :: psb_comm_rma_handle
     integer(psb_mpk_) :: win = mpi_win_null
     logical :: window_ready = .false.
@@ -67,51 +50,6 @@ module psb_comm_rma_mod
   end type psb_comm_rma_handle
 
 contains
-
-  ! Return the MPI_Info to pass to mpi_win_create, building it on first use.
-  ! no_locks must be .true. only where the window is synchronized exclusively
-  ! with PSCW: it asserts that no passive-target epoch will ever be opened on
-  ! it, and a win_lock afterwards would be erroneous. Today that is the double
-  ! precision swapdata path; every other path still takes locks.
-  subroutine psb_comm_rma_get_wininfo(winfo, no_locks, info)
-    integer(psb_mpk_), intent(out) :: winfo
-    logical, intent(in) :: no_locks
-    integer(psb_ipk_), intent(out) :: info
-
-    info = psb_success_
-    if (no_locks) then
-      if (rma_wininfo_pscw == mpi_info_null) then
-        call psb_comm_rma_build_wininfo(rma_wininfo_pscw, .true., info)
-        if (info /= psb_success_) return
-      end if
-      winfo = rma_wininfo_pscw
-    else
-      if (rma_wininfo_gen == mpi_info_null) then
-        call psb_comm_rma_build_wininfo(rma_wininfo_gen, .false., info)
-        if (info /= psb_success_) return
-      end if
-      winfo = rma_wininfo_gen
-    end if
-  end subroutine psb_comm_rma_get_wininfo
-
-  subroutine psb_comm_rma_build_wininfo(winfo, no_locks, info)
-    integer(psb_mpk_), intent(out) :: winfo
-    logical, intent(in) :: no_locks
-    integer(psb_ipk_), intent(out) :: info
-    integer(psb_mpk_) :: iret
-
-    info  = psb_success_
-    winfo = mpi_info_null
-    call mpi_info_create(winfo, iret)
-    if (iret /= mpi_success) then
-      info  = psb_err_mpi_error_
-      winfo = mpi_info_null
-      return
-    end if
-    ! Every rank passes the size of one element of the same type.
-    call mpi_info_set(winfo, 'same_disp_unit', 'true', iret)
-    if (no_locks) call mpi_info_set(winfo, 'no_locks', 'true', iret)
-  end subroutine psb_comm_rma_build_wininfo
 
   subroutine psb_comm_rma_init(this, info)
     class(psb_comm_rma_handle), intent(inout) :: this
