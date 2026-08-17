@@ -718,27 +718,37 @@ contains
     type(psb_ldspmat_type) :: aux_a
     real(psb_dpk_), allocatable :: rhs_glob(:), x_glob(:)
     integer(psb_lpk_) :: nrows, ncols
+    integer(psb_ipk_) :: iam, np
 
     info = psb_success_
+    call psb_info(ctxt, iam, np)
 
-    select case(psb_toupper(trim(matrix_fmt)))
-    case('MM')
-      call mm_mat_read(aux_a,info,filename=trim(matrix_file))
-    case('HB')
-      call hb_read(aux_a,info,filename=trim(matrix_file))
-    case default
-      info = psb_err_internal_error_
-      return
-    end select
-    if (info /= psb_success_) return
-
-    nrows = aux_a%get_nrows()
-    ncols = aux_a%get_ncols()
-    if (nrows /= ncols) then
-      write(psb_err_unit,'("Input matrix must be square: ",a)') trim(matrix_file)
-      info = psb_err_internal_error_
-      return
+    ! Only the root holds the global matrix; psb_matdist scatters from there.
+    ! Reading it on every rank costs one full copy per rank: at 448 ranks over
+    ! 4 nodes that is more than 100 GB per node for a 60M nonzero matrix, and
+    ! the job is OOM-killed long before it reaches the SpMV.
+    if (iam == psb_root_) then
+      select case(psb_toupper(trim(matrix_fmt)))
+      case('MM')
+        call mm_mat_read(aux_a,info,filename=trim(matrix_file))
+      case('HB')
+        call hb_read(aux_a,info,filename=trim(matrix_file))
+      case default
+        info = psb_err_internal_error_
+      end select
+      if (info == psb_success_) then
+        nrows = aux_a%get_nrows()
+        ncols = aux_a%get_ncols()
+        if (nrows /= ncols) then
+          write(psb_err_unit,'("Input matrix must be square: ",a)') trim(matrix_file)
+          info = psb_err_internal_error_
+        end if
+      end if
     end if
+    call psb_bcast(ctxt, info)
+    if (info /= psb_success_) return
+    call psb_bcast(ctxt, nrows)
+    call psb_bcast(ctxt, ncols)
 
     call psb_matdist(aux_a, a, ctxt, desc_a, info, fmt=afmt, parts=part_block)
     if (info /= psb_success_) return
@@ -748,7 +758,12 @@ contains
     call psb_geall(bv,desc_a,info)
     if (info /= psb_success_) return
 
-    allocate(rhs_glob(nrows), x_glob(ncols), stat=info)
+    ! Same reasoning: psb_scatter only reads these on the root.
+    if (iam == psb_root_) then
+      allocate(rhs_glob(nrows), x_glob(ncols), stat=info)
+    else
+      allocate(rhs_glob(1), x_glob(1), stat=info)
+    end if
     if (info /= psb_success_) then
       info = psb_err_alloc_dealloc_
       return
