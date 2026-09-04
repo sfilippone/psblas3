@@ -124,7 +124,7 @@ real(psb_dpk_), target :: work(:)
       goto 9999
     endif
 
-    if (.not.psb_is_asb_desc(desc_a)) then 
+    if (.not.desc_a%is_asb()) then 
       info=psb_err_invalid_cd_state_
       call psb_errpush(info,name)
       goto 9999
@@ -591,7 +591,7 @@ real(psb_dpk_), pointer, dimension(:) :: sndbuf, rcvbuf
       goto 9999
     endif
 
-    if (.not.psb_is_asb_desc(desc_a)) then 
+    if (.not.desc_a%is_asb()) then 
       info=psb_err_invalid_cd_state_
       call psb_errpush(info,name)
       goto 9999
