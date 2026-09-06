@@ -574,7 +574,7 @@ program pdgenmv
   ! miscellaneous 
   real(psb_dpk_), parameter :: one = 1.d0
   real(psb_dpk_) :: t1, t2, tprec, flops, tflops,&
-       & tt1, tt2, gt1, gt2, gflops, bdwdth,&
+       & tt1, tt2, gt1, gt2, gflops, bdwdth, tmin,&
        & tcnvcsr, tcnvc1, tcnvgpu, tcnvg1
 
   ! sparse matrix and preconditioner
@@ -595,7 +595,7 @@ program pdgenmv
   ! solver parameters
   integer(psb_epk_) :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)   :: err, eps, tnv, tng,tdot, dnrm2,ddot
-  integer, parameter :: ntests=8, ngpu=2, ncnv=3
+  integer, parameter :: ntests=20, ngpu=2, ncnv=3
   type(psb_d_coo_sparse_mat), target   :: acoo
   type(psb_d_csr_sparse_mat), target   :: acsr
   type(psb_d_ell_sparse_mat), target   :: aell
@@ -618,7 +618,7 @@ program pdgenmv
   class(psb_d_base_sparse_mat), pointer :: agmold, acmold
   ! other variables
   logical, parameter :: dump=.false.
-  integer(psb_ipk_)  :: info, i, j, nr, nrg
+  integer(psb_ipk_)  :: info, i, j, nr, nrg, hacksize
   integer(psb_lpk_)  :: ig
   character(len=20)  :: name,ch_err
   character(len=40)  :: fname
@@ -657,7 +657,7 @@ program pdgenmv
   !
   !  get parameters
   !
-  call get_parms(ctxt,acfmt,agfmt,idim,tnd)
+  call get_parms(ctxt,acfmt,agfmt,idim,tnd,hacksize)
   call psb_init_timers()
   !
   !  allocate and fill in the coefficient matrix and initial vectors
@@ -686,7 +686,7 @@ program pdgenmv
     acmold => aell
   case('HLL')
     acmold => ahll
-    call psi_set_hksz(8)
+    call psi_set_hksz(hacksize)
   case('DIA')
     acmold => adia
   case('HDIA')
@@ -783,6 +783,10 @@ program pdgenmv
 
 
   call xv%set(x0)
+  tmin=HUGE(done)
+  do i=1,ntests/2
+    call psb_spmm(done,a,xv,dzero,bv,desc_a,info)
+  end do
   call psb_barrier(ctxt)
   t1 = psb_wtime()
   do i=1,ntests 
@@ -981,10 +985,10 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ctxt,acfmt,agfmt,idim,tnd)
+  subroutine  get_parms(ctxt,acfmt,agfmt,idim,tnd,hacksize)
     type(psb_ctxt_type) :: ctxt
     character(len=*) :: agfmt, acfmt
-    integer      :: idim
+    integer      :: idim, hacksize
     logical :: tnd
     integer      :: np, iam
     integer      :: intbuf(10), ip
@@ -1002,12 +1006,15 @@ contains
 #endif
       write(*,*) 'Size of discretization cube?'
       read(psb_inp_unit,*) idim
+      write(*,*) 'Hack Size ?'
+      read(psb_inp_unit,*) hacksize
       write(*,*) 'Try comm/comp overlap?'
       read(psb_inp_unit,*) tnd
     endif
     call psb_bcast(ctxt,acfmt)
     call psb_bcast(ctxt,agfmt)
     call psb_bcast(ctxt,idim)
+    call psb_bcast(ctxt,hacksize)
     call psb_bcast(ctxt,tnd)
     
     if (iam == 0) then
@@ -1017,6 +1024,7 @@ contains
       write(psb_out_unit,'("Data distribution    : BLOCK")')
       write(psb_out_unit,'(" ")')
       write(psb_out_unit,'("Storage formats        ",a)') acfmt,' ',agfmt
+      write(psb_out_unit,'("Hacksize             : ",i0)')hacksize
       write(psb_out_unit,'("Testing overlap ND     ",l8)') tnd
     end if
     return
