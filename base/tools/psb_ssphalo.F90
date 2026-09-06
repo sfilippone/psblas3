@@ -74,13 +74,7 @@ Subroutine psb_ssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_ssphalo
 
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   Type(psb_sspmat_type),Intent(in)    :: a
   Type(psb_sspmat_type),Intent(inout) :: blk
@@ -540,13 +534,7 @@ Subroutine psb_lssphalo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,outfmt,data)
   use psb_base_mod, psb_protect_name => psb_lssphalo
 
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   Type(psb_lsspmat_type),Intent(in)    :: a
   Type(psb_lsspmat_type),Intent(inout) :: blk
@@ -883,13 +871,7 @@ Subroutine psb_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,data,outcol_glob,col_desc)
   use psb_base_mod, psb_protect_name => psb_ls_csr_halo
 
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   type(psb_ls_csr_sparse_mat),Intent(in)    :: a
   type(psb_ls_csr_sparse_mat),Intent(inout) :: blk
@@ -1243,13 +1225,7 @@ Subroutine psb_s_ls_csr_halo(a,desc_a,blk,info,rowcnv,colcnv,&
      &  rowscale,colscale,data,outcol_glob,col_desc)
   use psb_base_mod, psb_protect_name => psb_s_ls_csr_halo
 
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   type(psb_s_csr_sparse_mat),Intent(in)    :: a
   type(psb_ls_csr_sparse_mat),Intent(inout) :: blk

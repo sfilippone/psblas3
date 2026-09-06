@@ -65,14 +65,7 @@
 !
 subroutine psb_m_remote_vect(n,v,iv,desc_a,x,ix, info)
   use psb_base_mod, psb_protect_name => psb_m_remote_vect
-
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   integer(psb_ipk_), intent(in)  :: n
   integer(psb_mpk_),   Intent(in)  :: v(:)
   integer(psb_lpk_), Intent(in)  :: iv(:)

@@ -44,14 +44,7 @@ subroutine psi_symm_dep_list_inrv(rvsz,adj,ctxt,info)
   use psb_penv_mod
   use psb_realloc_mod
   use psb_indx_map_mod, psb_protect_name => psi_symm_dep_list_inrv
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
-
   implicit none 
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   integer(psb_mpk_), intent(inout)   :: rvsz(0:)
   integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
   type(psb_ctxt_type), intent(in)    :: ctxt
@@ -123,14 +116,7 @@ subroutine psi_symm_dep_list_norv(adj,ctxt,info)
   use psb_penv_mod
   use psb_realloc_mod
   use psb_indx_map_mod, psb_protect_name => psi_symm_dep_list_norv
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
-
   implicit none 
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   integer(psb_ipk_), allocatable, intent(inout) :: adj(:)
   type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(out)  :: info

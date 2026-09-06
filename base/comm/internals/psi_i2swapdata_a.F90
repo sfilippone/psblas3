@@ -89,19 +89,13 @@ submodule (psi_i2_comm_a_mod)  psi_i2_swapdata_a_impl
 contains
   module subroutine psi_i2swapdatam(flag,n,beta,y,desc_a,work,info,data)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     integer(psb_mpk_), intent(in)      :: n
     integer(psb_ipk_), intent(in)      :: flag
     integer(psb_ipk_), intent(out)     :: info
-integer(psb_i2pk_)         :: y(:,:), beta
-integer(psb_i2pk_), target :: work(:)
+    integer(psb_i2pk_)         :: y(:,:), beta
+    integer(psb_i2pk_), target :: work(:)
     type(psb_desc_type),target      :: desc_a
     integer(psb_ipk_), optional        :: data
 
@@ -156,20 +150,14 @@ integer(psb_i2pk_), target :: work(:)
   module subroutine psi_i2swapidxm(ctxt,flag,n,beta,y,idx, &
        & totxch,totsnd,totrcv,work,info)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_mpk_), intent(in)   :: n
     integer(psb_ipk_), intent(in)   :: flag
     integer(psb_ipk_), intent(out)  :: info
-integer(psb_i2pk_)         :: y(:,:), beta
-integer(psb_i2pk_), target :: work(:)
+    integer(psb_i2pk_)         :: y(:,:), beta
+    integer(psb_i2pk_), target :: work(:)
     integer(psb_ipk_), intent(in)      :: idx(:),totxch,totsnd, totrcv
 
     ! locals
@@ -557,13 +545,7 @@ integer(psb_i2pk_), pointer, dimension(:) :: sndbuf, rcvbuf
   !
   module subroutine psi_i2swapdatav(flag,beta,y,desc_a,work,info,data)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     integer(psb_ipk_), intent(in)      :: flag
     integer(psb_ipk_), intent(out)     :: info
@@ -637,13 +619,7 @@ integer(psb_i2pk_), pointer, dimension(:) :: sndbuf, rcvbuf
     use psb_error_mod
     use psb_desc_mod
     use psb_penv_mod
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)   :: flag

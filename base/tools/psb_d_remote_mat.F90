@@ -73,13 +73,7 @@
 Subroutine psb_ld_remote_mat(a,desc_a,b,info)
   use psb_base_mod, psb_protect_name => psb_ld_remote_mat
 
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   Type(psb_ld_coo_sparse_mat),Intent(inout)  :: a
   Type(psb_ld_coo_sparse_mat),Intent(inout)  :: b

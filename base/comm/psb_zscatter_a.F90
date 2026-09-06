@@ -46,13 +46,7 @@
 subroutine  psb_zscatterm(globx, locx, desc_a, info, root)
 
   use psb_base_mod, psb_protect_name => psb_zscatterm
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   complex(psb_dpk_), intent(out), allocatable  :: locx(:,:)
   complex(psb_dpk_), intent(in)     :: globx(:,:)
@@ -292,13 +286,7 @@ end subroutine psb_zscatterm
 !
 subroutine  psb_zscatterv(globx, locx, desc_a, info, root)
   use psb_base_mod, psb_protect_name => psb_zscatterv
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   complex(psb_dpk_), intent(out), allocatable   :: locx(:)
   complex(psb_dpk_), intent(in)     :: globx(:)

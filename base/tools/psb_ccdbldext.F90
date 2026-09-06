@@ -64,13 +64,7 @@ Subroutine psb_ccdbldext(a,desc_a,novr,desc_ov,info, extype)
   use psb_base_mod, psb_protect_name => psb_ccdbldext
   use psi_mod
 
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   !     .. Array Arguments ..
   integer(psb_ipk_), intent(in)                      :: novr

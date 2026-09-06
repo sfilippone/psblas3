@@ -93,13 +93,7 @@ submodule (psi_i2_comm_a_mod)  psi_i2_swaptran_a_impl
 contains
   module subroutine psi_i2swaptranm(flag,n,beta,y,desc_a,work,info,data)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     integer(psb_mpk_), intent(in)      :: n
     integer(psb_ipk_), intent(in)      :: flag
@@ -162,13 +156,7 @@ contains
 
   module subroutine psi_i2tranidxm(ctxt,flag,n,beta,y,idx,&
        & totxch,totsnd,totrcv,work,info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in)   :: ctxt
     integer(psb_mpk_), intent(in)     :: n
@@ -571,13 +559,7 @@ contains
   !
   !
   module subroutine psi_i2swaptranv(flag,beta,y,desc_a,work,info,data)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     integer(psb_ipk_), intent(in)      :: flag
     integer(psb_ipk_), intent(out)     :: info
@@ -648,13 +630,7 @@ contains
   ! 
   module subroutine psi_i2tranidxv(ctxt,flag,beta,y,idx,&
        & totxch,totsnd,totrcv,work,info)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in) :: ctxt
     integer(psb_ipk_), intent(in)   :: flag

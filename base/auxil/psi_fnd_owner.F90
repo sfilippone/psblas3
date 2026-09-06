@@ -54,14 +54,7 @@ subroutine psi_fnd_owner(nv,idx,iprc,desc,info)
   use psb_penv_mod
   use psb_realloc_mod
   use psi_mod, psb_protect_name => psi_fnd_owner
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
-
   implicit none 
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   integer(psb_ipk_), intent(in)      :: nv
   integer(psb_lpk_), intent(in)      :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)

@@ -94,14 +94,8 @@
 !
 !
 subroutine psb_ls_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   use psb_base_mod, psb_protect_name => psb_ls_coo_glob_transpose
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   type(psb_ls_coo_sparse_mat), intent(inout) :: ain
   type(psb_desc_type), intent(inout), target   :: desc_r
   type(psb_ls_coo_sparse_mat), intent(out), optional :: atrans
@@ -392,14 +386,8 @@ subroutine psb_ls_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
 end subroutine psb_ls_coo_glob_transpose
 
 subroutine psb_s_coo_glob_transpose(ain,desc_r,info,atrans,desc_c,desc_rx)
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   use psb_base_mod, psb_protect_name => psb_s_coo_glob_transpose
   Implicit None
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   type(psb_s_coo_sparse_mat), intent(inout) :: ain
   type(psb_desc_type), intent(inout), target   :: desc_r
   type(psb_s_coo_sparse_mat), intent(out), optional :: atrans

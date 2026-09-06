@@ -55,14 +55,7 @@ subroutine psi_a2a_fnd_owner(idx,iprc,idxmap,info,samesize)
   use psb_penv_mod
   use psb_realloc_mod
   use psb_indx_map_mod, psb_protect_name => psi_a2a_fnd_owner
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
-
   implicit none 
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   integer(psb_lpk_), intent(in)   :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:)
   class(psb_indx_map), intent(in) :: idxmap

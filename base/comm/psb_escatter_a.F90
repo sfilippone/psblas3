@@ -46,13 +46,7 @@
 subroutine  psb_escatterm(globx, locx, desc_a, info, root)
 
   use psb_base_mod, psb_protect_name => psb_escatterm
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   integer(psb_epk_), intent(out), allocatable  :: locx(:,:)
   integer(psb_epk_), intent(in)     :: globx(:,:)
@@ -292,13 +286,7 @@ end subroutine psb_escatterm
 !
 subroutine  psb_escatterv(globx, locx, desc_a, info, root)
   use psb_base_mod, psb_protect_name => psb_escatterv
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   integer(psb_epk_), intent(out), allocatable   :: locx(:)
   integer(psb_epk_), intent(in)     :: globx(:)

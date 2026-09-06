@@ -46,13 +46,7 @@
 subroutine  psb_i2scatterm(globx, locx, desc_a, info, root)
 
   use psb_base_mod, psb_protect_name => psb_i2scatterm
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   integer(psb_i2pk_), intent(out), allocatable  :: locx(:,:)
   integer(psb_i2pk_), intent(in)     :: globx(:,:)
@@ -292,13 +286,7 @@ end subroutine psb_i2scatterm
 !
 subroutine  psb_i2scatterv(globx, locx, desc_a, info, root)
   use psb_base_mod, psb_protect_name => psb_i2scatterv
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   integer(psb_i2pk_), intent(out), allocatable   :: locx(:)
   integer(psb_i2pk_), intent(in)     :: globx(:)

@@ -31,18 +31,12 @@
 !    
 subroutine psi_i_bld_glb_dep_list(ctxt,loc_dl,length_dl,c_dep_list,dl_ptr,info)
   use psi_mod, psb_protect_name => psi_i_bld_glb_dep_list
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
   use psb_desc_mod
   use psb_sort_mod
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   !     ....scalar parameters...
   type(psb_ctxt_type), intent(in) :: ctxt
   integer(psb_ipk_), intent(in)  :: loc_dl(:)

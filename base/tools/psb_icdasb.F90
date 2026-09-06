@@ -45,13 +45,7 @@
 subroutine psb_icdasb(desc,info,ext_hv,mold)
   use psb_base_mod, psb_protect_name => psb_icdasb
   use psi_mod
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   !...Parameters....
   type(psb_desc_type), intent(inout) :: desc
   integer(psb_ipk_), intent(out)               :: info

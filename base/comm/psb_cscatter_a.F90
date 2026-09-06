@@ -46,13 +46,7 @@
 subroutine  psb_cscatterm(globx, locx, desc_a, info, root)
 
   use psb_base_mod, psb_protect_name => psb_cscatterm
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   complex(psb_spk_), intent(out), allocatable  :: locx(:,:)
   complex(psb_spk_), intent(in)     :: globx(:,:)
@@ -292,13 +286,7 @@ end subroutine psb_cscatterm
 !
 subroutine  psb_cscatterv(globx, locx, desc_a, info, root)
   use psb_base_mod, psb_protect_name => psb_cscatterv
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
 
   complex(psb_spk_), intent(out), allocatable   :: locx(:)
   complex(psb_spk_), intent(in)     :: globx(:)

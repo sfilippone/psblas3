@@ -49,13 +49,7 @@ subroutine  psb_dsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,keep
   use psb_mat_mod
   use psb_tools_mod
   use iso_c_binding
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   type(psb_dspmat_type), intent(inout) :: loca
   type(psb_dspmat_type), intent(inout) :: globa
   type(psb_desc_type), intent(in) :: desc_a
@@ -233,13 +227,7 @@ subroutine  psb_ldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,kee
   use psb_mat_mod
   use psb_tools_mod
   use iso_c_binding
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   type(psb_dspmat_type), intent(inout) :: loca
   type(psb_ldspmat_type), intent(inout) :: globa
   type(psb_desc_type), intent(in) :: desc_a
@@ -406,13 +394,7 @@ subroutine  psb_ldldsp_allgather(globa, loca, desc_a, info, root, dupl,keepnum,k
   use psb_mat_mod
   use psb_tools_mod
   use iso_c_binding
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   type(psb_ldspmat_type), intent(inout) :: loca
   type(psb_ldspmat_type), intent(inout) :: globa
   type(psb_desc_type), intent(in) :: desc_a

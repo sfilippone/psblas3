@@ -86,14 +86,7 @@ subroutine psi_graph_fnd_owner(idx,iprc,ladj,idxmap,info)
   use psb_realloc_mod
   use psb_timers_mod
   use psb_desc_mod, psb_protect_name => psi_graph_fnd_owner
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
-
   implicit none 
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   integer(psb_lpk_), intent(in)      :: idx(:)
   integer(psb_ipk_), allocatable, intent(out) ::  iprc(:), ladj(:)
   class(psb_indx_map), intent(in) :: idxmap

@@ -109,18 +109,12 @@ subroutine psi_i_xtr_loc_dl(ctxt,is_bld,is_upd,desc_str,loc_dl,length_dl,info)
   !            dependence list of current process
   !           
   use psi_mod, psb_protect_name => psi_i_xtr_loc_dl
-#ifdef PSB_MPI_MOD
-  use mpi
-#endif
   use psb_penv_mod
   use psb_const_mod
   use psb_error_mod
   use psb_desc_mod
   use psb_sort_mod
   implicit none
-#ifdef PSB_MPI_H
-  include 'mpif.h'
-#endif
   !     ....scalar parameters...
   logical,  intent(in)            :: is_bld, is_upd
   type(psb_ctxt_type), intent(in) :: ctxt

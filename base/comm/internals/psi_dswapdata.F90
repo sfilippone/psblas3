@@ -94,13 +94,7 @@ submodule (psi_d_comm_v_mod)  psi_d_swapdata_impl
 contains
   module subroutine psi_dswapdata_vect(flag,beta,y,desc_a,work,info,data)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
@@ -176,13 +170,7 @@ contains
   module subroutine psi_dswap_vidx_vect(ctxt,flag,beta,y,idx, &
        & totxch,totsnd,totrcv,work,info)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in)  :: ctxt
     integer(psb_ipk_), intent(in)    :: flag
@@ -421,13 +409,7 @@ contains
   !   
   !   
   module subroutine psi_dswapdata_multivect(flag,beta,y,desc_a,work,info,data)
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     integer(psb_ipk_), intent(in)         :: flag
     integer(psb_ipk_), intent(out)        :: info
@@ -503,13 +485,7 @@ contains
   module subroutine psi_dswap_vidx_multivect(ctxt,flag,beta,y,idx, &
        & totxch,totsnd,totrcv,work,info)
 
-#ifdef PSB_MPI_MOD
-    use mpi
-#endif
     implicit none
-#ifdef PSB_MPI_H
-    include 'mpif.h'
-#endif
 
     type(psb_ctxt_type), intent(in)    :: ctxt
     integer(psb_ipk_), intent(in)      :: flag
