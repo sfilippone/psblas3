@@ -834,7 +834,7 @@ contains
       write(psb_out_unit,'("Number of processors : ",i0)')np
       write(psb_out_unit,'("Data distribution    : BLOCK")')
       write(psb_out_unit,'(" ")')
-      write(psb_out_unit,'("Storage formats        ",a)') acfmt,' ',agfmt
+      write(psb_out_unit,'("Storage format         ",a)') acfmt
       write(psb_out_unit,'("Hacksize             : ",i0)')hacksize
       write(psb_out_unit,'("Testing overlap ND     ",l8)') tnd
     end if
