@@ -558,9 +558,6 @@ program pdgenmv
   use psb_base_mod
   use psb_util_mod 
   use psb_ext_mod
-#ifdef PSB_HAVE_CUDA
-  use psb_cuda_mod
-#endif
 #ifdef HAVE_RSB
   use psb_rsb_mod
 #endif
@@ -568,7 +565,7 @@ program pdgenmv
   implicit none
 
   ! input parameters
-  character(len=5)  :: acfmt, agfmt
+  character(len=5)  :: acfmt
   integer   :: idim
   logical   :: tnd
   ! miscellaneous 
@@ -583,10 +580,6 @@ program pdgenmv
   type(psb_desc_type)   :: desc_a
   ! dense matrices
   type(psb_d_vect_type), target :: xv, bv, xg, bg  
-#ifdef PSB_HAVE_CUDA
-  type(psb_d_vect_cuda)  :: vmold
-  type(psb_i_vect_cuda)  :: imold 
-#endif
   real(psb_dpk_), allocatable :: x1(:), x2(:), x0(:)
   ! blacs parameters
   type(psb_ctxt_type) :: ctxt
@@ -605,16 +598,6 @@ program pdgenmv
 #ifdef HAVE_RSB
   type(psb_d_rsb_sparse_mat), target   :: arsb
 #endif
-#ifdef PSB_HAVE_CUDA
-  type(psb_d_cuda_elg_sparse_mat), target   :: aelg
-  type(psb_d_cuda_csrg_sparse_mat), target  :: acsrg
-#if PSB_CUDA_SHORT_VERSION <= 10
-  type(psb_d_cuda_hybg_sparse_mat), target  :: ahybg
-#endif
-  type(psb_d_cuda_hlg_sparse_mat), target   :: ahlg
-  type(psb_d_cuda_hdiag_sparse_mat), target   :: ahdiag
-  type(psb_d_cuda_dnsg_sparse_mat), target   :: adnsg
-#endif
   class(psb_d_base_sparse_mat), pointer :: agmold, acmold
   ! other variables
   logical, parameter :: dump=.false.
@@ -629,9 +612,6 @@ program pdgenmv
   call psb_init(ctxt)
   call psb_info(ctxt,iam,np)
 
-#ifdef PSB_HAVE_CUDA
-  call psb_cuda_init(ctxt)
-#endif
 #ifdef HAVE_RSB
   call psb_rsb_init()
 #endif
@@ -642,7 +622,7 @@ program pdgenmv
     stop
   endif
   if(psb_get_errstatus() /= 0) goto 9999
-  name='pdegenmv-cuda'
+  name='pdegenmv-ext'
   !
   ! Hello world
   !
@@ -650,14 +630,10 @@ program pdgenmv
     write(*,*) 'Welcome to PSBLAS version: ',psb_version_string_
     write(*,*) 'This is the ',trim(name),' sample program'
   end if
-#ifdef PSB_HAVE_CUDA
-  write(*,*) 'Process ',iam,' running on device: ', psb_cuda_getDevice(),' out of', psb_cuda_getDeviceCount()
-  write(*,*) 'Process ',iam,' device ', psb_cuda_getDevice(),' is a: ', trim(psb_cuda_DeviceName())  
-#endif
   !
   !  get parameters
   !
-  call get_parms(ctxt,acfmt,agfmt,idim,tnd,hacksize)
+  call get_parms(ctxt,acfmt,idim,tnd,hacksize)
   call psb_init_timers()
   !
   !  allocate and fill in the coefficient matrix and initial vectors
@@ -710,37 +686,6 @@ program pdgenmv
     stop
   end if
 
-#ifdef PSB_HAVE_CUDA
-  select case(psb_toupper(agfmt))
-  case('ELG')
-    agmold => aelg
-  case('HLG')
-    agmold => ahlg
-  case('HDIAG')
-    agmold => ahdiag
-  case('CSRG')
-    agmold => acsrg
-  case('DNSG')
-    agmold => adnsg
-#if PSB_CUDA_SHORT_VERSION <= 10
-  case('HYBG')
-    agmold => ahybg
-#endif
-  case default
-    write(*,*) 'Unknown format defaulting to HLG'
-    agmold => ahlg
-  end select
-  call a%cscnv(agpu,info,mold=agmold)
-  if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-    write(0,*) 'From cscnv ',info
-    call psb_error()
-    stop
-  end if
-  call desc_a%cnv(mold=imold)
-  
-  call psb_geasb(bg,desc_a,info,scratch=.true.,mold=vmold)
-  call psb_geasb(xg,desc_a,info,scratch=.true.,mold=vmold)
-#endif
   nr       = desc_a%get_local_rows()
   nrg      = desc_a%get_global_rows() 
   call psb_geall(x0,desc_a,info)
@@ -765,20 +710,6 @@ program pdgenmv
     call xv%bld(x0)
     call psb_geasb(bv,desc_a,info,scratch=.true.)
     
-#ifdef PSB_HAVE_CUDA
-    
-    call aux_a%cscnv(agpu,info,mold=acoo)
-    call xg%bld(x0,mold=vmold)
-    call psb_geasb(bg,desc_a,info,scratch=.true.,mold=vmold)
-    call psb_barrier(ctxt)
-    t1 = psb_wtime()
-    call agpu%cscnv(info,mold=agmold)
-    call psb_cuda_DeviceSync()
-    t2 = psb_Wtime() -t1
-    call psb_amx(ctxt,t2)
-    if (j==1) tcnvg1 = t2
-    tcnvgpu = tcnvgpu + t2
-#endif
   end do
 
 
@@ -796,79 +727,6 @@ program pdgenmv
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
 
-#ifdef PSB_HAVE_CUDA
-  call xg%set(x0)
-
-  ! FIXME: cache flush needed here
-  x1 = bv%get_vect()
-  x2 = bg%get_vect()
-  
-  call psb_barrier(ctxt)
-  tt1 = psb_wtime()
-  do i=1,ntests 
-    call psb_spmm(done,agpu,xv,dzero,bg,desc_a,info)
-    if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-      write(0,*) 'From 1 spmm',info,i,ntests
-      call psb_error()
-      stop
-    end if
-
-  end do
-  call psb_cuda_DeviceSync()
-  call psb_barrier(ctxt)
-  tt2 = psb_wtime() - tt1
-  call psb_amx(ctxt,tt2)
-  x1 = bv%get_vect()
-  x2 = bg%get_vect()
-  nr       = desc_a%get_local_rows() 
-  eps = maxval(abs(x1(1:nr)-x2(1:nr)))
-  call psb_amx(ctxt,eps)
-  if (iam==0) write(*,*) 'Max diff on xGPU',eps
-
-  ! FIXME: cache flush needed here
-  call xg%set(x0)
-  call xg%sync()
-  call psb_barrier(ctxt)
-  gt1 = psb_wtime()
-  do i=1,ntests*ngpu
-    call psb_spmm(done,agpu,xg,dzero,bg,desc_a,info)
-     ! For timing purposes we need to make sure all threads
-    ! in the device are done. 
-    if ((info /= 0).or.(psb_get_errstatus()/=0)) then 
-      write(0,*) 'From 2 spmm',info,i,ntests
-      call psb_error()
-      stop
-    end if
-
-  end do
-  call psb_cuda_DeviceSync()
-  call psb_barrier(ctxt)
-  gt2 = psb_wtime() - gt1
-  call psb_amx(ctxt,gt2)
-  call bg%sync()
-  x1 = bv%get_vect()
-  x2 = bg%get_vect()
-  tnv = psb_genrm2(bv,desc_a,info)
-  tng = psb_genrm2(bg,desc_a,info)
-  tdot = psb_gedot(bg,bg,desc_a,info)
-  write(0,*) ' bv ',tnv,' bg ',tng, ' dot ',tdot,eps,&
-       & dnrm2(desc_a%get_local_rows(),x2,1),&
-       & ddot(desc_a%get_local_rows(),x1,1,x2,1)
-  call psb_geaxpby(-done,bg,+done,bv,desc_a,info)
-  eps = psb_geamax(bv,desc_a,info)
-
-  call psb_amx(ctxt,t2)
-  eps = maxval(abs(x1(1:nr)-x2(1:nr)))
-  call psb_amx(ctxt,eps)
-  if (iam==0) write(*,*) 'Max diff on GPU',eps
-  if (dump) then 
-    write(fname,'(a,i3.3,a,i3.3,a)')'XCPU-out-',iam,'-',np,'.mtx'
-    call mm_array_write(x1(1:nr),'Local part CPU',info,filename=fname)
-    write(fname,'(a,i3.3,a,i3.3,a)')'XGPU-out-',iam,'-',np,'.mtx'
-    call mm_array_write(x2(1:nr),'Local part GPU',info,filename=fname)
-  end if
-
-#endif
   annz     = a%get_nzeros()
   amatsize = a%sizeof()
   descsize = psb_sizeof(desc_a)
@@ -892,22 +750,6 @@ program pdgenmv
     tflops = flops
     gflops = flops * ngpu
     write(psb_out_unit,'("Storage type for    A: ",a)') a%get_fmt()
-#ifdef PSB_HAVE_CUDA
-    write(psb_out_unit,'("Storage type for AGPU: ",a)') agpu%get_fmt()
-    write(psb_out_unit,'("Time to convert A from COO to CPU (1): ",F20.9)')&
-         & tcnvc1
-    write(psb_out_unit,'("Time to convert A from COO to CPU (t): ",F20.9)')&
-         & tcnvcsr
-    write(psb_out_unit,'("Time to convert A from COO to CPU (a): ",F20.9)')&
-         & tcnvcsr/ncnv
-    write(psb_out_unit,'("Time to convert A from COO to GPU (1): ",F20.9)')&
-         & tcnvg1
-    write(psb_out_unit,'("Time to convert A from COO to GPU (t): ",F20.9)')&
-         & tcnvgpu
-    write(psb_out_unit,'("Time to convert A from COO to GPU (a): ",F20.9)')&
-         & tcnvgpu/ncnv
-
-#endif
     write(psb_out_unit,&
          & '("Number of flops (",i0," prod)        : ",F20.0,"           ")') &
          &  ntests,flops
@@ -922,21 +764,6 @@ program pdgenmv
          & t2*1.d3/(1.d0*ntests)
     write(psb_out_unit,'("MFLOPS                       (CPU)   : ",F20.3)')&
          & flops/1.d6
-#ifdef PSB_HAVE_CUDA
-    write(psb_out_unit,'("Time for ",i6," products (s) (xGPU)  : ",F20.3)')&
-         & ntests, tt2
-    write(psb_out_unit,'("Time per product    (ms)     (xGPU)  : ",F20.3)')&
-         & tt2*1.d3/(1.d0*ntests)
-    write(psb_out_unit,'("MFLOPS                       (xGPU)  : ",F20.3)')&
-         & tflops/1.d6
-
-    write(psb_out_unit,'("Time for ",i6," products (s) (GPU.)  : ",F20.3)')&
-         & ngpu*ntests,gt2
-    write(psb_out_unit,'("Time per product    (ms)     (GPU.)  : ",F20.3)')&
-         & gt2*1.d3/(1.d0*ntests*ngpu)
-    write(psb_out_unit,'("MFLOPS                       (GPU.)  : ",F20.3)')&
-         & gflops/1.d6
-#endif
     !
     ! This computation assumes the data movement associated with CSR:
     ! it is minimal in terms of coefficients. Other formats may either move
@@ -947,12 +774,6 @@ program pdgenmv
     bdwdth = ntests*nbytes/(t2*1.d6)
     write(psb_out_unit,*)
     write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (CPU)  : ",F20.3)') bdwdth
-#ifdef PSB_HAVE_CUDA
-    bdwdth = ngpu*ntests*nbytes/(gt2*1.d6)
-    write(psb_out_unit,'("MBYTES/S sust. effective bandwidth  (GPU)  : ",F20.3)') bdwdth
-    bdwdth = psb_cuda_MemoryPeakBandwidth()
-    write(psb_out_unit,'("MBYTES/S peak bandwidth             (GPU)  : ",F20.3)') bdwdth
-#endif
     write(psb_out_unit,'("Storage type for DESC_A: ",a)') desc_a%indxmap%get_fmt()
     write(psb_out_unit,'("Total memory occupation for DESC_A: ",i12)')descsize
 
@@ -972,9 +793,6 @@ program pdgenmv
     call psb_errpush(info,name,a_err=ch_err)
     goto 9999
   end if
-#ifdef PSB_HAVE_CUDA
-  call psb_cuda_exit()
-#endif
   call psb_exit(ctxt)
   stop
 
@@ -985,9 +803,9 @@ contains
   !
   ! get iteration parameters from standard input
   !
-  subroutine  get_parms(ctxt,acfmt,agfmt,idim,tnd,hacksize)
+  subroutine  get_parms(ctxt,acfmt,idim,tnd,hacksize)
     type(psb_ctxt_type) :: ctxt
-    character(len=*) :: agfmt, acfmt
+    character(len=*) :: acfmt
     integer      :: idim, hacksize
     logical :: tnd
     integer      :: np, iam
@@ -998,12 +816,6 @@ contains
     if (iam == 0) then
       write(*,*) 'CPU side format?'
       read(psb_inp_unit,*) acfmt
-#ifdef PSB_HAVE_CUDA
-      write(*,*) 'CUDA side format?'
-      read(psb_inp_unit,*) agfmt
-#else
-      agfmt = acfmt
-#endif
       write(*,*) 'Size of discretization cube?'
       read(psb_inp_unit,*) idim
       write(*,*) 'Hack Size ?'
