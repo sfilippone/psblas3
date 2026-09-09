@@ -824,7 +824,6 @@ contains
       read(psb_inp_unit,*) tnd
     endif
     call psb_bcast(ctxt,acfmt)
-    call psb_bcast(ctxt,agfmt)
     call psb_bcast(ctxt,idim)
     call psb_bcast(ctxt,hacksize)
     call psb_bcast(ctxt,tnd)
