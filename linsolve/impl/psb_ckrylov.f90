@@ -79,89 +79,117 @@
 !                                           where r is the (preconditioned, recursive
 !                                           estimate of) residual 
 ! 
-Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,irst,istop,cond)
+subroutine psb_ckrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
+                        & itmax, iter, err, itrace, irst, istop, cond, &
+                        & steps, base_type, eigext, Gram_solver, FGS_sweeps)
 
   use psb_base_mod
-  use psb_prec_mod,only : psb_cprec_type
+  use psb_prec_mod, only : psb_cprec_type
   use psb_linsolve_mod, psb_protect_name => psb_ckrylov_vect
 
   character(len=*)                     :: method
-  Type(psb_cspmat_type), Intent(in)    :: a
-  Type(psb_desc_type), Intent(in)      :: desc_a
+  type(psb_cspmat_type), intent(in)    :: a
+  type(psb_desc_type), intent(in)      :: desc_a
   class(psb_cprec_type), intent(inout) :: prec 
-  type(psb_c_vect_type), Intent(inout) :: b
-  type(psb_c_vect_type), Intent(inout) :: x
-  Real(psb_spk_), Intent(in)           :: eps
-  integer(psb_ipk_), intent(out)                 :: info
-  integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
-  integer(psb_ipk_), Optional, Intent(out)       :: iter
-  Real(psb_spk_), Optional, Intent(out) :: err,cond
-
+  type(psb_c_vect_type), intent(inout) :: b
+  type(psb_c_vect_type), intent(inout) :: x
+  real(psb_spk_), intent(in)           :: eps
+  integer(psb_ipk_), intent(out)       :: info
+  integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, irst, istop, steps
+  integer(psb_ipk_), optional, intent(out)  :: iter
+  real(psb_spk_), optional, intent(out)     :: err, cond
+  character, optional, intent(in)           :: base_type
+  complex(psb_spk_), optional, intent(in)      :: eigext(2)
+  character(len=3), optional, intent(in)    :: Gram_solver
+  integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
 
   abstract interface
-    subroutine psb_ckryl_vect(a,prec,b,x,eps,&
-         & desc_a,info,itmax,iter,err,itrace,istop)
+    subroutine psb_ckryl_vect(a, prec, b, x, eps, desc_a, info, &
+                          & itmax, iter, err, itrace, istop)
       import :: psb_ipk_, psb_spk_, psb_desc_type, &
            & psb_cspmat_type, psb_cprec_type, psb_c_vect_type
       type(psb_cspmat_type), intent(in)    :: a
       type(psb_desc_type), intent(in)      :: desc_a
-      type(psb_c_vect_type), Intent(inout) :: b
-      type(psb_c_vect_type), Intent(inout) :: x
+      type(psb_c_vect_type), intent(inout) :: b
+      type(psb_c_vect_type), intent(inout) :: x
       real(psb_spk_), intent(in)           :: eps
       class(psb_cprec_type), intent(inout) :: prec
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), optional, intent(in)        :: itmax, itrace,istop
-      integer(psb_ipk_), optional, intent(out)       :: iter
-      real(psb_spk_), optional, intent(out) :: err
+      integer(psb_ipk_), intent(out)           :: info
+      integer(psb_ipk_), optional, intent(in)  :: itmax, itrace, istop
+      integer(psb_ipk_), optional, intent(out) :: iter
+      real(psb_spk_), optional, intent(out)    :: err
     end subroutine psb_ckryl_vect
-    Subroutine psb_ckryl_rest_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err, itrace,irst,istop)
+
+    subroutine psb_ckryl_rest_vect(a, prec, b, x, eps, desc_a, info, &
+                                & itmax, iter, err, itrace, irst, istop)
       import :: psb_ipk_, psb_spk_, psb_desc_type, &
            & psb_cspmat_type, psb_cprec_type, psb_c_vect_type
-      Type(psb_cspmat_type), Intent(in)    :: a
-      Type(psb_desc_type), Intent(in)      :: desc_a
+      type(psb_cspmat_type), intent(in)    :: a
+      type(psb_desc_type), intent(in)      :: desc_a
       class(psb_cprec_type), intent(inout) :: prec
-      type(psb_c_vect_type), Intent(inout) :: b
-      type(psb_c_vect_type), Intent(inout) :: x
-      Real(psb_spk_), Intent(in)           :: eps
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, irst,istop
-      integer(psb_ipk_), Optional, Intent(out)       :: iter
-      Real(psb_spk_), Optional, Intent(out) :: err
+      type(psb_c_vect_type), intent(inout) :: b
+      type(psb_c_vect_type), intent(inout) :: x
+      real(psb_spk_), intent(in)           :: eps
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, irst, istop
+      integer(psb_ipk_), optional, intent(out)  :: iter
+      real(psb_spk_), optional, intent(out)     :: err
     end subroutine psb_ckryl_rest_vect
-    Subroutine psb_ckryl_cond_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err, itrace,istop,cond)
+
+    subroutine psb_ckryl_cond_vect(a, prec, b, x, eps, desc_a, info, &
+         & itmax, iter, err, itrace, istop, cond)
       import :: psb_ipk_, psb_spk_, psb_desc_type, &
            & psb_cspmat_type, psb_cprec_type, psb_c_vect_type
-      Type(psb_cspmat_type), Intent(in)    :: a
-      Type(psb_desc_type), Intent(in)      :: desc_a
+      type(psb_cspmat_type), intent(in)    :: a
+      type(psb_desc_type), intent(in)      :: desc_a
       class(psb_cprec_type), intent(inout) :: prec
-      type(psb_c_vect_type), Intent(inout) :: b
-      type(psb_c_vect_type), Intent(inout) :: x
-      Real(psb_spk_), Intent(in)           :: eps
-      integer(psb_ipk_), intent(out)                 :: info
-      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
-      integer(psb_ipk_), Optional, Intent(out)       :: iter
-      Real(psb_spk_), Optional, Intent(out) :: err, cond
+      type(psb_c_vect_type), intent(inout) :: b
+      type(psb_c_vect_type), intent(inout) :: x
+      real(psb_spk_), intent(in)           :: eps
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
+      integer(psb_ipk_), optional, intent(out)  :: iter
+      real(psb_spk_), optional, intent(out)     :: err, cond
     end subroutine psb_ckryl_cond_vect
+
+    subroutine psb_ckryl_step_vect(a, prec, b, x, s, eps, desc_a, info, &
+                                & itmax, iter, err, itrace, istop, &
+                                & base_type, eigext, Gram_solver, FGS_sweeps)
+      import :: psb_ipk_, psb_spk_, psb_desc_type, &
+           & psb_cspmat_type, psb_cprec_type, psb_c_vect_type
+      type(psb_cspmat_type), intent(in)    :: a
+      class(psb_cprec_type), intent(inout) :: prec
+      type(psb_c_vect_type), intent(inout) :: b
+      type(psb_c_vect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)        :: s
+      real(psb_spk_), intent(in)           :: eps
+      type(psb_desc_type), intent(in)      :: desc_a
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
+      integer(psb_ipk_), optional, intent(out)  :: iter
+      real(psb_spk_), optional, intent(out)     :: err
+      character, optional, intent(in)           :: base_type
+      complex(psb_spk_), optional, intent(in)      :: eigext(2)
+      character(len=3), optional, intent(in)    :: Gram_solver
+      integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+    end subroutine psb_ckryl_step_vect
   end interface
 
-  procedure(psb_ckryl_vect) :: psb_cbicg_vect, psb_ccgstab_vect,&
-       & psb_ccgs_vect
-  procedure(psb_ckryl_rest_vect) :: psb_crgmres_vect, psb_ccgstabl_vect, psb_cgcr_vect
-  procedure(psb_ckryl_cond_vect) :: psb_ccg_vect, psb_cfcg_vect, psb_cminres_vect
+  procedure(psb_ckryl_vect)       :: psb_cbicg_vect, psb_ccgstab_vect, psb_ccgs_vect
+  procedure(psb_ckryl_rest_vect)  :: psb_crgmres_vect, psb_ccgstabl_vect, psb_cgcr_vect
+  procedure(psb_ckryl_cond_vect)  :: psb_ccg_vect, psb_cfcg_vect, psb_cminres_vect
+  procedure(psb_ckryl_step_vect)  :: psb_cscg_vect, psb_cscg2_vect
 
-  logical           :: do_alloc_wrk
+  logical             :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: me,np,err_act, itrace_
-  character(len=20)             :: name
+  integer(psb_ipk_)   :: me, np, err_act, itrace_, steps_
+  character(len=20)   :: name
 
   info = psb_success_
   name = 'psb_krylov'
   call psb_erractionsave(err_act)
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
 
@@ -174,59 +202,74 @@ Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
     itrace_ = -1
   end if
 
-  do_alloc_wrk = .not.prec%is_allocated_wrk()
-  if (do_alloc_wrk) call prec%allocate_wrk(info,vmold=x%v,desc=desc_a)
+  do_alloc_wrk = .not. prec%is_allocated_wrk()
+  if (do_alloc_wrk) call prec%allocate_wrk(info, vmold=x%v, desc=desc_a)
 
   select case(psb_toupper(method))
-  case('CG') 
-    call  psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
-  case('FCG') 
-    call  psb_cfcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond)
-  case('GCR') 
-    call  psb_cgcr_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
-  case('CGS') 
-    call  psb_ccgs_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
-  case('BICG') 
-    call  psb_cbicg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
-  case('BICGSTAB') 
-    call  psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
-  case('RGMRES','GMRES')
-    call  psb_crgmres_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
-  case('MINRES','PMINRES')
-    call  psb_cminres_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
-  case('BICGSTABL')
-    call  psb_ccgstabl_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop)
-  case default
-    if (me == 0) write(psb_err_unit,*) trim(name),&
-         & ': Warning: Unknown method  ',method,&
-         & ', defaulting to BiCGSTAB'
-    call  psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop)
+    case('CG') 
+      call psb_ccg_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop, cond = cond)
+    case('FCG') 
+      call psb_cfcg_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop, cond = cond)
+    case('GCR') 
+      call psb_cgcr_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop)
+    case('CGS') 
+      call psb_ccgs_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop)
+    case('BICG') 
+      call psb_cbicg_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop)
+    case('BICGSTAB') 
+      call psb_ccgstab_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop)
+    case('RGMRES', 'GMRES')
+      call psb_crgmres_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, irst = irst, istop = istop)
+    case('MINRES', 'PMINRES')
+      call psb_cminres_vect(a, prec, b, x, eps, desc_a, info, &
+		  & itmax, iter, err, itrace = itrace_, istop = istop)
+    case('BICGSTABL')
+      call psb_ccgstabl_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, irst = irst, istop = istop)
+    case('SSTEPCG')
+      ! steps (default = 5)
+      steps_ = 5
+      if(present(steps)) steps_ = steps
+      
+      call psb_cscg_vect(a, prec, b, x, steps_, eps, desc_a, info, &
+          & itmax = itmax, iter = iter, err = err, itrace = itrace_, istop = istop, &
+          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)
+      
+    case('SSTEPCG1')
+      ! steps (default = 5)
+      steps_ = 5
+      if(present(steps)) steps_ = steps
+
+      call psb_cscg2_vect(a, prec, b, x, steps_, eps, desc_a, info, &
+          & itmax = itmax, iter = iter, err = err, itrace = itrace_, istop = istop, &
+          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)  
+                     
+    case default
+      if (me == psb_root_) write(psb_err_unit, *) trim(name) , &
+          & ': Warning: Unknown method  ', method, ', defaulting to BiCGSTAB'
+      
+      call psb_ccgstab_vect(a, prec, b, x, eps, desc_a, info, &
+          & itmax, iter, err, itrace = itrace_, istop = istop)
   end select
 
-  if ((info==psb_success_).and.do_alloc_wrk) call prec%free_wrk(info)
+  if ((info == psb_success_) .and. do_alloc_wrk) call prec%free_wrk(info)
   
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_
-    call psb_errpush(info,name,a_err=trim(method))
+    call psb_errpush(info, name, a_err = trim(method))
     goto 9999
   end if
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
-
 end subroutine psb_ckrylov_vect
-

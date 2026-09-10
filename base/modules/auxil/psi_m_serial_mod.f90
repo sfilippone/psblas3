@@ -34,171 +34,334 @@ module psi_m_serial_mod
 
   interface psb_gelp 
     ! 2-D version
-    subroutine psb_m_mgelp(trans,iperm,x,info)
+    subroutine psb_m_mgelp(trans, iperm, x, info)
       import
       implicit none
-      integer(psb_mpk_), intent(inout)     ::  x(:,:)
-      integer(psb_mpk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
-      character, intent(in)              :: trans
+      character, intent(in)           :: trans
+      integer(psb_mpk_), intent(in)   :: iperm(:)
+      integer(psb_mpk_), intent(inout)   :: x(:, :)
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psb_m_mgelp
-    subroutine psb_m_mgelpv(trans,iperm,x,info)
+
+    subroutine psb_m_mgelpv(trans, iperm, x, info)
       import
       implicit none
-      integer(psb_mpk_), intent(inout)     ::  x(:)
-      integer(psb_mpk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
-      character, intent(in)              :: trans
+      character, intent(in)           :: trans
+      integer(psb_mpk_), intent(in)   :: iperm(:)
+      integer(psb_mpk_), intent(inout)   :: x(:)
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psb_m_mgelpv
-    subroutine psb_e_mgelp(trans,iperm,x,info)
+
+    subroutine psb_e_mgelp(trans, iperm, x, info)
       import
       implicit none
-      integer(psb_mpk_), intent(inout)     ::  x(:,:)
-      integer(psb_epk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
-      character, intent(in)              :: trans
+      character, intent(in)           :: trans
+      integer(psb_epk_), intent(in)   :: iperm(:)
+      integer(psb_mpk_), intent(inout)   :: x(:, :)
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psb_e_mgelp
-    subroutine psb_e_mgelpv(trans,iperm,x,info)
+
+    subroutine psb_e_mgelpv(trans, iperm, x, info)
       import
       implicit none
-      integer(psb_mpk_), intent(inout)     ::  x(:)
-      integer(psb_epk_), intent(in)      ::  iperm(:)
-      integer(psb_ipk_), intent(out)     ::  info
-      character, intent(in)              :: trans
+      character, intent(in)           :: trans
+      integer(psb_epk_), intent(in)   :: iperm(:)
+      integer(psb_mpk_), intent(inout)   :: x(:)
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psb_e_mgelpv
   end interface psb_gelp
 
   interface psb_geaxpby
-    subroutine psi_maxpby(m,n,alpha, x, beta, y, info)
-      import
+    subroutine psi_maxpby(m, n, alpha, x, beta, y, info)
+      import :: psb_ipk_, psb_mpk_
       implicit none
-      integer(psb_ipk_), intent(in)      :: m, n
-      integer(psb_mpk_), intent (in)       ::  x(:,:)
-      integer(psb_mpk_), intent (inout)    ::  y(:,:)
-      integer(psb_mpk_), intent (in)       ::  alpha, beta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: x(:, :)
+      integer(psb_mpk_), intent(inout)   :: y(:, :)
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_maxpby
-    subroutine psi_maxpbyv(m,alpha, x, beta, y, info)
-      import
+
+    subroutine psi_maxpby2(m, n, alpha, x, beta, y, z, info)
+      import :: psb_ipk_, psb_mpk_
       implicit none
-      integer(psb_ipk_), intent(in)      :: m
-      integer(psb_mpk_), intent (in)       ::  x(:)
-      integer(psb_mpk_), intent (inout)    ::  y(:)
-      integer(psb_mpk_), intent (in)       :: alpha, beta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: x(:, :)
+      integer(psb_mpk_), intent(in)      :: y(:, :)
+      integer(psb_mpk_), intent(inout)   :: z(:, :)
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_maxpby2
+
+    subroutine psi_maxpby3(m, n, alpha, x, beta, y, gamma, z, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: x(:, :)
+      integer(psb_mpk_), intent(in)      :: y(:, :)
+      integer(psb_mpk_), intent(inout)   :: z(:, :)
+      integer(psb_mpk_), intent(in)      :: alpha, beta, gamma
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_maxpby3
+
+    subroutine psi_maxpbyv(m, alpha, x, beta, y, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(inout)   :: y(:)
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_maxpbyv
-    subroutine psi_maxpbyv2(m,alpha, x, beta, y, z, info)
-      import
+
+    subroutine psi_maxpbyv2(m, alpha, x, beta, y, z, info)
+      import :: psb_ipk_, psb_mpk_
       implicit none
-      integer(psb_ipk_), intent(in)      :: m
-      integer(psb_mpk_), intent (in)       ::  x(:)
-      integer(psb_mpk_), intent (in)       ::  y(:)
-      integer(psb_mpk_), intent (inout)    ::  z(:)
-      integer(psb_mpk_), intent (in)       :: alpha, beta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(in)      :: y(:)
+      integer(psb_mpk_), intent(inout)   :: z(:)
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_maxpbyv2
+
+    subroutine psi_maxpbyv3(m, alpha, x, beta, y, gamma, z, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(in)      :: y(:)
+      integer(psb_mpk_), intent(inout)   :: z(:)
+      integer(psb_mpk_), intent(in)      :: alpha, beta, gamma
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_maxpbyv3
+
+    subroutine psi_maxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(in)      :: y(:)
+      integer(psb_mpk_), intent(in)      :: z(:)
+      integer(psb_mpk_), intent(inout)   :: w(:)
+      integer(psb_mpk_), intent(in)      :: alpha, beta, gamma
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_maxpbyv3_out
   end interface psb_geaxpby
 
+  interface psb_gemlt
+    subroutine psi_mmlt(m, n, alpha, x, y, beta, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:, :)
+      integer(psb_mpk_), intent(inout)   :: y(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmlt
+
+    subroutine psi_mmlt2(m, n, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:, :)
+      integer(psb_mpk_), intent(in)      :: y(:, :)
+      integer(psb_mpk_), intent(inout)   :: z(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmlt2
+
+    subroutine psi_mmltv(m, alpha, x, y, beta, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(inout)   :: y(:)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmltv
+
+    subroutine psi_mmltv2(m, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(in)      :: y(:)
+      integer(psb_mpk_), intent(inout)   :: z(:)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmltv2
+
+    subroutine psi_mmltx(m, n, alpha, x, y, beta, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(inout)   :: y(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmltx
+
+    subroutine psi_mmltx2(m, n, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(in)      :: y(:, :)
+      integer(psb_mpk_), intent(inout)   :: z(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmltx2
+
+    subroutine psi_mmlte2(m, n, alpha, x, y, beta, z, info)
+      import :: psb_ipk_, psb_mpk_
+      implicit none
+      integer(psb_ipk_), intent(in)   :: m, n
+      integer(psb_mpk_), intent(in)      :: alpha, beta
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(in)      :: y(:)
+      integer(psb_mpk_), intent(inout)   :: z(:, :)
+      integer(psb_ipk_), intent(out)  :: info
+    end subroutine psi_mmlte2
+  end interface psb_gemlt
+
   interface psi_upd_xyz
-    subroutine psi_m_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+    subroutine psi_m_upd_xyz(m, alpha, beta, gamma, delta, x, y, z, info)
       import
       implicit none
-      integer(psb_ipk_), intent(in)      :: m
-      integer(psb_mpk_), intent (in)       ::  x(:)
-      integer(psb_mpk_), intent (inout)    ::  y(:)
-      integer(psb_mpk_), intent (inout)    ::  z(:)
-      integer(psb_mpk_), intent (in)       :: alpha, beta,gamma,delta
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(inout)   :: y(:)
+      integer(psb_mpk_), intent(inout)   :: z(:)
+      integer(psb_mpk_), intent(in)      :: alpha, beta, gamma, delta
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_m_upd_xyz
   end interface psi_upd_xyz
   
   interface psi_xyzw
-    subroutine psi_mxyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+    subroutine psi_mxyzw(m, a, b, c, d, e, f, x, y, z, w, info)
       import
       implicit none
-      integer(psb_ipk_), intent(in)      :: m
-      integer(psb_mpk_), intent (in)       :: x(:)
-      integer(psb_mpk_), intent (inout)    :: y(:)
-      integer(psb_mpk_), intent (inout)    :: z(:)
-      integer(psb_mpk_), intent (inout)    :: w(:)
-      integer(psb_mpk_), intent (in)       :: a,b,c,d,e,f
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in)   :: m
+      integer(psb_mpk_), intent(in)      :: x(:)
+      integer(psb_mpk_), intent(inout)   :: y(:)
+      integer(psb_mpk_), intent(inout)   :: z(:)
+      integer(psb_mpk_), intent(inout)   :: w(:)
+      integer(psb_mpk_), intent(in)      :: a, b, c, d, e, f
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_mxyzw
   end interface psi_xyzw
   
   interface psi_gth
-    subroutine psi_mgthmv(n,k,idx,alpha,x,beta,y)
+    subroutine psi_mgthmv(n, k, idx, alpha, x, beta, y)
       import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: x(:,:), y(:),alpha,beta
+      integer(psb_mpk_)    :: alpha, x(:, :), beta, y(:)
     end subroutine psi_mgthmv
-    subroutine psi_mgthv(n,idx,alpha,x,beta,y)
+
+    subroutine psi_mgthv(n, idx, alpha, x, beta, y)
       import
       implicit none
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: x(:), y(:),alpha,beta
+      integer(psb_mpk_)    :: alpha, x(:), beta, y(:)
     end subroutine psi_mgthv
-    subroutine psi_mgthzmv(n,k,idx,x,y)
+
+    subroutine psi_mgthzmv(n, k, idx, x, y)
       import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: x(:,:), y(:)
-
+      integer(psb_mpk_)    :: x(:, :), y(:)
     end subroutine psi_mgthzmv
-    subroutine psi_mgthzmm(n,k,idx,x,y)
+
+    subroutine psi_mgthzmm(n, k, idx, x, y)
       import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: x(:,:), y(:,:)
-
+      integer(psb_mpk_)    :: x(:, :), y(:, :)
     end subroutine psi_mgthzmm
-    subroutine psi_mgthzv(n,idx,x,y)
+
+    subroutine psi_mgthzv(n, idx, x, y)
       import
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: x(:), y(:)
+      integer(psb_mpk_)    :: x(:), y(:)
     end subroutine psi_mgthzv
   end interface psi_gth
 
   interface psi_sct
-    subroutine psi_msctmm(n,k,idx,x,beta,y)
+    subroutine psi_msctmm(n, k, idx, x, beta, y)
       import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: beta, x(:,:), y(:,:)
+      integer(psb_mpk_)    :: x(:, :), beta, y(:, :)
     end subroutine psi_msctmm
-    subroutine psi_msctmv(n,k,idx,x,beta,y)
+
+    subroutine psi_msctmv(n, k, idx, x, beta, y)
       import
       implicit none
       integer(psb_mpk_) :: n, k
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: beta, x(:), y(:,:)
+      integer(psb_mpk_)    :: x(:), beta, y(:, :)
     end subroutine psi_msctmv
-    subroutine psi_msctv(n,idx,x,beta,y)
+
+    subroutine psi_msctv(n, idx, x, beta, y)
       import
       implicit none
-
       integer(psb_mpk_) :: n
       integer(psb_ipk_) :: idx(:)
-      integer(psb_mpk_) :: beta, x(:), y(:)
+      integer(psb_mpk_)    :: x(:), beta, y(:)
     end subroutine psi_msctv
   end interface psi_sct
 
   interface psi_exscan
-    subroutine psi_m_exscanv(n,x,info,shift)
+    subroutine psi_m_exscanv(n, x, info, shift)
       import
       implicit none
-      integer(psb_ipk_), intent(in)      :: n
-      integer(psb_mpk_), intent (inout)    :: x(:)
-      integer(psb_ipk_), intent(out)     :: info
+      integer(psb_ipk_), intent(in) :: n
+      integer(psb_mpk_), intent(inout) :: x(:)
+      integer(psb_ipk_), intent(out) :: info
       integer(psb_mpk_), intent(in), optional :: shift
     end subroutine psi_m_exscanv
   end interface psi_exscan
-  
+
+  !Dispach of axpy-like operations.
+  interface get_axpbylike_code
+    module procedure get_axpbylike_code1
+    module procedure get_axpbylike_code2
+    module procedure get_axpbylike_code3
+  end interface get_axpbylike_code
+
+contains
+  function get_axpbylike_code1(var) result(code)
+    integer(psb_mpk_), intent(in) :: var
+    integer(psb_ipk_) :: code
+
+    code = 0_psb_ipk_
+    if(var ==  mone) code = 1_psb_ipk_
+    if(var == mzero) code = 2_psb_ipk_
+    if(var == -mone) code = 3_psb_ipk_
+  end function get_axpbylike_code1
+
+  function get_axpbylike_code2(alpha, beta) result(code)
+    integer(psb_mpk_), intent(in) :: alpha, beta
+    integer(psb_ipk_) :: code
+
+    code = get_axpbylike_code1(alpha) &
+            + ishft(get_axpbylike_code1(beta), 2)
+  end function get_axpbylike_code2
+
+  function get_axpbylike_code3(alpha, beta, gamma) result(code)
+    integer(psb_mpk_), intent(in) :: alpha, beta, gamma
+    integer(psb_ipk_) :: code
+
+    code = get_axpbylike_code1(alpha) &
+            + ishft(get_axpbylike_code1(beta), 2) &
+            + ishft(get_axpbylike_code1(gamma), 4)
+  end function get_axpbylike_code3
 end module psi_m_serial_mod

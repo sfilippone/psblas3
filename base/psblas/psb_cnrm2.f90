@@ -32,112 +32,102 @@
 ! File: psb_cnrm2.f90
 !
 ! Function: psb_cnrm2
-!    Computes the norm2 of a distributed vector,
+!    Computes the norm2 of a distributed vector, 
 !
 !    norm2 := sqrt ( sub( X )**C * sub( X ) )
 !
-!    where sub( X ) denotes X(:,JX).
+!    where sub( X ) denotes X(:, JX).
 !
 ! Arguments:
-!    x(:,:) -  complex              The input vector containing the entries of sub( X ).
+!    x(:, :) -  complex              The input vector containing the entries of sub( X ).
 !    desc_a -  type(psb_desc_type). The communication descriptor.
 !    info   -  integer.             Return code
 !    jx     -  integer(optional).   The column offset for sub( X ).
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2(x, desc_a, info, jx,global)  result(res)
+function psb_cnrm2(x, desc_a, info, jx, global) result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
-
-  complex(psb_spk_), intent(in)      ::  x(:,:)
-  type(psb_desc_type), intent(in)   :: desc_a
-  integer(psb_ipk_), intent(in), optional     :: jx
-  integer(psb_ipk_), intent(out)              :: info
-  real(psb_spk_)                  :: res
-  logical, intent(in), optional        :: global
+  complex(psb_spk_), intent(in)      ::  x(:, :)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  integer(psb_ipk_), intent(in), optional :: jx
+  logical, intent(in), optional           :: global
+  real(psb_spk_)  :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
-  integer(psb_lpk_) :: ix, ijx, iy, ijy, m
-  logical :: global_
-  real(psb_spk_)         :: scnrm2, dd
-  character(len=20)      :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, ijx, iy, ijy, m
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_spk_)      :: scnrm2, dd
 
-  name='psb_cnrm2'
-  info=psb_success_
+  name = 'psb_cnrm2'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ 
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
   ix = 1
-  if (present(jx)) then
-    ijx = jx
-  else
-    ijx = 1
-  endif
+  ijx = 1
+  if(present(jx)) ijx = jx
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   m = desc_a%get_global_rows()
-  ldx = size(x,1)
-  call psb_chkvect(m,lone,ldx,ix,ijx,desc_a,info,iix,jjx)
+  ldx = size(x, 1)
+  call psb_chkvect(m, lone, ldx, ix, ijx, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = scnrm2( int(ndim,kind=psb_mpk_), x(iix:,jjx), int(ione,kind=psb_mpk_) )
+    res = scnrm2(int(ndim, kind = psb_mpk_), x(iix:, jjx), int(ione, kind = psb_mpk_))
 
-    ! adjust  because overlapped elements are computed more than once
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      dd  = real(ndm-1)/real(ndm)
-      res = res * sqrt(sone - dd*(abs(x(idx,jjx))/res)**2)
+    ! adjust because overlapped elements are computed more than once
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
+      dd = real(ndm-1) / real(ndm)
+      res = res * sqrt(sone - dd*(abs(x(idx, jjx))/res)**2)
     end do
   else
     res = szero
   end if
 
-  if (global_) call psb_nrm2(ctxt,res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_cnrm2
-
-
 
 !!$
 !!$              Parallel Sparse BLAS  version 3.5
@@ -172,7 +162,7 @@ end function psb_cnrm2
 !!$
 !
 ! Function: psb_cnrm2
-!    Computes the norm2 of a distributed vector,
+!    Computes the norm2 of a distributed vector, 
 !
 !    norm2 := sqrt ( X**C * X)
 !
@@ -182,93 +172,89 @@ end function psb_cnrm2
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2v(x, desc_a, info,global)  result(res)
+function psb_cnrm2v(x, desc_a, info, global) result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
-
-  complex(psb_spk_), intent(in)    :: x(:)
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)   :: info
-  real(psb_spk_)                   :: res
-  logical, intent(in), optional        :: global
+  complex(psb_spk_), intent(in)      :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  logical, intent(in), optional :: global
+  real(psb_spk_)  :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
-  integer(psb_lpk_) :: ix, jx, iy, ijy, m
-  real(psb_spk_)         :: scnrm2, dd
-  logical :: global_
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_spk_)      :: scnrm2, dd
 
-  name='psb_cnrm2v'
-  info=psb_success_
+  name = 'psb_cnrm2v'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
+
   ix = 1
-  jx=1
+  jx = 1
   m = desc_a%get_global_rows()
-  ldx = size(x,1)
-  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  ldx = size(x, 1)
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = scnrm2( int(ndim,kind=psb_mpk_), x, int(ione,kind=psb_mpk_) )
-    ! adjust  because overlapped elements are computed more than once
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      dd  = real(ndm-1)/real(ndm)
+    res = scnrm2(int(ndim, kind = psb_mpk_), x, int(ione, kind = psb_mpk_))
+
+    ! adjust because overlapped elements are computed more than once
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
+      dd = real(ndm-1)/real(ndm)
       res = res * sqrt(sone - dd*(abs(x(idx))/res)**2)
     end do
   else
     res = szero
   end if
 
-  if (global_) call psb_nrm2(ctxt,res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_cnrm2v
 
-
 ! Function: psb_cnrm2_vect
-!    Computes the norm2 of a distributed vector,
+!    Computes the norm2 of a distributed vector, 
 !
 !    norm2 := sqrt ( X**C * X)
 !
@@ -278,84 +264,80 @@ end function psb_cnrm2v
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
+function psb_cnrm2_vect(x, desc_a, info, global) result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_c_vect_mod
   implicit none
-
-  real(psb_spk_)                        :: res
-  type(psb_c_vect_type), intent (inout) :: x
+  type(psb_c_vect_type), intent(inout)  :: x
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
-  logical, intent(in), optional        :: global
+  logical, intent(in), optional :: global
+  real(psb_spk_)  :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
-  integer(psb_lpk_) :: ix, jx, iy, ijy, m
-  logical :: global_
-  real(psb_spk_)         :: snrm2, dd
-  character(len=20)      :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_spk_)      :: scnrm2, dd
 
-  name='psb_cnrm2v'
+  name = 'psb_cnrm2v'
   call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ 
+    goto 9999
   end if
-  info=psb_success_
+  info = psb_success_
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
-  m  = desc_a%get_global_rows()
+  m = desc_a%get_global_rows()
   ldx = x%get_nrows()
-  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = x%nrm2(ndim)
-    ! adjust  because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem,1)>0) then
-      if (x%is_dev()) call x%sync()
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        dd  = dble(ndm-1)/dble(ndm)
+    res = x%nrm2(ndim)
+    ! adjust because overlapped elements are computed more than once
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
+      do i = 1, size(desc_a%ovrlap_elem, 1)
+        idx = desc_a%ovrlap_elem(i, 1)
+        ndm = desc_a%ovrlap_elem(i, 2)
+        dd = dble(ndm-1)/dble(ndm)
         res = res * sqrt(sone - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
@@ -363,18 +345,207 @@ function psb_cnrm2_vect(x, desc_a, info,global)  result(res)
     res = szero
   end if
 
-  if (global_) call psb_nrm2(ctxt,res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_cnrm2_vect
 
+function psb_cnrm2_mvect_full(x, desc_a, info, global) result(res)
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_c_multivect_mod
+  implicit none
+  type(psb_c_multivect_type), intent(inout) :: x
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  logical, intent(in), optional :: global
+  real(psb_spk_), allocatable :: res(:)
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx,  nr, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  integer(psb_ipk_)   :: ovrlap_size
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_spk_)      :: scnrm2, dd
+
+  name = 'psb_cnrm2v'
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ 
+    goto 9999
+  end if
+  info = psb_success_
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(.not. allocated(x%v)) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  global_ = .true.
+  if(present(global)) global_ = global
+
+  ix = 1
+  jx = 1
+  m = desc_a%get_global_rows()
+  ldx = x%get_nrows()
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
+  end if
+
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  nr = desc_a%get_local_rows()
+  if(nr > 0) then
+    res = x%nrm2(nr)
+
+    ! adjust because overlapped elements are computed more than once
+    ovrlap_size = size(desc_a%ovrlap_elem, 1)
+    if(ovrlap_size > 0) then
+      ! if(x%is_dev()) call x%sync()
+
+      do i = 1, ovrlap_size
+        idx = desc_a%ovrlap_elem(i, 1)
+        ndm = desc_a%ovrlap_elem(i, 2)
+        dd = dble(ndm-1)/dble(ndm)
+        res = res * sqrt(sone - dd * (abs(x%v%v(idx, :))/res)**2)   ! Is the best way to do it?
+      end do
+    end if
+  else
+    res = szero
+  end if
+
+  if(global_) call psb_nrm2(ctxt, res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end function psb_cnrm2_mvect_full
+
+function psb_cnrm2_mvect_idxs(x, idx_x, desc_a, info, global) result(res)
+  use psb_desc_mod
+  use psb_check_mod
+  use psb_error_mod
+  use psb_penv_mod
+  use psb_c_multivect_mod
+  implicit none
+  type(psb_c_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)             :: idx_x
+  type(psb_desc_type), intent(in)           :: desc_a
+  integer(psb_ipk_), intent(out)            :: info
+  logical, intent(in), optional :: global
+  real(psb_spk_)  :: res
+
+  ! locals
+  type(psb_ctxt_type) :: ctxt
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, nr, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  integer(psb_ipk_)   :: ovrlap_size
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_spk_)      :: scnrm2, dd
+
+  name = 'psb_cnrm2v'
+  call psb_erractionsave(err_act)
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_ 
+    goto 9999
+  end if
+  info = psb_success_
+
+  ctxt = desc_a%get_context()
+
+  call psb_info(ctxt, me, np)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if(.not. allocated(x%v)) then
+    info = psb_err_invalid_mvect_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  global_ = .true.
+  if(present(global)) global_ = global
+
+  ix = 1
+  jx = 1
+  m = desc_a%get_global_rows()
+  ldx = x%get_nrows()
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
+  if(info /= psb_success_) then
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
+  end if
+
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
+    goto 9999
+  end if
+
+  nr = desc_a%get_local_rows()
+  if(nr > 0) then
+    res = x%nrm2(nr, idx_x)
+
+    ! adjust because overlapped elements are computed more than once
+    ovrlap_size = size(desc_a%ovrlap_elem, 1)
+    if(ovrlap_size > 0) then
+      ! if(x%is_dev()) call x%sync()
+
+      do i = 1, ovrlap_size
+        idx = desc_a%ovrlap_elem(i, 1)
+        ndm = desc_a%ovrlap_elem(i, 2)
+        dd = dble(ndm-1)/dble(ndm)
+        res = res * sqrt(sone - dd * (abs(x%v%v(idx, idx_x))/res)**2)   ! Is the best way to do it?
+      end do
+    end if
+  else
+    res = szero
+  end if
+
+  if(global_) call psb_nrm2(ctxt, res)
+
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(ctxt, err_act)
+  return
+end function psb_cnrm2_mvect_idxs
+
+
 ! Function: psb_cnrm2_weight_vect
-!    Computes the weighted norm2 of a distributed vector,
+!    Computes the weighted norm2 of a distributed vector, 
 !
 !    norm2 := sqrt ( (w.*X)**C * (w.*X))
 !
@@ -385,86 +556,83 @@ end function psb_cnrm2_vect
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2_weight_vect(x,w, desc_a, info,global,aux)  result(res)
+function psb_cnrm2_weight_vect(x, w, desc_a, info, global, aux) result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_c_vect_mod
   implicit none
-
-  real(psb_spk_)                        :: res
-  type(psb_c_vect_type), intent (inout) :: x
-  type(psb_c_vect_type), intent (inout) :: w
+  type(psb_c_vect_type), intent(inout) :: x
+  type(psb_c_vect_type), intent(inout) :: w
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
-  logical, intent(in), optional        :: global
-  type(psb_c_vect_type), intent(inout), optional :: aux
+  logical, intent(in), optional                   :: global
+  type(psb_c_vect_type), intent(inout), optional  :: aux
+  real(psb_spk_)  :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
-  integer(psb_lpk_) :: ix, jx, iy, ijy, m
-  logical :: global_
-  real(psb_spk_)         :: snrm2, dd
-  character(len=20)      :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  logical             :: global_
+  real(psb_spk_)      :: scnrm2, dd
+  character(len = 20) :: name, ch_err
 
-  name='psb_cnrm2v_weight'
+  name = 'psb_cnrm2v_weight'
   call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
-  info=psb_success_
+  info = psb_success_
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
-  m  = desc_a%get_global_rows()
+  m = desc_a%get_global_rows()
   ldx = x%get_nrows()
-  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = x%nrm2(ndim,w,aux)
-    ! adjust  because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem,1)>0) then
-      if (x%is_dev()) call x%sync()
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        dd  = dble(ndm-1)/dble(ndm)
+    res = x%nrm2(ndim, w, aux)
+
+    ! adjust because overlapped elements are computed more than once
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
+      do i = 1, size(desc_a%ovrlap_elem, 1)
+        idx = desc_a%ovrlap_elem(i, 1)
+        ndm = desc_a%ovrlap_elem(i, 2)
+        dd = dble(ndm-1)/dble(ndm)
         res = res * sqrt(sone - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
@@ -472,13 +640,12 @@ function psb_cnrm2_weight_vect(x,w, desc_a, info,global,aux)  result(res)
     res = szero
   end if
 
-  if (global_) call psb_nrm2(ctxt,res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_cnrm2_weight_vect
 
@@ -496,87 +663,84 @@ end function psb_cnrm2_weight_vect
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global, aux)  result(res)
+function psb_cnrm2_weightmask_vect(x, w, idv, desc_a, info, global, aux) result(res)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   use psb_c_vect_mod
   implicit none
-
-  real(psb_spk_)                        :: res
-  type(psb_c_vect_type), intent (inout) :: x
-  type(psb_c_vect_type), intent (inout) :: w
-  type(psb_c_vect_type), intent (inout) :: idv
+  type(psb_c_vect_type), intent(inout)  :: x
+  type(psb_c_vect_type), intent(inout)  :: w
+  type(psb_c_vect_type), intent(inout)  :: idv
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
-  logical, intent(in), optional        :: global
-  type(psb_c_vect_type), intent(inout), optional :: aux
+  logical, intent(in), optional                   :: global
+  type(psb_c_vect_type), intent(inout), optional  :: aux
+  real(psb_spk_)  :: res
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
-  integer(psb_lpk_) :: ix, jx, iy, ijy, m
-  logical :: global_
-  real(psb_spk_)         :: snrm2, dd
-  character(len=20)      :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  logical             :: global_
+  real(psb_spk_)      :: scnrm2, dd
+  character(len = 20) :: name, ch_err
 
-  name='psb_cnrm2v_weightmask'
+  name = 'psb_cnrm2v_weightmask'
   call psb_erractionsave(err_act)
-  if  (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
-  info=psb_success_
+  info = psb_success_
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (.not.allocated(x%v)) then
+  if(.not. allocated(x%v)) then
     info = psb_err_invalid_vect_state_
-    call psb_errpush(info,name)
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
-  m  = desc_a%get_global_rows()
+  m = desc_a%get_global_rows()
   ldx = x%get_nrows()
-  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = x%nrm2(ndim,w,idv,info,aux)
-    ! adjust  because overlapped elements are computed more than once
-    if (size(desc_a%ovrlap_elem,1)>0) then
-      if (x%is_dev()) call x%sync()
-      do i=1,size(desc_a%ovrlap_elem,1)
-        idx = desc_a%ovrlap_elem(i,1)
-        ndm = desc_a%ovrlap_elem(i,2)
-        dd  = dble(ndm-1)/dble(ndm)
+    res = x%nrm2(ndim, w, idv, info, aux)
+
+    ! adjust because overlapped elements are computed more than once
+    if(size(desc_a%ovrlap_elem, 1)>0) then
+      if(x%is_dev()) call x%sync()
+      do i = 1, size(desc_a%ovrlap_elem, 1)
+        idx = desc_a%ovrlap_elem(i, 1)
+        ndm = desc_a%ovrlap_elem(i, 2)
+        dd = dble(ndm-1)/dble(ndm)
         res = res * sqrt(sone - dd*(abs(x%v%v(idx))/res)**2)
       end do
     end if
@@ -584,13 +748,12 @@ function psb_cnrm2_weightmask_vect(x,w,idv, desc_a, info,global, aux)  result(re
     res = szero
   end if
 
-  if (global_) call psb_nrm2(ctxt,res)
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end function psb_cnrm2_weightmask_vect
 
@@ -638,89 +801,83 @@ end function psb_cnrm2_weightmask_vect
 !    info   -  integer.              Return code
 !    global -  logical(optional)    Whether to perform the global reduction, default: .true.
 !
-subroutine psb_cnrm2vs(res, x, desc_a, info,global)
+subroutine psb_cnrm2vs(res, x, desc_a, info, global)
   use psb_desc_mod
   use psb_check_mod
   use psb_error_mod
   use psb_penv_mod
   implicit none
-
-  complex(psb_spk_), intent(in)    :: x(:)
-  real(psb_spk_), intent(out)      :: res
-  type(psb_desc_type), intent(in)  :: desc_a
-  integer(psb_ipk_), intent(out)   :: info
-  logical, intent(in), optional        :: global
+  real(psb_spk_), intent(out)     :: res
+  complex(psb_spk_), intent(in)      :: x(:)
+  type(psb_desc_type), intent(in) :: desc_a
+  integer(psb_ipk_), intent(out)  :: info
+  logical, intent(in), optional :: global
 
   ! locals
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_) :: np, me,&
-       & err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
-  integer(psb_lpk_) :: ix, jx, iy, ijy, m
-  logical :: global_
-  real(psb_spk_)         :: nrm2, scnrm2, dd
-  character(len=20)        :: name, ch_err
+  integer(psb_ipk_)   :: np, me, err_act, iix, jjx, ndim, i, id, idx, ndm, ldx
+  integer(psb_lpk_)   :: ix, jx, iy, ijy, m
+  logical             :: global_
+  character(len = 20) :: name, ch_err
+  real(psb_spk_)      :: scnrm2, dd
 
-  name='psb_cnrm2'
-  info=psb_success_
+  name = 'psb_cnrm2'
+  info = psb_success_
   call psb_erractionsave(err_act)
-  if (psb_errstatus_fatal()) then
-    info = psb_err_internal_error_ ;    goto 9999
+  if(psb_errstatus_fatal()) then
+    info = psb_err_internal_error_
+    goto 9999
   end if
 
-  ctxt=desc_a%get_context()
+  ctxt = desc_a%get_context()
 
   call psb_info(ctxt, me, np)
-  if (np == -1) then
-    info=psb_err_context_error_
-    call psb_errpush(info,name)
+  if(np == -1) then
+    info = psb_err_context_error_
+    call psb_errpush(info, name)
     goto 9999
   endif
 
-  if (present(global)) then
-    global_ = global
-  else
-    global_ = .true.
-  end if
+  global_ = .true.
+  if(present(global)) global_ = global
 
   ix = 1
   jx = 1
   m = desc_a%get_global_rows()
-  ldx = size(x,1)
-  call psb_chkvect(m,lone,ldx,ix,jx,desc_a,info,iix,jjx)
+  ldx = size(x, 1)
+  call psb_chkvect(m, lone, ldx, ix, jx, desc_a, info, iix, jjx)
   if(info /= psb_success_) then
-    info=psb_err_from_subroutine_
-    ch_err='psb_chkvect'
-    call psb_errpush(info,name,a_err=ch_err)
+    info = psb_err_from_subroutine_
+    ch_err = 'psb_chkvect'
+    call psb_errpush(info, name, a_err = ch_err)
   end if
 
-  if (iix /= 1) then
-    info=psb_err_ix_n1_iy_n1_unsupported_
-    call psb_errpush(info,name)
+  if(iix /= 1) then
+    info = psb_err_ix_n1_iy_n1_unsupported_
+    call psb_errpush(info, name)
     goto 9999
   end if
 
-  if (desc_a%get_local_rows() > 0) then
+  if(desc_a%get_local_rows() > 0) then
     ndim = desc_a%get_local_rows()
-    res  = scnrm2( int(ndim,kind=psb_mpk_), x, int(ione,kind=psb_mpk_) )
+    res = scnrm2(int(ndim, kind = psb_mpk_), x, int(ione, kind = psb_mpk_))
 
-    ! adjust  because overlapped elements are computed more than once
-    do i=1,size(desc_a%ovrlap_elem,1)
-      idx = desc_a%ovrlap_elem(i,1)
-      ndm = desc_a%ovrlap_elem(i,2)
-      dd  = real(ndm-1)/real(ndm)
+    ! adjust because overlapped elements are computed more than once
+    do i = 1, size(desc_a%ovrlap_elem, 1)
+      idx = desc_a%ovrlap_elem(i, 1)
+      ndm = desc_a%ovrlap_elem(i, 2)
+      dd = real(ndm-1)/real(ndm)
       res = res * sqrt(sone - dd*(abs(x(idx))/res)**2)
     end do
   else
     res = szero
   end if
 
-  if (global_) call psb_nrm2(ctxt,res)
-
+  if(global_) call psb_nrm2(ctxt, res)
 
   call psb_erractionrestore(err_act)
   return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+9999 call psb_error_handler(ctxt, err_act)
   return
 end subroutine psb_cnrm2vs
