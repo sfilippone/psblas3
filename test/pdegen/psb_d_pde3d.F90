@@ -686,7 +686,7 @@ program psb_d_pde3d
   real(psb_dpk_) :: t1, t2, tprec
 
   ! sparse matrix and preconditioner
-  type(psb_dspmat_type) :: a
+  type(psb_dspmat_type) :: a, atril
   type(psb_dprec_type)  :: prec
   ! descriptor
   type(psb_desc_type)   :: desc_a
@@ -881,6 +881,17 @@ program psb_d_pde3d
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
 
+  block
+    integer(psb_lpk_), allocatable :: iv(:)
+    call psb_globtril(a,desc_a,atril,info)
+    write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
+    call a%print(fname)
+    iv = desc_a%get_global_indices(owned=.false.)
+    write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
+    call a%print(fname,iv=iv)
+  end block
+  
+  
 
   !
   !  cleanup storage and exit

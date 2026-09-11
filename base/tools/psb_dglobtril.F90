@@ -90,7 +90,7 @@ Subroutine psb_dglobtril(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
   call ldglob%tril(ldtril,info,&
        & diag=diag,imin=imin,imax=imax,jmin=jmin,jmax=jmax)
   call ldglob%free()
-  call ldglob%mv_to(ldtcoo)
+  call ldtril%mv_to(ldtcoo)
   lnz = ldtcoo%get_nzeros()
   call desc_a%g2lip(ldtcoo%ia(1:lnz),info,owned=.false.)
   call desc_a%g2lip(ldtcoo%ja(1:lnz),info,owned=.false.)
