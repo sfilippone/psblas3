@@ -50,13 +50,13 @@ Subroutine psb_dglobtriu(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
   !     .. Local Scalars ..
   integer(psb_ipk_) ::  i, j, err_act,m,&
        &  nz
-  integer(psb_lpk_) :: gidx, lnz
+  integer(psb_lpk_) :: gidx, lnz, lnr, lnc, gnr, gnc
   type(psb_ctxt_type) :: ctxt
   integer(psb_ipk_) :: me, np
   integer(psb_mpk_) :: icomm, minfo
 
   type(psb_d_coo_sparse_mat)  :: dtcoo
-  type(psb_ld_coo_sparse_mat) :: ldtcoo
+  type(psb_ld_coo_sparse_mat) :: ldtcoo, ldcootriu
   type(psb_ldspmat_type)     :: ldglob,ldtriu
   integer(psb_ipk_) :: debug_level, debug_unit
   integer(psb_ipk_) :: ierr(5)
@@ -82,20 +82,23 @@ Subroutine psb_dglobtriu(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
        & Write(debug_unit,*) me,' ',trim(name),&
        & ': start',diag
 
+  gnr = desc_a%get_global_rows()
+  gnc = desc_a%get_global_cols()
   call a%a%cp_to_lcoo(ldtcoo,info)
   lnz = ldtcoo%get_nzeros()
   call desc_a%l2gip(ldtcoo%ia(1:lnz),info,owned=.false.)
   call desc_a%l2gip(ldtcoo%ja(1:lnz),info,owned=.false.)
-  call ldglob%mv_from(ldtcoo)
-  call ldglob%triu(ldtriu,info,&
-       & diag=diag,imin=imin,imax=imax,jmin=jmin,jmax=jmax)
-  call ldglob%free()
-  call ldtriu%mv_to(ldtcoo)
-  lnz = ldtcoo%get_nzeros()
-  call desc_a%g2lip(ldtcoo%ia(1:lnz),info,owned=.false.)
-  call desc_a%g2lip(ldtcoo%ja(1:lnz),info,owned=.false.)
-  call b%mv_from_lb(ldtcoo) 
-  
+  call ldtcoo%triu(ldcootriu,info,&
+       & diag=diag,imax=gnr,jmax=gnc)
+  lnz = ldcootriu%get_nzeros()
+  call desc_a%g2lip(ldcootriu%ia(1:lnz),info,owned=.false.)
+  call desc_a%g2lip(ldcootriu%ja(1:lnz),info,owned=.false.)
+  lnc = desc_a%get_local_cols()
+  call ldcootriu%set_nrows(lnr)
+  call ldcootriu%set_ncols(lnc)
+  call ldcootriu%fix(info)
+  call b%mv_from_lb(ldcootriu) 
+
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
 
