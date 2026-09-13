@@ -624,7 +624,7 @@ subroutine psi_saxpby2(m, n, alpha, x, beta, y, z, info)
 
   if(lx < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
+    ierr(1) = 4; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -638,7 +638,7 @@ subroutine psi_saxpby2(m, n, alpha, x, beta, y, z, info)
 
   if(lz < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
+    ierr(1) = 7; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -696,7 +696,7 @@ subroutine psi_saxpby3(m, n, alpha, x, beta, y, gamma, z, info)
 
   if(lx < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
+    ierr(1) = 4; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -710,7 +710,7 @@ subroutine psi_saxpby3(m, n, alpha, x, beta, y, gamma, z, info)
 
   if(lz < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
+    ierr(1) = 8; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -918,7 +918,7 @@ subroutine psi_saxpbyv2(m, alpha, x, beta, y, z, info)
   end if
   if(lz < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m
+    ierr(1) = 6; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -1075,7 +1075,7 @@ subroutine psi_saxpbyv3(m, alpha, x, beta, y, gamma, z, info)
   end if
   if(lz < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 5; ierr(2) = m
+    ierr(1) = 7; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -1279,7 +1279,7 @@ subroutine psi_saxpbyv3(m, alpha, x, beta, y, gamma, z, info)
     case(39) ! (alpha, beta, gamma) = (-1,  1,  0)
       !$omp parallel do private(i)
       do i = 1, m
-          z(i) = -y(i)
+          z(i) = -x(i) + y(i)
       end do
     case(40) ! (alpha, beta, gamma) = ( *,  0,  0)
       !$omp parallel do private(i)
@@ -1675,7 +1675,7 @@ subroutine psi_saxpbyv3_out(m, alpha, x, beta, y, gamma, z, w, info)
     case(39) ! (alpha, beta, gamma) = (-1,  1,  0)
       !$omp parallel do private(i)
       do i = 1, m
-          w(i) = -y(i)
+          w(i) = -x(i) + y(i)
       end do
     case(40) ! (alpha, beta, gamma) = ( *,  0,  0)
       !$omp parallel do private(i)
@@ -2359,14 +2359,14 @@ subroutine psi_smltv2(m, alpha, x, y, beta, z, info)
 
   if(lx < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
+    ierr(1) = 3; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   endif
 
   if(ly < m) then
     info = psb_err_input_asize_small_i_
-    ierr(1) = 6; ierr(2) = m
+    ierr(1) = 4; ierr(2) = m
     call psb_errpush(info, name, i_err = ierr)
     goto 9999
   end if
@@ -3461,7 +3461,7 @@ subroutine saxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
   use psb_error_mod
   implicit none
   integer(psb_ipk_) :: n, m, lldx, lldy, lldz, info
-  real(psb_spk_)    :: X(lldx, *), Y(lldy, *), Z(lldy, *)
+  real(psb_spk_)    :: X(lldx, *), Y(lldy, *), Z(lldz, *)
   real(psb_spk_)    :: alpha, beta
   integer(psb_ipk_) :: i, j
   integer(psb_ipk_) :: int_err(5)
@@ -3502,7 +3502,7 @@ subroutine saxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
     goto 9999
   else if(lldz .lt. max(1, m)) then
     info = psb_err_iarg_not_gtia_ii_
-    int_err(1) = 8
+    int_err(1) = 11
     int_err(2) = 1
     int_err(3) = lldz
     int_err(4) = m
@@ -3518,10 +3518,12 @@ subroutine saxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
         enddo
       enddo
     else if(beta.eq.sone) then
-      !
-      !        Do nothing!
-      !
-
+      do j = 1, n
+        !$omp parallel do private(i)
+        do i = 1, m
+          Z(i, j) = y(i, j)
+        enddo
+      enddo
     else if(beta.eq.-sone) then
       do j = 1, n
         !$omp parallel do private(i)
@@ -3645,12 +3647,12 @@ subroutine saxpbyv2(m, n, alpha, X, lldx, beta, Y, lldy, Z, lldz, info)
 end subroutine saxpbyv2
 
 subroutine saxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
-  use psi_s_serial_mod, psb_protect_name => psi_saxpbyv3
+  use psi_s_serial_mod
   use psb_const_mod
   use psb_error_mod
   implicit none
   integer(psb_ipk_) :: n, m, lldx, lldy, lldz, info
-  real(psb_spk_)    :: X(lldx, *), Y(lldy, *), Z(lldy, *)
+  real(psb_spk_)    :: X(lldx, *), Y(lldy, *), Z(lldz, *)
   real(psb_spk_)    :: alpha, beta, gamma
   integer(psb_ipk_) :: i, j, code
   integer(psb_ipk_) :: int_err(5)
@@ -3699,7 +3701,7 @@ subroutine saxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
 
   if(lldz .lt. max(1, m)) then
     info = psb_err_iarg_not_gtia_ii_
-    int_err(1) = 8
+    int_err(1) = 11
     int_err(2) = 1
     int_err(3) = lldz
     int_err(4) = m
@@ -3982,7 +3984,7 @@ subroutine saxpbyv3(m, n, alpha, X, lldx, beta, Y, lldy, gamma, Z, lldz, info)
       do j = 1, n
         !$omp parallel do private(i)
         do i = 1, m
-            z(i, j) = -y(i, j)
+            z(i, j) = -x(i, j) + y(i, j)
         end do
       end do
     case(40) ! (alpha, beta, gamma) = ( *,  0,  0)

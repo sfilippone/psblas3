@@ -349,6 +349,8 @@ module psi_s_serial_mod
 
 contains
   function get_axpbylike_code1(var) result(code)
+    use psb_const_mod, only : szero, sone
+    implicit none
     real(psb_spk_), intent(in) :: var
     integer(psb_ipk_) :: code
 
@@ -359,6 +361,7 @@ contains
   end function get_axpbylike_code1
 
   function get_axpbylike_code2(alpha, beta) result(code)
+    implicit none
     real(psb_spk_), intent(in) :: alpha, beta
     integer(psb_ipk_) :: code
 
@@ -367,6 +370,7 @@ contains
   end function get_axpbylike_code2
 
   function get_axpbylike_code3(alpha, beta, gamma) result(code)
+    implicit none
     real(psb_spk_), intent(in) :: alpha, beta, gamma
     integer(psb_ipk_) :: code
 
