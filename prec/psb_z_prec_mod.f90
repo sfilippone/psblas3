@@ -35,16 +35,14 @@ module psb_z_prec_mod
   use psb_z_base_prec_mod
 
   interface psb_ilu_fct
-    subroutine psb_zilu_fct(a,l,u,d,info,blck)
+    subroutine psb_zilu_fct(a, l, u, d, info, blck)
       import :: psb_ipk_, psb_desc_type, psb_zspmat_type, &
-           & psb_z_csr_sparse_mat, psb_dpk_
-      integer(psb_ipk_), intent(out)                ::     info
-      type(psb_zspmat_type),intent(in)    :: a
-      type(psb_z_csr_sparse_mat),intent(inout) :: l,u
-      type(psb_zspmat_type),intent(in), optional, target :: blck
-      complex(psb_dpk_), intent(inout)     ::  d(:)
+              & psb_z_csr_sparse_mat, psb_dpk_
+      type(psb_zspmat_type), intent(in)         :: a
+      type(psb_z_csr_sparse_mat), intent(inout) :: l, u
+      complex(psb_dpk_), intent(inout)             :: d(:)
+      integer(psb_ipk_), intent(out)            :: info
+      type(psb_zspmat_type), intent(in), optional, target :: blck
     end subroutine psb_zilu_fct
   end interface
-
-
 end module psb_z_prec_mod

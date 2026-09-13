@@ -28,28 +28,24 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !
-!
-!
-!
 module psb_d_base_mat_mod
-
   use psb_base_mat_mod
   use psb_d_base_vect_mod
-
+  use psb_d_base_multivect_mod
 
   !> \namespace  psb_base_mod  \class  psb_d_base_sparse_mat
   !! \extends psb_base_mat_mod::psb_base_sparse_mat
-  !! The psb_d_base_sparse_mat type, extending psb_base_sparse_mat,
+  !! The psb_d_base_sparse_mat type, extending psb_base_sparse_mat, 
   !! defines a middle level  real(psb_dpk_) sparse matrix object.
   !! This class object itself does not have any additional members
   !! with respect to those of the base class. Most methods cannot be fully
   !! implemented at this level, but we can define the interface for the
   !! computational methods requiring the knowledge of the underlying
-  !! field, such as the matrix-vector product; this interface is defined,
+  !! field, such as the matrix-vector product; this interface is defined, 
   !! but is supposed to be overridden at the leaf level.
   !!
   !! About the method MOLD: this has been defined for those compilers
-  !! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
+  !! not yet supporting ALLOCATE( ..., MOLD=...); it's otherwise silly to
   !! duplicate "by hand" what is specified in the language (in this case F2008)
   !!
   type, extends(psb_base_sparse_mat) :: psb_d_base_sparse_mat
@@ -59,7 +55,7 @@ module psb_d_base_mat_mod
     !
     procedure, pass(a) :: csput_a       => psb_d_base_csput_a
     procedure, pass(a) :: csput_v       => psb_d_base_csput_v
-    generic, public    :: csput         => csput_a,  csput_v
+    generic, public    :: csput         => csput_a, csput_v
     procedure, pass(a) :: csgetrow      => psb_d_base_csgetrow
     procedure, pass(a) :: csgetblk      => psb_d_base_csgetblk
     procedure, pass(a) :: get_diag      => psb_d_base_get_diag
@@ -79,6 +75,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: clone         => psb_d_base_clone
     procedure, pass(a) :: make_nonunit  => psb_d_base_make_nonunit
     procedure, pass(a) :: clean_zeros   => psb_d_base_clean_zeros
+
     !
     ! Convert internal indices
     !
@@ -90,7 +87,6 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mv_from_lcoo   => psb_d_base_mv_from_lcoo
     procedure, pass(a) :: mv_to_lfmt     => psb_d_base_mv_to_lfmt
     procedure, pass(a) :: mv_from_lfmt   => psb_d_base_mv_from_lfmt
-
 
     !
     ! Transpose methods: defined here but not implemented.
@@ -106,18 +102,42 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: vect_mv     => psb_d_base_vect_mv
     procedure, pass(a) :: csmv        => psb_d_base_csmv
     procedure, pass(a) :: csmm        => psb_d_base_csmm
-    generic, public    :: spmm        => csmm, csmv, vect_mv
-    procedure, pass(a) :: in_vect_sv  => psb_d_base_inner_vect_sv
-    procedure, pass(a) :: inner_cssv  => psb_d_base_inner_cssv
-    procedure, pass(a) :: inner_cssm  => psb_d_base_inner_cssm
-    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv
-    procedure, pass(a) :: vect_cssv   => psb_d_base_vect_cssv
+    procedure, pass(a) :: mvt_mv      => psb_d_base_mvect_mv
+    procedure, pass(a) :: mvt_vm      => psb_d_base_mvect_vm
+    procedure, pass(a) :: mvt_mm_i    => psb_d_base_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_f    => psb_d_base_mvect_mm_full
+    generic, public    :: spmm        => csmm, csmv, vect_mv, &
+                                        & mvt_mv, mvt_vm, &
+                                        & mvt_mm_i, mvt_mm_f
+
     procedure, pass(a) :: cssv        => psb_d_base_cssv
     procedure, pass(a) :: cssm        => psb_d_base_cssm
-    generic, public    :: spsm        => cssm, cssv, vect_cssv
+    procedure, pass(a) :: vect_cssv   => psb_d_base_vect_cssv
+    procedure, pass(a) :: cssv_mv     => psb_d_base_cssv_mv
+    procedure, pass(a) :: cssv_vm     => psb_d_base_cssv_vm
+    procedure, pass(a) :: cssv_mm_i   => psb_d_base_cssv_mm_i
+    procedure, pass(a) :: cssv_mm_f   => psb_d_base_cssv_mm_f
+    generic, public    :: spsm        => cssm, cssv, vect_cssv, &
+                                        & cssv_mv, cssv_vm, &
+                                        & cssv_mm_i, cssv_mm_f
+
+    ! Multivector inner object routines are not implemented.
+    ! The base ones calls use directly the underlying fortran arrays
+    procedure, pass(a) :: inner_cssv  => psb_d_base_inner_cssv
+    procedure, pass(a) :: inner_cssm  => psb_d_base_inner_cssm
+    procedure, pass(a) :: in_vect_sv  => psb_d_base_inner_vect_sv
+    ! procedure, pass(a) :: inner_cssv_mv   => psb_d_base_inner_cssv_mv
+    ! procedure, pass(a) :: inner_cssv_vm   => psb_d_base_inner_cssv_vm
+    ! procedure, pass(a) :: inner_cssv_mm_i => psb_d_base_inner_cssv_mm_i
+    ! procedure, pass(a) :: inner_cssv_mm_f => psb_d_base_inner_cssv_mm_f
+    generic, public    :: inner_spsm  => inner_cssm, inner_cssv, in_vect_sv !, &
+                                        ! & inner_cssv_mv, inner_cssv_vm, &
+                                        ! & inner_cssv_mm_i, inner_cssv_mm_f
+
     procedure, pass(a) :: scals       => psb_d_base_scals
     procedure, pass(a) :: scalv       => psb_d_base_scal
     generic, public    :: scal        => scals, scalv
+    
     procedure, pass(a) :: maxval      => psb_d_base_maxval
     procedure, pass(a) :: spnmi       => psb_d_base_csnmi
     procedure, pass(a) :: spnm1       => psb_d_base_csnm1
@@ -133,7 +153,7 @@ module psb_d_base_mat_mod
   end type psb_d_base_sparse_mat
 
   private :: d_base_mat_sync, d_base_mat_is_host, d_base_mat_is_dev, &
-       & d_base_mat_is_sync, d_base_mat_set_host, d_base_mat_set_dev,&
+       & d_base_mat_is_sync, d_base_mat_set_host, d_base_mat_set_dev, &
        & d_base_mat_set_sync
 
   !> \namespace  psb_base_mod  \class  psb_d_coo_sparse_mat
@@ -155,7 +175,7 @@ module psb_d_base_mat_mod
     !> Coefficient values.
     real(psb_dpk_), allocatable :: val(:)
 
-    integer, private   :: sort_status=psb_unsorted_
+    integer, private :: sort_status = psb_unsorted_
 
   contains
     !
@@ -242,23 +262,23 @@ module psb_d_base_mat_mod
   end type psb_d_coo_sparse_mat
 
   private :: d_coo_get_nzeros, d_coo_set_nzeros, &
-       & d_coo_get_fmt,  d_coo_free, d_coo_sizeof, &
+       & d_coo_get_fmt, d_coo_free, d_coo_sizeof, &
        & d_coo_transp_1mat, d_coo_transc_1mat
 
 
   !> \namespace  psb_base_mod  \class  psb_ld_base_sparse_mat
   !! \extends psb_lbase_mat_mod::psb_lbase_sparse_mat
-  !! The psb_ld_base_sparse_mat type, extending psb_base_sparse_mat,
+  !! The psb_ld_base_sparse_mat type, extending psb_base_sparse_mat, 
   !! defines a middle level  real(psb_dpk_) sparse matrix object.
   !! This class object itself does not have any additional members
   !! with respect to those of the base class. Most methods cannot be fully
   !! implemented at this level, but we can define the interface for the
   !! computational methods requiring the knowledge of the underlying
-  !! field, such as the matrix-vector product; this interface is defined,
+  !! field, such as the matrix-vector product; this interface is defined, 
   !! but is supposed to be overridden at the leaf level.
   !!
   !! About the method MOLD: this has been defined for those compilers
-  !! not yet supporting ALLOCATE( ...,MOLD=...); it's otherwise silly to
+  !! not yet supporting ALLOCATE( ..., MOLD=...); it's otherwise silly to
   !! duplicate "by hand" what is specified in the language (in this case F2008)
   !!
   type, extends(psb_lbase_sparse_mat) :: psb_ld_base_sparse_mat
@@ -268,7 +288,7 @@ module psb_d_base_mat_mod
     !
     procedure, pass(a) :: csput_a       => psb_ld_base_csput_a
     procedure, pass(a) :: csput_v       => psb_ld_base_csput_v
-    generic, public    :: csput         => csput_a,  csput_v
+    generic, public    :: csput         => csput_a, csput_v
     procedure, pass(a) :: csgetrow      => psb_ld_base_csgetrow
     procedure, pass(a) :: csgetblk      => psb_ld_base_csgetblk
     procedure, pass(a) :: get_diag      => psb_ld_base_get_diag
@@ -306,7 +326,8 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: spaxpby     => psb_ld_base_spaxpby
     procedure, pass(a) :: cmpval      => psb_ld_base_cmpval
     procedure, pass(a) :: cmpmat      => psb_ld_base_cmpmat
-    generic, public    :: spcmp         => cmpval, cmpmat
+    generic, public    :: spcmp       => cmpval, cmpmat
+
     !
     ! Convert internal indices
     !
@@ -326,11 +347,10 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: transp_2mat => psb_ld_base_transp_2mat
     procedure, pass(a) :: transc_1mat => psb_ld_base_transc_1mat
     procedure, pass(a) :: transc_2mat => psb_ld_base_transc_2mat
-
   end type psb_ld_base_sparse_mat
 
   private :: ld_base_mat_sync, ld_base_mat_is_host, ld_base_mat_is_dev, &
-       & ld_base_mat_is_sync, ld_base_mat_set_host, ld_base_mat_set_dev,&
+       & ld_base_mat_is_sync, ld_base_mat_set_host, ld_base_mat_set_dev, &
        & ld_base_mat_set_sync
 
   !> \namespace  psb_base_mod  \class  psb_ld_coo_sparse_mat
@@ -352,7 +372,7 @@ module psb_d_base_mat_mod
     !> Coefficient values.
     real(psb_dpk_), allocatable :: val(:)
 
-    integer, private   :: sort_status=psb_unsorted_
+    integer, private   :: sort_status = psb_unsorted_
 
   contains
     !
@@ -397,7 +417,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: set_sort_status => ld_coo_set_sort_status
     procedure, pass(a) :: get_sort_status => ld_coo_get_sort_status
 
-
+    !
     ! Computational methods: defined here but not implemented.
     !
     procedure, pass(a) :: scals      => psb_ld_coo_scals
@@ -413,6 +433,7 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: spaxpby    => psb_ld_coo_spaxpby
     procedure, pass(a) :: cmpval     => psb_ld_coo_cmpval
     procedure, pass(a) :: cmpmat     => psb_ld_coo_cmpmat
+
     !
     ! This is COO specific
     !
@@ -432,13 +453,11 @@ module psb_d_base_mat_mod
     !
     procedure, pass(a) :: transp_1mat => ld_coo_transp_1mat
     procedure, pass(a) :: transc_1mat => ld_coo_transc_1mat
-
-
   end type psb_ld_coo_sparse_mat
 
   private :: ld_coo_get_nzeros, ld_coo_iset_nzeros, &
-       & ld_coo_get_fmt,  ld_coo_free, ld_coo_sizeof, &
-       & ld_coo_transp_1mat, ld_coo_transc_1mat
+            & ld_coo_get_fmt, ld_coo_free, ld_coo_sizeof, &
+            & ld_coo_transp_1mat, ld_coo_transc_1mat
 #if defined(PSB_IPK4) && defined(PSB_LPK8)
   private :: ld_coo_lset_nzeros
 #endif
@@ -449,66 +468,66 @@ module psb_d_base_mat_mod
   !
   ! == =================
 
-  !> Function  csput:
+  !> Function csput:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Insert coefficients.
   !!
   !!
   !!         Given  a list of NZ triples
-  !!           (IA(i),JA(i),VAL(i))
+  !!           (IA(i), JA(i), VAL(i))
   !!         record a new coefficient in A such that
-  !!            A(IA(1:nz),JA(1:nz)) = VAL(1:NZ).
+  !!            A(IA(1:nz), JA(1:nz)) = VAL(1:NZ).
   !!
-  !!         The internal components IA,JA,VAL are reallocated as necessary.
+  !!         The internal components IA, JA, VAL are reallocated as necessary.
   !!         Constraints:
   !!         - If the matrix A is in the BUILD state, then the method will
   !!           only work for COO matrices, all other format will throw an error.
   !!           In this case coefficients are queued inside A for further processing.
   !!         - If the matrix A is in the UPDATE state, then it can be in any format;
   !!           the update operation will perform either
-  !!               A(IA(1:nz),JA(1:nz)) = VAL(1:NZ)
+  !!               A(IA(1:nz), JA(1:nz)) = VAL(1:NZ)
   !!           or
-  !!               A(IA(1:nz),JA(1:nz)) =  A(IA(1:nz),JA(1:nz))+VAL(1:NZ)
+  !!               A(IA(1:nz), JA(1:nz)) =  A(IA(1:nz), JA(1:nz))+VAL(1:NZ)
   !!           according to the value of DUPLICATE.
-  !!         - Coefficients with (IA(I),JA(I)) outside the ranges specified by
-  !!           IMIN:IMAX,JMIN:JMAX will be ignored.
+  !!         - Coefficients with (IA(I), JA(I)) outside the ranges specified by
+  !!           IMIN:IMAX, JMIN:JMAX will be ignored.
   !!
-  !!  \param nz    number of triples in input
+  !!  \param nz     number of triples in input
   !!  \param ia(:)  the input row indices
   !!  \param ja(:)  the input col indices
-  !!  \param val(:)  the input coefficients
-  !!  \param imin  minimum row index
-  !!  \param imax  maximum row index
-  !!  \param jmin  minimum col index
-  !!  \param jmax  maximum col index
-  !!  \param info  return code
-  !!  \param gtl(:) [none] an array to renumber indices   (iren(ia(:)),iren(ja(:))
+  !!  \param val(:) the input coefficients
+  !!  \param imin   minimum row index
+  !!  \param imax   maximum row index
+  !!  \param jmin   minimum col index
+  !!  \param jmax   maximum col index
+  !!  \param info   return code
+  !!  \param gtl(:) [none] an array to renumber indices   (iren(ia(:)), iren(ja(:))
   !!
   !
   interface
-    subroutine psb_d_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+    subroutine psb_d_base_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
+      integer(psb_ipk_), intent(in)               :: nz, ia(:), ja(:), imin, imax, jmin, jmax
+      real(psb_dpk_), intent(in)                  :: val(:)
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: val(:)
-      integer(psb_ipk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_csput_a
   end interface
 
   interface
-    subroutine psb_d_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+    subroutine psb_d_base_csput_v(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
-      class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_vect_type), intent(inout)  :: val
+      integer(psb_ipk_), intent(in)               :: nz, imin, imax, jmin, jmax
       class(psb_i_base_vect_type), intent(inout)  :: ia, ja
-      integer(psb_ipk_), intent(in)             :: nz, imin, imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_vect_type), intent(inout)  :: val
+      class(psb_d_base_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_csput_v
   end interface
 
   !
   !
-  !> Function  csgetrow:
+  !> Function csgetrow:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Get a (subset of) row(s)
   !!
@@ -519,44 +538,44 @@ module psb_d_base_mat_mod
   !!           NZ, IA(1:nz), JA(1:nz), VAL(1:NZ)
   !!         each identifying the position of a nonzero in A
   !!         between row indices IMIN:IMAX;
-  !!         IA,JA are reallocated as necessary.
+  !!         IA, JA are reallocated as necessary.
   !!
-  !!  \param imin  the minimum row index we are interested in
-  !!  \param imax  the minimum row index we are interested in
-  !!  \param nz the number of output coefficients
-  !!  \param ia(:)  the output row indices
-  !!  \param ja(:)  the output col indices
-  !!  \param val(:)  the output coefficients
-  !!  \param info  return code
-  !!  \param jmin [1] minimum col index
-  !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
-  !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
-  !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
-  !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
+  !!  \param imin     the minimum row index we are interested in
+  !!  \param imax     the minimum row index we are interested in
+  !!  \param nz       the number of output coefficients
+  !!  \param ia(:)    the output row indices
+  !!  \param ja(:)    the output col indices
+  !!  \param val(:)   the output coefficients
+  !!  \param info     return code
+  !!  \param jmin     [1] minimum col index
+  !!  \param jmax     [a\%get_ncols()] maximum col index
+  !!  \param iren(:)  [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
+  !!  \param rscale   [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
+  !!  \param cscale   [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append   [false] append to ia, ja
+  !!  \param nzin     [none]  if append, then first new entry should go in entry nzin+1
   !!
   !
   interface
-    subroutine psb_d_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
+    subroutine psb_d_base_csgetrow(imin, imax, a, nz, ia, ja, val, info, &
+          & jmin, jmax, iren, append, nzin, rscale, cscale, chksz)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_), intent(out)                 :: nz
-      integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_ipk_), intent(in), optional        :: iren(:)
-      integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale,chksz
+      integer(psb_ipk_), intent(in)                 :: imin, imax
+      class(psb_d_base_sparse_mat), intent(in)      :: a
+      integer(psb_ipk_), intent(out)                :: nz
+      integer(psb_ipk_), allocatable, intent(inout) :: ia(:), ja(:)
+      real(psb_dpk_), allocatable, intent(inout)    :: val(:)
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(in), optional :: jmin, jmax, nzin
+      integer(psb_ipk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale, chksz
     end subroutine psb_d_base_csgetrow
   end interface
 
   !
-  !> Function  csgetblk:
+  !> Function csgetblk:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Get a (subset of) row(s)
   !!
@@ -569,32 +588,32 @@ module psb_d_base_mat_mod
   !!  \param info  return code
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!
   !
   interface
-    subroutine psb_d_base_csgetblk(imin,imax,a,b,info,&
-         & jmin,jmax,iren,append,rscale,cscale,chksz)
+    subroutine psb_d_base_csgetblk(imin, imax, a, b, info, &
+          & jmin, jmax, iren, append, rscale, cscale, chksz)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_ipk_), intent(in), optional        :: iren(:)
-      integer(psb_ipk_), intent(in), optional        :: jmin,jmax
-      logical, intent(in), optional        :: rscale,cscale,chksz
+      integer(psb_ipk_), intent(in)               :: imin, imax
+      class(psb_d_base_sparse_mat), intent(in)    :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), intent(in), optional :: jmin, jmax
+      integer(psb_ipk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale, chksz
     end subroutine psb_d_base_csgetblk
   end interface
 
   !
   !
-  !> Function  csclip:
+  !> Function csclip:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Get a submatrix.
   !!
@@ -607,36 +626,36 @@ module psb_d_base_mat_mod
   !!  \param imax [a%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!
   !
   interface
-    subroutine psb_d_base_csclip(a,b,info,&
-         & imin,imax,jmin,jmax,rscale,cscale)
+    subroutine psb_d_base_csclip(a, b, info, &
+          & imin, imax, jmin, jmax, rscale, cscale)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: b
-      integer(psb_ipk_),intent(out)            :: info
-      integer(psb_ipk_), intent(in), optional  :: imin,imax,jmin,jmax
-      logical, intent(in), optional            :: rscale,cscale
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      class(psb_d_coo_sparse_mat), intent(out)  :: b
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional :: imin, imax, jmin, jmax
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_d_base_csclip
   end interface
   !
-  !> Function  tril:
+  !> Function tril:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief  Copy the lower triangle, i.e. all entries
-  !!         A(I,J) such that J-I <= DIAG
+  !!         A(I, J) such that J-I <= DIAG
   !!         default value is DIAG=0, i.e. lower triangle up to
   !!         the main diagonal.
   !!         DIAG=-1 means copy the strictly lower triangle
   !!         DIAG= 1 means copy the lower triangle plus the first diagonal
   !!                 of the upper triangle.
-  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         Moreover, apply a clipping by copying entries A(I, J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!
@@ -647,39 +666,39 @@ module psb_d_base_mat_mod
   !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param u  [none]  copy of the complementary triangle
   !!
   !
   interface
-    subroutine psb_d_base_tril(a,l,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale,u)
+    subroutine psb_d_base_tril(a, l, info, &
+         & diag, imin, imax, jmin, jmax, rscale, cscale, u)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: l
-      integer(psb_ipk_),intent(out)              :: info
-      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
-      logical, intent(in), optional              :: rscale,cscale
-      class(psb_d_coo_sparse_mat), optional, intent(out) :: u
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      class(psb_d_coo_sparse_mat), intent(out)  :: l
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional             :: diag, imin, imax, jmin, jmax
+      logical, intent(in), optional                       :: rscale, cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out)  :: u
     end subroutine psb_d_base_tril
   end interface
 
   !
-  !> Function  triu:
+  !> Function triu:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief  Copy the upper triangle, i.e. all entries
-  !!         A(I,J) such that DIAG <= J-I
+  !!         A(I, J) such that DIAG <= J-I
   !!         default value is DIAG=0, i.e. upper triangle from
   !!         the main diagonal up.
   !!         DIAG= 1 means copy the strictly upper triangle
   !!         DIAG=-1 means copy the upper triangle plus the first diagonal
   !!                 of the lower triangle.
-  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         Moreover, apply a clipping by copying entries A(I, J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!         Optionally copies the lower triangle at the same time
@@ -691,50 +710,50 @@ module psb_d_base_mat_mod
   !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param l  [none]  copy of the complementary triangle
   !!
   !
   interface
-    subroutine psb_d_base_triu(a,u,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale,l)
+    subroutine psb_d_base_triu(a, u, info, &
+         & diag, imin, imax, jmin, jmax, rscale, cscale, l)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: u
-      integer(psb_ipk_),intent(out)              :: info
-      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
-      logical, intent(in), optional              :: rscale,cscale
-      class(psb_d_coo_sparse_mat), optional, intent(out) :: l
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      class(psb_d_coo_sparse_mat), intent(out)  :: u
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional             :: diag, imin, imax, jmin, jmax
+      logical, intent(in), optional                       :: rscale, cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out)  :: l
     end subroutine psb_d_base_triu
   end interface
 
-
   !
-  !> Function  get_diag:
+  !> Function get_diag:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Extract the diagonal of A.
   !!
-  !!   D(i) = A(i:i), i=1:min(nrows,ncols)
+  !!   D(i) = A(i:i), i=1:min(nrows, ncols)
   !!
   !! \param d(:)  The output diagonal
   !! \param info  return code.
   !
   interface
-    subroutine psb_d_base_get_diag(a,d,info)
+    subroutine psb_d_base_get_diag(a, d, info)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)     :: d(:)
+      implicit none
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(out)               :: d(:)
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_d_base_get_diag
   end interface
 
   !
-  !> Function  mold:
+  !> Function mold:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Allocate a class(psb_d_base_sparse_mat) with the
   !!     same dynamic type as the input.
@@ -744,41 +763,42 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mold(a,b,info)
+    subroutine psb_d_base_mold(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(in)                 :: a
-      class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      implicit none
+      class(psb_d_base_sparse_mat), intent(in)                  :: a
+      class(psb_d_base_sparse_mat), intent(inout), allocatable  :: b
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_d_base_mold
   end interface
 
   !
   !
-  !> Function  clone:
+  !> Function clone:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Allocate and clone  a class(psb_d_base_sparse_mat) with the
   !!     same dynamic type as the input.
   !!     This is equivalent to allocate( source=  ) except that
   !!     it should guarantee a deep copy wherever needed.
-  !!     Should also be equivalent to calling mold and then copy,
+  !!     Should also be equivalent to calling mold and then copy, 
   !!     but it can also be implemented by default using cp_to_fmt.
   !!   \param b The output variable
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_clone(a,b, info)
+    subroutine psb_d_base_clone(a, b, info)
       import
       implicit none
-      class(psb_d_base_sparse_mat), intent(inout)              :: a
-      class(psb_d_base_sparse_mat), allocatable, intent(inout) :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      class(psb_d_base_sparse_mat), intent(inout)               :: a
+      class(psb_d_base_sparse_mat), allocatable, intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_d_base_clone
   end interface
 
 
   !
   !
-  !> Function  make_nonunit:
+  !> Function make_nonunit:
   !! \memberof  psb_d_base_make_nonunit
   !! \brief Given a matrix for which is_unit() is true, explicitly
   !!     store the unit diagonal and set is_unit() to false.
@@ -794,7 +814,7 @@ module psb_d_base_mat_mod
 
 
   !
-  !> Function  cp_to_coo:
+  !> Function cp_to_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert to psb_d_coo_sparse_mat
   !!        Invoked from the source object.
@@ -802,16 +822,17 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_to_coo(a,b,info)
+    subroutine psb_d_base_cp_to_coo(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      implicit none
+      class(psb_d_base_sparse_mat), intent(in)    :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_to_coo
   end interface
 
   !
-  !> Function  cp_from_coo:
+  !> Function cp_from_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert from psb_d_coo_sparse_mat
   !!        Invoked from the target object.
@@ -819,16 +840,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_from_coo(a,b,info)
+    subroutine psb_d_base_cp_from_coo(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(in)     :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_from_coo
   end interface
 
   !
-  !> Function  cp_to_fmt:
+  !> Function cp_to_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert to a class(psb_d_base_sparse_mat)
   !!        Invoked from the source object. Can be implemented by
@@ -837,16 +858,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_to_fmt(a,b,info)
+    subroutine psb_d_base_cp_to_fmt(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
+      class(psb_d_base_sparse_mat), intent(in)    :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_to_fmt
   end interface
 
   !
-  !> Function  cp_from_fmt:
+  !> Function cp_from_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert from a class(psb_d_base_sparse_mat)
   !!        Invoked from the target object. Can be implemented by
@@ -855,16 +876,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_from_fmt(a,b,info)
+    subroutine psb_d_base_cp_from_fmt(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(in) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_sparse_mat), intent(in)    :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_from_fmt
   end interface
 
   !
-  !> Function  mv_to_coo:
+  !> Function mv_to_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert to psb_d_coo_sparse_mat, freeing the source.
   !!        Invoked from the source object.
@@ -872,16 +893,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_to_coo(a,b,info)
+    subroutine psb_d_base_mv_to_coo(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_to_coo
   end interface
 
   !
-  !> Function  mv_from_coo:
+  !> Function mv_from_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert from psb_d_coo_sparse_mat, freeing the source.
   !!        Invoked from the target object.
@@ -889,16 +910,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_from_coo(a,b,info)
+    subroutine psb_d_base_mv_from_coo(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
       class(psb_d_coo_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_from_coo
   end interface
 
   !
-  !> Function  mv_to_fmt:
+  !> Function mv_to_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert to a class(psb_d_base_sparse_mat), freeing the source.
   !!        Invoked from the source object. Can be implemented by
@@ -907,16 +928,15 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_to_fmt(a,b,info)
+    subroutine psb_d_base_mv_to_fmt(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_sparse_mat), intent(inout) :: a, b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_to_fmt
   end interface
 
   !
-  !> Function  mv_from_fmt:
+  !> Function mv_from_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert from a class(psb_d_base_sparse_mat), freeing the source.
   !!        Invoked from the target object. Can be implemented by
@@ -925,15 +945,14 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_from_fmt(a,b,info)
+    subroutine psb_d_base_mv_from_fmt(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_sparse_mat), intent(inout) :: a, b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_from_fmt
   end interface
   !
-  !> Function  cp_to_coo:
+  !> Function cp_to_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert to psb_d_coo_sparse_mat
   !!        Invoked from the source object.
@@ -941,16 +960,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_to_lcoo(a,b,info)
+    subroutine psb_d_base_cp_to_lcoo(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
+      class(psb_d_base_sparse_mat), intent(in)    :: a
       class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_to_lcoo
   end interface
 
   !
-  !> Function  cp_from_coo:
+  !> Function cp_from_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert from psb_d_coo_sparse_mat
   !!        Invoked from the target object.
@@ -958,16 +977,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_from_lcoo(a,b,info)
+    subroutine psb_d_base_cp_from_lcoo(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(in)     :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_coo_sparse_mat), intent(in)    :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_from_lcoo
   end interface
 
   !
-  !> Function  cp_to_fmt:
+  !> Function cp_to_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert to a class(psb_d_base_sparse_mat)
   !!        Invoked from the source object. Can be implemented by
@@ -976,16 +995,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_to_lfmt(a,b,info)
+    subroutine psb_d_base_cp_to_lfmt(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_sparse_mat), intent(in)      :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_d_base_cp_to_lfmt
   end interface
 
   !
-  !> Function  cp_from_fmt:
+  !> Function cp_from_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Copy and convert from a class(psb_d_base_sparse_mat)
   !!        Invoked from the target object. Can be implemented by
@@ -994,16 +1013,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_cp_from_lfmt(a,b,info)
+    subroutine psb_d_base_cp_from_lfmt(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(in) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(in)   :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_cp_from_lfmt
   end interface
 
   !
-  !> Function  mv_to_coo:
+  !> Function mv_to_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert to psb_d_coo_sparse_mat, freeing the source.
   !!        Invoked from the source object.
@@ -1011,16 +1030,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_to_lcoo(a,b,info)
+    subroutine psb_d_base_mv_to_lcoo(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
       class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_to_lcoo
   end interface
 
   !
-  !> Function  mv_from_coo:
+  !> Function mv_from_coo:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert from psb_d_coo_sparse_mat, freeing the source.
   !!        Invoked from the target object.
@@ -1028,16 +1047,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_from_lcoo(a,b,info)
+    subroutine psb_d_base_mv_from_lcoo(a, b, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_coo_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_from_lcoo
   end interface
 
   !
-  !> Function  mv_to_fmt:
+  !> Function mv_to_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert to a class(psb_d_base_sparse_mat), freeing the source.
   !!        Invoked from the source object. Can be implemented by
@@ -1046,16 +1065,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_to_lfmt(a,b,info)
+    subroutine psb_d_base_mv_to_lfmt(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_sparse_mat), intent(inout)   :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_d_base_mv_to_lfmt
   end interface
 
   !
-  !> Function  mv_from_fmt:
+  !> Function mv_from_fmt:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Convert from a class(psb_d_base_sparse_mat), freeing the source.
   !!        Invoked from the target object. Can be implemented by
@@ -1064,14 +1083,13 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_d_base_mv_from_lfmt(a,b,info)
+    subroutine psb_d_base_mv_from_lfmt(a, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_base_sparse_mat), intent(inout)   :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_mv_from_lfmt
   end interface
-
 
   !
   !>
@@ -1079,7 +1097,7 @@ module psb_d_base_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_clean_zeros
   !
   interface
-    subroutine  psb_d_base_clean_zeros(a, info)
+    subroutine psb_d_base_clean_zeros(a, info)
       import
       class(psb_d_base_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(out)              :: info
@@ -1087,7 +1105,7 @@ module psb_d_base_mat_mod
   end interface
 
   !
-  !> Function  transp:
+  !> Function transp:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -1095,15 +1113,15 @@ module psb_d_base_mat_mod
   !!   \param b The output variable
   !
    interface
-    subroutine psb_d_base_transp_2mat(a,b)
+    subroutine psb_d_base_transp_2mat(a, b)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      class(psb_base_sparse_mat), intent(out)   :: b
     end subroutine psb_d_base_transp_2mat
   end interface
 
   !
-  !> Function  transc:
+  !> Function transc:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -1111,15 +1129,15 @@ module psb_d_base_mat_mod
   !!   \param b The output variable
   !
   interface
-    subroutine psb_d_base_transc_2mat(a,b)
+    subroutine psb_d_base_transc_2mat(a, b)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      class(psb_base_sparse_mat), intent(out)    :: b
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      class(psb_base_sparse_mat), intent(out)   :: b
     end subroutine psb_d_base_transc_2mat
   end interface
 
   !
-  !> Function  transp:
+  !> Function transp:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -1133,7 +1151,7 @@ module psb_d_base_mat_mod
   end interface
 
   !
-  !> Function  transc:
+  !> Function transc:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -1147,7 +1165,7 @@ module psb_d_base_mat_mod
   end interface
 
   !
-  !> Function  csmm:
+  !> Function csmm:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Product by a dense rank 2 array.
   !!
@@ -1156,26 +1174,27 @@ module psb_d_base_mat_mod
   !!
   !! \param alpha  Scaling factor for Ax
   !! \param A      the input sparse matrix
-  !! \param x(:,:) the input dense X
+  !! \param x(:, :) the input dense X
   !! \param beta   Scaling factor for y
-  !! \param y(:,:) the input/output dense Y
+  !! \param y(:, :) the input/output dense Y
   !! \param info   return code
   !! \param trans  [N] Whether to use A (N), its transpose (T)
   !!               or its conjugate transpose (C)
   !!
   !
   interface
-    subroutine psb_d_base_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_base_csmm(alpha, a, x, beta, y, info, trans)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout) :: y(:,:)
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(in)                :: x(:, :)
+      real(psb_dpk_), intent(inout)             :: y(:, :)
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_base_csmm
   end interface
 
-  !> Function  csmv:
+  !> Function csmv:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Product by a dense rank 1 array.
   !!
@@ -1193,17 +1212,18 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_base_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_base_csmv(alpha, a, x, beta, y, info, trans)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout) :: y(:)
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(in)                :: x(:)
+      real(psb_dpk_), intent(inout)             :: y(:)
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_base_csmv
   end interface
 
-  !> Function  vect_mv:
+  !> Function vect_mv:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Product by an encapsulated array type(psb_d_vect_type)
   !!
@@ -1228,19 +1248,68 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_base_vect_mv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_base_vect_mv(alpha, a, x, beta, y, info, trans)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)       :: alpha, beta
-      class(psb_d_base_vect_type), intent(inout) :: x
-      class(psb_d_base_vect_type), intent(inout) :: y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)    :: a
+      class(psb_d_base_vect_type), intent(inout)  :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_d_base_vect_mv
   end interface
 
+  ! Multivector versions
+  interface
+    subroutine psb_d_base_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_vect_type), intent(inout)      :: x
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_d_base_mvect_mv
+  end interface
+  
+  interface
+    subroutine psb_d_base_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_d_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_d_base_mvect_vm
+  end interface
+  
+  interface
+    subroutine psb_d_base_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_d_base_mvect_mm_idxs
+  end interface
+  
+  interface
+    subroutine psb_d_base_mvect_mm_full(alpha, a, x, beta, y, info, trans)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_d_base_mvect_mm_full
+  end interface
+
   !
-  !> Function  cssm:
+  !> Function cssm:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 2 array.
   !!
@@ -1251,28 +1320,28 @@ module psb_d_base_mat_mod
   !!
   !! \param alpha  Scaling factor for Ax
   !! \param A      the input sparse matrix
-  !! \param x(:,:) the input dense X
+  !! \param x(:, :) the input dense X
   !! \param beta   Scaling factor for y
-  !! \param y(:,:) the input/output dense Y
+  !! \param y(:, :) the input/output dense Y
   !! \param info   return code
   !! \param trans  [N] Whether to use A (N), its transpose (T)
   !!               or its conjugate transpose (C)
   !!
   !
   interface
-    subroutine psb_d_base_inner_cssm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_base_inner_cssm(alpha, a, x, beta, y, info, trans)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout) :: y(:,:)
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(in)                :: x(:, :)
+      real(psb_dpk_), intent(inout)             :: y(:, :)
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_base_inner_cssm
   end interface
 
-
   !
-  !> Function  cssv:
+  !> Function cssv:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 1 array.
   !!
@@ -1295,18 +1364,19 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_base_inner_cssv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_base_inner_cssv(alpha, a, x, beta, y, info, trans)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout) :: y(:)
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(in)                :: x(:)
+      real(psb_dpk_), intent(inout)             :: y(:)
       integer(psb_ipk_), intent(out)            :: info
       character, optional, intent(in) :: trans
     end subroutine psb_d_base_inner_cssv
   end interface
 
   !
-  !> Function  inner_vect_cssv:
+  !> Function inner_vect_cssv:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Triangular system solve by
   !!        an encapsulated array type(psb_d_vect_type)
@@ -1330,18 +1400,18 @@ module psb_d_base_mat_mod
   !!               or its conjugate transpose (C)
   !
   interface
-    subroutine psb_d_base_inner_vect_sv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_base_inner_vect_sv(alpha, a, x, beta, y, info, trans)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)       :: alpha, beta
-      class(psb_d_base_vect_type), intent(inout) :: x, y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)    :: a
+      class(psb_d_base_vect_type), intent(inout)  :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_d_base_inner_vect_sv
   end interface
 
   !
-  !> Function  cssm:
+  !> Function cssm:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 2 array.
   !!
@@ -1350,9 +1420,9 @@ module psb_d_base_mat_mod
   !!
   !! \param alpha  Scaling factor for Ax
   !! \param A      the input sparse matrix
-  !! \param x(:,:) the input dense X
+  !! \param x(:, :) the input dense X
   !! \param beta   Scaling factor for y
-  !! \param y(:,:) the input/output dense Y
+  !! \param y(:, :) the input/output dense Y
   !! \param info   return code
   !! \param trans  [N] Whether to use A (N), its transpose (T)
   !!               or its conjugate transpose (C)
@@ -1362,19 +1432,20 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_base_cssm(alpha,a,x,beta,y,info,trans,scale,d)
+    subroutine psb_d_base_cssm(alpha, a, x, beta, y, info, trans, scale, d)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout) :: y(:,:)
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(in)                :: x(:, :)
+      real(psb_dpk_), intent(inout)             :: y(:, :)
       integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans, scale
-      real(psb_dpk_), intent(in), optional :: d(:)
+      character, optional, intent(in)       :: trans, scale
+      real(psb_dpk_), intent(in), optional  :: d(:)
     end subroutine psb_d_base_cssm
   end interface
 
   !
-  !> Function  cssv:
+  !> Function cssv:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Triangular system solve by a dense rank 1 array.
   !!
@@ -1395,19 +1466,20 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_base_cssv(alpha,a,x,beta,y,info,trans,scale,d)
+    subroutine psb_d_base_cssv(alpha, a, x, beta, y, info, trans, scale, d)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)    :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout) :: y(:)
+      real(psb_dpk_), intent(in)                :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(in)                :: x(:)
+      real(psb_dpk_), intent(inout)             :: y(:)
       integer(psb_ipk_), intent(out)            :: info
-      character, optional, intent(in) :: trans, scale
-      real(psb_dpk_), intent(in), optional :: d(:)
+      character, optional, intent(in)       :: trans, scale
+      real(psb_dpk_), intent(in), optional  :: d(:)
     end subroutine psb_d_base_cssv
   end interface
 
   !
-  !> Function  vect_cssv:
+  !> Function vect_cssv:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Triangular system solve by
   !!        an encapsulated array type(psb_d_vect_type)
@@ -1429,19 +1501,75 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_base_vect_cssv(alpha,a,x,beta,y,info,trans,scale,d)
+    subroutine psb_d_base_vect_cssv(alpha, a, x, beta, y, info, trans, scale, d)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)       :: alpha, beta
-      class(psb_d_base_vect_type), intent(inout) :: x,y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans, scale
-      class(psb_d_base_vect_type), optional, intent(inout)   :: d
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)    :: a
+      class(psb_d_base_vect_type), intent(inout)  :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
     end subroutine psb_d_base_vect_cssv
   end interface
 
   !
-  !> Function  base_scals:
+  ! Multivector version
+  !
+  interface
+    subroutine psb_d_base_cssv_mv(alpha, a, x, idx_x, beta, y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_d_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_mv
+  end interface
+
+  interface
+    subroutine psb_d_base_cssv_vm(alpha, a, x, beta, y, idx_y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_vect_type), intent(inout)      :: x
+      class(psb_d_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_vm
+  end interface
+
+  interface
+    subroutine psb_d_base_cssv_mm_i(alpha, a, x, idx_x, beta, y, idx_y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_mm_i
+  end interface
+
+  interface
+    subroutine psb_d_base_cssv_mm_f(alpha, a, x, beta, y, info, trans, scale, d)
+      import
+      real(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(in)        :: a
+      class(psb_d_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in)                       :: trans, scale
+      class(psb_d_base_vect_type), optional, intent(inout)  :: d
+    end subroutine psb_d_base_cssv_mm_f
+  end interface
+
+  !
+  !> Function base_scals:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Scale a matrix by a single scalar value
   !!
@@ -1449,16 +1577,16 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-    subroutine psb_d_base_scals(d,a,info)
+    subroutine psb_d_base_scals(d, a, info)
       import
+      real(psb_dpk_), intent(in)                  :: d
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_scals
   end interface
 
   !
-  !> Function  base_scal:
+  !> Function base_scal:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Scale a matrix by a vector
   !!
@@ -1467,17 +1595,17 @@ module psb_d_base_mat_mod
   !! \param side   [L] Scale on the Left (rows) or on the Right (columns)
   !
   interface
-    subroutine psb_d_base_scal(d,a,info,side)
+    subroutine psb_d_base_scal(d, a, info, side)
       import
+      real(psb_dpk_), intent(in)                  :: d(:)
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d(:)
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
       character, intent(in), optional :: side
     end subroutine psb_d_base_scal
   end interface
 
   !
-  !> Function  base_scalplusidentity:
+  !> Function base_scalplusidentity:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Scale a matrix by a vector and sums an identity
   !!
@@ -1485,16 +1613,16 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-    subroutine psb_d_base_scalplusidentity(d,a,info)
+    subroutine psb_d_base_scalplusidentity(d, a, info)
       import
+      real(psb_dpk_), intent(in)                  :: d
       class(psb_d_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_scalplusidentity
   end interface
 
   !
-  !> Function  base_spaxpby:
+  !> Function base_spaxpby:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Scale add tow sparse matrices A = alpha A + beta B
   !!
@@ -1505,20 +1633,18 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-    subroutine psb_d_base_spaxpby(alpha,a,beta,b,info)
+    subroutine psb_d_base_spaxpby(alpha, a, beta, b, info)
       import
-      class(psb_d_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      real(psb_dpk_), intent(in)      :: alpha
-      real(psb_dpk_), intent(in)      :: beta
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_base_sparse_mat), intent(inout) :: a, b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_base_spaxpby
   end interface
 
   !
-  !> Function  base_cmpval:
+  !> Function base_cmpval:
   !! \memberof  psb_d_base_sparse_mat
-  !! \brief Compare the element of A with the value val |A(i,j) -val| < tol
+  !! \brief Compare the element of A with the value val |A(i, j) -val| < tol
   !!
   !! \param alpha  scaling for A
   !! \param A      sparse matrix A (intent inout)
@@ -1528,20 +1654,20 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-      function psb_d_base_cmpval(a,val,tol,info) result(res)
-          import
-          class(psb_d_base_sparse_mat), intent(inout) :: a
-          real(psb_dpk_), intent(in)             :: val
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
-      end function psb_d_base_cmpval
+    function psb_d_base_cmpval(a, val, tol, info) result(res)
+      import
+      class(psb_d_base_sparse_mat), intent(inout) :: a
+      real(psb_dpk_), intent(in)                  :: val
+      real(psb_dpk_), intent(in)                  :: tol
+      integer(psb_ipk_), intent(out)              :: info
+      logical :: res
+    end function psb_d_base_cmpval
   end interface
 
   !
-  !> Function  base_cmpmat:
+  !> Function base_cmpmat:
   !! \memberof  psb_d_base_sparse_mat
-  !! \brief Compare the element of A with the ones of B |A(i,j) - B(i,j)| < tol
+  !! \brief Compare the element of A with the ones of B |A(i, j) - B(i, j)| < tol
   !!
   !! \param alpha  scaling for A
   !! \param A      sparse matrix A (intent inout)
@@ -1551,18 +1677,17 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-      function psb_d_base_cmpmat(a,b,tol,info) result(res)
-          import
-          class(psb_d_base_sparse_mat), intent(inout) :: a
-          class(psb_d_base_sparse_mat), intent(inout) :: b
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
-      end function psb_d_base_cmpmat
+    function psb_d_base_cmpmat(a, b, tol, info) result(res)
+      import
+      class(psb_d_base_sparse_mat), intent(inout) :: a, b
+      real(psb_dpk_), intent(in)                  :: tol
+      integer(psb_ipk_), intent(out)              :: info
+      logical :: res
+    end function psb_d_base_cmpmat
   end interface
 
   !
-  !> Function  base_maxval:
+  !> Function base_maxval:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Maximum absolute value of all coefficients;
   !!
@@ -1570,14 +1695,13 @@ module psb_d_base_mat_mod
   interface
     function psb_d_base_maxval(a) result(res)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_)  :: res
     end function psb_d_base_maxval
   end interface
 
   !
-  !
-  !> Function  base_csnmi:
+  !> Function base_csnmi:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Operator infinity norm
   !!
@@ -1585,14 +1709,13 @@ module psb_d_base_mat_mod
   interface
     function psb_d_base_csnmi(a) result(res)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_)  :: res
     end function psb_d_base_csnmi
   end interface
 
   !
-  !
-  !> Function  base_csnmi:
+  !> Function base_csnmi:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Operator 1-norm
   !!
@@ -1600,68 +1723,66 @@ module psb_d_base_mat_mod
   interface
     function psb_d_base_csnm1(a) result(res)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      class(psb_d_base_sparse_mat), intent(in)  :: a
+      real(psb_dpk_)  :: res
     end function psb_d_base_csnm1
   end interface
 
   !
-  !
-  !> Function  base_rowsum:
+  !> Function base_rowsum:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Sum along the rows
   !! \param d(:) The output row sums
   !!
   !
   interface
-    subroutine psb_d_base_rowsum(d,a)
+    subroutine psb_d_base_rowsum(d, a)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      real(psb_dpk_), intent(out)               :: d(:)
+      class(psb_d_base_sparse_mat), intent(in)  :: a
     end subroutine psb_d_base_rowsum
   end interface
 
   !
-  !> Function  base_arwsum:
+  !> Function base_arwsum:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Absolute value sum along the rows
   !! \param d(:) The output row sums
   !!
   interface
-    subroutine psb_d_base_arwsum(d,a)
+    subroutine psb_d_base_arwsum(d, a)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      real(psb_dpk_), intent(out)               :: d(:)
+      class(psb_d_base_sparse_mat), intent(in)  :: a
     end subroutine psb_d_base_arwsum
   end interface
 
   !
-  !
-  !> Function  base_colsum:
+  !> Function base_colsum:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Sum along the columns
   !! \param d(:) The output col sums
   !!
   !
   interface
-    subroutine psb_d_base_colsum(d,a)
+    subroutine psb_d_base_colsum(d, a)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      real(psb_dpk_), intent(out)               :: d(:)
+      class(psb_d_base_sparse_mat), intent(in)  :: a
     end subroutine psb_d_base_colsum
   end interface
 
   !
-  !> Function  base_aclsum:
+  !> Function base_aclsum:
   !! \memberof  psb_d_base_sparse_mat
   !! \brief Absolute value sum along the columns
   !! \param d(:) The output col sums
   !!
   interface
-    subroutine psb_d_base_aclsum(d,a)
+    subroutine psb_d_base_aclsum(d, a)
       import
-      class(psb_d_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      real(psb_dpk_), intent(out)               :: d(:)
+      class(psb_d_base_sparse_mat), intent(in)  :: a
     end subroutine psb_d_base_aclsum
   end interface
 
@@ -1678,21 +1799,22 @@ module psb_d_base_mat_mod
   !! \see psb_base_mat_mod::psb_base_reallocate_nz
   !
   interface
-    subroutine  psb_d_coo_reallocate_nz(nz,a)
+    subroutine psb_d_coo_reallocate_nz(nz, a)
       import
-      integer(psb_ipk_), intent(in) :: nz
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(in)               :: nz
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
     end subroutine psb_d_coo_reallocate_nz
   end interface
+
   !
   !>
   !! \memberof  psb_d_coo_sparse_mat
   !
   interface
-    subroutine  psb_d_coo_ensure_size(nz,a)
+    subroutine psb_d_coo_ensure_size(nz, a)
       import
-      integer(psb_ipk_), intent(in) :: nz
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(in)               :: nz
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
     end subroutine psb_d_coo_ensure_size
   end interface
 
@@ -1702,9 +1824,9 @@ module psb_d_base_mat_mod
   !! \see psb_base_mat_mod::psb_base_reinit
   !
   interface
-    subroutine psb_d_coo_reinit(a,clear)
+    subroutine psb_d_coo_reinit(a, clear)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      class(psb_d_coo_sparse_mat), intent(inout)    :: a
       logical, intent(in), optional :: clear
     end subroutine psb_d_coo_reinit
   end interface
@@ -1714,9 +1836,9 @@ module psb_d_base_mat_mod
   !! \see psb_base_mat_mod::psb_base_trim
   !
   interface
-    subroutine  psb_d_coo_trim(a)
+    subroutine psb_d_coo_trim(a)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
     end subroutine psb_d_coo_trim
   end interface
   !
@@ -1725,10 +1847,10 @@ module psb_d_base_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_clean_zeros
   !
   interface
-    subroutine  psb_d_coo_clean_zeros(a,info)
+    subroutine psb_d_coo_clean_zeros(a, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_coo_clean_zeros
   end interface
 
@@ -1741,10 +1863,10 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine  psb_d_coo_clean_negidx(a,info)
+    subroutine psb_d_coo_clean_negidx(a, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_coo_clean_negidx
   end interface
 
@@ -1761,16 +1883,15 @@ module psb_d_base_mat_mod
   !!
   !
   interface psb_coo_clean_negidx_inner
-    subroutine psb_d_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+    subroutine psb_d_coo_clean_negidx_inner(nzin, ia, ja, val, nzout, info)
       import
-      integer(psb_ipk_), intent(in)           :: nzin
-      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
-      real(psb_dpk_), intent(inout) :: val(:)
-      integer(psb_ipk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in)     :: nzin
+      integer(psb_ipk_), intent(inout)  :: ia(:), ja(:)
+      real(psb_dpk_), intent(inout)     :: val(:)
+      integer(psb_ipk_), intent(out)    :: nzout
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psb_d_coo_clean_negidx_inner
   end interface psb_coo_clean_negidx_inner
-
 
   !
   !>
@@ -1778,23 +1899,24 @@ module psb_d_base_mat_mod
   !! \see psb_base_mat_mod::psb_base_allocate_mnnz
   !
   interface
-    subroutine  psb_d_coo_allocate_mnnz(m,n,a,nz)
+    subroutine psb_d_coo_allocate_mnnz(m, n, a, nz)
       import
-      integer(psb_ipk_), intent(in) :: m,n
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      integer(psb_ipk_), intent(in)               :: m, n
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
       integer(psb_ipk_), intent(in), optional :: nz
     end subroutine psb_d_coo_allocate_mnnz
   end interface
 
-
-  !> \memberof psb_d_coo_sparse_mat
+  !
+  !>
+  !! \memberof psb_d_coo_sparse_mat
   !| \see psb_base_mat_mod::psb_base_mold
   interface
-    subroutine psb_d_coo_mold(a,b,info)
+    subroutine psb_d_coo_mold(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(in)                  :: a
-      class(psb_d_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      class(psb_d_coo_sparse_mat), intent(in)                   :: a
+      class(psb_d_base_sparse_mat), intent(inout), allocatable  :: b
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_d_coo_mold
   end interface
 
@@ -1812,17 +1934,15 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_coo_print(iout,a,iv,head,ivr,ivc)
+    subroutine psb_d_coo_print(iout, a, iv, head, ivr, ivc)
       import
-      integer(psb_ipk_), intent(in)               :: iout
+      integer(psb_ipk_), intent(in)           :: iout
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      integer(psb_lpk_), intent(in), optional     :: iv(:)
-      character(len=*), optional        :: head
-      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_lpk_), intent(in), optional :: iv(:)
+      character(len=*), optional              :: head
+      integer(psb_lpk_), intent(in), optional :: ivr(:), ivc(:)
     end subroutine psb_d_coo_print
   end interface
-
-
 
   !
   !> Function get_nz_row.
@@ -1833,14 +1953,13 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    function  psb_d_coo_get_nz_row(idx,a) result(res)
+    function psb_d_coo_get_nz_row(idx, a) result(res)
       import
+      integer(psb_ipk_), intent(in)           :: idx
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)                  :: idx
       integer(psb_ipk_) :: res
     end function psb_d_coo_get_nz_row
   end interface
-
 
   !
   !> Funtion: fix_coo_inner
@@ -1857,26 +1976,26 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
+    subroutine psb_d_fix_coo_inner(nr, nc, nzin, dupl, ia, ja, val, nzout, info, idir)
       import
-      integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
-      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:)
-      real(psb_dpk_), intent(inout) :: val(:)
-      integer(psb_ipk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in)     :: nr, nc, nzin, dupl
+      integer(psb_ipk_), intent(inout)  :: ia(:), ja(:)
+      real(psb_dpk_), intent(inout)     :: val(:)
+      integer(psb_ipk_), intent(out)    :: nzout
+      integer(psb_ipk_), intent(out)    :: info
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_d_fix_coo_inner
   end interface
 
   interface
-    subroutine psb_d_fix_coo_inner_rowmajor(nr,nc,nzin,dupl,&
-         & ia,ja,val,iaux,nzout,info)
+    subroutine psb_d_fix_coo_inner_rowmajor(nr, nc, nzin, dupl, &
+         & ia, ja, val, iaux, nzout, info)
       import
-      integer(psb_ipk_), intent(in)           :: nr,nc,nzin,dupl
-      integer(psb_ipk_), intent(inout)        :: ia(:), ja(:), iaux(:)
-      real(psb_dpk_), intent(inout) :: val(:)
-      integer(psb_ipk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_ipk_), intent(in)     :: nr, nc, nzin, dupl
+      integer(psb_ipk_), intent(inout)  :: ia(:), ja(:), iaux(:)
+      real(psb_dpk_), intent(inout)     :: val(:)
+      integer(psb_ipk_), intent(out)    :: nzout
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psb_d_fix_coo_inner_rowmajor
   end interface
 
@@ -1889,24 +2008,25 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_fix_coo(a,info,idir)
+    subroutine psb_d_fix_coo(a, info, idir)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)                :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)              :: info
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_d_fix_coo
   end interface
+  
   !
-  !> Function  tril:
+  !> Function tril:
   !! \memberof  psb_d_coo_sparse_mat
   !! \brief  Copy the lower triangle, i.e. all entries
-  !!         A(I,J) such that J-I <= DIAG
+  !!         A(I, J) such that J-I <= DIAG
   !!         default value is DIAG=0, i.e. lower triangle up to
   !!         the main diagonal.
   !!         DIAG=-1 means copy the strictly lower triangle
   !!         DIAG= 1 means copy the lower triangle plus the first diagonal
   !!                 of the upper triangle.
-  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         Moreover, apply a clipping by copying entries A(I, J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!
@@ -1917,39 +2037,39 @@ module psb_d_base_mat_mod
   !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param u  [none]  copy of the complementary triangle
   !!
   !
   interface
-    subroutine psb_d_coo_tril(a,l,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale,u)
+    subroutine psb_d_coo_tril(a, l, info, &
+         & diag, imin, imax, jmin, jmax, rscale, cscale, u)
       import
-      class(psb_d_coo_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: l
-      integer(psb_ipk_),intent(out)              :: info
-      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
-      logical, intent(in), optional              :: rscale,cscale
-      class(psb_d_coo_sparse_mat), optional, intent(out) :: u
+      class(psb_d_coo_sparse_mat), intent(in)   :: a
+      class(psb_d_coo_sparse_mat), intent(out)  :: l
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional             :: diag, imin, imax, jmin, jmax
+      logical, intent(in), optional                       :: rscale, cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out)  :: u
     end subroutine psb_d_coo_tril
   end interface
 
   !
-  !> Function  triu:
+  !> Function triu:
   !! \memberof  psb_d_coo_sparse_mat
   !! \brief  Copy the upper triangle, i.e. all entries
-  !!         A(I,J) such that DIAG <= J-I
+  !!         A(I, J) such that DIAG <= J-I
   !!         default value is DIAG=0, i.e. upper triangle from
   !!         the main diagonal up.
   !!         DIAG= 1 means copy the strictly upper triangle
   !!         DIAG=-1 means copy the upper triangle plus the first diagonal
   !!                 of the lower triangle.
-  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         Moreover, apply a clipping by copying entries A(I, J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!         Optionally copies the lower triangle at the same time
@@ -1961,25 +2081,25 @@ module psb_d_base_mat_mod
   !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param l  [none]  copy of the complementary triangle
   !!
   !
   interface
-    subroutine psb_d_coo_triu(a,u,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale,l)
+    subroutine psb_d_coo_triu(a, u, info, &
+         & diag, imin, imax, jmin, jmax, rscale, cscale, l)
       import
-      class(psb_d_coo_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(out) :: u
-      integer(psb_ipk_),intent(out)              :: info
-      integer(psb_ipk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
-      logical, intent(in), optional              :: rscale,cscale
-      class(psb_d_coo_sparse_mat), optional, intent(out) :: l
+      class(psb_d_coo_sparse_mat), intent(in)   :: a
+      class(psb_d_coo_sparse_mat), intent(out)  :: u
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in), optional             :: diag, imin, imax, jmin, jmax
+      logical, intent(in), optional                       :: rscale, cscale
+      class(psb_d_coo_sparse_mat), optional, intent(out)  :: l
     end subroutine psb_d_coo_triu
   end interface
 
@@ -1988,11 +2108,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_coo
   interface
-    subroutine psb_d_cp_coo_to_coo(a,b,info)
+    subroutine psb_d_cp_coo_to_coo(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_coo_sparse_mat), intent(in)     :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_cp_coo_to_coo
   end interface
 
@@ -2000,22 +2120,23 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
   interface
-    subroutine psb_d_cp_coo_from_coo(a,b,info)
+    subroutine psb_d_cp_coo_from_coo(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)               :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      class(psb_d_coo_sparse_mat), intent(in)     :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_cp_coo_from_coo
   end interface
+
   !>
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_to_coo
   interface
-    subroutine psb_d_cp_coo_to_lcoo(a,b,info)
+    subroutine psb_d_cp_coo_to_lcoo(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(in) :: a
+      class(psb_d_coo_sparse_mat), intent(in)     :: a
       class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_cp_coo_to_lcoo
   end interface
 
@@ -2023,11 +2144,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
   interface
-    subroutine psb_d_cp_coo_from_lcoo(a,b,info)
+    subroutine psb_d_cp_coo_from_lcoo(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
       class(psb_ld_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_cp_coo_from_lcoo
   end interface
 
@@ -2036,11 +2157,11 @@ module psb_d_base_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_coo
   !!
   interface
-    subroutine psb_d_cp_coo_to_fmt(a,b,info)
+    subroutine psb_d_cp_coo_to_fmt(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(in)   :: a
+      class(psb_d_coo_sparse_mat), intent(in)     :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                       :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_cp_coo_to_fmt
   end interface
 
@@ -2049,11 +2170,11 @@ module psb_d_base_mat_mod
   !! \see psb_d_base_mat_mod::psb_d_base_cp_from_fmt
   !!
    interface
-    subroutine psb_d_cp_coo_from_fmt(a,b,info)
+    subroutine psb_d_cp_coo_from_fmt(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(in)   :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(in)    :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_cp_coo_from_fmt
   end interface
 
@@ -2061,11 +2182,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_to_coo
   interface
-    subroutine psb_d_mv_coo_to_coo(a,b,info)
+    subroutine psb_d_mv_coo_to_coo(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout)   :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a, b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_mv_coo_to_coo
   end interface
 
@@ -2073,11 +2193,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from_coo
   interface
-    subroutine psb_d_mv_coo_from_coo(a,b,info)
+    subroutine psb_d_mv_coo_from_coo(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a,b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_mv_coo_from_coo
   end interface
 
@@ -2085,11 +2204,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_to_fmt
   interface
-    subroutine psb_d_mv_coo_to_fmt(a,b,info)
+    subroutine psb_d_mv_coo_to_fmt(a, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(inout) :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_mv_coo_to_fmt
   end interface
 
@@ -2097,31 +2216,31 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_mv_from_fmt
   interface
-    subroutine psb_d_mv_coo_from_fmt(a,b,info)
+    subroutine psb_d_mv_coo_from_fmt(a, b, info)
       import
       class(psb_d_coo_sparse_mat), intent(inout)  :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                         :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_mv_coo_from_fmt
   end interface
 
   interface
-    subroutine psb_d_coo_cp_from(a,b)
+    subroutine psb_d_coo_cp_from(a, b)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      type(psb_d_coo_sparse_mat), intent(in)   :: b
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      type(psb_d_coo_sparse_mat), intent(in)      :: b
     end subroutine psb_d_coo_cp_from
   end interface
 
   interface
-    subroutine psb_d_coo_mv_from(a,b)
+    subroutine psb_d_coo_mv_from(a, b)
       import
       class(psb_d_coo_sparse_mat), intent(inout)  :: a
-      type(psb_d_coo_sparse_mat), intent(inout) :: b
+      type(psb_d_coo_sparse_mat), intent(inout)   :: b
     end subroutine psb_d_coo_mv_from
   end interface
-
-
+  
+  !
   !> Function csput
   !! \memberof  psb_d_coo_sparse_mat
   !! \brief  Add coefficients into the matrix.
@@ -2139,13 +2258,12 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_d_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+    subroutine psb_d_coo_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: val(:)
-      integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
-           &  imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(in)               :: nz, ia(:), ja(:), imin, imax, jmin, jmax
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      real(psb_dpk_), intent(in)                  :: val(:)
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_coo_csput_a
   end interface
 
@@ -2153,18 +2271,18 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_csgetptn
   interface
-    subroutine psb_d_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+    subroutine psb_d_coo_csgetptn(imin, imax, a, nz, ia, ja, info, &
+         & jmin, jmax, iren, append, nzin, rscale, cscale)
       import
-      class(psb_d_coo_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_), intent(out)                 :: nz
-      integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_ipk_), intent(in), optional        :: iren(:)
-      integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      integer(psb_ipk_), intent(in)                 :: imin, imax
+      class(psb_d_coo_sparse_mat), intent(in)       :: a
+      integer(psb_ipk_), intent(out)                :: nz
+      integer(psb_ipk_), allocatable, intent(inout) :: ia(:), ja(:)
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(in), optional :: jmin, jmax, nzin
+      integer(psb_ipk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_d_coo_csgetptn
   end interface
 
@@ -2172,19 +2290,19 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csgetrow
   interface
-    subroutine psb_d_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale,chksz)
+    subroutine psb_d_coo_csgetrow(imin, imax, a, nz, ia, ja, val, info, &
+         & jmin, jmax, iren, append, nzin, rscale, cscale, chksz)
       import
-      class(psb_d_coo_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_), intent(out)                 :: nz
-      integer(psb_ipk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_ipk_), intent(in), optional        :: iren(:)
-      integer(psb_ipk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale,chksz
+      integer(psb_ipk_), intent(in)                 :: imin, imax
+      class(psb_d_coo_sparse_mat), intent(in)       :: a
+      integer(psb_ipk_), intent(out)                :: nz
+      integer(psb_ipk_), allocatable, intent(inout) :: ia(:), ja(:)
+      real(psb_dpk_), allocatable, intent(inout)    :: val(:)
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(in), optional :: jmin, jmax, nzin
+      integer(psb_ipk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale, chksz
     end subroutine psb_d_coo_csgetrow
   end interface
 
@@ -2192,26 +2310,28 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cssv
   interface
-    subroutine psb_d_coo_cssv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_coo_cssv(alpha, a, x, beta, y, info, trans)
       import
+      real(psb_dpk_), intent(in)              :: alpha, beta
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout)       :: y(:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
+      real(psb_dpk_), intent(in)              :: x(:)
+      real(psb_dpk_), intent(inout)           :: y(:)
+      integer(psb_ipk_), intent(out)          :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_d_coo_cssv
   end interface
   !>
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cssm
   interface
-    subroutine psb_d_coo_cssm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_coo_cssm(alpha, a, x, beta, y, info, trans)
       import
+      real(psb_dpk_), intent(in)              :: alpha, beta
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout)       :: y(:,:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
+      real(psb_dpk_), intent(in)              :: x(:, :)
+      real(psb_dpk_), intent(inout)           :: y(:, :)
+      integer(psb_ipk_), intent(out)          :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_d_coo_cssm
   end interface
 
@@ -2219,13 +2339,14 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csmv
   interface
-    subroutine psb_d_coo_csmv(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_coo_csmv(alpha, a, x, beta, y, info, trans)
       import
+      real(psb_dpk_), intent(in)              :: alpha, beta
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)          :: alpha, beta, x(:)
-      real(psb_dpk_), intent(inout)       :: y(:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
+      real(psb_dpk_), intent(in)              :: x(:)
+      real(psb_dpk_), intent(inout)           :: y(:)
+      integer(psb_ipk_), intent(out)          :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_d_coo_csmv
   end interface
 
@@ -2233,16 +2354,16 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_csmm
   interface
-    subroutine psb_d_coo_csmm(alpha,a,x,beta,y,info,trans)
+    subroutine psb_d_coo_csmm(alpha, a, x, beta, y, info, trans)
       import
+      real(psb_dpk_), intent(in)              :: alpha, beta
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(in)          :: alpha, beta, x(:,:)
-      real(psb_dpk_), intent(inout)       :: y(:,:)
-      integer(psb_ipk_), intent(out)                :: info
-      character, optional, intent(in)     :: trans
+      real(psb_dpk_), intent(in)              :: x(:, :)
+      real(psb_dpk_), intent(inout)           :: y(:, :)
+      integer(psb_ipk_), intent(out)          :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_d_coo_csmm
   end interface
-
 
   !>
   !! \memberof  psb_d_coo_sparse_mat
@@ -2251,7 +2372,7 @@ module psb_d_base_mat_mod
     function psb_d_coo_maxval(a) result(res)
       import
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_dpk_)  :: res
     end function psb_d_coo_maxval
   end interface
 
@@ -2262,7 +2383,7 @@ module psb_d_base_mat_mod
     function psb_d_coo_csnmi(a) result(res)
       import
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_dpk_)  :: res
     end function psb_d_coo_csnmi
   end interface
 
@@ -2273,7 +2394,7 @@ module psb_d_base_mat_mod
     function psb_d_coo_csnm1(a) result(res)
       import
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_dpk_)  :: res
     end function psb_d_coo_csnm1
   end interface
 
@@ -2281,20 +2402,20 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_rowsum
   interface
-    subroutine psb_d_coo_rowsum(d,a)
+    subroutine psb_d_coo_rowsum(d, a)
       import
+      real(psb_dpk_), intent(out)             :: d(:)
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_coo_rowsum
   end interface
   !>
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_arwsum
   interface
-    subroutine psb_d_coo_arwsum(d,a)
+    subroutine psb_d_coo_arwsum(d, a)
       import
+      real(psb_dpk_), intent(out)             :: d(:)
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_coo_arwsum
   end interface
 
@@ -2302,10 +2423,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_colsum
   interface
-    subroutine psb_d_coo_colsum(d,a)
+    subroutine psb_d_coo_colsum(d, a)
       import
+      real(psb_dpk_), intent(out)             :: d(:)
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_coo_colsum
   end interface
 
@@ -2313,10 +2434,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_aclsum
   interface
-    subroutine psb_d_coo_aclsum(d,a)
+    subroutine psb_d_coo_aclsum(d, a)
       import
+      real(psb_dpk_), intent(out)             :: d(:)
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_d_coo_aclsum
   end interface
 
@@ -2324,11 +2445,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_get_diag
   interface
-    subroutine psb_d_coo_get_diag(a,d,info)
+    subroutine psb_d_coo_get_diag(a, d, info)
       import
       class(psb_d_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)     :: d(:)
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(out)             :: d(:)
+      integer(psb_ipk_), intent(out)          :: info
     end subroutine psb_d_coo_get_diag
   end interface
 
@@ -2336,11 +2457,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_scal
   interface
-    subroutine psb_d_coo_scal(d,a,info,side)
+    subroutine psb_d_coo_scal(d, a, info, side)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d(:)
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                  :: d(:)
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)              :: info
       character, intent(in), optional :: side
     end subroutine psb_d_coo_scal
   end interface
@@ -2349,35 +2470,36 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_scals
   interface
-    subroutine psb_d_coo_scals(d,a,info)
+    subroutine psb_d_coo_scals(d, a, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                  :: d
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_coo_scals
   end interface
+
   !>
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_scalplusidentity
   interface
-    subroutine psb_d_coo_scalplusidentity(d,a,info)
+    subroutine psb_d_coo_scalplusidentity(d, a, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                  :: d
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_coo_scalplusidentity
   end interface
+
   !
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_spaxpby
   interface
-    subroutine psb_d_coo_spaxpby(alpha,a,beta,b,info)
+    subroutine psb_d_coo_spaxpby(alpha, a, beta, b, info)
       import
-      class(psb_d_coo_sparse_mat), intent(inout) :: a
+      real(psb_dpk_), intent(in)                  :: alpha, beta
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
-      real(psb_dpk_), intent(in)      :: alpha
-      real(psb_dpk_), intent(in)      :: beta
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_d_coo_spaxpby
   end interface
 
@@ -2385,28 +2507,28 @@ module psb_d_base_mat_mod
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cmpval
   interface
-      function psb_d_coo_cmpval(a,val,tol,info) result(res)
-          import
-          class(psb_d_coo_sparse_mat), intent(inout) :: a
-          real(psb_dpk_), intent(in)             :: val
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
-      end function psb_d_coo_cmpval
+    function psb_d_coo_cmpval(a, val, tol, info) result(res)
+      import
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      real(psb_dpk_), intent(in)                  :: val
+      real(psb_dpk_), intent(in)                  :: tol
+      integer(psb_ipk_), intent(out)              :: info
+      logical :: res
+    end function psb_d_coo_cmpval
   end interface
 
   !
   !! \memberof  psb_d_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_d_base_cmpmat
   interface
-      function psb_d_coo_cmpmat(a,b,tol,info) result(res)
-          import
-          class(psb_d_coo_sparse_mat), intent(inout) :: a
-          class(psb_d_base_sparse_mat), intent(inout) :: b
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
-      end function psb_d_coo_cmpmat
+    function psb_d_coo_cmpmat(a, b, tol, info) result(res)
+      import
+      class(psb_d_coo_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(inout) :: b
+      real(psb_dpk_), intent(in)                  :: tol
+      integer(psb_ipk_), intent(out)              :: info
+      logical :: res
+    end function psb_d_coo_cmpmat
   end interface
 
   ! == =================
@@ -2415,29 +2537,29 @@ module psb_d_base_mat_mod
   !
   ! == =================
 
-  !> Function  csput:
+  !> Function csput:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Insert coefficients.
   !!
   !!
   !!         Given  a list of NZ triples
-  !!           (IA(i),JA(i),VAL(i))
+  !!           (IA(i), JA(i), VAL(i))
   !!         record a new coefficient in A such that
-  !!            A(IA(1:nz),JA(1:nz)) = VAL(1:NZ).
+  !!            A(IA(1:nz), JA(1:nz)) = VAL(1:NZ).
   !!
-  !!         The internal components IA,JA,VAL are reallocated as necessary.
+  !!         The internal components IA, JA, VAL are reallocated as necessary.
   !!         Constraints:
   !!         - If the matrix A is in the BUILD state, then the method will
   !!           only work for COO matrices, all other format will throw an error.
   !!           In this case coefficients are queued inside A for further processing.
   !!         - If the matrix A is in the UPDATE state, then it can be in any format;
   !!           the update operation will perform either
-  !!               A(IA(1:nz),JA(1:nz)) = VAL(1:NZ)
+  !!               A(IA(1:nz), JA(1:nz)) = VAL(1:NZ)
   !!           or
-  !!               A(IA(1:nz),JA(1:nz)) =  A(IA(1:nz),JA(1:nz))+VAL(1:NZ)
+  !!               A(IA(1:nz), JA(1:nz)) =  A(IA(1:nz), JA(1:nz))+VAL(1:NZ)
   !!           according to the value of DUPLICATE.
-  !!         - Coefficients with (IA(I),JA(I)) outside the ranges specified by
-  !!           IMIN:IMAX,JMIN:JMAX will be ignored.
+  !!         - Coefficients with (IA(I), JA(I)) outside the ranges specified by
+  !!           IMIN:IMAX, JMIN:JMAX will be ignored.
   !!
   !!  \param nz    number of triples in input
   !!  \param ia(:)  the input row indices
@@ -2448,33 +2570,33 @@ module psb_d_base_mat_mod
   !!  \param jmin  minimum col index
   !!  \param jmax  maximum col index
   !!  \param info  return code
-  !!  \param gtl(:) [none] an array to renumber indices   (iren(ia(:)),iren(ja(:))
+  !!  \param gtl(:) [none] an array to renumber indices   (iren(ia(:)), iren(ja(:))
   !!
   !
   interface
-    subroutine psb_ld_base_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+    subroutine psb_ld_base_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: val(:)
-      integer(psb_lpk_), intent(in)             :: nz, ia(:), ja(:), imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_lpk_), intent(in)                 :: nz, ia(:), ja(:), imin, imax, jmin, jmax
+      real(psb_dpk_), intent(in)                    :: val(:)
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_csput_a
   end interface
 
   interface
-    subroutine psb_ld_base_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+    subroutine psb_ld_base_csput_v(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_vect_type), intent(inout)  :: val
-      class(psb_l_base_vect_type), intent(inout)  :: ia, ja
-      integer(psb_lpk_), intent(in)             :: nz, imin, imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_lpk_), intent(in)                 :: nz, imin, imax, jmin, jmax
+      class(psb_l_base_vect_type), intent(inout)    :: ia, ja
+      class(psb_d_base_vect_type), intent(inout)    :: val
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_csput_v
   end interface
 
   !
   !
-  !> Function  csgetrow:
+  !> Function csgetrow:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Get a (subset of) row(s)
   !!
@@ -2485,7 +2607,7 @@ module psb_d_base_mat_mod
   !!           NZ, IA(1:nz), JA(1:nz), VAL(1:NZ)
   !!         each identifying the position of a nonzero in A
   !!         between row indices IMIN:IMAX;
-  !!         IA,JA are reallocated as necessary.
+  !!         IA, JA are reallocated as necessary.
   !!
   !!  \param imin  the minimum row index we are interested in
   !!  \param imax  the minimum row index we are interested in
@@ -2496,33 +2618,33 @@ module psb_d_base_mat_mod
   !!  \param info  return code
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!
   !
   interface
-    subroutine psb_ld_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+    subroutine psb_ld_base_csgetrow(imin, imax, a, nz, ia, ja, val, info, &
+          & jmin, jmax, iren, append, nzin, rscale, cscale)
       import
-      class(psb_ld_base_sparse_mat), intent(in) :: a
-      integer(psb_lpk_), intent(in)                  :: imin,imax
-      integer(psb_lpk_), intent(out)                 :: nz
-      integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_lpk_), intent(in), optional        :: iren(:)
-      integer(psb_lpk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      integer(psb_lpk_), intent(in)                 :: imin, imax
+      class(psb_ld_base_sparse_mat), intent(in)     :: a
+      integer(psb_lpk_), intent(out)                :: nz
+      integer(psb_lpk_), allocatable, intent(inout) :: ia(:), ja(:)
+      real(psb_dpk_), allocatable, intent(inout)    :: val(:)
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_lpk_), intent(in), optional :: jmin, jmax, nzin
+      integer(psb_lpk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_ld_base_csgetrow
   end interface
 
   !
-  !> Function  csgetblk:
+  !> Function csgetblk:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Get a (subset of) row(s)
   !!
@@ -2535,32 +2657,32 @@ module psb_d_base_mat_mod
   !!  \param info  return code
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!
   !
   interface
-    subroutine psb_ld_base_csgetblk(imin,imax,a,b,info,&
-         & jmin,jmax,iren,append,rscale,cscale)
+    subroutine psb_ld_base_csgetblk(imin, imax, a, b, info, &
+          & jmin, jmax, iren, append, rscale, cscale)
       import
-      class(psb_ld_base_sparse_mat), intent(in) :: a
+      integer(psb_lpk_), intent(in)               :: imin, imax
+      class(psb_ld_base_sparse_mat), intent(in)   :: a
       class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_lpk_), intent(in)                  :: imin,imax
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_lpk_), intent(in), optional        :: iren(:)
-      integer(psb_lpk_), intent(in), optional        :: jmin,jmax
-      logical, intent(in), optional        :: rscale,cscale
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_lpk_), intent(in), optional :: jmin, jmax
+      integer(psb_lpk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_ld_base_csgetblk
   end interface
 
   !
   !
-  !> Function  csclip:
+  !> Function csclip:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Get a submatrix.
   !!
@@ -2573,36 +2695,37 @@ module psb_d_base_mat_mod
   !!  \param imax [a%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!
   !
   interface
-    subroutine psb_ld_base_csclip(a,b,info,&
-         & imin,imax,jmin,jmax,rscale,cscale)
+    subroutine psb_ld_base_csclip(a, b, info, &
+          & imin, imax, jmin, jmax, rscale, cscale)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
       class(psb_ld_coo_sparse_mat), intent(out) :: b
-      integer(psb_ipk_),intent(out)            :: info
-      integer(psb_lpk_), intent(in), optional  :: imin,imax,jmin,jmax
-      logical, intent(in), optional            :: rscale,cscale
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_lpk_), intent(in), optional :: imin, imax, jmin, jmax
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_ld_base_csclip
   end interface
+
   !
-  !> Function  tril:
+  !> Function tril:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief  Copy the lower triangle, i.e. all entries
-  !!         A(I,J) such that J-I <= DIAG
+  !!         A(I, J) such that J-I <= DIAG
   !!         default value is DIAG=0, i.e. lower triangle up to
   !!         the main diagonal.
   !!         DIAG=-1 means copy the strictly lower triangle
   !!         DIAG= 1 means copy the lower triangle plus the first diagonal
   !!                 of the upper triangle.
-  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         Moreover, apply a clipping by copying entries A(I, J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!
@@ -2613,39 +2736,39 @@ module psb_d_base_mat_mod
   !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param u  [none]  copy of the complementary triangle
   !!
   !
   interface
-    subroutine psb_ld_base_tril(a,l,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale,u)
+    subroutine psb_ld_base_tril(a, l, info, diag, imin, imax, &
+         & jmin, jmax, rscale, cscale, u)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
       class(psb_ld_coo_sparse_mat), intent(out) :: l
-      integer(psb_ipk_),intent(out)              :: info
-      integer(psb_lpk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
-      logical, intent(in), optional              :: rscale,cscale
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_lpk_), intent(in), optional             :: diag, imin, imax, jmin, jmax
+      logical, intent(in), optional                       :: rscale, cscale
       class(psb_ld_coo_sparse_mat), optional, intent(out) :: u
     end subroutine psb_ld_base_tril
   end interface
 
   !
-  !> Function  triu:
+  !> Function triu:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief  Copy the upper triangle, i.e. all entries
-  !!         A(I,J) such that DIAG <= J-I
+  !!         A(I, J) such that DIAG <= J-I
   !!         default value is DIAG=0, i.e. upper triangle from
   !!         the main diagonal up.
   !!         DIAG= 1 means copy the strictly upper triangle
   !!         DIAG=-1 means copy the upper triangle plus the first diagonal
   !!                 of the lower triangle.
-  !!         Moreover, apply a clipping by copying entries A(I,J) only if
+  !!         Moreover, apply a clipping by copying entries A(I, J) only if
   !!         IMIN<=I<=IMAX
   !!         JMIN<=J<=JMAX
   !!         Optionally copies the lower triangle at the same time
@@ -2657,50 +2780,49 @@ module psb_d_base_mat_mod
   !!  \param imax [a\%get_nrows()] the minimum row index we are interested in
   !!  \param jmin [1] minimum col index
   !!  \param jmax [a\%get_ncols()] maximum col index
-  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)),iren(ja(:))
+  !!  \param iren(:) [none] an array to return renumbered indices (iren(ia(:)), iren(ja(:))
   !!  \param rscale [false] map [min(ia(:)):max(ia(:))] onto [1:max(ia(:))-min(ia(:))+1]
   !!  \param cscale [false] map [min(ja(:)):max(ja(:))] onto [1:max(ja(:))-min(ja(:))+1]
-  !!          ( iren cannot be specified with rscale/cscale)
-  !!  \param append [false] append to ia,ja
+  !!          (iren cannot be specified with rscale/cscale)
+  !!  \param append [false] append to ia, ja
   !!  \param nzin [none]  if append, then first new entry should go in entry nzin+1
   !!  \param l  [none]  copy of the complementary triangle
   !!
   !
   interface
-    subroutine psb_ld_base_triu(a,u,info,diag,imin,imax,&
-         & jmin,jmax,rscale,cscale,l)
+    subroutine psb_ld_base_triu(a, u, info, diag, imin, imax, &
+         & jmin, jmax, rscale, cscale, l)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
       class(psb_ld_coo_sparse_mat), intent(out) :: u
-      integer(psb_ipk_),intent(out)              :: info
-      integer(psb_lpk_), intent(in), optional    :: diag,imin,imax,jmin,jmax
-      logical, intent(in), optional              :: rscale,cscale
+      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_lpk_), intent(in), optional             :: diag, imin, imax, jmin, jmax
+      logical, intent(in), optional                       :: rscale, cscale
       class(psb_ld_coo_sparse_mat), optional, intent(out) :: l
     end subroutine psb_ld_base_triu
   end interface
 
-
   !
-  !> Function  get_diag:
+  !> Function get_diag:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Extract the diagonal of A.
   !!
-  !!   D(i) = A(i:i), i=1:min(nrows,ncols)
+  !!   D(i) = A(i:i), i=1:min(nrows, ncols)
   !!
   !! \param d(:)  The output diagonal
   !! \param info  return code.
   !
   interface
-    subroutine psb_ld_base_get_diag(a,d,info)
+    subroutine psb_ld_base_get_diag(a, d, info)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)     :: d(:)
+      real(psb_dpk_), intent(out)               :: d(:)
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ld_base_get_diag
   end interface
 
   !
-  !> Function  mold:
+  !> Function mold:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Allocate a class(psb_ld_base_sparse_mat) with the
   !!     same dynamic type as the input.
@@ -2710,41 +2832,38 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mold(a,b,info)
+    subroutine psb_ld_base_mold(a, b, info)
       import
       class(psb_ld_base_sparse_mat), intent(in)                 :: a
       class(psb_ld_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_ld_base_mold
   end interface
 
   !
-  !
-  !> Function  clone:
+  !> Function clone:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Allocate and clone  a class(psb_ld_base_sparse_mat) with the
   !!     same dynamic type as the input.
   !!     This is equivalent to allocate( source=  ) except that
   !!     it should guarantee a deep copy wherever needed.
-  !!     Should also be equivalent to calling mold and then copy,
+  !!     Should also be equivalent to calling mold and then copy, 
   !!     but it can also be implemented by default using cp_to_fmt.
   !!   \param b The output variable
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_clone(a,b, info)
+    subroutine psb_ld_base_clone(a, b, info)
       import
       implicit none
       class(psb_ld_base_sparse_mat), intent(inout)              :: a
       class(psb_ld_base_sparse_mat), allocatable, intent(inout) :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_ld_base_clone
   end interface
 
-
   !
-  !
-  !> Function  make_nonunit:
+  !> Function make_nonunit:
   !! \memberof  psb_ld_base_make_nonunit
   !! \brief Given a matrix for which is_unit() is true, explicitly
   !!     store the unit diagonal and set is_unit() to false.
@@ -2758,9 +2877,8 @@ module psb_d_base_mat_mod
     end subroutine psb_ld_base_make_nonunit
   end interface
 
-
   !
-  !> Function  cp_to_coo:
+  !> Function cp_to_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert to psb_ld_coo_sparse_mat
   !!        Invoked from the source object.
@@ -2768,16 +2886,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_to_coo(a,b,info)
+    subroutine psb_ld_base_cp_to_coo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(in) :: a
+      class(psb_ld_base_sparse_mat), intent(in)   :: a
       class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_base_cp_to_coo
   end interface
 
   !
-  !> Function  cp_from_coo:
+  !> Function cp_from_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert from psb_ld_coo_sparse_mat
   !!        Invoked from the target object.
@@ -2785,16 +2903,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_from_coo(a,b,info)
+    subroutine psb_ld_base_cp_from_coo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(in)     :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_ld_coo_sparse_mat), intent(in)      :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_cp_from_coo
   end interface
 
   !
-  !> Function  cp_to_fmt:
+  !> Function cp_to_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert to a class(psb_ld_base_sparse_mat)
   !!        Invoked from the source object. Can be implemented by
@@ -2803,16 +2921,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_to_fmt(a,b,info)
+    subroutine psb_ld_base_cp_to_fmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(in) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(in)     :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_cp_to_fmt
   end interface
 
   !
-  !> Function  cp_from_fmt:
+  !> Function cp_from_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert from a class(psb_ld_base_sparse_mat)
   !!        Invoked from the target object. Can be implemented by
@@ -2821,16 +2939,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_from_fmt(a,b,info)
+    subroutine psb_ld_base_cp_from_fmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(in) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_ld_base_sparse_mat), intent(in)     :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_cp_from_fmt
   end interface
 
   !
-  !> Function  mv_to_coo:
+  !> Function mv_to_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert to psb_ld_coo_sparse_mat, freeing the source.
   !!        Invoked from the source object.
@@ -2838,16 +2956,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_to_coo(a,b,info)
+    subroutine psb_ld_base_mv_to_coo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_ld_coo_sparse_mat), intent(inout)   :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_to_coo
   end interface
 
   !
-  !> Function  mv_from_coo:
+  !> Function mv_from_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert from psb_ld_coo_sparse_mat, freeing the source.
   !!        Invoked from the target object.
@@ -2855,16 +2973,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_from_coo(a,b,info)
+    subroutine psb_ld_base_mv_from_coo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_ld_coo_sparse_mat), intent(inout)   :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_from_coo
   end interface
 
   !
-  !> Function  mv_to_fmt:
+  !> Function mv_to_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert to a class(psb_ld_base_sparse_mat), freeing the source.
   !!        Invoked from the source object. Can be implemented by
@@ -2873,16 +2991,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_to_fmt(a,b,info)
+    subroutine psb_ld_base_mv_to_fmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_to_fmt
   end interface
 
   !
-  !> Function  mv_from_fmt:
+  !> Function mv_from_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert from a class(psb_ld_base_sparse_mat), freeing the source.
   !!        Invoked from the target object. Can be implemented by
@@ -2891,17 +3009,17 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_from_fmt(a,b,info)
+    subroutine psb_ld_base_mv_from_fmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_from_fmt
   end interface
 
 
   !
-  !> Function  cp_to_coo:
+  !> Function cp_to_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert to psb_ld_coo_sparse_mat
   !!        Invoked from the source object.
@@ -2909,16 +3027,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_to_icoo(a,b,info)
+    subroutine psb_ld_base_cp_to_icoo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(in)   :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_base_cp_to_icoo
   end interface
 
   !
-  !> Function  cp_from_coo:
+  !> Function cp_from_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert from psb_ld_coo_sparse_mat
   !!        Invoked from the target object.
@@ -2926,16 +3044,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_from_icoo(a,b,info)
+    subroutine psb_ld_base_cp_from_icoo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(in)     :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_d_coo_sparse_mat), intent(in)       :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_cp_from_icoo
   end interface
 
   !
-  !> Function  cp_to_fmt:
+  !> Function cp_to_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert to a class(psb_ld_base_sparse_mat)
   !!        Invoked from the source object. Can be implemented by
@@ -2944,16 +3062,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_to_ifmt(a,b,info)
+    subroutine psb_ld_base_cp_to_ifmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(in) :: a
+      class(psb_ld_base_sparse_mat), intent(in)   :: a
       class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_base_cp_to_ifmt
   end interface
 
   !
-  !> Function  cp_from_fmt:
+  !> Function cp_from_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Copy and convert from a class(psb_ld_base_sparse_mat)
   !!        Invoked from the target object. Can be implemented by
@@ -2962,16 +3080,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_cp_from_ifmt(a,b,info)
+    subroutine psb_ld_base_cp_from_ifmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(in) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(in)      :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_cp_from_ifmt
   end interface
 
   !
-  !> Function  mv_to_coo:
+  !> Function mv_to_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert to psb_ld_coo_sparse_mat, freeing the source.
   !!        Invoked from the source object.
@@ -2979,16 +3097,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_to_icoo(a,b,info)
+    subroutine psb_ld_base_mv_to_icoo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_d_coo_sparse_mat), intent(inout)    :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_to_icoo
   end interface
 
   !
-  !> Function  mv_from_coo:
+  !> Function mv_from_coo:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert from psb_ld_coo_sparse_mat, freeing the source.
   !!        Invoked from the target object.
@@ -2996,16 +3114,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_from_icoo(a,b,info)
+    subroutine psb_ld_base_mv_from_icoo(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_d_coo_sparse_mat), intent(inout)    :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_from_icoo
   end interface
 
   !
-  !> Function  mv_to_fmt:
+  !> Function mv_to_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert to a class(psb_ld_base_sparse_mat), freeing the source.
   !!        Invoked from the source object. Can be implemented by
@@ -3014,16 +3132,16 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_to_ifmt(a,b,info)
+    subroutine psb_ld_base_mv_to_ifmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(inout)   :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_to_ifmt
   end interface
 
   !
-  !> Function  mv_from_fmt:
+  !> Function mv_from_fmt:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Convert from a class(psb_ld_base_sparse_mat), freeing the source.
   !!        Invoked from the target object. Can be implemented by
@@ -3032,15 +3150,13 @@ module psb_d_base_mat_mod
   !!   \param info return code
   !
   interface
-    subroutine psb_ld_base_mv_from_ifmt(a,b,info)
+    subroutine psb_ld_base_mv_from_ifmt(a, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_d_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      class(psb_d_base_sparse_mat), intent(inout)   :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_mv_from_ifmt
   end interface
-
-
 
   !
   !>
@@ -3048,10 +3164,10 @@ module psb_d_base_mat_mod
   !! \see psb_ld_base_mat_mod::psb_ld_base_clean_zeros
   !
   interface
-    subroutine  psb_ld_base_clean_zeros(a, info)
+    subroutine psb_ld_base_clean_zeros(a, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)              :: info
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_clean_zeros
   end interface
 
@@ -3061,8 +3177,8 @@ module psb_d_base_mat_mod
   interface
     function psb_ld_coo_maxval(a) result(res)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_)  :: res
     end function psb_ld_coo_maxval
   end interface
 
@@ -3072,8 +3188,8 @@ module psb_d_base_mat_mod
   interface
     function psb_ld_coo_csnmi(a) result(res)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_)  :: res
     end function psb_ld_coo_csnmi
   end interface
 
@@ -3083,8 +3199,8 @@ module psb_d_base_mat_mod
   interface
     function psb_ld_coo_csnm1(a) result(res)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_)  :: res
     end function psb_ld_coo_csnm1
   end interface
 
@@ -3092,20 +3208,21 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_ld_base_rowsum
   interface
-    subroutine psb_ld_coo_rowsum(d,a)
+    subroutine psb_ld_coo_rowsum(d, a)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(out)               :: d(:)
     end subroutine psb_ld_coo_rowsum
   end interface
+
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_ld_base_arwsum
   interface
-    subroutine psb_ld_coo_arwsum(d,a)
+    subroutine psb_ld_coo_arwsum(d, a)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(out)               :: d(:)
     end subroutine psb_ld_coo_arwsum
   end interface
 
@@ -3113,10 +3230,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_ld_base_colsum
   interface
-    subroutine psb_ld_coo_colsum(d,a)
+    subroutine psb_ld_coo_colsum(d, a)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(out)               :: d(:)
     end subroutine psb_ld_coo_colsum
   end interface
 
@@ -3124,15 +3241,15 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_d_base_mat_mod::psb_ld_base_aclsum
   interface
-    subroutine psb_ld_coo_aclsum(d,a)
+    subroutine psb_ld_coo_aclsum(d, a)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      real(psb_dpk_), intent(out)               :: d(:)
     end subroutine psb_ld_coo_aclsum
   end interface
 
   !
-  !> Function  base_scals:
+  !> Function base_scals:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Scale a matrix by a single scalar value
   !!
@@ -3140,16 +3257,16 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-    subroutine psb_ld_base_scals(d,a,info)
+    subroutine psb_ld_base_scals(d, a, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                    :: d
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_scals
   end interface
 
   !
-  !> Function  base_scalsplusidentity:
+  !> Function base_scalsplusidentity:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Scale a matrix by a single scalar value and adds identity
   !!
@@ -3157,15 +3274,16 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-    subroutine psb_ld_base_scalplusidentity(d,a,info)
+    subroutine psb_ld_base_scalplusidentity(d, a, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                    :: d
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_scalplusidentity
   end interface
+
   !
-  !> Function  base_spaxpby:
+  !> Function base_spaxpby:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Scale add tow sparse matrices A = alpha A + beta B
   !!
@@ -3176,19 +3294,16 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-    subroutine psb_ld_base_spaxpby(alpha,a,beta,b,info)
+    subroutine psb_ld_base_spaxpby(alpha, a, beta, b, info)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      real(psb_dpk_), intent(in)      :: alpha
-      real(psb_dpk_), intent(in)      :: beta
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a, b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_base_spaxpby
   end interface
 
-
   !
-  !> Function  base_scal:
+  !> Function base_scal:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Scale a matrix by a vector
   !!
@@ -3197,19 +3312,19 @@ module psb_d_base_mat_mod
   !! \param side   [L] Scale on the Left (rows) or on the Right (columns)
   !
   interface
-    subroutine psb_ld_base_scal(d,a,info,side)
+    subroutine psb_ld_base_scal(d, a, info, side)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d(:)
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                    :: d(:)
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
+      integer(psb_ipk_), intent(out)                :: info
       character, intent(in), optional :: side
     end subroutine psb_ld_base_scal
   end interface
 
   !
-  !> Function  base_cmpval:
+  !> Function base_cmpval:
   !! \memberof  psb_ld_base_sparse_mat
-  !! \brief Compare the element of A with the value val |A(i,j) -val| < tol
+  !! \brief Compare the element of A with the value val |A(i, j) -val| < tol
   !!
   !! \param alpha  scaling for A
   !! \param A      sparse matrix A (intent inout)
@@ -3219,20 +3334,20 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-      function psb_ld_base_cmpval(a,val,tol,info) result(res)
+      function psb_ld_base_cmpval(a, val, tol, info) result(res)
           import
-          class(psb_ld_base_sparse_mat), intent(inout) :: a
-          real(psb_dpk_), intent(in)             :: val
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
+          class(psb_ld_base_sparse_mat), intent(inout)  :: a
+          real(psb_dpk_), intent(in)                    :: val
+          real(psb_dpk_), intent(in)                    :: tol
+          integer(psb_ipk_), intent(out)                :: info
+          logical :: res
       end function psb_ld_base_cmpval
   end interface
 
   !
-  !> Function  base_cmpmat:
+  !> Function base_cmpmat:
   !! \memberof  psb_ld_base_sparse_mat
-  !! \brief Compare the element of A with the ones of B |A(i,j) - B(i,j)| < tol
+  !! \brief Compare the element of A with the ones of B |A(i, j) - B(i, j)| < tol
   !!
   !! \param alpha  scaling for A
   !! \param A      sparse matrix A (intent inout)
@@ -3242,18 +3357,17 @@ module psb_d_base_mat_mod
   !! \param info   return code
   !
   interface
-      function psb_ld_base_cmpmat(a,b,tol,info) result(res)
-          import
-          class(psb_ld_base_sparse_mat), intent(inout) :: a
-          class(psb_ld_base_sparse_mat), intent(inout) :: b
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
-      end function psb_ld_base_cmpmat
+    function psb_ld_base_cmpmat(a, b, tol, info) result(res)
+      import
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a, b
+      real(psb_dpk_), intent(in)                    :: tol
+      integer(psb_ipk_), intent(out)                :: info
+      logical :: res
+    end function psb_ld_base_cmpmat
   end interface
 
   !
-  !> Function  base_maxval:
+  !> Function base_maxval:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Maximum absolute value of all coefficients;
   !!
@@ -3262,13 +3376,12 @@ module psb_d_base_mat_mod
     function psb_ld_base_maxval(a) result(res)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_dpk_)  :: res
     end function psb_ld_base_maxval
   end interface
 
   !
-  !
-  !> Function  base_csnmi:
+  !> Function base_csnmi:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Operator infinity norm
   !!
@@ -3277,13 +3390,12 @@ module psb_d_base_mat_mod
     function psb_ld_base_csnmi(a) result(res)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_dpk_)  :: res
     end function psb_ld_base_csnmi
   end interface
 
   !
-  !
-  !> Function  base_csnmi:
+  !> Function base_csnmi:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Operator 1-norm
   !!
@@ -3292,73 +3404,70 @@ module psb_d_base_mat_mod
     function psb_ld_base_csnm1(a) result(res)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_)         :: res
+      real(psb_dpk_)  :: res
     end function psb_ld_base_csnm1
   end interface
 
   !
-  !
-  !> Function  base_rowsum:
+  !> Function base_rowsum:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Sum along the rows
   !! \param d(:) The output row sums
   !!
   !
   interface
-    subroutine psb_ld_base_rowsum(d,a)
+    subroutine psb_ld_base_rowsum(d, a)
       import
+      real(psb_dpk_), intent(out)               :: d(:)
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_ld_base_rowsum
   end interface
 
   !
-  !> Function  base_arwsum:
+  !> Function base_arwsum:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Absolute value sum along the rows
   !! \param d(:) The output row sums
   !!
   interface
-    subroutine psb_ld_base_arwsum(d,a)
+    subroutine psb_ld_base_arwsum(d, a)
       import
+      real(psb_dpk_), intent(out)               :: d(:)
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_ld_base_arwsum
   end interface
 
   !
-  !
-  !> Function  base_colsum:
+  !> Function base_colsum:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Sum along the columns
   !! \param d(:) The output col sums
   !!
   !
   interface
-    subroutine psb_ld_base_colsum(d,a)
+    subroutine psb_ld_base_colsum(d, a)
       import
+      real(psb_dpk_), intent(out)               :: d(:)
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_ld_base_colsum
   end interface
 
   !
-  !> Function  base_aclsum:
+  !> Function base_aclsum:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Absolute value sum along the columns
   !! \param d(:) The output col sums
   !!
   interface
-    subroutine psb_ld_base_aclsum(d,a)
+    subroutine psb_ld_base_aclsum(d, a)
       import
+      real(psb_dpk_), intent(out)               :: d(:)
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)              :: d(:)
     end subroutine psb_ld_base_aclsum
   end interface
 
-
   !
-  !> Function  transp:
+  !> Function transp:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -3366,15 +3475,15 @@ module psb_d_base_mat_mod
   !!   \param b The output variable
   !
    interface
-    subroutine psb_ld_base_transp_2mat(a,b)
+    subroutine psb_ld_base_transp_2mat(a, b)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      class(psb_lbase_sparse_mat), intent(out)    :: b
+      class(psb_lbase_sparse_mat), intent(out)  :: b
     end subroutine psb_ld_base_transp_2mat
   end interface
 
   !
-  !> Function  transc:
+  !> Function transc:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -3382,15 +3491,15 @@ module psb_d_base_mat_mod
   !!   \param b The output variable
   !
   interface
-    subroutine psb_ld_base_transc_2mat(a,b)
+    subroutine psb_ld_base_transc_2mat(a, b)
       import
       class(psb_ld_base_sparse_mat), intent(in) :: a
-      class(psb_lbase_sparse_mat), intent(out)    :: b
+      class(psb_lbase_sparse_mat), intent(out)  :: b
     end subroutine psb_ld_base_transc_2mat
   end interface
 
   !
-  !> Function  transp:
+  !> Function transp:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -3399,12 +3508,12 @@ module psb_d_base_mat_mod
   interface
     subroutine psb_ld_base_transp_1mat(a)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
     end subroutine psb_ld_base_transp_1mat
   end interface
 
   !
-  !> Function  transc:
+  !> Function transc:
   !! \memberof  psb_ld_base_sparse_mat
   !! \brief Conjugate Transpose. Can always be implemented by staging through a COO
   !!        temporary for which transpose is very easy.
@@ -3413,7 +3522,7 @@ module psb_d_base_mat_mod
   interface
     subroutine psb_ld_base_transc_1mat(a)
       import
-      class(psb_ld_base_sparse_mat), intent(inout) :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: a
     end subroutine psb_ld_base_transc_1mat
   end interface
 
@@ -3429,20 +3538,21 @@ module psb_d_base_mat_mod
   !! \see psb_base_mat_mod::psb_base_reallocate_nz
   !
   interface
-    subroutine  psb_ld_coo_reallocate_nz(nz,a)
+    subroutine psb_ld_coo_reallocate_nz(nz, a)
       import
-      integer(psb_lpk_), intent(in) :: nz
+      integer(psb_lpk_), intent(in)               :: nz
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_ld_coo_reallocate_nz
   end interface
+
   !
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !
   interface
-    subroutine  psb_ld_coo_ensure_size(nz,a)
+    subroutine psb_ld_coo_ensure_size(nz, a)
       import
-      integer(psb_lpk_), intent(in) :: nz
+      integer(psb_lpk_), intent(in)               :: nz
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_ld_coo_ensure_size
   end interface
@@ -3453,33 +3563,35 @@ module psb_d_base_mat_mod
   !! \see psb_base_mat_mod::psb_base_reinit
   !
   interface
-    subroutine psb_ld_coo_reinit(a,clear)
+    subroutine psb_ld_coo_reinit(a, clear)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
       logical, intent(in), optional :: clear
     end subroutine psb_ld_coo_reinit
   end interface
+
   !
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_trim
   !
   interface
-    subroutine  psb_ld_coo_trim(a)
+    subroutine psb_ld_coo_trim(a)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
     end subroutine psb_ld_coo_trim
   end interface
+
   !
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_clean_zeros
   !
   interface
-    subroutine  psb_ld_coo_clean_zeros(a,info)
+    subroutine psb_ld_coo_clean_zeros(a, info)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_coo_clean_zeros
   end interface
 
@@ -3492,10 +3604,10 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine  psb_ld_coo_clean_negidx(a,info)
+    subroutine psb_ld_coo_clean_negidx(a, info)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_coo_clean_negidx
   end interface
 
@@ -3513,42 +3625,41 @@ module psb_d_base_mat_mod
   !!
   !
   interface  psb_coo_clean_negidx_inner
-    subroutine psb_ld_coo_clean_negidx_inner(nzin,ia,ja,val,nzout,info)
+    subroutine psb_ld_coo_clean_negidx_inner(nzin, ia, ja, val, nzout, info)
       import
-      integer(psb_lpk_), intent(in)           :: nzin
-      integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
-      real(psb_dpk_), intent(inout) :: val(:)
-      integer(psb_lpk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_lpk_), intent(in)     :: nzin
+      integer(psb_lpk_), intent(inout)  :: ia(:), ja(:)
+      real(psb_dpk_), intent(inout)     :: val(:)
+      integer(psb_lpk_), intent(out)    :: nzout
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psb_ld_coo_clean_negidx_inner
   end interface psb_coo_clean_negidx_inner
 #endif
+
   !
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_allocate_mnnz
   !
   interface
-    subroutine  psb_ld_coo_allocate_mnnz(m,n,a,nz)
+    subroutine psb_ld_coo_allocate_mnnz(m, n, a, nz)
       import
-      integer(psb_lpk_), intent(in) :: m,n
+      integer(psb_lpk_), intent(in)               :: m, n
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      integer(psb_lpk_), intent(in), optional :: nz
+      integer(psb_lpk_), intent(in), optional     :: nz
     end subroutine psb_ld_coo_allocate_mnnz
   end interface
-
 
   !> \memberof psb_ld_coo_sparse_mat
   !| \see psb_base_mat_mod::psb_base_mold
   interface
-    subroutine psb_ld_coo_mold(a,b,info)
+    subroutine psb_ld_coo_mold(a, b, info)
       import
       class(psb_ld_coo_sparse_mat), intent(in)                  :: a
       class(psb_ld_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_ld_coo_mold
   end interface
-
 
   !
   !> Function print.
@@ -3563,17 +3674,15 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_ld_coo_print(iout,a,iv,head,ivr,ivc)
+    subroutine psb_ld_coo_print(iout, a, iv, head, ivr, ivc)
       import
-      integer(psb_ipk_), intent(in)               :: iout
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      integer(psb_lpk_), intent(in), optional     :: iv(:)
-      character(len=*), optional        :: head
-      integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+      integer(psb_ipk_), intent(in)             :: iout
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
+      integer(psb_lpk_), intent(in), optional :: iv(:)
+      character(len=*), optional              :: head
+      integer(psb_lpk_), intent(in), optional :: ivr(:), ivc(:)
     end subroutine psb_ld_coo_print
   end interface
-
-
 
   !
   !> Function get_nz_row.
@@ -3584,14 +3693,13 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    function  psb_ld_coo_get_nz_row(idx,a) result(res)
+    function psb_ld_coo_get_nz_row(idx, a) result(res)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      integer(psb_lpk_), intent(in)                  :: idx
+      integer(psb_lpk_), intent(in)             :: idx
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
       integer(psb_lpk_) :: res
     end function psb_ld_coo_get_nz_row
   end interface
-
 
   !
   !> Funtion: fix_coo_inner
@@ -3608,14 +3716,14 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_ld_fix_coo_inner(nr,nc,nzin,dupl,ia,ja,val,nzout,info,idir)
+    subroutine psb_ld_fix_coo_inner(nr, nc, nzin, dupl, ia, ja, val, nzout, info, idir)
       import
-      integer(psb_lpk_), intent(in)           :: nr,nc,nzin
-      integer(psb_ipk_), intent(in)           :: dupl
-      integer(psb_lpk_), intent(inout)        :: ia(:), ja(:)
-      real(psb_dpk_), intent(inout) :: val(:)
-      integer(psb_lpk_), intent(out)          :: nzout
-      integer(psb_ipk_), intent(out)          :: info
+      integer(psb_lpk_), intent(in)     :: nr, nc, nzin
+      integer(psb_ipk_), intent(in)     :: dupl
+      integer(psb_lpk_), intent(inout)  :: ia(:), ja(:)
+      real(psb_dpk_), intent(inout)     :: val(:)
+      integer(psb_lpk_), intent(out)    :: nzout
+      integer(psb_ipk_), intent(out)    :: info
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_ld_fix_coo_inner
   end interface
@@ -3629,10 +3737,10 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_ld_fix_coo(a,info,idir)
+    subroutine psb_ld_fix_coo(a, info, idir)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_ipk_), intent(out)              :: info
       integer(psb_ipk_), intent(in), optional :: idir
     end subroutine psb_ld_fix_coo
   end interface
@@ -3641,11 +3749,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_cp_to_coo
   interface
-    subroutine psb_ld_cp_coo_to_coo(a,b,info)
+    subroutine psb_ld_cp_coo_to_coo(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
+      class(psb_ld_coo_sparse_mat), intent(in)    :: a
       class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_cp_coo_to_coo
   end interface
 
@@ -3653,24 +3761,23 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_cp_from_coo
   interface
-    subroutine psb_ld_cp_coo_from_coo(a,b,info)
+    subroutine psb_ld_cp_coo_from_coo(a, b, info)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
       class(psb_ld_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)               :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_cp_coo_from_coo
   end interface
-
 
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_cp_to_coo
   interface
-    subroutine psb_ld_cp_coo_to_icoo(a,b,info)
+    subroutine psb_ld_cp_coo_to_icoo(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      class(psb_d_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_coo_sparse_mat), intent(in)    :: a
+      class(psb_d_coo_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_cp_coo_to_icoo
   end interface
 
@@ -3678,11 +3785,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_cp_from_coo
   interface
-    subroutine psb_ld_cp_coo_from_icoo(a,b,info)
+    subroutine psb_ld_cp_coo_from_icoo(a, b, info)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      class(psb_d_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)               :: info
+      class(psb_d_coo_sparse_mat), intent(in)     :: b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_cp_coo_from_icoo
   end interface
 
@@ -3691,11 +3798,11 @@ module psb_d_base_mat_mod
   !! \see psb_ld_base_mat_mod::psb_ld_base_cp_from_coo
   !!
   interface
-    subroutine psb_ld_cp_coo_to_fmt(a,b,info)
+    subroutine psb_ld_cp_coo_to_fmt(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(in)   :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                       :: info
+      class(psb_ld_coo_sparse_mat), intent(in)      :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_cp_coo_to_fmt
   end interface
 
@@ -3704,11 +3811,11 @@ module psb_d_base_mat_mod
   !! \see psb_ld_base_mat_mod::psb_ld_base_cp_from_fmt
   !!
    interface
-    subroutine psb_ld_cp_coo_from_fmt(a,b,info)
+    subroutine psb_ld_cp_coo_from_fmt(a, b, info)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
       class(psb_ld_base_sparse_mat), intent(in)   :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_cp_coo_from_fmt
   end interface
 
@@ -3716,11 +3823,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_mv_to_coo
   interface
-    subroutine psb_ld_mv_coo_to_coo(a,b,info)
+    subroutine psb_ld_mv_coo_to_coo(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(inout)   :: b
-      integer(psb_ipk_), intent(out)            :: info
+      class(psb_ld_coo_sparse_mat), intent(inout) :: a, b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_mv_coo_to_coo
   end interface
 
@@ -3728,11 +3834,10 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_mv_from_coo
   interface
-    subroutine psb_ld_mv_coo_from_coo(a,b,info)
+    subroutine psb_ld_mv_coo_from_coo(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      class(psb_ld_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      class(psb_ld_coo_sparse_mat), intent(inout) :: a, b
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_mv_coo_from_coo
   end interface
 
@@ -3740,11 +3845,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_mv_to_fmt
   interface
-    subroutine psb_ld_mv_coo_to_fmt(a,b,info)
+    subroutine psb_ld_mv_coo_to_fmt(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(inout) :: a
+      class(psb_ld_coo_sparse_mat), intent(inout)   :: a
       class(psb_ld_base_sparse_mat), intent(inout)  :: b
-      integer(psb_ipk_), intent(out)                        :: info
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_mv_coo_to_fmt
   end interface
 
@@ -3752,27 +3857,27 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_mv_from_fmt
   interface
-    subroutine psb_ld_mv_coo_from_fmt(a,b,info)
+    subroutine psb_ld_mv_coo_from_fmt(a, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(inout)  :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)                         :: info
+      class(psb_ld_coo_sparse_mat), intent(inout)   :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_mv_coo_from_fmt
   end interface
 
   interface
-    subroutine psb_ld_coo_cp_from(a,b)
+    subroutine psb_ld_coo_cp_from(a, b)
       import
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      type(psb_ld_coo_sparse_mat), intent(in)   :: b
+      type(psb_ld_coo_sparse_mat), intent(in)     :: b
     end subroutine psb_ld_coo_cp_from
   end interface
 
   interface
-    subroutine psb_ld_coo_mv_from(a,b)
+    subroutine psb_ld_coo_mv_from(a, b)
       import
-      class(psb_ld_coo_sparse_mat), intent(inout)  :: a
-      type(psb_ld_coo_sparse_mat), intent(inout) :: b
+      class(psb_ld_coo_sparse_mat), intent(inout) :: a
+      type(psb_ld_coo_sparse_mat), intent(inout)  :: b
     end subroutine psb_ld_coo_mv_from
   end interface
 
@@ -3794,13 +3899,12 @@ module psb_d_base_mat_mod
   !!
   !
   interface
-    subroutine psb_ld_coo_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info)
+    subroutine psb_ld_coo_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info)
       import
+      integer(psb_lpk_), intent(in) :: nz, ia(:), ja(:), imin, imax, jmin, jmax
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: val(:)
-      integer(psb_lpk_), intent(in)             :: nz,ia(:), ja(:),&
-           &  imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                  :: val(:)
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_coo_csput_a
   end interface
 
@@ -3808,18 +3912,18 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_base_mat_mod::psb_base_csgetptn
   interface
-    subroutine psb_ld_coo_csgetptn(imin,imax,a,nz,ia,ja,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+    subroutine psb_ld_coo_csgetptn(imin, imax, a, nz, ia, ja, info, &
+         & jmin, jmax, iren, append, nzin, rscale, cscale)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      integer(psb_lpk_), intent(in)                  :: imin,imax
-      integer(psb_lpk_), intent(out)                 :: nz
-      integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_lpk_), intent(in), optional        :: iren(:)
-      integer(psb_lpk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      integer(psb_lpk_), intent(in)                 :: imin, imax
+      class(psb_ld_coo_sparse_mat), intent(in)      :: a
+      integer(psb_lpk_), intent(out)                :: nz
+      integer(psb_lpk_), allocatable, intent(inout) :: ia(:), ja(:)
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_lpk_), intent(in), optional :: jmin, jmax, nzin
+      integer(psb_lpk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_ld_coo_csgetptn
   end interface
 
@@ -3827,19 +3931,19 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_csgetrow
   interface
-    subroutine psb_ld_coo_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
-         & jmin,jmax,iren,append,nzin,rscale,cscale)
+    subroutine psb_ld_coo_csgetrow(imin, imax, a, nz, ia, ja, val, info, &
+         & jmin, jmax, iren, append, nzin, rscale, cscale)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      integer(psb_lpk_), intent(in)                  :: imin,imax
-      integer(psb_lpk_), intent(out)                 :: nz
-      integer(psb_lpk_), allocatable, intent(inout)  :: ia(:), ja(:)
-      real(psb_dpk_), allocatable,  intent(inout)    :: val(:)
-      integer(psb_ipk_),intent(out)                  :: info
-      logical, intent(in), optional        :: append
-      integer(psb_lpk_), intent(in), optional        :: iren(:)
-      integer(psb_lpk_), intent(in), optional        :: jmin,jmax, nzin
-      logical, intent(in), optional        :: rscale,cscale
+      integer(psb_lpk_), intent(in)                 :: imin, imax
+      class(psb_ld_coo_sparse_mat), intent(in)      :: a
+      integer(psb_lpk_), intent(out)                :: nz
+      integer(psb_lpk_), allocatable, intent(inout) :: ia(:), ja(:)
+      real(psb_dpk_), allocatable, intent(inout)    :: val(:)
+      integer(psb_ipk_), intent(out)                :: info
+      integer(psb_lpk_), intent(in), optional :: jmin, jmax, nzin
+      integer(psb_lpk_), intent(in), optional :: iren(:)
+      logical, intent(in), optional           :: append
+      logical, intent(in), optional           :: rscale, cscale
     end subroutine psb_ld_coo_csgetrow
   end interface
 
@@ -3847,24 +3951,23 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_get_diag
   interface
-    subroutine psb_ld_coo_get_diag(a,d,info)
+    subroutine psb_ld_coo_get_diag(a, d, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(in) :: a
-      real(psb_dpk_), intent(out)     :: d(:)
+      real(psb_dpk_), intent(out)               :: d(:)
+      class(psb_ld_coo_sparse_mat), intent(in)  :: a
       integer(psb_ipk_), intent(out)            :: info
     end subroutine psb_ld_coo_get_diag
   end interface
-
 
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_scal
   interface
-    subroutine psb_ld_coo_scal(d,a,info,side)
+    subroutine psb_ld_coo_scal(d, a, info, side)
       import
+      real(psb_dpk_), intent(in)                  :: d(:)
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d(:)
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
       character, intent(in), optional :: side
     end subroutine psb_ld_coo_scal
   end interface
@@ -3873,11 +3976,11 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_scals
   interface
-    subroutine psb_ld_coo_scals(d,a,info)
+    subroutine psb_ld_coo_scals(d, a, info)
       import
+      real(psb_dpk_), intent(in)                  :: d
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_coo_scals
   end interface
 
@@ -3887,24 +3990,24 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_scalplusidentity
   interface
-    subroutine psb_ld_coo_scalplusidentity(d,a,info)
+    subroutine psb_ld_coo_scalplusidentity(d, a, info)
       import
+      real(psb_dpk_), intent(in)                  :: d
       class(psb_ld_coo_sparse_mat), intent(inout) :: a
-      real(psb_dpk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_ld_coo_scalplusidentity
   end interface
+
   !>
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_spaxpby
   interface
-    subroutine psb_ld_coo_spaxpby(alpha,a,beta,b,info)
+    subroutine psb_ld_coo_spaxpby(alpha, a, beta, b, info)
       import
-      class(psb_ld_coo_sparse_mat), intent(inout)  :: a
-      class(psb_ld_base_sparse_mat), intent(inout) :: b
-      real(psb_dpk_), intent(in)      :: alpha
-      real(psb_dpk_), intent(in)      :: beta
-      integer(psb_ipk_), intent(out)            :: info
+      real(psb_dpk_), intent(in)                    :: alpha, beta
+      class(psb_ld_coo_sparse_mat), intent(inout)   :: a
+      class(psb_ld_base_sparse_mat), intent(inout)  :: b
+      integer(psb_ipk_), intent(out)                :: info
     end subroutine psb_ld_coo_spaxpby
   end interface
 
@@ -3912,13 +4015,13 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_cmpval
   interface
-      function psb_ld_coo_cmpval(a,val,tol,info) result(res)
+      function psb_ld_coo_cmpval(a, val, tol, info) result(res)
           import
           class(psb_ld_coo_sparse_mat), intent(inout) :: a
-          real(psb_dpk_), intent(in)             :: val
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
+          real(psb_dpk_), intent(in)                  :: val
+          real(psb_dpk_), intent(in)                  :: tol
+          integer(psb_ipk_), intent(out)              :: info
+          logical :: res
       end function psb_ld_coo_cmpval
   end interface
 
@@ -3926,68 +4029,62 @@ module psb_d_base_mat_mod
   !! \memberof  psb_ld_coo_sparse_mat
   !! \see psb_ld_base_mat_mod::psb_ld_base_cmpmat
   interface
-      function psb_ld_coo_cmpmat(a,b,tol,info) result(res)
+      function psb_ld_coo_cmpmat(a, b, tol, info) result(res)
           import
-          class(psb_ld_coo_sparse_mat), intent(inout)  :: a
-          class(psb_ld_base_sparse_mat), intent(inout) :: b
-          real(psb_dpk_), intent(in)            :: tol
-          logical                                 :: res
-          integer(psb_ipk_), intent(out)          :: info
+          class(psb_ld_coo_sparse_mat), intent(inout)   :: a
+          class(psb_ld_base_sparse_mat), intent(inout)  :: b
+          real(psb_dpk_), intent(in)                    :: tol
+          integer(psb_ipk_), intent(out)                :: info
+          logical :: res
       end function psb_ld_coo_cmpmat
   end interface
 
 contains
-
-  function psb_d_get_print_frmt(nr,nc,nz,iv,ivr,ivc) result(frmt)
-
+  function psb_d_get_print_frmt(nr, nc, nz, iv, ivr, ivc) result(frmt)
     implicit none
-    character(len=80) :: frmt
     integer(psb_ipk_), intent(in) :: nr, nc, nz
-    integer(psb_lpk_), intent(in), optional     :: iv(:)
-    integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+    integer(psb_lpk_), intent(in), optional :: iv(:)
+    integer(psb_lpk_), intent(in), optional :: ivr(:), ivc(:)
+    character(len=80) :: frmt
     !
-    character(len=*), parameter  :: datatype='real'
+    character(len=*), parameter :: datatype = 'real'
     integer(psb_lpk_) :: nmx
     integer(psb_ipk_) :: ni
-    nmx = max(nr,nc,ione)
-    if (present(iv))  nmx = max(nmx,maxval(abs(iv(1:nc))))
-    if (present(ivr)) nmx = max(nmx,maxval(abs(ivr(1:nr))))
-    if (present(ivc)) nmx = max(nmx,maxval(abs(ivc(1:nc))))
-    ni  = floor(log10(1.0*nmx)) + 2
+    nmx = max(nr, nc, ione)
+    if(present(iv))  nmx = max(nmx, maxval(abs(iv(1 : nc))))
+    if(present(ivr)) nmx = max(nmx, maxval(abs(ivr(1 : nr))))
+    if(present(ivc)) nmx = max(nmx, maxval(abs(ivc(1 : nc))))
+    ni = floor(log10(1.0 * nmx)) + 2
 
-    if (datatype=='complex') then
-      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+    if(datatype == 'complex') then
+      write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), 2(es26.18, 1x), 2(i', ni, ', 1x))'
     else
-      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+      write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), es26.18, 1x, 2(i', ni, ', 1x))'
     end if
-
   end function psb_d_get_print_frmt
 
-  function psb_ld_get_print_frmt(nr,nc,nz,iv,ivr,ivc) result(frmt)
-
+  function psb_ld_get_print_frmt(nr, nc, nz, iv, ivr, ivc) result(frmt)
     implicit none
-    character(len=80) :: frmt
     integer(psb_lpk_), intent(in) :: nr, nc, nz
-    integer(psb_lpk_), intent(in), optional     :: iv(:)
-    integer(psb_lpk_), intent(in), optional     :: ivr(:), ivc(:)
+    integer(psb_lpk_), intent(in), optional :: iv(:)
+    integer(psb_lpk_), intent(in), optional :: ivr(:), ivc(:)
+    character(len=80) :: frmt
     !
-    character(len=*), parameter  :: datatype='real'
-    integer(psb_lpk_) :: nmx
-    integer(psb_lpk_) :: ni
-    nmx = max(nr,nc,lone)
-    if (present(iv))  nmx = max(nmx,maxval(abs(iv(1:nc))))
-    if (present(ivr)) nmx = max(nmx,maxval(abs(ivr(1:nr))))
-    if (present(ivc)) nmx = max(nmx,maxval(abs(ivc(1:nc))))
-    ni  = floor(log10(1.0*nmx)) + 2
+    character(len=*), parameter :: datatype = 'real'
+    integer(psb_lpk_) :: nmx, ni
+    
+    nmx = max(nr, nc, lone)
+    if(present(iv))  nmx = max(nmx, maxval(abs(iv(1 : nc))))
+    if(present(ivr)) nmx = max(nmx, maxval(abs(ivr(1 : nr))))
+    if(present(ivc)) nmx = max(nmx, maxval(abs(ivc(1 : nc))))
+    ni = floor(log10(1.0 * nmx)) + 2
 
-    if (datatype=='complex') then
-      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),2(es26.18,1x),2(i',ni,',1x))'
+    if(datatype=='complex') then
+      write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), 2(es26.18, 1x), 2(i', ni, ', 1x))'
     else
-      write(frmt,'(a,i3.3,a,i3.3,a)') '(2(i',ni,',1x),es26.18,1x,2(i',ni,',1x))'
+      write(frmt, '(a, i3.3, a, i3.3, a)') '(2(i', ni, ', 1x), es26.18, 1x, 2(i', ni, ', 1x))'
     end if
-
   end function psb_ld_get_print_frmt
-
 
   ! == ==================================
   !
@@ -3997,23 +4094,18 @@ contains
   !
   !
   !
-  !
-  !
   ! == ==================================
-
-
 
   function d_coo_sizeof(a) result(res)
     implicit none
     class(psb_d_coo_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
-    res = 3*psb_sizeof_ip
-    res = res + psb_sizeof_dp  * psb_size(a%val)
+
+    res = 3 * psb_sizeof_ip
+    res = res + psb_sizeof_dp * psb_size(a%val)
     res = res + psb_sizeof_ip * psb_size(a%ia)
     res = res + psb_sizeof_ip * psb_size(a%ja)
-
   end function d_coo_sizeof
-
 
   function d_coo_get_fmt() result(res)
     implicit none
@@ -4021,61 +4113,57 @@ contains
     res = 'COO'
   end function d_coo_get_fmt
 
-
   function d_coo_get_size(a) result(res)
     implicit none
     class(psb_d_coo_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
     res = -1
 
-    if (allocated(a%ia)) res = size(a%ia)
-    if (allocated(a%ja)) then
-      if (res >= 0) then
-        res = min(res,size(a%ja))
+    if(allocated(a%ia)) res = size(a%ia)
+    if(allocated(a%ja)) then
+      if(res >= 0) then
+        res = min(res, size(a%ja))
       else
         res = size(a%ja)
       end if
     end if
-    if (allocated(a%val)) then
-      if (res >= 0) then
-        res = min(res,size(a%val))
+    if(allocated(a%val)) then
+      if(res >= 0) then
+        res = min(res, size(a%val))
       else
         res = size(a%val)
       end if
     end if
   end function d_coo_get_size
 
-
   function d_coo_get_nzeros(a) result(res)
     implicit none
     class(psb_d_coo_sparse_mat), intent(in) :: a
     integer(psb_ipk_) :: res
-    res  = a%nnz
+    res = a%nnz
   end function d_coo_get_nzeros
 
   function d_coo_is_by_rows(a) result(res)
     implicit none
     class(psb_d_coo_sparse_mat), intent(in) :: a
     logical :: res
-    res  = (a%sort_status == psb_row_major_)
+    res = (a%sort_status == psb_row_major_)
   end function d_coo_is_by_rows
 
   function d_coo_is_by_cols(a) result(res)
     implicit none
     class(psb_d_coo_sparse_mat), intent(in) :: a
     logical :: res
-    res  = (a%sort_status == psb_col_major_)
+    res = (a%sort_status == psb_col_major_)
   end function d_coo_is_by_cols
 
   function d_coo_is_sorted(a) result(res)
     implicit none
     class(psb_d_coo_sparse_mat), intent(in) :: a
     logical :: res
-    res  = (a%sort_status == psb_row_major_) &
-         & .or.(a%sort_status == psb_col_major_)
+    res = (a%sort_status == psb_row_major_) &
+          & .or. (a%sort_status == psb_col_major_)
   end function d_coo_is_sorted
-
-
 
   ! == ==================================
   !
@@ -4085,51 +4173,45 @@ contains
   !
   !
   !
-  !
-  !
-  !
   ! == ==================================
 
-  subroutine  d_coo_set_nzeros(nz,a)
+  subroutine d_coo_set_nzeros(nz, a)
     implicit none
-    integer(psb_ipk_), intent(in) :: nz
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_), intent(in)               :: nz
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
     a%nnz = nz
-
   end subroutine d_coo_set_nzeros
 
   function d_coo_get_sort_status(a) result(res)
     implicit none
-    integer(psb_ipk_)   :: res
     class(psb_d_coo_sparse_mat), intent(in) :: a
+    integer(psb_ipk_) :: res
 
     res = a%sort_status
   end function d_coo_get_sort_status
 
-  subroutine  d_coo_set_sort_status(ist,a)
+  subroutine d_coo_set_sort_status(ist, a)
     implicit none
-    integer(psb_ipk_), intent(in)   :: ist
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    integer(psb_ipk_), intent(in)               :: ist
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
     a%sort_status = ist
     call a%set_sorted((a%sort_status == psb_row_major_) &
-         & .or.(a%sort_status == psb_col_major_))
+                    & .or. (a%sort_status == psb_col_major_))
   end subroutine d_coo_set_sort_status
 
-
-  subroutine  d_coo_set_by_rows(a)
+  subroutine d_coo_set_by_rows(a)
     implicit none
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
     a%sort_status = psb_row_major_
     call a%set_sorted()
   end subroutine d_coo_set_by_rows
 
-
-  subroutine  d_coo_set_by_cols(a)
+  subroutine d_coo_set_by_cols(a)
     implicit none
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
     a%sort_status = psb_col_major_
     call a%set_sorted()
@@ -4143,29 +4225,22 @@ contains
   !
   !
   !
-  !
-  !
   ! == ==================================
 
-  subroutine  d_coo_free(a)
+  subroutine d_coo_free(a)
     implicit none
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
-
-    if (allocated(a%ia)) deallocate(a%ia)
-    if (allocated(a%ja)) deallocate(a%ja)
-    if (allocated(a%val)) deallocate(a%val)
+    if(allocated(a%ia)) deallocate(a%ia)
+    if(allocated(a%ja)) deallocate(a%ja)
+    if(allocated(a%val)) deallocate(a%val)
     call a%set_null()
     call a%set_nrows(0_psb_ipk_)
     call a%set_ncols(0_psb_ipk_)
     call a%set_nzeros(0_psb_ipk_)
     call a%set_sort_status(psb_unsorted_)
-
     return
-
   end subroutine d_coo_free
-
-
 
   ! == ==================================
   !
@@ -4175,43 +4250,33 @@ contains
   !
   !
   !
-  !
-  !
-  !
   ! == ==================================
   subroutine d_coo_transp_1mat(a)
     implicit none
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
-
-    integer(psb_ipk_), allocatable :: itemp(:)
-    integer(psb_ipk_) :: info
+    integer(psb_ipk_), allocatable  :: itemp(:)
+    integer(psb_ipk_)               :: info
 
     call a%psb_d_base_sparse_mat%psb_base_sparse_mat%transp()
-    call move_alloc(a%ia,itemp)
-    call move_alloc(a%ja,a%ia)
-    call move_alloc(itemp,a%ja)
-
+    call move_alloc(a%ia, itemp)
+    call move_alloc(a%ja, a%ia)
+    call move_alloc(itemp, a%ja)
     call a%set_sorted(.false.)
     call a%set_sort_status(psb_unsorted_)
-
     return
-
   end subroutine d_coo_transp_1mat
 
   subroutine d_coo_transc_1mat(a)
     implicit none
-
-    class(psb_d_coo_sparse_mat), intent(inout) :: a
+    class(psb_d_coo_sparse_mat), intent(inout)  :: a
 
     call a%transp()
     ! This will morph into conjg() for C and Z
     ! and into a no-op for S and D, so a conditional
     ! on a constant ought to take it out completely.
-    if (psb_d_is_complex_) a%val(:) = (a%val(:))
-
+    if(psb_d_is_complex_) a%val(:) = (a%val(:))
   end subroutine d_coo_transc_1mat
-
 
   ! == ==================================
   !
@@ -4221,23 +4286,18 @@ contains
   !
   !
   !
-  !
-  !
   ! == ==================================
-
-
 
   function ld_coo_sizeof(a) result(res)
     implicit none
-    class(psb_ld_coo_sparse_mat), intent(in) :: a
+    class(psb_ld_coo_sparse_mat), intent(in)  :: a
     integer(psb_epk_) :: res
-    res = 3*psb_sizeof_lp
-    res = res + psb_sizeof_dp  * psb_size(a%val)
+
+    res = 3 * psb_sizeof_lp
+    res = res + psb_sizeof_dp * psb_size(a%val)
     res = res + psb_sizeof_lp * psb_size(a%ia)
     res = res + psb_sizeof_lp * psb_size(a%ja)
-
   end function ld_coo_sizeof
-
 
   function ld_coo_get_fmt() result(res)
     implicit none
@@ -4245,61 +4305,57 @@ contains
     res = 'COO'
   end function ld_coo_get_fmt
 
-
   function ld_coo_get_size(a) result(res)
     implicit none
-    class(psb_ld_coo_sparse_mat), intent(in) :: a
+    class(psb_ld_coo_sparse_mat), intent(in)  :: a
     integer(psb_lpk_) :: res
+    
     res = -1
-
-    if (allocated(a%ia)) res = size(a%ia)
-    if (allocated(a%ja)) then
-      if (res >= 0) then
-        res = min(res,size(a%ja))
+    if(allocated(a%ia)) res = size(a%ia)
+    if(allocated(a%ja)) then
+      if(res >= 0) then
+        res = min(res, size(a%ja))
       else
         res = size(a%ja)
       end if
     end if
-    if (allocated(a%val)) then
-      if (res >= 0) then
-        res = min(res,size(a%val))
+    if(allocated(a%val)) then
+      if(res >= 0) then
+        res = min(res, size(a%val))
       else
         res = size(a%val)
       end if
     end if
   end function ld_coo_get_size
 
-
   function ld_coo_get_nzeros(a) result(res)
     implicit none
-    class(psb_ld_coo_sparse_mat), intent(in) :: a
+    class(psb_ld_coo_sparse_mat), intent(in)  :: a
     integer(psb_lpk_) :: res
-    res  = a%nnz
+    res = a%nnz
   end function ld_coo_get_nzeros
 
   function ld_coo_is_by_rows(a) result(res)
     implicit none
-    class(psb_ld_coo_sparse_mat), intent(in) :: a
+    class(psb_ld_coo_sparse_mat), intent(in)  :: a
     logical :: res
-    res  = (a%sort_status == psb_row_major_)
+    res = (a%sort_status == psb_row_major_)
   end function ld_coo_is_by_rows
 
   function ld_coo_is_by_cols(a) result(res)
     implicit none
-    class(psb_ld_coo_sparse_mat), intent(in) :: a
+    class(psb_ld_coo_sparse_mat), intent(in)  :: a
     logical :: res
-    res  = (a%sort_status == psb_col_major_)
+    res = (a%sort_status == psb_col_major_)
   end function ld_coo_is_by_cols
 
   function ld_coo_is_sorted(a) result(res)
     implicit none
-    class(psb_ld_coo_sparse_mat), intent(in) :: a
+    class(psb_ld_coo_sparse_mat), intent(in)  :: a
     logical :: res
-    res  = (a%sort_status == psb_row_major_) &
-         & .or.(a%sort_status == psb_col_major_)
+    res = (a%sort_status == psb_row_major_) &
+          & .or. (a%sort_status == psb_col_major_)
   end function ld_coo_is_sorted
-
-
 
   ! == ==================================
   !
@@ -4309,28 +4365,23 @@ contains
   !
   !
   !
-  !
-  !
-  !
   ! == ==================================
 
-  subroutine  ld_coo_iset_nzeros(nz,a)
+  subroutine ld_coo_iset_nzeros(nz, a)
     implicit none
-    integer(psb_ipk_), intent(in) :: nz
+    integer(psb_ipk_), intent(in)               :: nz
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
     a%nnz = nz
-
   end subroutine ld_coo_iset_nzeros
 
 #if defined(PSB_IPK4) && defined(PSB_LPK8)
-  subroutine  ld_coo_lset_nzeros(nz,a)
+  subroutine ld_coo_lset_nzeros(nz, a)
     implicit none
-    integer(psb_lpk_), intent(in) :: nz
+    integer(psb_lpk_), intent(in)               :: nz
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
     a%nnz = nz
-
   end subroutine ld_coo_lset_nzeros
 #endif
 
@@ -4342,18 +4393,17 @@ contains
     res = a%sort_status
   end function ld_coo_get_sort_status
 
-  subroutine  ld_coo_set_sort_status(ist,a)
+  subroutine ld_coo_set_sort_status(ist, a)
     implicit none
-    integer(psb_ipk_), intent(in)   :: ist
+    integer(psb_ipk_), intent(in)               :: ist
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
     a%sort_status = ist
     call a%set_sorted((a%sort_status == psb_row_major_) &
-         & .or.(a%sort_status == psb_col_major_))
+                & .or. (a%sort_status == psb_col_major_))
   end subroutine ld_coo_set_sort_status
 
-
-  subroutine  ld_coo_set_by_rows(a)
+  subroutine ld_coo_set_by_rows(a)
     implicit none
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
@@ -4361,8 +4411,7 @@ contains
     call a%set_sorted()
   end subroutine ld_coo_set_by_rows
 
-
-  subroutine  ld_coo_set_by_cols(a)
+  subroutine ld_coo_set_by_cols(a)
     implicit none
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
@@ -4378,29 +4427,22 @@ contains
   !
   !
   !
-  !
-  !
   ! == ==================================
 
-  subroutine  ld_coo_free(a)
+  subroutine ld_coo_free(a)
     implicit none
-
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
-    if (allocated(a%ia)) deallocate(a%ia)
-    if (allocated(a%ja)) deallocate(a%ja)
-    if (allocated(a%val)) deallocate(a%val)
+    if(allocated(a%ia)) deallocate(a%ia)
+    if(allocated(a%ja)) deallocate(a%ja)
+    if(allocated(a%val)) deallocate(a%val)
     call a%set_null()
     call a%set_nrows(0_psb_lpk_)
     call a%set_ncols(0_psb_lpk_)
     call a%set_nzeros(0_psb_lpk_)
     call a%set_sort_status(psb_unsorted_)
-
     return
-
   end subroutine ld_coo_free
-
-
 
   ! == ==================================
   !
@@ -4410,42 +4452,32 @@ contains
   !
   !
   !
-  !
-  !
-  !
   ! == ==================================
+
   subroutine ld_coo_transp_1mat(a)
     implicit none
-
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
-    integer(psb_lpk_), allocatable :: itemp(:)
-    integer(psb_ipk_) :: info
+    integer(psb_lpk_), allocatable  :: itemp(:)
+    integer(psb_ipk_)               :: info
 
     call a%psb_ld_base_sparse_mat%psb_lbase_sparse_mat%transp()
-    call move_alloc(a%ia,itemp)
-    call move_alloc(a%ja,a%ia)
-    call move_alloc(itemp,a%ja)
-
+    call move_alloc(a%ia, itemp)
+    call move_alloc(a%ja, a%ia)
+    call move_alloc(itemp, a%ja)
     call a%set_sorted(.false.)
     call a%set_sort_status(psb_unsorted_)
-
     return
-
   end subroutine ld_coo_transp_1mat
 
   subroutine ld_coo_transc_1mat(a)
     implicit none
-
     class(psb_ld_coo_sparse_mat), intent(inout) :: a
 
     call a%transp()
     ! This will morph into conjg() for C and Z
     ! and into a no-op for S and D, so a conditional
     ! on a constant ought to take it out completely.
-    if (psb_ld_is_complex_) a%val(:) = (a%val(:))
-
+    if(psb_ld_is_complex_) a%val(:) = (a%val(:))
   end subroutine ld_coo_transc_1mat
-
-
 end module psb_d_base_mat_mod

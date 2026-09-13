@@ -51,7 +51,7 @@ module psb_spmm_test
 
         call mm_mat_read(aux_a,info,filename=mtx_file)
         if(info /= psb_success_) then
-            write(psb_out_unit,*) "Error while reading matric ", mtx_file
+            write(psb_out_unit,*) "Error while reading matrix ", mtx_file
             goto 9999        
         end if 
 

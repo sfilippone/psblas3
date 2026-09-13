@@ -30,127 +30,147 @@
 !
 !
 module psb_c_bjacprec
-
   use psb_c_base_prec_mod
   use psb_c_ilu_fact_mod
   use psb_c_ainv_fact_mod
   use psb_c_invk_fact_mod
   use psb_c_invt_fact_mod
 
-  type, extends(psb_c_base_prec_type)   :: psb_c_bjac_prec_type
+  type, extends(psb_c_base_prec_type) :: psb_c_bjac_prec_type
     integer(psb_ipk_), allocatable      :: iprcparm(:)
-    real(psb_spk_), allocatable       :: rprcparm(:)
+    real(psb_spk_), allocatable         :: rprcparm(:)
     type(psb_cspmat_type), allocatable  :: av(:)
     type(psb_c_vect_type), allocatable  :: dv, wrk(:)
   contains
-    procedure, pass(prec) :: c_apply_v => psb_c_bjac_apply_vect
-    procedure, pass(prec) :: c_apply   => psb_c_bjac_apply
-    procedure, pass(prec) :: precbld   => psb_c_bjac_precbld
-    procedure, pass(prec) :: precinit  => psb_c_bjac_precinit
-    procedure, pass(prec) :: precseti  => psb_c_bjac_precseti
-    procedure, pass(prec) :: precsetr  => psb_c_bjac_precsetr
-    procedure, pass(prec) :: precdescr => psb_c_bjac_precdescr
-    procedure, pass(prec) :: dump      => psb_c_bjac_dump
-    procedure, pass(prec) :: clone     => psb_c_bjac_clone
-    procedure, pass(prec) :: free      => psb_c_bjac_precfree
-    procedure, pass(prec) :: sizeof    => psb_c_bjac_sizeof
-    procedure, pass(prec) :: get_nzeros => psb_c_bjac_get_nzeros
+    procedure, pass(prec) :: c_apply_mv_col => psb_c_bjac_apply_mvect_col
+    procedure, pass(prec) :: c_apply_mv     => psb_c_bjac_apply_mvect
+    procedure, pass(prec) :: c_apply_v      => psb_c_bjac_apply_vect
+    procedure, pass(prec) :: c_apply        => psb_c_bjac_apply
+    procedure, pass(prec) :: precbld      => psb_c_bjac_precbld
+    procedure, pass(prec) :: precinit     => psb_c_bjac_precinit
+    procedure, pass(prec) :: precseti     => psb_c_bjac_precseti
+    procedure, pass(prec) :: precsetr     => psb_c_bjac_precsetr
+    procedure, pass(prec) :: precdescr    => psb_c_bjac_precdescr
+    procedure, pass(prec) :: dump         => psb_c_bjac_dump
+    procedure, pass(prec) :: clone        => psb_c_bjac_clone
+    procedure, pass(prec) :: free         => psb_c_bjac_precfree
+    procedure, pass(prec) :: sizeof       => psb_c_bjac_sizeof
+    procedure, pass(prec) :: get_nzeros   => psb_c_bjac_get_nzeros
     procedure, pass(prec) :: allocate_wrk => psb_c_bjac_allocate_wrk
     procedure, pass(prec) :: free_wrk     => psb_c_bjac_free_wrk
     procedure, pass(prec) :: is_allocated_wrk => psb_c_bjac_is_allocated_wrk
   end type psb_c_bjac_prec_type
 
-  character(len=15), parameter, private :: &
-       &  fact_names(0:6)=(/'None          ','ILU(0)        ',&
-       &  'ILU(n)        ','ILU(eps)      ','AINV(eps)     ',&
-       &  'INVT          ','INVK          '/)
+  character(len=15), parameter, private :: fact_names(0:6) = (/'none          ', &
+                        & 'ILU(0)        ', 'ILU(n)        ', 'ILU(eps)      ', &
+                        & 'AINV(eps)     ', 'INVT          ', 'INVK          '/)
 
   private :: psb_c_bjac_sizeof, psb_c_bjac_precdescr, psb_c_bjac_get_nzeros
 
   interface
-    subroutine psb_c_bjac_dump(prec,info,prefix,head)
+    subroutine psb_c_bjac_dump(prec, info, prefix, head)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
       class(psb_c_bjac_prec_type), intent(in) :: prec
-      integer(psb_ipk_), intent(out)                    :: info
-      character(len=*), intent(in), optional  :: prefix,head
+      integer(psb_ipk_), intent(out)          :: info
+      character(len=*), intent(in), optional  :: prefix, head
     end subroutine psb_c_bjac_dump
   end interface
 
   interface
-    subroutine psb_c_bjac_apply_vect(alpha,prec,x,beta,y,desc_data,info,trans,work)
-      import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
-      type(psb_desc_type),intent(in)    :: desc_data
+    subroutine psb_c_bjac_apply_mvect_col(alpha, prec, x, idx_x, beta, y, idx_y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_multivect_type, psb_spk_
+      complex(psb_spk_), intent(in)                  :: alpha, beta
       class(psb_c_bjac_prec_type), intent(inout)  :: prec
-      complex(psb_spk_),intent(in)         :: alpha,beta
-      type(psb_c_vect_type),intent(inout)   :: x
-      type(psb_c_vect_type),intent(inout)   :: y
+      type(psb_c_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(in)               :: idx_x, idx_y
+      type(psb_desc_type), intent(in)             :: desc_data
       integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
+      character(len=1), optional                      :: trans
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_c_bjac_apply_mvect_col
+  end interface
+
+  interface
+    subroutine psb_c_bjac_apply_mvect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_multivect_type, psb_spk_
+      complex(psb_spk_), intent(in)                  :: alpha, beta
+      class(psb_c_bjac_prec_type), intent(inout)  :: prec
+      type(psb_c_multivect_type), intent(inout)   :: x, y
+      type(psb_desc_type), intent(in)             :: desc_data
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                      :: trans
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
+    end subroutine psb_c_bjac_apply_mvect
+  end interface
+
+  interface
+    subroutine psb_c_bjac_apply_vect(alpha, prec, x, beta, y, desc_data, info, trans, work)
+      import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
+      complex(psb_spk_), intent(in)                  :: alpha, beta
+      class(psb_c_bjac_prec_type), intent(inout)  :: prec
+      type(psb_c_vect_type), intent(inout)        :: x, y
+      type(psb_desc_type), intent(in)             :: desc_data
+      integer(psb_ipk_), intent(out)              :: info
+      character(len=1), optional                      :: trans
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
     end subroutine psb_c_bjac_apply_vect
   end interface
 
   interface
-    subroutine psb_c_bjac_apply(alpha,prec,x,beta,y,desc_data,info,trans,work)
+    subroutine psb_c_bjac_apply(alpha, prec, x, beta, y, desc_data, info, trans, work)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
-
-      type(psb_desc_type),intent(in)    :: desc_data
+      complex(psb_spk_), intent(in)                  :: alpha, beta
       class(psb_c_bjac_prec_type), intent(inout)  :: prec
-      complex(psb_spk_),intent(in)         :: alpha,beta
-      complex(psb_spk_),intent(inout)      :: x(:)
-      complex(psb_spk_),intent(inout)      :: y(:)
+      complex(psb_spk_), intent(inout)               :: x(:), y(:)
+      type(psb_desc_type), intent(in)             :: desc_data
       integer(psb_ipk_), intent(out)              :: info
-      character(len=1), optional        :: trans
-      complex(psb_spk_),intent(inout), optional, target :: work(:)
+      character(len=1), optional                      :: trans
+      complex(psb_spk_), intent(inout), optional, target :: work(:)
     end subroutine psb_c_bjac_apply
   end interface
 
   interface
-    subroutine psb_c_bjac_precinit(prec,info)
+    subroutine psb_c_bjac_precinit(prec, info)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
-      class(psb_c_bjac_prec_type),intent(inout) :: prec
-      integer(psb_ipk_), intent(out)                     :: info
+      class(psb_c_bjac_prec_type), intent(inout)  :: prec
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_c_bjac_precinit
   end interface
 
   interface
-    subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
+    subroutine psb_c_bjac_precbld(a, desc_a, prec, info, amold, vmold, imold)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_, &
-           & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type, &
-           & psb_i_base_vect_type
-      type(psb_cspmat_type), intent(in), target :: a
-      type(psb_desc_type), intent(inout), target   :: desc_a
-      class(psb_c_bjac_prec_type),intent(inout) :: prec
-      integer(psb_ipk_), intent(out)                      :: info
-      class(psb_c_base_sparse_mat), intent(in), optional :: amold
-      class(psb_c_base_vect_type), intent(in), optional  :: vmold
-      class(psb_i_base_vect_type), intent(in), optional  :: imold
+              & psb_cspmat_type, psb_c_base_sparse_mat, psb_c_base_vect_type, psb_i_base_vect_type
+      type(psb_cspmat_type), intent(in), target   :: a
+      type(psb_desc_type), intent(inout), target  :: desc_a
+      class(psb_c_bjac_prec_type), intent(inout)  :: prec
+      integer(psb_ipk_), intent(out)              :: info
+      class(psb_c_base_sparse_mat), intent(in), optional  :: amold
+      class(psb_c_base_vect_type), intent(in), optional   :: vmold
+      class(psb_i_base_vect_type), intent(in), optional   :: imold
     end subroutine psb_c_bjac_precbld
   end interface
 
   interface
-    subroutine psb_c_bjac_precseti(prec,what,val,info)
+    subroutine psb_c_bjac_precseti(prec, what, val, info)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
-      class(psb_c_bjac_prec_type),intent(inout) :: prec
-      integer(psb_ipk_), intent(in)                      :: what
-      integer(psb_ipk_), intent(in)                      :: val
-      integer(psb_ipk_), intent(out)                     :: info
+      class(psb_c_bjac_prec_type), intent(inout)  :: prec
+      integer(psb_ipk_), intent(in)               :: what
+      integer(psb_ipk_), intent(in)               :: val
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_c_bjac_precseti
   end interface
 
   interface
-    subroutine psb_c_bjac_precsetr(prec,what,val,info)
+    subroutine psb_c_bjac_precsetr(prec, what, val, info)
       import :: psb_ipk_, psb_desc_type, psb_c_bjac_prec_type, psb_c_vect_type, psb_spk_
-      class(psb_c_bjac_prec_type),intent(inout) :: prec
-      integer(psb_ipk_), intent(in)                      :: what
-      real(psb_spk_), intent(in)                      :: val
-      integer(psb_ipk_), intent(out)                     :: info
+      class(psb_c_bjac_prec_type), intent(inout)  :: prec
+      integer(psb_ipk_), intent(in)               :: what
+      real(psb_spk_), intent(in)                  :: val
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psb_c_bjac_precsetr
   end interface
-
-
 contains
-
   !
   !
   ! verbosity:
@@ -158,85 +178,69 @@ contains
   !         0: normal
   !        >1: increased details 
   !
-  subroutine psb_c_bjac_precdescr(prec,iout,root, verbosity,prefix)
+  subroutine psb_c_bjac_precdescr(prec, iout, root, verbosity, prefix)
     use psb_penv_mod
     use psb_error_mod
     implicit none
-
-    class(psb_c_bjac_prec_type), intent(in)   :: prec
-    integer(psb_ipk_), intent(in), optional   :: iout
-    integer(psb_ipk_), intent(in), optional   :: root
-    integer(psb_ipk_), intent(in), optional   :: verbosity
+    class(psb_c_bjac_prec_type), intent(in) :: prec
+    integer(psb_ipk_), intent(in), optional :: iout
+    integer(psb_ipk_), intent(in), optional :: root
+    integer(psb_ipk_), intent(in), optional :: verbosity
     character(len=*), intent(in), optional  :: prefix
 
-    integer(psb_ipk_) :: err_act, nrow, info
-    character(len=20) :: name='c_bjac_precdescr'
+    integer(psb_ipk_)   :: err_act, nrow, info
+    character(len=20)   :: name = 'c_bjac_precdescr'
     type(psb_ctxt_type) :: ctxt
-    integer(psb_ipk_) :: iout_, iam, np, root_, verbosity_
-    character(1024)    :: prefix_
+    integer(psb_ipk_)   :: iout_, iam, np, root_, verbosity_
+    character(1024)     :: prefix_
 
     call psb_erractionsave(err_act)
-
     info = psb_success_
 
-    if (present(iout)) then
-      iout_ = iout
-    else
-      iout_ = 6
-    end if
-    if (present(root)) then
-      root_ = root
-    else
-      root_ = psb_root_
-    end if
+    iout_ = 6
+    if(present(iout)) iout_ = iout
 
-    if (present(verbosity)) then
-      verbosity_ = verbosity
-    else
-      verbosity_ = 0
-    end if
-    if (verbosity_ < 0) goto 9998
-    if (present(prefix)) then
-      prefix_ = prefix
-    else
-      prefix_ = ""
-    end if
+    root_ = psb_root_
+    if(present(root)) root_ = root
+
+    verbosity_ = 0
+    if(present(verbosity)) verbosity_ = verbosity
+
+    if(verbosity_ < 0) goto 9998
+
+    prefix_ = ""
+    if(present(prefix)) prefix_ = prefix
     
-    if (.not.allocated(prec%iprcparm)) then
+    if(.not. allocated(prec%iprcparm)) then
       info = 1124
-      call psb_errpush(info,name,a_err="preconditioner")
+      call psb_errpush(info, name, a_err = "preconditioner")
       goto 9999
     end if
 
     ctxt = prec%ctxt
-    call psb_info(ctxt,iam,np)
-    if (root_ == -1) root_ = iam
+    call psb_info(ctxt, iam, np)
+    if(root_ == -1) root_ = iam
     
-    if (iam == root_) &
-         &  write(iout_,*) trim(prefix_),' ', trim(prec%desc_prefix()),' ',&
-         & 'Block Jacobi with: ',&
-         &  fact_names(prec%iprcparm(psb_f_type_))
+    if(iam == root_) write(iout_, *) trim(prefix_), ' ', trim(prec%desc_prefix()), ' ', &
+                                & 'Block Jacobi with: ', fact_names(prec%iprcparm(psb_f_type_))
 
-9998 continue
+  9998 continue
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
-
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_c_bjac_precdescr
-
 
   function psb_c_bjac_sizeof(prec) result(val)
     class(psb_c_bjac_prec_type), intent(in) :: prec
     integer(psb_epk_) :: val
 
     val = 0
-    if (allocated(prec%dv)) then
+    if(allocated(prec%dv)) then
       val = val + (2*psb_sizeof_sp) * prec%dv%get_nrows()
     endif
-    if (allocated(prec%av)) then
+    if(allocated(prec%av)) then
       val = val + prec%av(psb_l_pr_)%sizeof()
       val = val + prec%av(psb_u_pr_)%sizeof()
     endif
@@ -244,208 +248,202 @@ contains
   end function psb_c_bjac_sizeof
 
   function psb_c_bjac_get_nzeros(prec) result(val)
-
     class(psb_c_bjac_prec_type), intent(in) :: prec
     integer(psb_epk_) :: val
 
     val = 0
-    if (allocated(prec%dv)) then
+    if(allocated(prec%dv)) then
       val = val + prec%dv%get_nrows()
     endif
-    if (allocated(prec%av)) then
+    if(allocated(prec%av)) then
       val = val + prec%av(psb_l_pr_)%get_nzeros()
       val = val + prec%av(psb_u_pr_)%get_nzeros()
     endif
     return
   end function psb_c_bjac_get_nzeros
 
-
-  subroutine psb_c_bjac_precfree(prec,info)
-
-    Implicit None
-
-    class(psb_c_bjac_prec_type), intent(inout) :: prec
-    integer(psb_ipk_), intent(out)                :: info
+  subroutine psb_c_bjac_precfree(prec, info)
+    implicit none
+    class(psb_c_bjac_prec_type), intent(inout)  :: prec
+    integer(psb_ipk_), intent(out)              :: info
 
     integer(psb_ipk_) :: err_act, i
-    character(len=20)  :: name='c_bjac_precfree'
+    character(len=20) :: name = 'c_bjac_precfree'
 
     call psb_erractionsave(err_act)
 
     info = psb_success_
-    if (allocated(prec%av)) then
-      do i=1,size(prec%av)
+    if(allocated(prec%av)) then
+      do i = 1, size(prec%av)
         call prec%av(i)%free()
       enddo
-      deallocate(prec%av,stat=info)
+      deallocate(prec%av, stat = info)
     end if
 
-    if (allocated(prec%dv)) then
+    if(allocated(prec%dv)) then
       call prec%dv%free(info)
-      if (info == 0) deallocate(prec%dv,stat=info)
+      if(info == psb_success_) deallocate(prec%dv, stat = info)
     end if
-    if (allocated(prec%iprcparm)) then
-      deallocate(prec%iprcparm,stat=info)
-    end if
+
+    if(allocated(prec%iprcparm)) deallocate(prec%iprcparm, stat = info)
+
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
-
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_c_bjac_precfree
 
-
-  subroutine psb_c_bjac_clone(prec,precout,info)
+  subroutine psb_c_bjac_clone(prec, precout, info)
     use psb_error_mod
     use psb_realloc_mod
-    Implicit None
-
+    implicit none
     class(psb_c_bjac_prec_type), intent(inout)              :: prec
     class(psb_c_base_prec_type), allocatable, intent(inout) :: precout
-    integer(psb_ipk_), intent(out)               :: info
+    integer(psb_ipk_), intent(out)                          :: info
 
     integer(psb_ipk_) :: err_act, i
-    character(len=20)  :: name='c_bjac_clone'
+    character(len=20) :: name = 'c_bjac_clone'
 
     call psb_erractionsave(err_act)
 
     info = psb_success_
-    if (allocated(precout)) then
+    if(allocated(precout)) then
       call precout%free(info)
-      if (info == psb_success_) deallocate(precout, stat=info)
+      if(info == psb_success_) deallocate(precout, stat = info)
     end if
-    if (info == psb_success_) &
-         & allocate(psb_c_bjac_prec_type :: precout, stat=info)
-    if (info /= 0) goto 9999
+
+    if(info == psb_success_) allocate(psb_c_bjac_prec_type :: precout, stat = info)
+    if(info /= psb_success_) goto 9999
+
     select type(pout => precout)
-    type is (psb_c_bjac_prec_type)
-      call pout%set_ctxt(prec%get_ctxt())
+      type is (psb_c_bjac_prec_type)
+        call pout%set_ctxt(prec%get_ctxt())
 
-      if (allocated(prec%av)) then
-        allocate(pout%av(size(prec%av)),stat=info)
-        do i=1,size(prec%av)
-          if (info /= psb_success_) exit
-          call prec%av(i)%clone(pout%av(i),info)
-        enddo
-        if (info /= psb_success_) goto 9999
-      end if
+        if(allocated(prec%av)) then
+          allocate(pout%av(size(prec%av)), stat = info)
+          do i = 1, size(prec%av)
+            if(info /= psb_success_) exit
+            call prec%av(i)%clone(pout%av(i), info)
+          enddo
+          if(info /= psb_success_) goto 9999
+        end if
 
-      if (allocated(prec%dv)) then
-        allocate(pout%dv,stat=info)
-        if (info == 0) call prec%dv%clone(pout%dv,info)
-      end if
+        if(allocated(prec%dv)) then
+          allocate(pout%dv, stat = info)
+          if(info == 0) call prec%dv%clone(pout%dv, info)
+        end if
+
       class default
-      info = psb_err_internal_error_
+        info = psb_err_internal_error_
     end select
-    if (info /= 0) goto 9999
+    if(info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
-
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine psb_c_bjac_clone
 
-  subroutine psb_c_bjac_allocate_wrk(prec,info,vmold,desc)
+  subroutine psb_c_bjac_allocate_wrk(prec, info, vmold, desc)
     use psb_base_mod
     implicit none
-
     ! Arguments
-    class(psb_c_bjac_prec_type), intent(inout) :: prec
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_c_base_vect_type), intent(in), optional  :: vmold
-    type(psb_desc_type), intent(in), optional :: desc
+    class(psb_c_bjac_prec_type), intent(inout)  :: prec
+    integer(psb_ipk_), intent(out)              :: info
+    class(psb_c_base_vect_type), intent(in), optional :: vmold
+    type(psb_desc_type), intent(in), optional         :: desc
 
     ! Local variables
     integer(psb_ipk_) :: err_act, i
-    character(len=20)   :: name
-
-    info=psb_success_
-    name = 'psb_c_allocate_wrk'
-    call psb_erractionsave(err_act)
-
-    if (psb_get_errstatus().ne.0) goto 9999
-    if (allocated(prec%wrk)) then
-      if (size(prec%wrk)<2) then
-        do i=1,size(prec%wrk)
-          if (info == 0) call prec%wrk(i)%free(info)
-        end do
-        if (info == 0) deallocate(prec%wrk,stat=info)
-      end if
-    end if
-    if (info /= 0) then
-      info = psb_err_internal_error_; call psb_errpush(info,name,a_err="deallocate");   goto 9999
-    end if
-
-    if (.not.allocated(prec%wrk)) then
-      if (.not.present(desc)) then
-        info = psb_err_internal_error_; call psb_errpush(info,name,a_err="no desc?");   goto 9999
-      end if
-      allocate(prec%wrk(2),stat=info)
-      do i=1, 2
-        if (info == 0)   call psb_geall(prec%wrk(i),desc,info)
-        if (info == 0)   call psb_geasb(prec%wrk(i),desc,info,mold=vmold,scratch=.true.)
-      end do
-    end if
-    if (info /= 0) then
-      info = psb_err_internal_error_; call psb_errpush(info,name,a_err="allocate");   goto 9999
-    end if
-
-    call psb_erractionrestore(err_act)
-    return
-
-9999 call psb_error_handler(err_act)
-    return
-
-  end subroutine psb_c_bjac_allocate_wrk
-
-  subroutine psb_c_bjac_free_wrk(prec,info)
-    use psb_base_mod
-    implicit none
-
-    ! Arguments
-    class(psb_c_bjac_prec_type), intent(inout) :: prec
-    integer(psb_ipk_), intent(out)        :: info
-
-    ! Local variables
-    integer(psb_ipk_) :: err_act
-    integer(psb_ipk_) :: i
     character(len=20) :: name
 
-    info=psb_success_
+    info = psb_success_
     name = 'psb_c_allocate_wrk'
     call psb_erractionsave(err_act)
 
-    if (psb_get_errstatus().ne.0) goto 9999
-
-    info = psb_success_
-    if (allocated(prec%wrk)) then
-      do i=1,size(prec%wrk)
-        if (info == 0) call prec%wrk(i)%free(info)
-      end do
-      if (info == 0) deallocate(prec%wrk,stat=info)
+    if(psb_get_errstatus() .ne. 0) goto 9999
+    if(allocated(prec%wrk)) then
+      if(size(prec%wrk) < 2) then
+        do i = 1, size(prec%wrk)
+          if(info == psb_success_) call prec%wrk(i)%free(info)
+        end do
+        if(info == psb_success_) deallocate(prec%wrk, stat = info)
+      end if
     end if
-    if (info /= 0) then
-      info = psb_err_internal_error_; call psb_errpush(info,name,a_err="deallocate");   goto 9999
+
+    if(info /= psb_success_) then
+      info = psb_err_internal_error_
+      call psb_errpush(info, name, a_err = "deallocate")
+      goto 9999
+    end if
+
+    if(.not. allocated(prec%wrk)) then
+      if(.not. present(desc)) then
+        info = psb_err_internal_error_
+        call psb_errpush(info, name, a_err = "no desc?")
+        goto 9999
+      end if
+      allocate(prec%wrk(2), stat = info)
+      do i = 1, 2
+        if(info == psb_success_) call psb_geall(prec%wrk(i), desc, info)
+        if(info == psb_success_) call psb_geasb(prec%wrk(i), desc, info, mold = vmold, scratch = .true.)
+      end do
+    end if
+    if(info /= psb_success_) then
+      info = psb_err_internal_error_
+      call psb_errpush(info, name, a_err = "allocate")
+      goto 9999
     end if
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
+    return
+  end subroutine psb_c_bjac_allocate_wrk
+
+  subroutine psb_c_bjac_free_wrk(prec, info)
+    use psb_base_mod
+    implicit none
+    ! Arguments
+    class(psb_c_bjac_prec_type), intent(inout)  :: prec
+    integer(psb_ipk_), intent(out)              :: info
+
+    ! Local variables
+    integer(psb_ipk_) :: err_act, i
+    character(len=20) :: name
+
+    info = psb_success_
+    name = 'psb_c_allocate_wrk'
+    call psb_erractionsave(err_act)
+
+    if(psb_get_errstatus() .ne. 0) goto 9999
+
+    info = psb_success_
+    if(allocated(prec%wrk)) then
+      do i = 1, size(prec%wrk)
+        if(info == psb_success_) call prec%wrk(i)%free(info)
+      end do
+      if(info == psb_success_) deallocate(prec%wrk, stat = info)
+    end if
+    if(info /= psb_success_) then
+      info = psb_err_internal_error_
+      call psb_errpush(info, name, a_err = "deallocate")
+      goto 9999
+    end if
+
+    call psb_erractionrestore(err_act)
     return
 
+  9999 call psb_error_handler(err_act)
+    return
   end subroutine psb_c_bjac_free_wrk
 
   function psb_c_bjac_is_allocated_wrk(prec) result(res)
     use psb_base_mod
     implicit none
-
-    ! Arguments
     class(psb_c_bjac_prec_type), intent(in) :: prec
     logical :: res
 
@@ -453,8 +451,5 @@ contains
     ! there is nothing to allocate
 
     res = allocated(prec%wrk)
-
   end function psb_c_bjac_is_allocated_wrk
-
-
 end module psb_c_bjacprec
