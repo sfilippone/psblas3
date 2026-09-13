@@ -91,9 +91,11 @@ Subroutine psb_dglobtriu(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
   call ldtcoo%triu(ldcootriu,info,&
        & diag=diag,imax=gnr,jmax=gnc)
   lnz = ldcootriu%get_nzeros()
+  
+  lnr = desc_a%get_local_rows()
+  lnc = desc_a%get_local_cols()
   call desc_a%g2lip(ldcootriu%ia(1:lnz),info,owned=.false.)
   call desc_a%g2lip(ldcootriu%ja(1:lnz),info,owned=.false.)
-  lnc = desc_a%get_local_cols()
   call ldcootriu%set_nrows(lnr)
   call ldcootriu%set_ncols(lnc)
   call ldcootriu%fix(info)

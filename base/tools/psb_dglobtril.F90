@@ -93,9 +93,11 @@ Subroutine psb_dglobtril(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
   call ldtcoo%tril(ldcootril,info,&
        & diag=diag,imax=gnr,jmax=gnc)
   lnz = ldcootril%get_nzeros()
+
+  lnr = desc_a%get_local_rows()
+  lnc = desc_a%get_local_cols()
   call desc_a%g2lip(ldcootril%ia(1:lnz),info,owned=.false.)
   call desc_a%g2lip(ldcootril%ja(1:lnz),info,owned=.false.)
-  lnc = desc_a%get_local_cols()
   call ldcootril%set_nrows(lnr)
   call ldcootril%set_ncols(lnc)
   call ldcootril%fix(info)

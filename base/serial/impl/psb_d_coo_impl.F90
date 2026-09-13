@@ -3908,7 +3908,7 @@ subroutine psb_d_coo_triu(a,u,info,&
         i = a%ia(k)
         j = a%ja(k)
         if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
-          if ((j-i)<=diag_) then
+          if ((j-i)<diag_) then
             !$omp atomic update
             lrws(i-imin_+1) = lrws(i-imin_+1) +1
             !$omp end atomic
@@ -6302,7 +6302,7 @@ subroutine psb_ld_coo_triu(a,u,info,&
         i = a%ia(k)
         j = a%ja(k)
         if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
-          if ((j-i)>=diag_) then
+          if ((j-i)<diag_) then
             !$omp atomic update
             lrws(i-imin_+1) = lrws(i-imin_+1) +1
             !$omp end atomic
@@ -6325,7 +6325,7 @@ subroutine psb_ld_coo_triu(a,u,info,&
         i = a%ia(k)
         j = a%ja(k)
         if ((i>=imin_).and.(i<=imax_).and.(jmin_<=j).and.(j<=jmax_)) then
-          if ((j-i)>=diag_) then
+          if ((j-i)<diag_) then
             !$omp atomic capture
             lrws(i-imin_+1) = lrws(i-imin_+1) +1
             lpnt            = lrws(i-imin_+1)
@@ -6469,7 +6469,7 @@ subroutine psb_ld_coo_triu(a,u,info,&
           if ((j-i)>=diag_) then
             nzin = nzin + 1
             u%ia(nzin)  = i
-            u%ja(nzin)  = ja(k)
+            u%ja(nzin)  = j
             u%val(nzin) = val(k)
           end if
         end if
