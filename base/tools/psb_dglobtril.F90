@@ -101,7 +101,8 @@ Subroutine psb_dglobtril(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
   call ldcootril%set_nrows(lnr)
   call ldcootril%set_ncols(lnc)
   call ldcootril%fix(info)
-  call b%mv_from_lb(ldcootril) 
+  call b%mv_from_lb(ldcootril)
+  call b%cscnv(info,mold=a%a)
 
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': end'

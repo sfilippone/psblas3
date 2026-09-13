@@ -100,7 +100,7 @@ Subroutine psb_dglobtriu(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
   call ldcootriu%set_ncols(lnc)
   call ldcootriu%fix(info)
   call b%mv_from_lb(ldcootriu) 
-
+  call b%cscnv(info,mold=a%a)
   if (debug_level >= psb_debug_outer_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
 
