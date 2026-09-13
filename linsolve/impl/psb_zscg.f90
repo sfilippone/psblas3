@@ -32,11 +32,12 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   character(len=*), parameter :: methdbasename = 'sStepCG'
   character(len=20)           :: methdfullname
 
-  complex(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_fa(:, :)
-  type(psb_z_vect_type)       :: r  
-  type(psb_z_multivect_type)  :: Z, Q, P, V, temp_mv
-  complex(psb_dpk_)              :: cheb_coeff(3)
-  integer(psb_ipk_)           :: itidx
+  complex(psb_dpk_), allocatable     :: alpha(:), beta(:, :), W(:, :), temp_fa(:, :)
+  integer(psb_ipk_), allocatable  :: pW(:)
+  type(psb_z_vect_type)           :: r  
+  type(psb_z_multivect_type)      :: Z, Q, P, V, temp_mv
+  complex(psb_dpk_)                  :: cheb_coeff(3)
+  integer(psb_ipk_)               :: itidx
   
   type(psb_itconv_type)         :: stopdat
   real(psb_dpk_)                :: derr
@@ -393,11 +394,12 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   character(len=*), parameter :: methdbasename = 'sStepCGv2'
   character(len=20)           :: methdfullname
 
-  complex(psb_dpk_), allocatable :: alpha(:), beta(:, :), W(:, :), pW(:), temp_fa(:, :), B2(:, :), c0(:)
-  type(psb_z_vect_type)       :: r  
-  type(psb_z_multivect_type)  :: Z, Q, P, V, temp_mv
-  complex(psb_dpk_)              :: cheb_coeff(3)
-  integer(psb_ipk_)           :: itidx
+  complex(psb_dpk_), allocatable     :: alpha(:), beta(:, :), W(:, :), temp_fa(:, :), B2(:, :), c0(:)
+  integer(psb_ipk_), allocatable  :: pW(:)
+  type(psb_z_vect_type)           :: r  
+  type(psb_z_multivect_type)      :: Z, Q, P, V, temp_mv
+  complex(psb_dpk_)                  :: cheb_coeff(3)
+  integer(psb_ipk_)               :: itidx
   
   type(psb_itconv_type)         :: stopdat
   real(psb_dpk_)                :: derr 

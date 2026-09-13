@@ -77,7 +77,7 @@ module psb_linsolve_mod
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_spk_), optional, intent(out)     :: err, cond
       character, optional, intent(in)           :: base_type
-      real(psb_spk_), optional, intent(in)      :: eigext(2)
+      complex(psb_spk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
     end subroutine psb_ckrylov_vect
@@ -121,7 +121,7 @@ module psb_linsolve_mod
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_dpk_), optional, intent(out)     :: err, cond
       character, optional, intent(in)           :: base_type
-      real(psb_dpk_), optional, intent(in)      :: eigext(2)
+      complex(psb_dpk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
     end subroutine psb_zkrylov_vect

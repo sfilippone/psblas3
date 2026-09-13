@@ -82,6 +82,11 @@ subroutine psb_c_pMPK_packd(spmat, prec, vec_in, mvec_out, s, desc, info, &
             goto 9999
     end select
 
+    if(.not. present(farr_temp)) deallocate(aux)
+
+    call psb_erractionrestore(err_act)
+    return
+
 9999 call psb_error_handler(err_act)
     return
 
@@ -153,8 +158,8 @@ contains
         ! Loop for s > 2
         do i = 3, s
             ind_tmp = modulo(ind_tmp, 3) + 1
-            call psb_geaxpby(2*alpha, mvec_out, idx_Q, -2*beta, mvec_tmp, modulo(ind_tmp - 1, 3) + 1, &
-                                & -gamma_, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, mvec_tmp, ind_tmp, desc, info)
+            call psb_geaxpby(2*alpha, mvec_out, idx_Q, -2*beta, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, &
+                                & -gamma_, mvec_tmp, modulo(ind_tmp - 3, 3) + 1, mvec_tmp, ind_tmp, desc, info)
 
             idx_Z = idx_Z + 1
             call prec%apply(mvec_tmp, ind_tmp, mvec_out, idx_Z, desc, info, work = aux)
@@ -163,7 +168,7 @@ contains
             call psb_spmm(cone, spmat, mvec_out, idx_Z, czero, mvec_out, idx_Q, desc, info, work = aux)
         end do
 
-    9998 call psb_gefree(mvec_tmp, desc, info)
+    9998 if(.not. present(mvec_temp)) call psb_gefree(mvec_tmp, desc, info)
         return
     end subroutine psb_c_pMPK_packd_chebyshev
 end subroutine psb_c_pMPK_packd    
@@ -253,9 +258,10 @@ subroutine psb_c_pMPK_split(spmat, prec, vec_in, Z, Q, s, desc, info,  &
             goto 9999
     end select
 
-    if(.not. present(farr_temp)) then
-        deallocate(aux)
-    end if
+    if(.not. present(farr_temp)) deallocate(aux)
+
+    call psb_erractionrestore(err_act)
+    return
 
 9999 call psb_error_handler(err_act)
     return
