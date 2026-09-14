@@ -4072,7 +4072,7 @@ subroutine psb_d_coo_triu(a,u,info,&
       loop2: do k=1,nz      
         i = ia(k)
         j = ja(k)
-       if ((jmin_<=j).and.(j<=jmax_)) then
+        if ((jmin_<=j).and.(j<=jmax_)) then
           if ((j-i)>=diag_) then
             nzin = nzin + 1
             u%ia(nzin)  = i
@@ -6499,7 +6499,6 @@ subroutine psb_ld_coo_triu(a,u,info,&
   return
 
 end subroutine psb_ld_coo_triu
-
 
 subroutine  psb_ld_coo_trim(a)
   use psb_d_base_mat_mod, psb_protect_name => psb_ld_coo_trim

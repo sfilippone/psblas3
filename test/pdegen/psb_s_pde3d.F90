@@ -881,6 +881,40 @@ program psb_s_pde3d
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
 
+  if (.false.) then 
+    block
+      integer(psb_lpk_), allocatable :: iv(:)
+      type(psb_sspmat_type) :: atril
+      call psb_globtril(a,desc_a,atril,info)
+      write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
+      call a%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
+      call a%print(fname,iv=iv)
+      write(fname,'(a,i0,a)') "atril-loc-",iam,".mtx"
+      call atril%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "atril-glb-",iam,".mtx"
+      call atril%print(fname,iv=iv)
+    end block
+
+    block
+      integer(psb_lpk_), allocatable :: iv(:)
+      type(psb_sspmat_type) :: atriu    
+      call psb_globtriu(a,desc_a,atriu,info)
+      write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
+      call a%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
+      call a%print(fname,iv=iv)
+      write(fname,'(a,i0,a)') "atriu-loc-",iam,".mtx"
+      call atriu%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "atriu-glb-",iam,".mtx"
+      call atriu%print(fname,iv=iv)
+    end block
+  end if
+
 
   !
   !  cleanup storage and exit

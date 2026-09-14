@@ -435,6 +435,30 @@ Module psb_z_tools_mod
     end subroutine psb_z_simple_glob_transpose_ip
   end interface psb_glob_transpose
 
+  interface psb_globtril
+    Subroutine psb_zglobtril(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
+      import
+      implicit none
+      Type(psb_zspmat_type), Intent(inout)       ::  a
+      Type(psb_desc_type), Intent(inout), target :: desc_a
+      Type(psb_zspmat_type), Intent(out)       ::  b
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_lpk_), intent(in), optional :: diag,imin,imax,jmin,jmax
+    end Subroutine psb_zglobtril
+  end interface psb_globtril
+
+  interface psb_globtriu
+    Subroutine psb_zglobtriu(a,desc_a,b,info,diag,imin,imax,jmin,jmax)
+      import
+      implicit none
+      Type(psb_zspmat_type), Intent(inout)       ::  a
+      Type(psb_desc_type), Intent(inout), target :: desc_a
+      Type(psb_zspmat_type), Intent(out)       ::  b
+      integer(psb_ipk_), intent(out)                    :: info
+      integer(psb_lpk_), intent(in), optional :: diag,imin,imax,jmin,jmax
+    end Subroutine psb_zglobtriu
+  end interface psb_globtriu
+
   interface psb_getelem
     function psb_z_getelem(x,index,desc_a,info) result(res)
       import

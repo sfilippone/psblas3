@@ -375,8 +375,8 @@ module psb_d_base_mat_mod
     procedure, pass(a) :: mv_from_fmt  => psb_ld_mv_coo_from_fmt
     procedure, pass(a) :: cp_to_icoo   => psb_ld_cp_coo_to_icoo
     procedure, pass(a) :: cp_from_icoo => psb_ld_cp_coo_from_icoo
-    procedure, pass(a) :: tril          => psb_ld_coo_tril
-    procedure, pass(a) :: triu          => psb_ld_coo_triu
+    procedure, pass(a) :: tril         => psb_ld_coo_tril
+    procedure, pass(a) :: triu         => psb_ld_coo_triu
 
     procedure, pass(a) :: csput_a      => psb_ld_coo_csput_a
     procedure, pass(a) :: get_diag     => psb_ld_coo_get_diag
@@ -1799,7 +1799,6 @@ module psb_d_base_mat_mod
       integer(psb_ipk_), intent(out)                           :: info
     end subroutine psb_d_coo_mold
   end interface
-
 
   !
   !> Function print.
@@ -3636,7 +3635,6 @@ module psb_d_base_mat_mod
       class(psb_ld_coo_sparse_mat), optional, intent(out) :: l
     end subroutine psb_ld_coo_triu
   end interface
-
 
   !
   !> Function print.
