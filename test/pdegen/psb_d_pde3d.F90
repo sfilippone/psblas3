@@ -728,7 +728,7 @@ program psb_d_pde3d
 #else
   nth = 1
 #endif
-  
+
   if (iam < 0) then
     ! This should not happen, but just in case
     call psb_exit(ctxt)
@@ -773,33 +773,33 @@ program psb_d_pde3d
   ! Set the options for the BJAC preconditioner
   !
   if (psb_toupper(ptype) == "BJAC") then
-      call prec%set('sub_solve',       parms%alg,   info)
-      select case (psb_toupper(parms%alg))
-      case ("ILU")
-        call prec%set('sub_fillin',      parms%fill,       info)
-        call prec%set('ilu_alg',         parms%ilu_alg,    info)
-      case ("ILUT")
-        call prec%set('sub_fillin',      parms%fill,       info)
-        call prec%set('sub_iluthrs',     parms%thresh,     info)
-        call prec%set('ilut_scale',      parms%ilut_scale, info)
-      case ("AINV")
-        call prec%set('inv_thresh',      parms%inv_thresh, info)
-        call prec%set('inv_fillin',      parms%inv_fill,   info)
-        call prec%set('ilut_scale',      parms%ilut_scale, info)
-        call prec%set('ainv_alg',        parms%orth_alg,   info)
-      case ("INVK")
-        call prec%set('sub_fillin',      parms%fill,       info)
-        call prec%set('inv_fillin',      parms%inv_fill,   info)
-        call prec%set('ilut_scale',      parms%ilut_scale, info)
-      case ("INVT")
-        call prec%set('sub_fillin',      parms%fill,       info)
-        call prec%set('inv_fillin',      parms%inv_fill,   info)
-        call prec%set('sub_iluthrs',     parms%thresh,     info)
-        call prec%set('inv_thresh',      parms%inv_thresh, info)
-        call prec%set('ilut_scale',      parms%ilut_scale, info)
-      case default
-        ! Do nothing, use default setting in the init routine
-      end select
+    call prec%set('sub_solve',       parms%alg,   info)
+    select case (psb_toupper(parms%alg))
+    case ("ILU")
+      call prec%set('sub_fillin',      parms%fill,       info)
+      call prec%set('ilu_alg',         parms%ilu_alg,    info)
+    case ("ILUT")
+      call prec%set('sub_fillin',      parms%fill,       info)
+      call prec%set('sub_iluthrs',     parms%thresh,     info)
+      call prec%set('ilut_scale',      parms%ilut_scale, info)
+    case ("AINV")
+      call prec%set('inv_thresh',      parms%inv_thresh, info)
+      call prec%set('inv_fillin',      parms%inv_fill,   info)
+      call prec%set('ilut_scale',      parms%ilut_scale, info)
+      call prec%set('ainv_alg',        parms%orth_alg,   info)
+    case ("INVK")
+      call prec%set('sub_fillin',      parms%fill,       info)
+      call prec%set('inv_fillin',      parms%inv_fill,   info)
+      call prec%set('ilut_scale',      parms%ilut_scale, info)
+    case ("INVT")
+      call prec%set('sub_fillin',      parms%fill,       info)
+      call prec%set('inv_fillin',      parms%inv_fill,   info)
+      call prec%set('sub_iluthrs',     parms%thresh,     info)
+      call prec%set('inv_thresh',      parms%inv_thresh, info)
+      call prec%set('ilut_scale',      parms%ilut_scale, info)
+    case default
+      ! Do nothing, use default setting in the init routine
+    end select
   else
     ! nothing to set for NONE or DIAG preconditioner
   end if
@@ -881,39 +881,40 @@ program psb_d_pde3d
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
 
-  block
-    integer(psb_lpk_), allocatable :: iv(:)
-    type(psb_dspmat_type) :: atril
-    call psb_globtril(a,desc_a,atril,info)
-    write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
-    call a%print(fname)
-    iv = desc_a%get_global_indices(owned=.false.)
-    write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
-    call a%print(fname,iv=iv)
-    write(fname,'(a,i0,a)') "atril-loc-",iam,".mtx"
-    call atril%print(fname)
-    iv = desc_a%get_global_indices(owned=.false.)
-    write(fname,'(a,i0,a)') "atril-glb-",iam,".mtx"
-    call atril%print(fname,iv=iv)
-  end block
-  
-  block
-    integer(psb_lpk_), allocatable :: iv(:)
-    type(psb_dspmat_type) :: atriu    
-    call psb_globtriu(a,desc_a,atriu,info)
-    write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
-    call a%print(fname)
-    iv = desc_a%get_global_indices(owned=.false.)
-    write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
-    call a%print(fname,iv=iv)
-    write(fname,'(a,i0,a)') "atriu-loc-",iam,".mtx"
-    call atriu%print(fname)
-    iv = desc_a%get_global_indices(owned=.false.)
-    write(fname,'(a,i0,a)') "atriu-glb-",iam,".mtx"
-    call atriu%print(fname,iv=iv)
-  end block
-  
-  
+  if (.false.) then 
+    block
+      integer(psb_lpk_), allocatable :: iv(:)
+      type(psb_dspmat_type) :: atril
+      call psb_globtril(a,desc_a,atril,info)
+      write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
+      call a%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
+      call a%print(fname,iv=iv)
+      write(fname,'(a,i0,a)') "atril-loc-",iam,".mtx"
+      call atril%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "atril-glb-",iam,".mtx"
+      call atril%print(fname,iv=iv)
+    end block
+
+    block
+      integer(psb_lpk_), allocatable :: iv(:)
+      type(psb_dspmat_type) :: atriu    
+      call psb_globtriu(a,desc_a,atriu,info)
+      write(fname,'(a,i0,a)') "amat-loc-",iam,".mtx"
+      call a%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "amat-glb-",iam,".mtx"
+      call a%print(fname,iv=iv)
+      write(fname,'(a,i0,a)') "atriu-loc-",iam,".mtx"
+      call atriu%print(fname)
+      iv = desc_a%get_global_indices(owned=.false.)
+      write(fname,'(a,i0,a)') "atriu-glb-",iam,".mtx"
+      call atriu%print(fname,iv=iv)
+    end block
+  end if
+
 
   !
   !  cleanup storage and exit
@@ -1063,7 +1064,7 @@ contains
             write(psb_out_unit,'("Orthogonalization    : ",a)') parms%orth_alg
             write(psb_out_unit,'("Scaling              : ",a)') parms%ilut_scale
           case default
-              write(psb_out_unit,'("Unknown diagonal solver")')
+            write(psb_out_unit,'("Unknown diagonal solver")')
           end select
         end if
         write(psb_out_unit,'("Iterative method     : ",a)') kmethd
