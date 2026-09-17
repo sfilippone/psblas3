@@ -744,7 +744,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info   = psb_err_missing_override_method_
+    idxout = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
 
@@ -790,7 +791,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info      = psb_err_missing_override_method_
+    idxout(:) = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -841,7 +843,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info   = psb_err_missing_override_method_
+    idxout = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
 
@@ -887,7 +890,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info      = psb_err_missing_override_method_
+    idxout(:) = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -936,7 +940,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info   = psb_err_missing_override_method_
+    idxout = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -985,7 +990,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info      = psb_err_missing_override_method_
+    idxout(:) = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -1033,7 +1039,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info   = psb_err_missing_override_method_
+    idxout = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -1082,7 +1089,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info      = psb_err_missing_override_method_
+    idxout(:) = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -1131,7 +1139,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info   = psb_err_missing_override_method_
+    idxout = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -1181,7 +1190,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info      = psb_err_missing_override_method_
+    idxout(:) = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -1230,7 +1240,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info   = psb_err_missing_override_method_
+    idxout = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return
@@ -1280,7 +1291,8 @@ contains
     ! This is the base version. If we get here
     ! it means the derived class is incomplete,
     ! so we throw an error.
-    info = psb_err_missing_override_method_
+    info      = psb_err_missing_override_method_
+    idxout(:) = -1
     call psb_errpush(info,name,a_err=idxmap%get_fmt())
     call psb_error_handler(err_act)
     return

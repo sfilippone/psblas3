@@ -166,6 +166,7 @@ subroutine psb_base_csgetptn(imin,imax,a,nz,ia,ja,info,&
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  nz   = -1
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_base_csgetptn
@@ -457,6 +458,7 @@ subroutine psb_lbase_csgetptn(imin,imax,a,nz,ia,ja,info,&
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  nz   = -1
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 end subroutine psb_lbase_csgetptn

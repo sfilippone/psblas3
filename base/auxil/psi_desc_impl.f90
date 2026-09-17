@@ -41,6 +41,7 @@ subroutine psi_i_renum_index(iperm,idx,info)
 
   integer(psb_ipk_) :: i,j,k,nh
 
+  info = 0
   i=1
   k=idx(i)
   do while (k /= -1)

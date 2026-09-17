@@ -222,8 +222,6 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
         nzp = nzp + nzsrc(ip)
       end do
       call acoo_rcv%set_nzeros(nzp)
-!!$      write(0,*) rme,' Collected: ',&
-!!$           & acoo_rcv%get_nrows(),acoo_rcv%get_ncols(),acoo_rcv%get_nzeros()
 
       !
       !  New descriptor
@@ -237,9 +235,6 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
       call psb_cdasb(desc_out,info)
       call psb_spasb(a_out,desc_out,info)
 
-!!$      write(0,*) rme,' Regenerated: ',&
-!!$           & desc_out%get_local_rows(), desc_out%get_local_cols(),&
-!!$           & a_out%get_nrows(),a_out%get_ncols(),a_out%get_nzeros()
       naggr(me+1) = desc_out%get_local_rows()
     else
       naggr(me+1) = 0
@@ -257,16 +252,17 @@ subroutine psb_c_remap(np_remap, desc_in, a_in, ipd, isrc, nrsrc, naggr, &
   return  
 
 end subroutine psb_c_remap
-subroutine psb_c_remap2(map_in, desc_new, map_out, flag, info)
 
-  use psb_base_mod, psb_protect_name => psb_c_remap2
-  
-  implicit none
-  !....parameters...
-  type(psb_desc_type), intent(inout)   :: desc_new
-  type(psb_clinmap_type), intent(inout) :: map_in
-  type(psb_clinmap_type), intent(out)   :: map_out
-  integer(psb_ipk_), intent(in)       :: flag
-  integer(psb_ipk_), intent(out)       :: info
-  
-end subroutine psb_c_remap2
+!!$subroutine psb_c_remap2(map_in, desc_new, map_out, flag, info)
+!!$
+!!$  use psb_base_mod, psb_protect_name => psb_c_remap2
+!!$  
+!!$  implicit none
+!!$  !....parameters...
+!!$  type(psb_desc_type), intent(inout)   :: desc_new
+!!$  type(psb_clinmap_type), intent(inout) :: map_in
+!!$  type(psb_clinmap_type), intent(out)   :: map_out
+!!$  integer(psb_ipk_), intent(in)       :: flag
+!!$  integer(psb_ipk_), intent(out)       :: info
+!!$  
+!!$end subroutine psb_c_remap2

@@ -207,9 +207,9 @@ subroutine psi_indx_map_fnd_owner(idx,iprc,idxmap,info,adj)
     call psb_amx(ctxt,tidx)
     call psb_amx(ctxt,t1)
     if (me == psb_root_) then 
-      write(psb_out_unit,'(" fnd_owner  idx time  : ",es10.4)') tidx
-      write(psb_out_unit,'(" fnd_owner  amx time  : ",es10.4)') tamx
-      write(psb_out_unit,'(" fnd_owner remainedr  : ",es10.4)') t1 
+      write(psb_out_unit,'(" fnd_owner  idx time  : ",es16.4)') tidx
+      write(psb_out_unit,'(" fnd_owner  amx time  : ",es16.4)') tamx
+      write(psb_out_unit,'(" fnd_owner remainedr  : ",es16.4)') t1 
     endif
   end if
 

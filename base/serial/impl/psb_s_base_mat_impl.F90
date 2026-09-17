@@ -416,6 +416,7 @@ subroutine psb_s_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  nz   = -1
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -1729,6 +1730,7 @@ subroutine psb_s_base_rowsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -1750,6 +1752,7 @@ subroutine psb_s_base_arwsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -1771,6 +1774,7 @@ subroutine psb_s_base_colsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -1792,6 +1796,7 @@ subroutine psb_s_base_aclsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -1816,6 +1821,7 @@ subroutine psb_s_base_get_diag(a,d,info)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -2887,6 +2893,7 @@ subroutine psb_ls_base_csgetrow(imin,imax,a,nz,ia,ja,val,info,&
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  nz   = -1
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -3812,6 +3819,7 @@ subroutine psb_ls_base_rowsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -3833,6 +3841,7 @@ subroutine psb_ls_base_arwsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -3854,6 +3863,7 @@ subroutine psb_ls_base_colsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -3875,6 +3885,7 @@ subroutine psb_ls_base_aclsum(d,a)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
@@ -4038,6 +4049,7 @@ subroutine psb_ls_base_get_diag(a,d,info)
   ! it means the derived class is incomplete,
   ! so we throw an error.
   info = psb_err_missing_override_method_
+  d    = szero
   call psb_errpush(info,name,a_err=a%get_fmt())
   call psb_error_handler(err_act)
 
