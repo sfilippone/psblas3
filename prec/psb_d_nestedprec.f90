@@ -887,6 +887,7 @@ contains
       return
     end if
     ybuf(:) = dzero
+    if (beta /= dzero) ybuf(1:y%get_nrows()) = y%get_vect()
     call psb_d_nested_apply(alpha, prec, xbuf, beta, ybuf, desc_data, info, trans)
     if (info == psb_success_) call y%set(ybuf(1:y%get_nrows()))
     deallocate(ybuf)
@@ -1269,6 +1270,7 @@ contains
     bnorm = sqrt(max(dzero, psb_gedot(rhs, rhs, field_desc, info)))
     if (info /= psb_success_) goto 100
     if (bnorm == dzero) goto 100
+    r(:) = rhs(:) / bnorm
 
     z(:) = dzero
     call prec%blocks(field)%pc%apply(done, r, dzero, z, field_desc, info, trans='N', work=wrk)
@@ -1283,25 +1285,34 @@ contains
       if (info /= psb_success_) exit
       denom = psb_gedot(p, q, field_desc, info)
       if (info /= psb_success_) exit
-      if (abs(denom) <= epsilon(done)) exit
+      if (abs(denom) <= tiny(done)) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'nested inner solve', a_err='Krylov breakdown')
+        exit
+      end if
       alpha = rz / denom
       sol(:) = sol(:) + alpha * p(:)
       r(:) = r(:) - alpha * q(:)
       rnorm = sqrt(max(dzero, psb_gedot(r, r, field_desc, info)))
       if (info /= psb_success_) exit
-      if (rnorm <= kctx%tol * bnorm) exit
+      if (rnorm <= kctx%tol) exit
       z(:) = dzero
       call prec%blocks(field)%pc%apply(done, r, dzero, z, field_desc, info, trans='N', work=wrk)
       if (info /= psb_success_) exit
       rz_new = psb_gedot(r, z, field_desc, info)
       if (info /= psb_success_) exit
-      if (abs(rz) <= epsilon(done)) exit
+      if (abs(rz) <= tiny(done)) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'nested inner solve', a_err='Krylov breakdown')
+        exit
+      end if
       beta = rz_new / rz
       p(:) = z(:) + beta * p(:)
       rz = rz_new
     end do
 
 100 continue
+    sol(:) = bnorm * sol(:)
     deallocate(r, z, p, q, wrk)
   end subroutine psb_d_nested_inner_cg
 
@@ -1346,15 +1357,25 @@ contains
     bnorm = sqrt(max(dzero, psb_gedot(rhs, rhs, field_desc, info)))
     if (info /= psb_success_) goto 100
     if (bnorm == dzero) goto 100
+    r(:) = rhs(:) / bnorm
+    r0(:) = r(:)
 
     do k = 1, max(1, kctx%itmax)
       rho = psb_gedot(r0, r, field_desc, info)
       if (info /= psb_success_) exit
-      if (abs(rho) <= epsilon(done)) exit
+      if (abs(rho) <= tiny(done)) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'nested inner solve', a_err='Krylov breakdown')
+        exit
+      end if
       if (k == 1) then
         p(:) = r(:)
       else
-        if (abs(omega) <= epsilon(done)) exit
+        if (abs(omega) <= tiny(done)) then
+          info = psb_err_invalid_mat_state_
+          call psb_errpush(info, 'nested inner solve', a_err='Krylov breakdown')
+          exit
+        end if
         beta = (rho / rho_old) * (alpha / omega)
         p(:) = r(:) + beta * (p(:) - omega * v(:))
       end if
@@ -1367,12 +1388,16 @@ contains
       if (info /= psb_success_) exit
       denom = psb_gedot(r0, v, field_desc, info)
       if (info /= psb_success_) exit
-      if (abs(denom) <= epsilon(done)) exit
+      if (abs(denom) <= tiny(done)) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'nested inner solve', a_err='Krylov breakdown')
+        exit
+      end if
       alpha = rho / denom
       s(:) = r(:) - alpha * v(:)
       rnorm = sqrt(max(dzero, psb_gedot(s, s, field_desc, info)))
       if (info /= psb_success_) exit
-      if (rnorm <= kctx%tol * bnorm) then
+      if (rnorm <= kctx%tol) then
         sol(:) = sol(:) + alpha * ph(:)
         exit
       end if
@@ -1385,18 +1410,23 @@ contains
       if (info /= psb_success_) exit
       denom = psb_gedot(t, t, field_desc, info)
       if (info /= psb_success_) exit
-      if (abs(denom) <= epsilon(done)) exit
+      if (abs(denom) <= tiny(done)) then
+        info = psb_err_invalid_mat_state_
+        call psb_errpush(info, 'nested inner solve', a_err='Krylov breakdown')
+        exit
+      end if
       omega = psb_gedot(t, s, field_desc, info) / denom
       if (info /= psb_success_) exit
       sol(:) = sol(:) + alpha * ph(:) + omega * sh(:)
       r(:) = s(:) - omega * t(:)
       rnorm = sqrt(max(dzero, psb_gedot(r, r, field_desc, info)))
       if (info /= psb_success_) exit
-      if (rnorm <= kctx%tol * bnorm) exit
+      if (rnorm <= kctx%tol) exit
       rho_old = rho
     end do
 
 100 continue
+    sol(:) = bnorm * sol(:)
     deallocate(r, r0, p, v, s, t, ph, sh, wrk)
   end subroutine psb_d_nested_inner_bicgstab
 
@@ -1456,7 +1486,7 @@ contains
 
     block12 => psb_d_nest_get_block(prec%nest_op, 1, 2)
     block21 => psb_d_nest_get_block(prec%nest_op, 2, 1)
-    if (associated(block12) .and. associated(block21)) then
+    block ! All ranks participate; absent local blocks contribute zero.
       call psb_d_nest_apply_block(prec%nest_op, 1, 2, done, x2h, dzero, t1, info)
       if (info /= psb_success_) goto 100
       call psb_d_nested_field_solve(prec, 1, t1, w1, info)
@@ -1473,7 +1503,7 @@ contains
       call psb_d_nest_apply_block(prec%nest_op, 2, 1, done, w1h, dzero, t2, info)
       if (info /= psb_success_) goto 100
       y2(:) = y2(:) - t2(:)
-    end if
+    end block
 
 100 continue
     deallocate(x2h, t1, w1, w1h, t2)
@@ -1752,7 +1782,9 @@ contains
       if (info /= psb_success_) exit
       res(:) = rhs(:) - sx(:)
       if (prec%schur_tol > dzero) then
-        rnrm = sqrt(sum(res(1:n_owned) * res(1:n_owned)))
+        desc2 => psb_d_nest_get_field_desc(prec%nest_op, 2)
+        rnrm = sqrt(max(dzero, psb_gedot(res, res, desc2, info)))
+        if (info /= psb_success_) exit
         if (rnrm <= prec%schur_tol) exit
       end if
       call psb_d_nested_field_solve(prec, 2, res, dz, info)
@@ -1948,7 +1980,7 @@ contains
     block32 => psb_d_nest_get_block(prec%nest_op, 3, 2)
     block33 => psb_d_nest_get_block(prec%nest_op, 3, 3)
 
-    if (associated(block13) .and. associated(block31)) then
+    block ! All ranks participate; absent local blocks contribute zero.
       call psb_d_nest_apply_block(prec%nest_op, 1, 3, done, x3h, dzero, t1, info)
       if (info /= psb_success_) goto 100
       call psb_d_nested_field_solve(prec, 1, t1, w1, info)
@@ -1964,9 +1996,9 @@ contains
 
       call psb_d_nest_apply_block(prec%nest_op, 3, 1, done, w1h, done, y3, info)
       if (info /= psb_success_) goto 100
-    end if
+    end block
 
-    if (associated(block23) .and. associated(block32)) then
+    block ! All ranks participate; absent local blocks contribute zero.
       call psb_d_nest_apply_block(prec%nest_op, 2, 3, done, x3h, dzero, t2, info)
       if (info /= psb_success_) goto 100
       call psb_d_nested_field_solve(prec, 2, t2, w2, info)
@@ -1982,7 +2014,7 @@ contains
 
       call psb_d_nest_apply_block(prec%nest_op, 3, 2, done, w2h, done, y3, info)
       if (info /= psb_success_) goto 100
-    end if
+    end block
 
     if (associated(block33)) then
       call psb_d_nest_apply_block(prec%nest_op, 3, 3, done, x3h, dzero, t3, info)
@@ -2041,8 +2073,13 @@ contains
     r(:) = q(:)
     rhs_norm = sqrt(max(dzero, psb_gedot(q, q, desc3, info)))
     if (info /= psb_success_) goto 100
-    tol = prec%schur_tol
-    if (tol <= dzero) tol = 1.0e-6_psb_dpk_ * max(done, rhs_norm)
+    if (rhs_norm == dzero) goto 100
+    ! Normalize to make the default relative tolerance independent of RHS scale.
+    q(:) = q(:) / rhs_norm
+    r(:) = q(:)
+    tol = 1.0e-6_psb_dpk_
+    if (prec%schur_tol > dzero) tol = prec%schur_tol / rhs_norm
+    if (done <= tol) goto 100
 
     call psb_d_nested_field_solve(prec, 3, r, zc, info)
     if (info /= psb_success_) goto 100
@@ -2086,6 +2123,7 @@ contains
     end do
 
 100 continue
+    sol(:) = rhs_norm * sol(:)
     deallocate(q, r, zc, p, ap)
   end subroutine psb_d_nested_pde_control_schur_solve
 

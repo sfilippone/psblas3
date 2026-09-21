@@ -1,62 +1,55 @@
-cmake_minimum_required(VERSION 3.10)
-project(nested Fortran)
+cmake_minimum_required(VERSION 3.15)
 
-# Check for the installation path for psblas
-if(NOT DEFINED PSBLAS_INSTALL_DIR)
-    message(FATAL_ERROR "Please specify the path to the psblas installation directory using -DPSBLAS_INSTALL_DIR=<path>")
+# This directory can also be built independently against an installed PSBLAS.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  project(PSBLASNestedTests Fortran)
+  find_package(psblas REQUIRED HINTS ${PSBLAS_INSTALL_DIR})
+  find_package(MPI REQUIRED COMPONENTS Fortran)
+  set(NEST_LIBS psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base MPI::MPI_Fortran)
+  if(PSBLAS_INSTALL_DIR)
+    include_directories("${PSBLAS_INSTALL_DIR}/include" "${PSBLAS_INSTALL_DIR}/modules")
+  endif()
+else()
+  set(NEST_LIBS util linsolve prec ext base MPI::MPI_Fortran)
+  include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_BINARY_DIR}/modules")
 endif()
 
-# Set the include and library directories based on the provided path
-set(INSTALLDIR "${PSBLAS_INSTALL_DIR}")
-set(INCDIR "${INSTALLDIR}/include")
-set(MODDIR "${INSTALLDIR}/modules")
-set(LIBDIR "${INSTALLDIR}/lib")
-
-# Find the psblas package
-find_package(psblas REQUIRED PATHS ${INSTALLDIR})
-
-# Include directories for the Fortran compiler
-include_directories(${INCDIR} ${MODDIR})
-
-# Define executable directory
-set(EXEDIR "${CMAKE_CURRENT_SOURCE_DIR}/runs")
-file(MAKE_DIRECTORY ${EXEDIR})
+# Executable directory
+set(EXEDIR "${CMAKE_CURRENT_BINARY_DIR}/runs")
 
 # Nested (block-structured / MATNEST) tests
-set(SOURCES_D_NEST_GLOB_TEST  psb_d_nest_glob_test.F90)
-set(SOURCES_D_NEST_RECT_TEST  psb_d_nest_rect_test.F90)
-set(SOURCES_D_NEST_CG_TEST    psb_d_nest_cg_test.F90)
+set(SOURCES_D_NEST_GLOB_TEST psb_d_nest_glob_test.F90)
+set(SOURCES_D_NEST_RECT_TEST psb_d_nest_rect_test.F90)
+set(SOURCES_D_NEST_CG_TEST psb_d_nest_cg_test.F90)
 set(SOURCES_D_NEST_PREC_CG_TEST psb_d_nest_prec_cg_test.F90)
 set(SOURCES_D_NEST_MULT_PREC_CG_TEST psb_d_nest_mult_prec_cg_test.F90)
 set(SOURCES_D_NEST_SCHUR_PREC_CG_TEST psb_d_nest_schur_prec_cg_test.F90)
 set(SOURCES_D_NEST_PETSC_STOKES_TEST psb_d_nest_petsc_stokes_test.F90)
 
 add_executable(psb_d_nest_glob_test ${SOURCES_D_NEST_GLOB_TEST})
-target_link_libraries(psb_d_nest_glob_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
+target_link_libraries(psb_d_nest_glob_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_glob_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")
 
 add_executable(psb_d_nest_rect_test ${SOURCES_D_NEST_RECT_TEST})
-target_link_libraries(psb_d_nest_rect_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
+target_link_libraries(psb_d_nest_rect_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_rect_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")
 
 add_executable(psb_d_nest_cg_test ${SOURCES_D_NEST_CG_TEST})
-target_link_libraries(psb_d_nest_cg_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
+target_link_libraries(psb_d_nest_cg_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_cg_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")
 
 add_executable(psb_d_nest_prec_cg_test ${SOURCES_D_NEST_PREC_CG_TEST})
-target_link_libraries(psb_d_nest_prec_cg_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
+target_link_libraries(psb_d_nest_prec_cg_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_prec_cg_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")
 
 add_executable(psb_d_nest_mult_prec_cg_test ${SOURCES_D_NEST_MULT_PREC_CG_TEST})
-target_link_libraries(psb_d_nest_mult_prec_cg_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
+target_link_libraries(psb_d_nest_mult_prec_cg_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_mult_prec_cg_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")
 
 add_executable(psb_d_nest_schur_prec_cg_test ${SOURCES_D_NEST_SCHUR_PREC_CG_TEST})
-target_link_libraries(psb_d_nest_schur_prec_cg_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
-
+target_link_libraries(psb_d_nest_schur_prec_cg_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_schur_prec_cg_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")
 
 add_executable(psb_d_nest_petsc_stokes_test ${SOURCES_D_NEST_PETSC_STOKES_TEST})
-target_link_libraries(psb_d_nest_petsc_stokes_test psblas::util psblas::linsolve psblas::prec psblas::ext psblas::base)
-
-
-# Set output directory for executables
-foreach(target psb_d_nest_glob_test psb_d_nest_rect_test psb_d_nest_cg_test psb_d_nest_prec_cg_test psb_d_nest_mult_prec_cg_test psb_d_nest_schur_prec_cg_test psb_d_nest_petsc_stokes_test)
-    set_target_properties(${target} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${EXEDIR}
-    )
-endforeach()
+target_link_libraries(psb_d_nest_petsc_stokes_test PRIVATE ${NEST_LIBS})
+set_target_properties(psb_d_nest_petsc_stokes_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${EXEDIR}")

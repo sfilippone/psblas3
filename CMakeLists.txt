@@ -1407,3 +1407,8 @@ message(STATUS "CMAKE_INSTALL_MODULDIR: ${CMAKE_INSTALL_MODULDIR} - ${PSB_CMAKE_
 # Unit tests targeting each function, argument, and branch of code
 # add_mpi_test(initialize_mpi 2 initialize_mpi)
 
+option(PSB_BUILD_NESTED_TESTS "Build the nested matrix tests" OFF)
+if(PSB_BUILD_NESTED_TESTS)
+  find_package(MPI REQUIRED COMPONENTS Fortran)
+  add_subdirectory(test/nested)
+endif()

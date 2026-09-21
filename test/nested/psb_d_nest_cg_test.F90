@@ -75,7 +75,7 @@ program psb_d_nest_cg_test
   integer(psb_ipk_)          :: field1_local_rows, field2_local_rows
   integer(psb_lpk_)          :: field1_global_row, field2_global_row, field_size
 
-  type(psb_d_nest_matrix)    :: nested_matrix
+  type(psb_d_nest_matrix), target :: nested_matrix
   type(psb_dprec_type)       :: preconditioner
   type(psb_d_vect_type)      :: x_solution, rhs, x_exact
 
@@ -108,6 +108,7 @@ program psb_d_nest_cg_test
   ! 1) create the nested operator: 2 fields of global size field_size
   !---------------------------------------------------------------
   call nested_matrix%init(context, [field_size, field_size], info)
+  call check_info(info, 'nested_matrix%init')
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%init info=', info; goto 9999
   end if
@@ -128,6 +129,7 @@ program psb_d_nest_cg_test
     entry_vals(i_local_row) = diag_value
   end do
   call nested_matrix%ins(1, 1, field1_local_rows, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   ! block (2,2) = diag*I
@@ -139,6 +141,7 @@ program psb_d_nest_cg_test
     entry_vals(i_local_row) = diag_value
   end do
   call nested_matrix%ins(2, 2, field2_local_rows, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   ! block (1,2) = C : rows field1, cols field2 ; C(r,r)=-1, C(r,r-1)=-1
@@ -158,6 +161,7 @@ program psb_d_nest_cg_test
     end if
   end do
   call nested_matrix%ins(1, 2, entry_idx, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   ! block (2,1) = C^T : rows field2, cols field1 ; C^T(s,s)=-1, C^T(s,s+1)=-1
@@ -177,12 +181,14 @@ program psb_d_nest_cg_test
     end if
   end do
   call nested_matrix%ins(2, 1, entry_idx, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   !---------------------------------------------------------------
   ! 3) assemble: nested_matrix%a_glob / nested_matrix%desc_glob are ready for Krylov
   !---------------------------------------------------------------
   call nested_matrix%asb(info)
+  call check_info(info, 'nested_matrix%asb')
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%asb info=', info; goto 9999
   end if
@@ -191,16 +197,23 @@ program psb_d_nest_cg_test
   ! 4) consistent RHS: x_exact = 1, rhs = M * x_exact (via the nested operator)
   !---------------------------------------------------------------
   call psb_geall(x_exact, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geall')
   call psb_geasb(x_exact, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geasb')
   call x_exact%set(done)                                   ! x_exact = 1 everywhere
 
-  call psb_geall(rhs, nested_matrix%desc_glob, info); call psb_geasb(rhs, nested_matrix%desc_glob, info)
+  call psb_geall(rhs, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geall')
+  call psb_geasb(rhs, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geasb')
   call psb_spmm(done, nested_matrix%a_glob, x_exact, dzero, rhs, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_spmm')
   if (info /= psb_success_) then
     if (my_rank == 0) write(*,*) 'FAIL: psb_spmm (RHS) info=', info
     goto 9999
   end if
   norm_x_exact = psb_genrm2(x_exact, nested_matrix%desc_glob, info)
+  call check_info(info, 'norm')
 
   !---------------------------------------------------------------
   ! 5) solve with the standard PSBLAS CG under every stock preconditioner
@@ -211,17 +224,22 @@ program psb_d_nest_cg_test
   iter_diag  = -1
   do i_prec = 1, n_precs
     call preconditioner%init(context, trim(prec_names(i_prec)), info)
+    call check_info(info, 'preconditioner%init')
     call preconditioner%build(nested_matrix%a_glob, nested_matrix%desc_glob, info)
+    call check_info(info, 'preconditioner%build')
     if (info /= psb_success_) then
       if (my_rank == 0) write(*,*) 'FAIL: prec%build (', trim(prec_names(i_prec)), ') info=', info
       all_passed = .false.; exit
     end if
 
     call psb_geall(x_solution, nested_matrix%desc_glob, info)
+    call check_info(info, 'psb_geall')
     call psb_geasb(x_solution, nested_matrix%desc_glob, info)
+    call check_info(info, 'psb_geasb')
     call psb_krylov('CG', nested_matrix%a_glob, preconditioner, rhs, x_solution, stop_tol, &
          & nested_matrix%desc_glob, info, &
          & itmax=max_iter, iter=n_iter, err=final_residual, itrace=trace_level, istop=stop_criterion)
+    call check_info(info, 'psb_krylov')
     if (info /= psb_success_) then
       if (my_rank == 0) write(*,*) 'FAIL: psb_krylov(CG,', trim(prec_names(i_prec)), ') info=', info
       all_passed = .false.; exit
@@ -229,7 +247,9 @@ program psb_d_nest_cg_test
 
     ! solution error: || x_solution - x_exact || / || x_exact ||
     call psb_geaxpby(-done, x_exact, done, x_solution, nested_matrix%desc_glob, info)
+    call check_info(info, 'psb_geaxpby')
     solution_error = psb_genrm2(x_solution, nested_matrix%desc_glob, info) / norm_x_exact
+    call check_info(info, 'norm')
 
     if (my_rank == 0) then
       write(*,'(a,a6,a,i6,a,es12.4,a,es12.4)') ' prec=', prec_names(i_prec), &
@@ -241,7 +261,9 @@ program psb_d_nest_cg_test
     if (trim(prec_names(i_prec)) == 'DIAG') iter_diag = n_iter
 
     call psb_gefree(x_solution, nested_matrix%desc_glob, info)
+    call check_info(info, 'psb_gefree')
     call preconditioner%free(info)
+    call check_info(info, 'preconditioner%free')
   end do
 
   !---------------------------------------------------------------
@@ -254,12 +276,24 @@ program psb_d_nest_cg_test
       write(*,*) '[PASS] CG converges on the nested operator with NONE/DIAG/BJAC'
     else
       write(*,*) '[FAIL] preconditioned CG on the nested operator (tol ', solution_tol, ')'
+      call psb_abort(context)
     end if
   end if
 
   call nested_matrix%free(info)
+  call check_info(info, 'nested_matrix%free')
 
 9999 continue
   call psb_exit(context)
+
+contains
+  subroutine check_info(status, label)
+    integer(psb_ipk_), intent(in) :: status
+    character(len=*), intent(in) :: label
+    if (status /= psb_success_) then
+      write(*,*) '[FAIL] ', trim(label), ' rank=', my_rank, ' info=', status
+      call psb_abort(context)
+    end if
+  end subroutine check_info
 
 end program psb_d_nest_cg_test

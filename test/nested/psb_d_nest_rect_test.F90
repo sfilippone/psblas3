@@ -59,7 +59,7 @@ program psb_d_nest_rect_test
   integer(psb_ipk_)               :: entry_idx, v_local_rows, q_local_rows
   integer(psb_lpk_)               :: v_global_row, q_global_row, q_col, v_size, q_size
 
-  type(psb_d_nest_matrix)         :: nested_matrix
+  type(psb_d_nest_matrix), target :: nested_matrix
   type(psb_dspmat_type)           :: monolithic_ref
   type(psb_d_vect_type)           :: x_vec, y_nested, y_monolithic
   real(psb_dpk_)                  :: insert_value(1)
@@ -80,6 +80,7 @@ program psb_d_nest_rect_test
   ! 1) build the 2x2 nested operator (fields V, Q)
   !---------------------------------------------------------------
   call nested_matrix%init(context, [v_size, q_size], info)
+  call check_info(info, 'nested_matrix%init')
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%init info=', info; goto 9999
   end if
@@ -114,6 +115,7 @@ program psb_d_nest_rect_test
     end if
   end do
   call nested_matrix%ins(1, 1, entry_idx, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   ! B^T rectangular  -> block (1,2), V x Q : row r -> col mod(r-1,nQ)+1, val 0.5
@@ -127,6 +129,7 @@ program psb_d_nest_rect_test
     entry_vals(entry_idx) = 0.5_psb_dpk_
   end do
   call nested_matrix%ins(1, 2, entry_idx, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   ! B rectangular  -> block (2,1), Q x V : row q -> cols q and q+nQ, val 0.3
@@ -144,11 +147,13 @@ program psb_d_nest_rect_test
     entry_vals(entry_idx) = 0.3_psb_dpk_
   end do
   call nested_matrix%ins(2, 1, entry_idx, entry_rows, entry_cols, entry_vals, info)
+  call check_info(info, 'nested_matrix%ins')
   deallocate(entry_rows, entry_cols, entry_vals)
 
   ! assemble with the blocks stored in CSC instead of the CSR default:
   ! exercises the configurable block storage on a base format
   call nested_matrix%asb(info, type='CSC')
+  call check_info(info, 'nested_matrix%asb')
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL: nested_matrix%asb info=', info; goto 9999
   end if
@@ -158,51 +163,73 @@ program psb_d_nest_rect_test
   !---------------------------------------------------------------
   call psb_spall(monolithic_ref, nested_matrix%desc_glob, info, &
        &         nnz=6*nested_matrix%desc_glob%get_local_rows())
+  call check_info(info, 'psb_spall')
   do i_local_row = 1, v_local_rows                     ! V rows
     v_global_row = v_rows(i_local_row)
     insert_value(1)=2.0_psb_dpk_
     call psb_spins(1,[v_global_row],[v_global_row],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
+    call check_info(info, 'psb_spins')
     if (v_global_row>1) then
       insert_value(1)=-1.0_psb_dpk_
       call psb_spins(1,[v_global_row],[v_global_row-1_psb_lpk_],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
+      call check_info(info, 'psb_spins')
     end if
     if (v_global_row<v_size) then
       insert_value(1)=-1.0_psb_dpk_
       call psb_spins(1,[v_global_row],[v_global_row+1_psb_lpk_],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
+      call check_info(info, 'psb_spins')
     end if
     q_col = v_size + (mod(v_global_row-1_psb_lpk_, q_size) + 1)
     insert_value(1)=0.5_psb_dpk_                                                    ! B^T
     call psb_spins(1,[v_global_row],[q_col],insert_value,monolithic_ref,nested_matrix%desc_glob,info)
+    call check_info(info, 'psb_spins')
   end do
   do i_local_row = 1, q_local_rows                     ! Q rows
     q_global_row = q_rows(i_local_row)
     insert_value(1)=0.3_psb_dpk_
     call psb_spins(1,[v_size+q_global_row],[q_global_row],       insert_value,monolithic_ref,nested_matrix%desc_glob,info)  ! col q
+    call check_info(info, 'psb_spins')
     call psb_spins(1,[v_size+q_global_row],[q_global_row+q_size],insert_value,monolithic_ref,nested_matrix%desc_glob,info)  ! col q+nQ
+    call check_info(info, 'psb_spins')
   end do
   call psb_spasb(monolithic_ref, nested_matrix%desc_glob, info, dupl=psb_dupl_add_)
+  call check_info(info, 'psb_spasb')
 
   !---------------------------------------------------------------
   ! 4) compare the two matrix-vector products on x[g] = g
   !---------------------------------------------------------------
   call psb_geall(x_vec, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geall')
   do i_local_row = 1, nested_matrix%desc_glob%get_local_rows()
     call nested_matrix%desc_glob%l2g(i_local_row, v_global_row, info)
+    call check_info(info, 'nested_matrix%desc_glob%l2g')
     insert_value(1) = real(v_global_row, psb_dpk_)
     call psb_geins(1, [v_global_row], insert_value, x_vec, nested_matrix%desc_glob, info)
+    call check_info(info, 'psb_geins')
   end do
   call psb_geasb(x_vec, nested_matrix%desc_glob, info)
-  call psb_geall(y_nested,     nested_matrix%desc_glob, info); call psb_geasb(y_nested,     nested_matrix%desc_glob, info)
-  call psb_geall(y_monolithic, nested_matrix%desc_glob, info); call psb_geasb(y_monolithic, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geasb')
+  call psb_geall(y_nested,     nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geall')
+  call psb_geasb(y_nested,     nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geasb')
+  call psb_geall(y_monolithic, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geall')
+  call psb_geasb(y_monolithic, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geasb')
 
   call psb_spmm(done, nested_matrix%a_glob, x_vec, dzero, y_nested, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_spmm')
   if (info /= psb_success_) then
     if (my_rank==0) write(*,*) 'FAIL spmm nested info=', info; goto 9999
   end if
   call psb_spmm(done, monolithic_ref, x_vec, dzero, y_monolithic, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_spmm')
 
   call psb_geaxpby(done, y_nested, -done, y_monolithic, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geaxpby')
   mismatch_norm = psb_genrm2(y_monolithic, nested_matrix%desc_glob, info)
+  call check_info(info, 'norm')
 
   if (my_rank == 0) then
     write(*,'(a,i0,a,i0,a,i0)') ' np=', num_procs, '  |V|=', v_size, '  |Q|=', q_size
@@ -211,12 +238,24 @@ program psb_d_nest_rect_test
       write(*,*) '[PASS] rectangular nested operator matches monolithic CSR'
     else
       write(*,*) '[FAIL] mismatch above tolerance ', tolerance
+      call psb_abort(context)
     end if
   end if
 
   call nested_matrix%free(info)
+  call check_info(info, 'nested_matrix%free')
 
 9999 continue
   call psb_exit(context)
+
+contains
+  subroutine check_info(status, label)
+    integer(psb_ipk_), intent(in) :: status
+    character(len=*), intent(in) :: label
+    if (status /= psb_success_) then
+      write(*,*) '[FAIL] ', trim(label), ' rank=', my_rank, ' info=', status
+      call psb_abort(context)
+    end if
+  end subroutine check_info
 
 end program psb_d_nest_rect_test

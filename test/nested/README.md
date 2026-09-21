@@ -273,3 +273,21 @@ Library (under `base/modules/`):
 * `tools/psb_d_nest_tools_mod.F90`    — block tools (`psb_d_nest_rect_block`, ...)
 * `tools/psb_d_nest_builder_mod.F90`  — `psb_d_nest_matrix` frontend (init/ins/asb)
 * `psb_d_nest_mod.f90`                — umbrella module (`use psb_d_nest_mod`)
+
+## Automated nested tests
+
+Standalone CMake builds register the six synthetic nested tests on 1, 2, 3,
+and 4 MPI ranks: global and rectangular matrix products, CG, additive and
+multiplicative preconditioning, and Schur preconditioning.
+
+```sh
+cmake -S test/nested -B build-nested -DPSBLAS_INSTALL_DIR=/path/to/psblas
+cmake --build build-nested -j2
+ctest --test-dir build-nested --output-on-failure
+```
+
+Alternatively configure the main project with `-DPSB_BUILD_NESTED_TESTS=ON`.
+`NEST_TEST_RANKS` controls MPI sizes. Set `PETSC_STOKES_DIR` at configure time
+to register the external PETSc binary fixture tests. Failed numerical tolerance
+checks and library errors cause nonzero exits; CTest timeouts also catch MPI
+hangs.

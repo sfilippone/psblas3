@@ -4,14 +4,17 @@ set(PSB_linsolve_source_files
   impl/psb_crichardson.f90
   impl/psb_zfcg.F90
   impl/psb_zkrylov.f90
+  impl/psb_zminres.f90
   impl/psb_srichardson.f90
   impl/psb_ckrylov.f90
+  impl/psb_cminres.f90
   impl/psb_crgmres.f90
   impl/psb_cgcr.f90
   impl/psb_sbicg.f90
   impl/psb_ccgstabl.f90
   impl/psb_drgmres.f90
   impl/psb_skrylov.f90
+  impl/psb_sminres.f90
   impl/psb_scg.F90
   impl/psb_dcgstabl.f90
   impl/psb_ccg.F90
@@ -26,6 +29,7 @@ set(PSB_linsolve_source_files
   impl/psb_cfcg.F90
   impl/psb_zrichardson.f90
   impl/psb_dkrylov.f90
+  impl/psb_dminres.f90
   impl/psb_ccgstab.f90
   impl/psb_zcg.F90
   impl/psb_dbicg.f90

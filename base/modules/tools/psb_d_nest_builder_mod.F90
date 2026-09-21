@@ -64,7 +64,7 @@
 module psb_d_nest_builder_mod
   use psb_const_mod
   use psb_error_mod,           only : psb_errpush
-  use psb_penv_mod,            only : psb_ctxt_type, psb_info
+  use psb_penv_mod,            only : psb_ctxt_type, psb_info, psb_sum
   use psb_desc_mod,            only : psb_desc_type
   use psb_d_mat_mod,           only : psb_dspmat_type
   use psb_d_base_mat_mod,      only : psb_d_base_sparse_mat
@@ -126,6 +126,12 @@ contains
     name = 'psb_d_nest_op_init'
 
     call psb_info(context, my_rank, num_procs)
+    if (num_procs <= 0 .or. size(field_sizes) == 0 .or. any(field_sizes <= 0)) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, name, a_err='invalid context or field sizes'); return
+    end if
+    call op%free(info)
+    if (info /= psb_success_) return
     n_fields     = size(field_sizes)
     op%context   = context
     op%n_fields  = n_fields
@@ -171,7 +177,12 @@ contains
       info = psb_err_invalid_input_
       call psb_errpush(info, name, a_err='block index out of range'); return
     end if
-    if (n_entries <= 0) return
+    if (n_entries < 0 .or. n_entries > size(entry_rows) .or. &
+         & n_entries > size(entry_cols) .or. n_entries > size(entry_vals)) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, name, a_err='invalid triplet count'); return
+    end if
+    if (n_entries == 0) return
 
     call block_buffer_append(op%block_buffer(block_row,block_col), n_entries, &
          &                   entry_rows, entry_cols, entry_vals, info)
@@ -200,11 +211,15 @@ contains
     class(psb_d_base_sparse_mat), intent(in), optional :: mold
 
     type(psb_d_nest_base_mat) :: nest_operator
-    integer(psb_ipk_)         :: n_fields, i_field, j_field
+    integer(psb_ipk_)         :: n_fields, i_field, j_field, block_present
     character(len=24)         :: name
 
     info = psb_success_
     name = 'psb_d_nest_op_asb'
+    if (op%assembled .or. op%n_fields <= 0 .or. .not. allocated(op%block_buffer)) then
+      info = psb_err_invalid_input_
+      call psb_errpush(info, name, a_err='operator not in build state'); return
+    end if
     n_fields = op%n_fields
 
     ! 1) assemble the per-field descriptors (with the union halo accumulated in ins)
@@ -224,7 +239,19 @@ contains
     end if
     do j_field = 1, n_fields
       do i_field = 1, n_fields
-        if (op%block_buffer(i_field,j_field)%n_entries > 0) then
+        ! Presence is global: every rank must build the same block structure,
+        ! including empty local blocks on ranks owning no entries of a field.
+        block_present = merge(1, 0, op%block_buffer(i_field,j_field)%n_entries > 0)
+        call psb_sum(op%context, block_present)
+        if (block_present > 0) then
+          if (.not. allocated(op%block_buffer(i_field,j_field)%entry_rows)) then
+            allocate(op%block_buffer(i_field,j_field)%entry_rows(0), &
+                 & op%block_buffer(i_field,j_field)%entry_cols(0), &
+                 & op%block_buffer(i_field,j_field)%entry_vals(0), stat=info)
+            if (info /= 0) then
+              info = psb_err_alloc_dealloc_; call psb_errpush(info, name); return
+            end if
+          end if
           call psb_d_nest_rect_block(op%block_storage%mats(i_field,j_field),         &
                & op%block_buffer(i_field,j_field)%n_entries,                         &
                & op%block_buffer(i_field,j_field)%entry_rows,                        &
@@ -249,6 +276,7 @@ contains
     do j_field = 1, n_fields
       do i_field = 1, n_fields
         call op%field_desc(j_field)%clone(op%grid_desc%descs(i_field,j_field), info)
+        if (info /= psb_success_) return
       end do
     end do
 
@@ -294,17 +322,24 @@ contains
         end do
       end do
       deallocate(op%block_buffer, stat=local_info)
+      if (info == psb_success_) info = local_info
     end if
-    if (op%assembled) then
-      call op%a_glob%free()
-      call op%desc_glob%free(local_info)
-      call op%grid_desc%free(local_info)
-    end if
+    ! The adapter is a non-owning view; release the blocks explicitly.  Do not
+    ! gate cleanup on assembled: an earlier assembly may have failed midway.
+    call op%a_glob%free()
+    call op%block_storage%free(local_info)
+    if (info == psb_success_) info = local_info
+    call op%desc_glob%free(local_info)
+    if (info == psb_success_) info = local_info
+    call op%grid_desc%free(local_info)
+    if (info == psb_success_) info = local_info
     if (allocated(op%field_desc)) then
       do i_field = 1, size(op%field_desc)
         call op%field_desc(i_field)%free(local_info)
+        if (info == psb_success_) info = local_info
       end do
       deallocate(op%field_desc, stat=local_info)
+      if (info == psb_success_) info = local_info
     end if
     op%n_fields  = 0
     op%assembled = .false.

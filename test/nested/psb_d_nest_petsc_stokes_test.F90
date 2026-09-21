@@ -35,7 +35,7 @@ program psb_d_nest_petsc_stokes_test
   end type petsc_vector
 
   type(psb_ctxt_type)     :: context
-  type(psb_d_nest_matrix) :: nested_matrix
+  type(psb_d_nest_matrix), target :: nested_matrix
   type(psb_dprec_type)    :: preconditioner
   type(psb_d_vect_type)   :: rhs, x_solution, residual
 
@@ -153,11 +153,17 @@ program psb_d_nest_petsc_stokes_test
   call check_info(info, 'prec%init')
   if (psb_toupper(trim(ptype)) == 'NEST') then
     call preconditioner%set('COMPOSITION', trim(composition), info)
+    call check_info(info, 'preconditioner%set')
     call preconditioner%set('SCHUR_SOLVE', trim(schur_solve), info)
+    call check_info(info, 'preconditioner%set')
     call preconditioner%set('SCHUR_MAXIT', schur_maxit, info)
+    call check_info(info, 'preconditioner%set')
     call preconditioner%set('BLOCK_SOLVE', trim(block_solve), info)
+    call check_info(info, 'preconditioner%set')
     call preconditioner%set('SUB_SOLVE', trim(sub_solve), info)
+    call check_info(info, 'preconditioner%set')
     call preconditioner%set('SUB_FILLIN', sub_fillin, info)
+    call check_info(info, 'preconditioner%set')
   end if
   call preconditioner%build(nested_matrix%a_glob, nested_matrix%desc_glob, info)
   call check_info(info, 'prec%build')
@@ -171,12 +177,17 @@ program psb_d_nest_petsc_stokes_test
   t_solve = psb_wtime() - t0
 
   call psb_geall(residual, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geall')
   call psb_geasb(residual, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geasb')
   call psb_geaxpby(done, rhs, dzero, residual, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_geaxpby')
   call psb_spmm(-done, nested_matrix%a_glob, x_solution, done, residual, nested_matrix%desc_glob, info)
   call check_info(info, 'residual spmm')
   residual_norm = psb_genrm2(residual, nested_matrix%desc_glob, info)
+  call check_info(info, 'norm')
   rhs_norm      = psb_genrm2(rhs,      nested_matrix%desc_glob, info)
+  call check_info(info, 'norm')
 
   if (my_rank == 0) then
     write(*,'(a,i0,a,i0,a,i0,a,i0)') '  block sizes: n_u=', n_u, ' n_p=', n_p, ' total=', n_total, ' np=', num_procs
@@ -194,10 +205,15 @@ program psb_d_nest_petsc_stokes_test
 
 9999 continue
   call preconditioner%free(info)
+  call check_info(info, 'preconditioner%free')
   call psb_gefree(residual, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_gefree')
   call psb_gefree(x_solution, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_gefree')
   call psb_gefree(rhs, nested_matrix%desc_glob, info)
+  call check_info(info, 'psb_gefree')
   call nested_matrix%free(info)
+  call check_info(info, 'nested_matrix%free')
   call psb_exit(context)
 
 contains
@@ -291,7 +307,7 @@ contains
       stop 2
     end if
     read(unit) classid
-    if (classid /= petsc_mat_classid) stop 'Bad PETSc matrix classid'
+    if (classid /= petsc_mat_classid) error stop 'Bad PETSc matrix classid'
     read(unit) nrow32
     read(unit) ncol32
     read(unit) nnz32
@@ -318,7 +334,7 @@ contains
         mat%val(k) = real(vals64(k), psb_dpk_)
       end do
     end do
-    if (k /= mat%nnz) stop 'Bad PETSc matrix row lengths'
+    if (k /= mat%nnz) error stop 'Bad PETSc matrix row lengths'
   end subroutine read_petsc_matrix
 
   subroutine read_petsc_vector(filename, vec)
@@ -335,7 +351,7 @@ contains
       stop 2
     end if
     read(unit) classid
-    if (classid /= petsc_vec_classid) stop 'Bad PETSc vector classid'
+    if (classid /= petsc_vec_classid) error stop 'Bad PETSc vector classid'
     read(unit) n32
     vec%n = int(n32, psb_lpk_)
     allocate(vals64(vec%n), vec%val(vec%n))
