@@ -226,7 +226,7 @@ The files will be organized into the lib, include, and modules subdirectories wi
  - GNU compilers 10.5.0, 11.5.0, 12.5.0, 13.3.0, 14.2.0 14.3.0, 15.2.0
  - LLVM  20.1.0 and 21.1.0 (except OpenMPI 4.1.8 which does not build with LLVM)
  
- Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2 and 2025.3
+ Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2, 2025.3 and 2026.1.
 
  As of this release, the NVIDIA compiler 25.7 fails to handle our code.
  Cray, IBM and NAg compilers have been used for testing in the past, but not on this version.
