@@ -270,7 +270,7 @@ subroutine psb_z_diag_precbld(a,desc_a,prec,info,amold,vmold,imold)
     prec%d(i) = zone
   end do
 
-  allocate(prec%dv,stat=info) 
+  if (.not.allocated(prec%dv)) allocate(prec%dv,stat=info) 
   if (info == 0) then 
     if (present(vmold)) then 
       allocate(prec%dv%v,mold=vmold,stat=info) 

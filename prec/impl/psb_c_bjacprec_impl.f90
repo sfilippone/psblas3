@@ -644,6 +644,10 @@ subroutine psb_c_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
         enddo
         deallocate(prec%av,stat=info)
       endif
+      if (allocated (prec%dv)) then 
+        call prec%dv%free(info)
+        if (info == 0) deallocate(prec%dv)
+      end if
     end if
     if (.not.allocated(prec%av)) then
       allocate(prec%av(psb_max_avsz),stat=info)
