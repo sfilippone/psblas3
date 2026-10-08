@@ -115,16 +115,25 @@ extern "C" {
 #define psb_Trans_      "T"
 #define psb_ConjTrans_  "C"
 
+  /*  legal values for dupl argument  (must match Fortran psb_const_mod) */
+#define psb_dupl_null_   0
+#define psb_dupl_add_    1
+#define psb_dupl_ovwrt_  2
+#define psb_dupl_err_    3
+#define psb_dupl_def_    psb_dupl_add_
+
+/* PETSc-style insertion mode aliases */
+#define PSB_INSERT_VALUES psb_dupl_ovwrt_
+#define PSB_ADD_VALUES psb_dupl_add_
+/* Error code returned by psb_c_dgeins_v when insertion mode is changed
+ * while entries are already buffered (i.e. without an intervening assembly). */
+#define PSB_ERR_MODE_MISMATCH  (-2)
+
 #if 0
   /*  legal values for upd argument */
 #define psb_upd_srch_   98764
 #define psb_upd_perm_   98765
 #define psb_upd_def_    psb_upd_srch_
-  /*  legal values for dupl argument */
-#define psb_dupl_ovwrt_  0
-#define psb_dupl_add_    1
-#define psb_dupl_err_    2
-#define psb_dupl_def_    psb_dupl_ovwrt_
 
   /*  legal values for halo swap modes argument */
 #define  psb_swap_send_  1
