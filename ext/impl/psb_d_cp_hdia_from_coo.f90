@@ -136,7 +136,7 @@ contains
       write(*,*) 'Hackcount ',nhacks,' Allocation height ',iszd
       write(*,*) 'Hackoffsets ',a%hackOffsets(:)
     end if
-    if (info == psb_success_) call psb_realloc(hacksize*iszd,a%diaOffsets,info)
+    if (info == psb_success_) call psb_realloc(iszd,a%diaOffsets,info)
     if (info == psb_success_) call psb_realloc(hacksize*iszd,a%val,info)
     if (info /= psb_success_) return
     klast1 = 1 
@@ -163,9 +163,7 @@ contains
            & a%val((hacksize*hackfirst)+1:hacksize*hacknext),info,&
            & initdata=.true.,rdisp=(i-1))
           
-      call countnz(nr,nc,(i-1),hacksize,(hacknext-hackfirst),&
-           & a%diaOffsets(hackfirst+1:hacknext),nzout)
-      a%nzeros = a%nzeros + nzout
+      a%nzeros = a%nzeros + (klast1-kfirst)
       call cleand(nr,(hacknext-hackfirst),d,a%diaOffsets(hackfirst+1:hacknext))
       
     end do
