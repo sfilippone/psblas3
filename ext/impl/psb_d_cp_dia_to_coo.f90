@@ -34,6 +34,7 @@ subroutine psb_d_cp_dia_to_coo(a,b,info)
   
   use psb_base_mod
   use psb_d_dia_mat_mod, psb_protect_name => psb_d_cp_dia_to_coo
+  use psi_ext_util_mod
   implicit none 
 
   class(psb_d_dia_sparse_mat), intent(in)    :: a
@@ -58,7 +59,7 @@ subroutine psb_d_cp_dia_to_coo(a,b,info)
        & size(a%data,1),size(a%data,2),&
        & a%data,a%offset,info)
   
-  call b%set_nzeros(nza)
+  call b%set_nzeros(nzd)
   call b%set_host()
   call b%fix(info)
 

@@ -138,7 +138,7 @@ contains
       enddo
     else
       do  i = 1, min(nrd,nr-rdisp)
-        y(rdisp+i) = beta*y(i)
+        y(rdisp+i) = beta*y(rdisp+i)
       end do
     endif
     do j=1, ncd

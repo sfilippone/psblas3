@@ -588,7 +588,13 @@ program pdgenmv
   ! solver parameters
   integer(psb_epk_) :: amatsize, precsize, descsize, annz, nbytes
   real(psb_dpk_)   :: err, eps, tnv, tng,tdot, dnrm2,ddot
-  integer, parameter :: ntests=20, ngpu=2, ncnv=3
+  integer, parameter :: ntests=20, ngpu=2
+  ! Number of format conversions performed before the timed loop. They are
+  ! neither timed nor printed, but dominate the wall time of a run on large
+  ! matrices; SPMV_NCNV overrides the default.
+  integer            :: ncnv=3
+  character(len=32)  :: ncnvbuf
+  integer            :: ncnvlen, ncnvstat, ncnvios, ncnvval
   type(psb_d_coo_sparse_mat), target   :: acoo
   type(psb_d_csr_sparse_mat), target   :: acsr
   type(psb_d_ell_sparse_mat), target   :: aell
@@ -697,6 +703,15 @@ program pdgenmv
   tcnvcsr = 0
   tcnvgpu = 0
   call psb_geall(x1,desc_a,info)
+  call get_environment_variable('SPMV_NCNV',ncnvbuf,ncnvlen,ncnvstat)
+  if ((ncnvstat == 0).and.(ncnvlen > 0)) then
+    read(ncnvbuf,*,iostat=ncnvios) ncnvval
+    if ((ncnvios == 0).and.(ncnvval > 0)) then
+      ncnv = ncnvval
+    else
+      write(psb_err_unit,'("Ignoring invalid SPMV_NCNV=",a)') trim(ncnvbuf)
+    end if
+  end if
   do j=1, ncnv
     call aux_a%cscnv(a,info,mold=acoo)
     call psb_barrier(ctxt)
