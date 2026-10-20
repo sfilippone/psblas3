@@ -62,7 +62,7 @@ psb_i_t		 psb_c_ccopy_mat(psb_c_cspmat *ah,psb_c_cspmat *bh,psb_c_descriptor *cd
 
 psb_i_t    psb_c_cspasb_opt(psb_c_cspmat *mh, psb_c_descriptor *cdh,  
  			const char *afmt, psb_i_t upd, psb_i_t dupl); 
-psb_i_t    psb_c_csprn(psb_c_cspmat *mh, psb_c_descriptor *cdh, _Bool clear);
+psb_i_t    psb_c_csprn(psb_c_cspmat *mh, psb_c_descriptor *cdh, bool clear);
 psb_i_t    psb_c_cmat_name_print(psb_c_cspmat *mh, char *name);
 psb_i_t	   psb_c_cvect_set_scal(psb_c_cvector *xh, psb_c_t val);
 psb_i_t	   psb_c_cvect_set_vect(psb_c_cvector *xh, psb_c_t *val, psb_i_t n);
