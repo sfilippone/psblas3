@@ -218,17 +218,17 @@ The files will be organized into the lib, include, and modules subdirectories wi
 ## MPI and Compilers
  The library has been successfully compiled and tested with multiple compilers
  and MPI implementations; this release has been successfully tested with:
- - MPICH 4.2.3, 4.3.0, 4.3.2
- - OpenMPI 4.1.8. 5.0.7, 5.0.8, 5.0.9
+ - MPICH 4.2.3, 4.3.0, 4.3.2, 5.0.2
+ - OpenMPI 4.1.8. 5.0.7, 5.0.8, 5.0.9, 5.0.10, 5.0.11 
  
  combined with
  
  - GNU compilers 10.5.0, 11.5.0, 12.5.0, 13.3.0, 14.2.0 14.3.0, 15.2.0, 16.2.0
- - LLVM  20.1.0 and 21.1.0 (except OpenMPI 4.1.8 which does not build with LLVM)
+ - LLVM  20.1.0, 21.1.0, 22.1.8, 23.1.3 (except OpenMPI 4.1.8 which does not build with LLVM)
  
- Moreover, it has been tested with the Intel OneAPI toolchain versions 2025.2, 2025.3 and 2026.1.
+ It has been tested with the Intel OneAPI toolchain versions 2025.2, 2025.3 and 2026.1.
 
- As of this release, the NVIDIA compiler 25.7 fails to handle our code.
+ As of this release, the NVIDIA compilers 25.7 and 26.9 fails to handle our code.
  Cray, IBM and NAg compilers have been used for testing in the past, but not on this version.
  			   
 ## Documentation
