@@ -128,10 +128,10 @@ module psb_z_vect_mod
     procedure, pass(z) :: mlt_av   => z_vect_mlt_av
     generic, public    :: mlt      => mlt_v, mlt_a, mlt_a_2,&
          & mlt_v_2, mlt_av, mlt_va
-    procedure, pass(x) :: div_v    => z_vect_div_v
+    procedure, pass(y) :: div_v    => z_vect_div_v
     procedure, pass(z) :: div_v2    => z_vect_div_v2
-    procedure, pass(x) :: div_v_check => z_vect_div_v_check
-    procedure, pass(x) :: div_v2_check => z_vect_div_v2_check
+    procedure, pass(y) :: div_v_check => z_vect_div_v_check
+    procedure, pass(y) :: div_v2_check => z_vect_div_v2_check
     procedure, pass(z) :: div_a2   => z_vect_div_a2
     procedure, pass(z) :: div_a2_check => z_vect_div_a2_check
     generic, public    :: div      => div_v, div_v2, div_v_check, &

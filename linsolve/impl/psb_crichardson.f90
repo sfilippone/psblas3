@@ -120,8 +120,17 @@ Subroutine psb_crichardson_vect(a,prec,b,x,eps,desc_a,info,&
   if (present(istop)) then 
     istop_ = istop 
   else
-    istop_ = 2
+    istop_ = psb_get_istop_default()
   endif
+  
+  if (.not.psb_is_valid_istop(istop_)) then
+    info=psb_err_invalid_istop_
+    err=info
+    call psb_errpush(info,name,i_err=(/istop_/))
+    goto 9999
+  end if
+
+
   if (present(itmax)) then 
     itmax_ = itmax
   else

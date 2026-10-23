@@ -93,7 +93,7 @@
 !                                         where r is the (preconditioned, recursive
 !                                         estimate of) residual. 
 !
-Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop)
+Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,istop,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_c_linsolve_conv_mod
@@ -109,6 +109,7 @@ Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   integer(psb_ipk_), Optional, Intent(in)      :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)     :: iter
   Real(psb_spk_), Optional, Intent(out) :: err
+  type(psb_c_vect_type), intent(inout), optional   :: s1, s2
 ! =   Local data
   complex(psb_spk_), allocatable, target   :: aux(:),wwrk(:,:)
   type(psb_c_vect_type) :: q, r, p, v, s, t, z, f
@@ -156,13 +157,31 @@ Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
 
   If (Present(istop)) Then 
     istop_ = istop 
-  Else
-    istop_ = 2
-  Endif
+  else
+    istop_ = psb_get_istop_default()
+  endif
+  if (.not.psb_is_valid_istop(istop_)) then
+    info=psb_err_invalid_istop_
+    err=info
+    call psb_errpush(info,name,i_err=(/istop_/))
+    goto 9999
+  end if
   !
-  !  ISTOP_ = 1:  Normwise backward error, infinity norm 
-  !  ISTOP_ = 2:  ||r||/||b||   norm 2 
+  !  istop_ = 1:  normwise backward error, infinity norm 
+  !  istop_ = 2:  ||r||/||b||   norm 2
   !
+  select case(istop_)
+  case(psb_istop_ani_,psb_istop_bn2_,&
+       & psb_istop_rn2_abs_, psb_istop_rrn2_)
+    ! nothing needed
+  case default
+    ! should never get here
+    info=psb_err_internal_error_
+    err=info
+    call psb_errpush(info,name,a_err="invalid istop_")
+    goto 9999
+  end select
+
   ! =  if (.not.same_type_as(x,b)) then 
   ! =    write(0,*) 'Warning: different dynamic types for X and B '
   ! =  end if
@@ -217,7 +236,8 @@ Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
   End If
 
   itx   = 0
-  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+  call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,&
+       & desc_a,stopdat,info,s1=s1,s2=s2)
   if (psb_errstatus_fatal()) Then 
     call psb_errpush(psb_err_from_subroutine_non_,name)
     goto 9999
@@ -234,7 +254,7 @@ Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
     call psb_geaxpby(cone,r,czero,q,desc_a,info)
 
     ! Perhaps we already satisfy the convergence criterion...
-    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+    if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
 
     if (psb_errstatus_fatal()) then 
       info=psb_err_from_subroutine_
@@ -354,7 +374,7 @@ Subroutine psb_ccgstab_vect(a,prec,b,x,eps,desc_a,info,itmax,iter,err,itrace,ist
       call psb_geaxpby(omega,z,cone,x,desc_a,info)
       call psb_geaxpby(cone,s,czero,r,desc_a,info)
       call psb_geaxpby(-omega,t,cone,r,desc_a,info)
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
 
       if (psb_errstatus_fatal()) Then 
         call psb_errpush(psb_err_from_subroutine_,name,a_err='X/R update ')

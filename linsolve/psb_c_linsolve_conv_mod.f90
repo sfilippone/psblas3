@@ -83,15 +83,18 @@ contains
     stopdat%controls(psb_ik_itmax_) = itmax
 
     select case(stopdat%controls(psb_ik_stopc_))
-    case (1) 
+    case (psb_istop_ani_) 
       stopdat%values(psb_ik_ani_) = psb_spnrmi(a,desc_a,info)
       if (info == psb_success_)&
            & stopdat%values(psb_ik_bni_) = psb_geamax(b,desc_a,info)
 
-    case (2) 
+    case (psb_istop_bn2_) 
       stopdat%values(psb_ik_bn2_) = psb_genrm2(b,desc_a,info)
-
-    case (3)
+      
+    case (psb_istop_rn2_abs_) 
+      ! Do nothing
+      
+    case (psb_istop_rrn2_)
       call psb_geall(r,desc_a,info)
       call psb_geaxpby(cone,b,czero,r,desc_a,info)
       call psb_spmm(-cone,a,x,cone,r,desc_a,info)
@@ -108,8 +111,8 @@ contains
     end if
 
     stopdat%values(psb_ik_eps_)    = eps
-    stopdat%values(psb_ik_errnum_) = dzero
-    stopdat%values(psb_ik_errden_) = done
+    stopdat%values(psb_ik_errnum_) = szero
+    stopdat%values(psb_ik_errden_) = sone
 
     if ((stopdat%controls(psb_ik_trace_) > 0).and. (me == 0))&
          &  call log_header(methdname) 
@@ -122,7 +125,6 @@ contains
     return
 
   end subroutine psb_c_init_conv
-
 
   function psb_c_check_conv(methdname,it,x,r,desc_a,stopdat,info) result(res)
     use psb_base_mod
@@ -149,19 +151,26 @@ contains
     res = .false. 
 
     select case(stopdat%controls(psb_ik_stopc_)) 
-    case(1)
+    case(psb_istop_ani_)
       stopdat%values(psb_ik_rni_) = psb_geamax(r,desc_a,info)
-      if (info == psb_success_) stopdat%values(psb_ik_xni_) = psb_geamax(x,desc_a,info)
+      if (info == psb_success_) &
+           & stopdat%values(psb_ik_xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rni_)
       stopdat%values(psb_ik_errden_) =&
            & (stopdat%values(psb_ik_ani_)*stopdat%values(psb_ik_xni_)&
            &  +stopdat%values(psb_ik_bni_))
-    case(2)
+      
+    case(psb_istop_bn2_)
       stopdat%values(psb_ik_rn2_)  = psb_genrm2(r,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rn2_)
       stopdat%values(psb_ik_errden_) = stopdat%values(psb_ik_bn2_)
 
-    case(3)
+    case (psb_istop_rn2_abs_) 
+      stopdat%values(psb_ik_rn2_abs_) = psb_genrm2(r,desc_a,info)
+      stopdat%values(psb_ik_errnum_)  = stopdat%values(psb_ik_rn2_abs_)
+      stopdat%values(psb_ik_errden_)  = sone
+
+    case(psb_istop_rrn2_)
       stopdat%values(psb_ik_rn2_)  = psb_genrm2(r,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rn2_)
       stopdat%values(psb_ik_errden_) = stopdat%values(psb_ik_r0n2_)
@@ -201,8 +210,8 @@ contains
 
   end function psb_c_check_conv
 
-
-  subroutine psb_c_init_conv_vect(methdname,stopc,trace,itmax,a,x,b,eps,desc_a,stopdat,info)
+  subroutine psb_c_init_conv_vect(methdname,stopc,trace,itmax,&
+       & a,x,b,eps,desc_a,stopdat,info,s1,s2)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)      :: methdname
@@ -213,6 +222,7 @@ contains
     type(psb_desc_type), intent(in)   :: desc_a
     type(psb_itconv_type)             :: stopdat
     integer(psb_ipk_), intent(out)              :: info
+    type(psb_c_vect_type), optional :: s1, s2
 
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: me, np, err_act
@@ -236,15 +246,18 @@ contains
     stopdat%controls(psb_ik_itmax_) = itmax
 
     select case(stopdat%controls(psb_ik_stopc_))
-    case (1) 
+    case (psb_istop_ani_) 
       stopdat%values(psb_ik_ani_) = psb_spnrmi(a,desc_a,info)
       if (info == psb_success_)&
            & stopdat%values(psb_ik_bni_) = psb_geamax(b,desc_a,info)
 
-    case (2) 
+    case (psb_istop_bn2_) 
       stopdat%values(psb_ik_bn2_) = psb_genrm2(b,desc_a,info)
+      
+    case (psb_istop_rn2_abs_) 
+      ! Do nothing
 
-    case (3)
+    case (psb_istop_rrn2_)
       call psb_geasb(r,desc_a,info,scratch=.true.)
       call psb_geaxpby(cone,b,czero,r,desc_a,info)
       call psb_spmm(-cone,a,x,cone,r,desc_a,info)
@@ -261,8 +274,8 @@ contains
     end if
 
     stopdat%values(psb_ik_eps_)    = eps
-    stopdat%values(psb_ik_errnum_) = dzero
-    stopdat%values(psb_ik_errden_) = done
+    stopdat%values(psb_ik_errnum_) = szero
+    stopdat%values(psb_ik_errden_) = sone
 
     if ((stopdat%controls(psb_ik_trace_) > 0).and. (me == 0))&
          &  call log_header(methdname) 
@@ -276,7 +289,8 @@ contains
 
   end subroutine psb_c_init_conv_vect
 
-  function psb_c_check_conv_vect(methdname,it,x,r,desc_a,stopdat,info) result(res)
+  function psb_c_check_conv_vect(methdname,it,x,r,&
+       & desc_a,stopdat,info,s1,s2) result(res)
     use psb_base_mod
     implicit none 
     character(len=*), intent(in)     :: methdname
@@ -286,6 +300,7 @@ contains
     type(psb_itconv_type)            :: stopdat
     logical                          :: res
     integer(psb_ipk_), intent(out)             :: info
+    type(psb_c_vect_type), optional :: s1, s2
 
     type(psb_ctxt_type) :: ctxt
     integer(psb_ipk_) :: me, np, err_act
@@ -303,19 +318,26 @@ contains
 
 
     select case(stopdat%controls(psb_ik_stopc_)) 
-    case(1)
+    case(psb_istop_ani_)
       stopdat%values(psb_ik_rni_) = psb_geamax(r,desc_a,info)
-      if (info == psb_success_) stopdat%values(psb_ik_xni_) = psb_geamax(x,desc_a,info)
+      if (info == psb_success_) &
+           & stopdat%values(psb_ik_xni_) = psb_geamax(x,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rni_)
       stopdat%values(psb_ik_errden_) = &
            & (stopdat%values(psb_ik_ani_)*stopdat%values(psb_ik_xni_)&
            & +stopdat%values(psb_ik_bni_))
-    case(2)
+      
+    case(psb_istop_bn2_)
       stopdat%values(psb_ik_rn2_)    = psb_genrm2(r,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rn2_)
       stopdat%values(psb_ik_errden_) = stopdat%values(psb_ik_bn2_)
 
-    case(3)
+    case (psb_istop_rn2_abs_) 
+      stopdat%values(psb_ik_rn2_abs_) = psb_genrm2(r,desc_a,info)
+      stopdat%values(psb_ik_errnum_)  = stopdat%values(psb_ik_rn2_abs_)
+      stopdat%values(psb_ik_errden_)  = sone
+
+    case(psb_istop_rrn2_)
       stopdat%values(psb_ik_rn2_)  = psb_genrm2(r,desc_a,info)
       stopdat%values(psb_ik_errnum_) = stopdat%values(psb_ik_rn2_)
       stopdat%values(psb_ik_errden_) = stopdat%values(psb_ik_r0n2_)

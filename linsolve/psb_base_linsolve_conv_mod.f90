@@ -41,10 +41,20 @@ Module psb_base_linsolve_conv_mod
     module procedure psb_d_end_conv
   end interface
 
+  !
+  integer(psb_ipk_), parameter :: psb_istop_min_     = 1
+  integer(psb_ipk_), parameter :: psb_istop_ani_     = 1
+  integer(psb_ipk_), parameter :: psb_istop_bn2_     = 2
+  integer(psb_ipk_), parameter :: psb_istop_rn2_abs_ = 3
+  integer(psb_ipk_), parameter :: psb_istop_rrn2_    = 4
+  integer(psb_ipk_), parameter :: psb_istop_scbn2_   = 5
+  integer(psb_ipk_), parameter :: psb_istop_max_     = 3
+  
+  ! Fields in controls and values
   integer(psb_ipk_), parameter :: psb_ik_bni_=1, psb_ik_rni_=2, psb_ik_ani_=3
   integer(psb_ipk_), parameter :: psb_ik_xni_=4, psb_ik_bn2_=5, psb_ik_r0n2_=6
   integer(psb_ipk_), parameter :: psb_ik_xn2_=7, psb_ik_errnum_=8, psb_ik_errden_=9
-  integer(psb_ipk_), parameter :: psb_ik_eps_=10, psb_ik_rn2_=11
+  integer(psb_ipk_), parameter :: psb_ik_eps_=10, psb_ik_rn2_=11, psb_ik_rn2_abs_=12
   integer(psb_ipk_), parameter :: psb_ik_stopc_=1, psb_ik_trace_=2, psb_ik_itmax_=3
   integer(psb_ipk_), parameter :: psb_ik_ivsz_=16
   type psb_itconv_type
@@ -52,8 +62,29 @@ Module psb_base_linsolve_conv_mod
     real(psb_dpk_) :: values(psb_ik_ivsz_)
   end type psb_itconv_type
 
+  integer(psb_ipk_), save :: psb_istop_default = psb_istop_bn2_
+  
 contains
 
+  function psb_is_valid_istop(istop)  result(res)
+    integer(psb_ipk_) :: istop
+    logical :: res
+
+    res = ((psb_istop_min_<=istop).and.(istop<=psb_istop_max_))
+  end function psb_is_valid_istop
+  
+  function psb_get_istop_default()  result(res)
+    integer(psb_ipk_) :: res
+
+    res = psb_istop_default
+  end function psb_get_istop_default
+  
+  subroutine psb_set_istop_default(val) 
+    integer(psb_ipk_) :: val
+    if ((psb_istop_min_<=val).and.(val<=psb_istop_max_)) &
+         & psb_istop_default = val
+  end subroutine psb_set_istop_default
+  
   subroutine log_header(methdname)
     !use psb_base_mod
     implicit none 
