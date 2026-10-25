@@ -9,12 +9,12 @@ module psb_c_serial_cbind_mod
     module function psb_c_cvect_get_nrows(xh) bind(c) result(res)
       integer(psb_c_ipk_) :: res
       type(psb_c_cvector) :: xh
-      
+
       type(psb_c_vect_type), pointer :: vp
       integer(psb_c_ipk_)               :: info
     end function psb_c_cvect_get_nrows
   end interface
-  
+
   interface
     module function psb_c_cvect_f_get_cpy(v,xh) bind(c) result(res)
       integer(psb_c_ipk_)    :: res
@@ -22,7 +22,7 @@ module psb_c_serial_cbind_mod
       type(psb_c_cvector) :: xh
     end function psb_c_cvect_f_get_cpy
   end interface
-  
+
 
   interface
     module function psb_c_cvect_zero(xh) bind(c) result(res)
@@ -30,7 +30,7 @@ module psb_c_serial_cbind_mod
       type(psb_c_cvector) :: xh
     end function psb_c_cvect_zero
   end interface
-  
+
   interface
     module function psb_c_cvect_f_get_pnt(xh) bind(c) result(res)
       type(c_ptr)        :: res
@@ -69,7 +69,8 @@ module psb_c_serial_cbind_mod
   end interface
 
   interface
-    module function psb_c_cvect_set_scal_bound(x,val,ifirst,ilast) bind(c) result(info)
+    module function psb_c_cvect_set_scal_bound(x,val,ifirst,ilast) &
+         & bind(c) result(info)
       type(psb_c_cvector) :: x
       integer(psb_c_ipk_) :: info
       integer(psb_c_ipk_), value :: ifirst, ilast 
@@ -94,7 +95,7 @@ module psb_c_serial_cbind_mod
       complex(c_float_complex), value :: val
     end function psb_c_cvect_set_entry
   end interface
- 
+
   interface
     module function psb_c_cvect_get_entry(x,index) bind(c) result(res)
       type(psb_c_cvector) :: x
@@ -110,232 +111,71 @@ module psb_c_serial_cbind_mod
     end function psb_c_cvect_clone
   end interface
 
-    function psb_c_cnnz(ah,cdh) bind(c) result(res)
-    implicit none
-    integer(psb_c_ipk_) :: res
+  interface 
+    module function psb_c_cnnz(ah,cdh) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
 
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
 
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-    integer(psb_c_ipk_)               :: info
+    end function psb_c_cnnz
+  end interface
 
-    res = 0
+  interface
+    module function psb_c_cis_matupd(ah,cdh) bind(c) result(res)
+      logical(c_bool) :: res
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
 
-    res = psb_nnz(ap,descp,info)
+  interface
+    module function psb_c_cis_matasb(ah,cdh) bind(c) result(res)
+      logical(c_bool) :: res
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-  end function psb_c_cnnz
+  interface 
+    module function psb_c_cis_matbld(ah,cdh) bind(c) result(res)
+      logical(c_bool) :: res
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-  function psb_c_cis_matupd(ah,cdh) bind(c) result(res)
-    implicit none
-    logical(c_bool) :: res
+  interface 
+    module function psb_c_cset_matupd(ah,cdh) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
+  interface 
+    module function psb_c_cset_matasb(ah,cdh) bind(c) result(res)
+      integer(psb_c_ipk_)    :: res
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-    integer(psb_c_ipk_)               :: info
+  interface 
+    module function psb_c_cset_matbld(ah,cdh) bind(c) result(res)
+      integer(psb_c_ipk_)    :: res
+      type(psb_c_cspmat)   :: ah
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-    res = .false.
+  interface 
+    module function psb_c_ccopy_mat(ah,bh,cdh) bind(c) result(res)
+      integer(psb_c_ipk_)    :: res
+      type(psb_c_cspmat)   :: ah,bh
+      type(psb_c_descriptor) :: cdh
+    end function
+  end interface
 
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-
-    res = ap%is_upd()
-  end function
-
-  function psb_c_cis_matasb(ah,cdh) bind(c) result(res)
-    implicit none
-    logical(c_bool) :: res
-
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-    integer(psb_c_ipk_)               :: info
-
-    res = .false.
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-
-    res = ap%is_asb()
-  end function
-
-  function psb_c_cis_matbld(ah,cdh) bind(c) result(res)
-    implicit none
-    logical(c_bool) :: res
-
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-    integer(psb_c_ipk_)               :: info
-
-    res = .false.
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-
-    res = ap%is_bld()
-  end function
-
-  function psb_c_cset_matupd(ah,cdh) bind(c) result(res)
-    implicit none
-    integer(psb_c_ipk_) :: res
-
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-
-    res = -1
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-
-    call ap%set_upd()
-
-    res = psb_success_
-  end function
-
-  function psb_c_cset_matasb(ah,cdh) bind(c) result(res)
-    implicit none
-    integer(psb_c_ipk_)    :: res
-
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-
-    res = -1;
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-
-    call ap%set_asb()
-
-    res = psb_success_
-
-  end function
-
-  function psb_c_cset_matbld(ah,cdh) bind(c) result(res)
-    implicit none
-    integer(psb_c_ipk_)    :: res
-
-    type(psb_c_cspmat)   :: ah
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap
-
-    res = -1
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-
-    call ap%set_bld()
-
-    res = psb_success_
-  end function
-
-  function psb_c_ccopy_mat(ah,bh,cdh) bind(c) result(res)
-    implicit none
-    integer(psb_c_ipk_)    :: res
-
-    type(psb_c_cspmat)   :: ah,bh
-    type(psb_c_descriptor) :: cdh
-
-    type(psb_desc_type), pointer      :: descp
-    type(psb_cspmat_type), pointer  :: ap,bp
-    integer(psb_c_ipk_)               :: info
-
-    res = -1
-
-    if (c_associated(cdh%item)) then
-      call c_f_pointer(cdh%item,descp)
-    else
-      return
-    end if
-    if (c_associated(ah%item)) then
-      call c_f_pointer(ah%item,ap)
-    else
-      return
-    end if
-    if (c_associated(bh%item)) then
-      call c_f_pointer(bh%item,bp)
-    else
-      return
-    end if
-
-    call ap%clone(bp,info)
-
-    res = info
-  end function
-  
 end module psb_c_serial_cbind_mod

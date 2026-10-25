@@ -206,13 +206,14 @@ module psb_c_base_vect_mod
     ! Vector-Vector operations
     !
     procedure, pass(y) :: div_v         => c_base_div_v
-    procedure, pass(y) :: div_a         => c_base_div_a
+!!$    procedure, pass(y) :: div_a         => c_base_div_a
     procedure, pass(y) :: div_v_check   => c_base_div_v_check
     procedure, pass(z) :: div_v2         => c_base_div_v2
     procedure, pass(z) :: div_v2_check   => c_base_div_v2_check
     procedure, pass(z) :: div_a2        => c_base_div_a2
     procedure, pass(z) :: div_a2_check  => c_base_div_a2_check
-    generic, public    :: div           => div_v, div_v2, div_v_check, div_a, &
+!!$    generic, public    :: div           => div_v, div_v2, div_v_check, div_a, 
+    generic, public    :: div           => div_v, div_v2, div_v_check,  &
                                             div_v2_check, div_a2, div_a2_check
     procedure, pass(y) :: inv_v    => c_base_inv_v
     procedure, pass(y) :: inv_v_check => c_base_inv_v_check
