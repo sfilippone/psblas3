@@ -258,69 +258,69 @@ module psb_s_psblas_cbind_mod
     end function psb_c_sspsm
   end interface
   
-  interface
-    module function psb_c_snnz(ah,cdh) bind(c) result(res)
-      integer(psb_c_ipk_) :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function psb_c_snnz
-  end interface
-
-  interface
-    module function psb_c_sis_matupd(ah,cdh) bind(c) result(res)
-      logical(c_bool) :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
-
-  interface
-    module function psb_c_sis_matasb(ah,cdh) bind(c) result(res)
-      logical(c_bool) :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
-
-  interface
-    module function psb_c_sis_matbld(ah,cdh) bind(c) result(res)
-      logical(c_bool) :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
-
-  interface
-    module function psb_c_sset_matupd(ah,cdh) bind(c) result(res)
-      integer(psb_c_ipk_) :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
-
-  interface
-    module function psb_c_sset_matasb(ah,cdh) bind(c) result(res)
-      integer(psb_c_ipk_)    :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
-  
-  interface
-    module function psb_c_sset_matbld(ah,cdh) bind(c) result(res)
-      integer(psb_c_ipk_)    :: res
-      type(psb_c_sspmat)   :: ah
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
-
-  interface
-    module function psb_c_scopy_mat(ah,bh,cdh) bind(c) result(res)
-      integer(psb_c_ipk_)    :: res
-      type(psb_c_sspmat)   :: ah,bh
-      type(psb_c_descriptor) :: cdh
-    end function
-  end interface
+!!$  interface
+!!$    module function psb_c_snnz(ah,cdh) bind(c) result(res)
+!!$      integer(psb_c_ipk_) :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function psb_c_snnz
+!!$  end interface
+!!$
+!!$  interface
+!!$    module function psb_c_sis_matupd(ah,cdh) bind(c) result(res)
+!!$      logical(c_bool) :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
+!!$
+!!$  interface
+!!$    module function psb_c_sis_matasb(ah,cdh) bind(c) result(res)
+!!$      logical(c_bool) :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
+!!$
+!!$  interface
+!!$    module function psb_c_sis_matbld(ah,cdh) bind(c) result(res)
+!!$      logical(c_bool) :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
+!!$
+!!$  interface
+!!$    module function psb_c_sset_matupd(ah,cdh) bind(c) result(res)
+!!$      integer(psb_c_ipk_) :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
+!!$
+!!$  interface
+!!$    module function psb_c_sset_matasb(ah,cdh) bind(c) result(res)
+!!$      integer(psb_c_ipk_)    :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
+!!$  
+!!$  interface
+!!$    module function psb_c_sset_matbld(ah,cdh) bind(c) result(res)
+!!$      integer(psb_c_ipk_)    :: res
+!!$      type(psb_c_sspmat)   :: ah
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
+!!$
+!!$  interface
+!!$    module function psb_c_scopy_mat(ah,bh,cdh) bind(c) result(res)
+!!$      integer(psb_c_ipk_)    :: res
+!!$      type(psb_c_sspmat)   :: ah,bh
+!!$      type(psb_c_descriptor) :: cdh
+!!$    end function
+!!$  end interface
   
   interface
     module function psb_c_sspscal(alpha,ah,cdh) bind(c) result(res)
