@@ -115,4 +115,73 @@ subroutine psb_d_cuda_hybg_vect_mv(alpha,a,x,beta,y,info,trans)
   return
 
 end subroutine psb_d_cuda_hybg_vect_mv
+
+
+
+subroutine psb_d_cuda_hybg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_d_cuda_hybg_mat_mod, psb_protect_name => psb_d_cuda_hybg_mvect_mv
+  use psb_d_cuda_vect_mod
+  use psb_d_cuda_multivect_mod
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(psb_d_cuda_hybg_sparse_mat), intent(in) :: a
+  class(psb_d_base_vect_type), intent(inout)    :: x
+  class(psb_d_base_multivect_type), intent(inout)   :: y
+  integer(psb_ipk_), intent(in)                 :: idx_y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+end subroutine psb_d_cuda_hybg_mvect_mv
+
+subroutine psb_d_cuda_hybg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_d_cuda_hybg_mat_mod, psb_protect_name => psb_d_cuda_hybg_mvect_vm
+  use psb_d_cuda_vect_mod
+  use psb_d_cuda_multivect_mod
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(psb_d_cuda_hybg_sparse_mat), intent(in) :: a
+  class(psb_d_base_multivect_type), intent(inout)   :: x
+  integer(psb_ipk_), intent(in)                 :: idx_x
+  class(psb_d_base_vect_type), intent(inout)    :: y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+end subroutine psb_d_cuda_hybg_mvect_vm
+
+subroutine psb_d_cuda_hybg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_d_cuda_hybg_mat_mod, psb_protect_name => psb_d_cuda_hybg_mvect_mm_idxs
+  use psb_d_cuda_multivect_mod
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(psb_d_cuda_hybg_sparse_mat), intent(in) :: a
+  class(psb_d_base_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+end subroutine psb_d_cuda_hybg_mvect_mm_idxs
+
+subroutine psb_d_cuda_hybg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_d_cuda_hybg_mat_mod, psb_protect_name => psb_d_cuda_hybg_mvect_mm_full
+  use psb_d_cuda_multivect_mod
+  implicit none
+  real(psb_dpk_), intent(in)                    :: alpha, beta
+  class(psb_d_cuda_hybg_sparse_mat), intent(in) :: a
+  class(psb_d_base_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+end subroutine psb_d_cuda_hybg_mvect_mm_full
 #endif

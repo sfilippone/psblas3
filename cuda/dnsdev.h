@@ -1,34 +1,32 @@
-  /*             Parallel Sparse BLAS   GPU plugin  */
-  /*   (C) Copyright 2013 */
+/*             Parallel Sparse BLAS   GPU plugin  */
+/*   (C) Copyright 2013 */
 
-  /*                      Salvatore Filippone */
-  /*                      Alessandro Fanfarillo */
- 
-  /* Redistribution and use in source and binary forms, with or without */
-  /* modification, are permitted provided that the following conditions */
-  /* are met: */
-  /*   1. Redistributions of source code must retain the above copyright */
-  /*      notice, this list of conditions and the following disclaimer. */
-  /*   2. Redistributions in binary form must reproduce the above copyright */
-  /*      notice, this list of conditions, and the following disclaimer in the */
-  /*      documentation and/or other materials provided with the distribution. */
-  /*   3. The name of the PSBLAS group or the names of its contributors may */
-  /*      not be used to endorse or promote products derived from this */
-  /*      software without specific prior written permission. */
- 
-  /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS */
-  /* ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED */
-  /* TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR */
-  /* PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS */
-  /* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR */
-  /* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF */
-  /* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS */
-  /* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN */
-  /* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) */
-  /* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE */
-  /* POSSIBILITY OF SUCH DAMAGE. */
- 
-  
+/*                      Salvatore Filippone */
+/*                      Alessandro Fanfarillo */
+
+/* Redistribution and use in source and binary forms, with or without */
+/* modification, are permitted provided that the following conditions */
+/* are met: */
+/*   1. Redistributions of source code must retain the above copyright */
+/*      notice, this list of conditions and the following disclaimer. */
+/*   2. Redistributions in binary form must reproduce the above copyright */
+/*      notice, this list of conditions, and the following disclaimer in the */
+/*      documentation and/or other materials provided with the distribution. */
+/*   3. The name of the PSBLAS group or the names of its contributors may */
+/*      not be used to endorse or promote products derived from this */
+/*      software without specific prior written permission. */
+
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS */
+/* ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED */
+/* TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR */
+/* PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE PSBLAS GROUP OR ITS CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR */
+/* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF */
+/* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS */
+/* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN */
+/* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) */
+/* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE */
+/* POSSIBILITY OF SUCH DAMAGE. */
 
 #ifndef _DNSDEV_H_
 #define _DNSDEV_H_
@@ -38,19 +36,16 @@
 #include "cuComplex.h"
 #include "cublas_v2.h"
 
-
 struct DnsDevice
 {
-   // Compressed matrix
+  // Compressed matrix
   void *cM; //it can be float or double
-
 
   //matrix size (uncompressed)
   int rows;
   int columns;
 
   int pitch; //old
-
   int cMPitch;
   
   //allocation size (in elements)
@@ -80,9 +75,7 @@ typedef struct DnsDeviceParams
 	unsigned int firstIndex;
 } DnsDeviceParams;
 
-int FallocDnsDevice(void** deviceMat, unsigned int rows, 
-		    unsigned int columns, unsigned int elementType, 
-		    unsigned int firstIndex);
+int FallocDnsDevice(void** deviceMat, unsigned int rows, unsigned int columns, unsigned int elementType, unsigned int firstIndex);
 int allocDnsDevice(void ** remoteMatrix, DnsDeviceParams* params);
 void freeDnsDevice(void* remoteMatrix);
 
@@ -96,18 +89,25 @@ int readDnsDeviceDouble(void* deviceMat, double* val, int lda, int nc);
 int readDnsDeviceFloatComplex(void* deviceMat, float complex* val, int lda, int nc);
 int readDnsDeviceDoubleComplex(void* deviceMat, double complex* val, int lda, int nc);
 
-int spmvDnsDeviceFloat(char transa, int m, int n, int k,
-		       float *alpha, void *deviceMat, void* deviceX, 
-		       float *beta, void* deviceY);
-int spmvDnsDeviceDouble(char transa, int m, int n, int k,
-			double *alpha, void *deviceMat, void* deviceX, 
-			double *beta, void* deviceY);
-int spmvDnsDeviceFloatComplex(char transa, int m, int n, int k,
-		       float complex *alpha, void *deviceMat, void* deviceX, 
-		       float complex *beta, void* deviceY);
-int spmvDnsDeviceDoubleComplex(char transa, int m, int n, int k,
-			double complex *alpha, void *deviceMat, void* deviceX, 
-			double complex *beta, void* deviceY);
+int spmvDnsDeviceFloatF(char transa, int m, int n, int k, float* alpha, void *deviceMat, void* deviceX, float* beta, void* deviceY);
+int spmvDnsDeviceFloatMV(char transa, int m, int n, int k, float* alpha, void *deviceMat, void* deviceX, float* beta, void* deviceY, int idxY);
+int spmvDnsDeviceFloatVM(char transa, int m, int n, int k, float* alpha, void *deviceMat, void* deviceX, int idxX, float* beta, void* deviceY);
+int spmvDnsDeviceFloatMMi(char transa, int m, int n, int k, float* alpha, void *deviceMat, void* deviceX, int idxX, float* beta, void* deviceY, int idxY);
+
+int spmvDnsDeviceDoubleF(char transa, int m, int n, int k, double* alpha, void *deviceMat, void* deviceX, double* beta, void* deviceY);
+int spmvDnsDeviceDoubleMV(char transa, int m, int n, int k, double* alpha, void *deviceMat, void* deviceX, double* beta, void* deviceY, int idxY);
+int spmvDnsDeviceDoubleVM(char transa, int m, int n, int k, double* alpha, void *deviceMat, void* deviceX, int idxX, double* beta, void* deviceY);
+int spmvDnsDeviceDoubleMMi(char transa, int m, int n, int k, double* alpha, void *deviceMat, void* deviceX, int idxX, double* beta, void* deviceY, int idxY);
+
+int spmvDnsDeviceFloatComplexF(char transa, int m, int n, int k, float complex* alpha, void *deviceMat, void* deviceX, float complex* beta, void* deviceY);
+int spmvDnsDeviceFloatComplexMV(char transa, int m, int n, int k, float complex* alpha, void *deviceMat, void* deviceX, float complex* beta, void* deviceY, int idxY);
+int spmvDnsDeviceFloatComplexVM(char transa, int m, int n, int k, float complex* alpha, void *deviceMat, void* deviceX, int idxX, float complex* beta, void* deviceY);
+int spmvDnsDeviceFloatComplexMMi(char transa, int m, int n, int k, float complex* alpha, void *deviceMat, void* deviceX, int idxX, float complex* beta, void* deviceY, int idxY);
+
+int spmvDnsDeviceDoubleComplexF(char transa, int m, int n, int k, double complex* alpha, void *deviceMat, void* deviceX,	double complex* beta, void* deviceY);
+int spmvDnsDeviceDoubleComplexMV(char transa, int m, int n, int k, double complex* alpha, void *deviceMat, void* deviceX, double complex* beta, void* deviceY, int idxY);
+int spmvDnsDeviceDoubleComplexVM(char transa, int m, int n, int k, double complex* alpha, void *deviceMat, void* deviceX, int idxX, double complex* beta, void* deviceY);
+int spmvDnsDeviceDoubleComplexMMi(char transa, int m, int n, int k, double complex* alpha, void *deviceMat, void* deviceX, int idxX, double complex* beta, void* deviceY, int idxY);
 
 int getDnsDevicePitch(void* deviceMat);
 

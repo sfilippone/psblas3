@@ -246,6 +246,9 @@ int gpuInit(int dev)
 
 void gpuClose()
 {
+  //Free CFIBuffer
+  resetCFIstaticBuffers();
+
   cudaStream_t st1, st2;
   if ((! psb_cuda_handle)&&(! psb_cublas_handle)) {
     st1=spgpuGetStream(psb_cuda_handle);

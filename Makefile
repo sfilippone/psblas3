@@ -15,7 +15,7 @@ basemods:
 	$(MAKE) -C base mods
 precmods: basemods
 	$(MAKE) -C prec mods
-linslvmods: precmods
+linslvmods: precmods $(CUDAMODS)
 	$(MAKE) -C linsolve mods
 utilmods: basemods
 	$(MAKE) -C util mods 

@@ -139,3 +139,28 @@ GEN_SPGPU_HDIA_NAME(TYPE_SYMBOL)
 	cudaCheckError("CUDA error on hdia_spmv");
 }
 
+#define GEN_SPGPU_HDIA_NAME_M(x) CONCAT(CONCAT(spgpu,x), hdiaspmm)
+void
+GEN_SPGPU_HDIA_NAME_M(TYPE_SYMBOL)
+(spgpuHandle_t handle, 
+	int count,
+	VALUE_TYPE *z,
+	int zpitch,
+	const VALUE_TYPE *y,
+	int ypitch,
+	VALUE_TYPE alpha, 
+	const VALUE_TYPE* dM, 
+	const int* offsets, 
+	int hackSize, 
+	const int* hackOffsets,
+	int rows,
+	int cols, 
+	const VALUE_TYPE *x, 
+	int xpitch,
+	VALUE_TYPE beta)
+{
+	//TODO: proper gemm kernel
+	for(int colIdx = 0; colIdx < count; ++colIdx)
+		GEN_SPGPU_HDIA_NAME(TYPE_SYMBOL)(handle, z + (colIdx * zpitch), y + (colIdx * ypitch), alpha, dM, offsets, hackSize, hackOffsets, rows, cols, x + (colIdx * xpitch), beta);
+
+}

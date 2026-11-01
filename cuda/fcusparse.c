@@ -36,20 +36,20 @@
 #include <cuda_runtime.h>
 #include "fcusparse.h"
 
-static   cusparseHandle_t *cusparse_handle=NULL;
-
+static cusparseHandle_t *cusparse_handle = NULL;
 
 void setHandle(cusparseHandle_t);
 
 int FcusparseCreate() 
 {
-  int ret=CUSPARSE_STATUS_SUCCESS;
+  int ret = CUSPARSE_STATUS_SUCCESS;
   cusparseHandle_t *handle;
-  if (cusparse_handle == NULL) {
-    if ((handle = (cusparseHandle_t *)malloc(sizeof(cusparseHandle_t)))==NULL) 
+  if(cusparse_handle == NULL) 
+  {
+    if((handle = (cusparseHandle_t*) malloc(sizeof(cusparseHandle_t))) == NULL) 
       return((int) CUSPARSE_STATUS_ALLOC_FAILED);
-    ret = (int)cusparseCreate(handle);
-    if (ret == CUSPARSE_STATUS_SUCCESS)
+    ret = (int) cusparseCreate(handle);
+    if(ret == CUSPARSE_STATUS_SUCCESS)
       cusparse_handle = handle;
   }
   //fprintf(stderr,"Created cusparses_handle\n");
@@ -59,16 +59,18 @@ int FcusparseCreate()
 int FcusparseDestroy() 
 {
   int val;
-  if (cusparse_handle!=NULL){
+  if(cusparse_handle != NULL)
+  {
     val = (int) cusparseDestroy(*cusparse_handle);
     free(cusparse_handle);
   }
-  cusparse_handle=NULL;
+  cusparse_handle = NULL;
   return(val);
 }
+
 cusparseHandle_t *getHandle()
 {
-  if (cusparse_handle == NULL)
+  if(cusparse_handle == NULL)
     FcusparseCreate();
   return(cusparse_handle);
 }

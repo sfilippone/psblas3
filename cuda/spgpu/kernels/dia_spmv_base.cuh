@@ -141,3 +141,27 @@ GEN_SPGPU_DIA_NAME(TYPE_SYMBOL)
 	cudaCheckError("CUDA error on dia_spmv");
 }
 
+#define GEN_SPGPU_DIA_NAME_M(x) CONCAT(CONCAT(spgpu,x), diaspmm)
+void
+GEN_SPGPU_DIA_NAME_M(TYPE_SYMBOL)
+(spgpuHandle_t handle,
+	VALUE_TYPE *z,
+	int ldz,
+	const VALUE_TYPE *y, 
+	int ldy,
+	VALUE_TYPE alpha, 
+	const VALUE_TYPE* dM,
+	const int* offsets,
+	int dMPitch,
+	int rows, 
+	int cols,
+	int diags,
+	const __device VALUE_TYPE *x, 
+	int ldx,
+	VALUE_TYPE beta,
+	int mvectCount)
+{
+	//TODO: Implement a proper GEMM kernel
+	for(int colIdx = 0; colIdx < mvectCount; ++colIdx)
+		GEN_SPGPU_DIA_NAME(TYPE_SYMBOL)(handle, z + (colIdx * ldz), y + (colIdx * ldy), alpha, dM, offsets, dMPitch, rows, cols, diags, x + (colIdx * ldx), beta);
+}

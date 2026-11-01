@@ -37,27 +37,18 @@
 #include "core.h"
 #include "vector.h"
 
-int registerMappedInt(void *, void **, int, int);
+int registerMappedInt(void*, void**, int, int);
 int checkMultiVecDeviceInt(void* deviceMultiVec);
 int writeMultiVecDeviceInt(void* deviceMultiVec, int* hostMultiVec);
 int writeMultiVecDeviceIntR2(void* deviceMultiVec, int* hostMultiVec, int ld);
 int readMultiVecDeviceInt(void* deviceMultiVec, int* hostMultiVec);
 int readMultiVecDeviceIntR2(void* deviceMultiVec, int* hostMultiVec, int ld);
 
-int setscalMultiVecDeviceInt(int val, int first, int last, 
-			     int indexBase, void* devVecX); 
+int setscalMultiVecDeviceInt(int val, int first, int last, int indexBase, void* devVecX); 
 
-int geinsMultiVecDeviceInt(int n, void* devVecIrl, void* devVecVal, 
-			      int dupl, int indexBase, void* devVecX); 
+int geinsMultiVecDeviceInt(int n, void* devVecIrl, void* devVecVal, int dupl, int indexBase, void* devVecX); 
 
-int igathMultiVecDeviceIntVecIdx(void* deviceVec, int vectorId, int n,
-				 int first, void* deviceIdx, int hfirst,
-				 void* host_values, int indexBase);
-int igathMultiVecDeviceInt(void* deviceVec, int vectorId, int n,
-			   int first, void* indexes, int hfirst, void* host_values, 
-			   int indexBase);
-int iscatMultiVecDeviceIntVecIdx(void* deviceVec, int vectorId, int n, int first, 
-				 void *deviceIdx, int hfirst, void* host_values, 
-				 int indexBase, int beta);
-int iscatMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void *indexes,
-			   int hfirst, void* host_values, int indexBase, int beta);
+int igathMultiVecDeviceIntVecIdx(void* deviceVec, int vectorId, int n, int first, void* deviceIdx, int hfirst, void* host_values, int indexBase);
+int igathMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void* indexes, int hfirst, void* host_values, int indexBase);
+int iscatMultiVecDeviceIntVecIdx(void* deviceVec, int vectorId, int n, int first, void *deviceIdx, int hfirst, void* host_values, int indexBase, int beta);
+int iscatMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void *indexes, int hfirst, void* host_values, int indexBase, int beta);

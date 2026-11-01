@@ -28,7 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module hdiagdev_mod
   use iso_c_binding 
@@ -44,156 +43,205 @@ module hdiagdev_mod
  end type hdiagdev_parms
 
  ! interface computeHdiaHacksCount
- !    function computeHdiaHacksCountDouble(allocationHeight,hackOffsets,hackSize, &
- !         & diaValues,diaValuesPitch,diags,rows)&
- !         & result(res) bind(c,name='computeHdiaHackOffsetsDouble')
+ !    function computeHdiaHacksCountDouble(allocationHeight, hackOffsets, hackSize, &
+ !        & diaValues, diaValuesPitch, diags, rows)&
+ !        & result(res) bind(c, name = 'computeHdiaHackOffsetsDouble')
  !      use iso_c_binding
  !      integer(c_int)        :: res
- !      integer(c_int), value :: rows,diags,diaValuesPitch,hackSize,elementType
- !      real(c_double)        :: diaValues(rows,:)
- !      integer(c_int)        :: hackOffsets,allocationHeight
+ !      integer(c_int), value :: rows, diags, diaValuesPitch, hackSize, elementType
+ !      real(c_double)        :: diaValues(rows, :)
+ !      integer(c_int)        :: hackOffsets, allocationHeight
  !    end function computeHdiaHacksCountDouble
  ! end interface computeHdiaHacksCount
 
   interface 
-    function FgetHdiagDeviceParams(rows, columns, allocationHeight,hackSize, &
-         & hackCount, elementType) &
-         & result(res) bind(c,name='getHdiagDeviceParams')
+    function FgetHdiagDeviceParams(rows, columns, allocationHeight, &
+                                 & hackSize, hackCount, elementType) result(res) &
+        & bind(c, name = 'getHdiagDeviceParams')
       use iso_c_binding
       import :: hdiagdev_parms
-      type(hdiagdev_parms)    :: res
-      integer(c_int), value :: rows,columns,allocationHeight,&
-           & elementType,hackSize,hackCount
+      integer(c_int), value :: rows, columns, allocationHeight, &
+                           & elementType, hackSize, hackCount
+      type(hdiagdev_parms)  :: res
     end function FgetHdiagDeviceParams
   end interface
   
-
   interface 
-    function FallocHdiagDevice(deviceMat,rows,columns,allocationHeight,&
-         & hackSize,hackCount,elementType) &
-         & result(res) bind(c,name='FallocHdiagDevice')
+    function FallocHdiagDevice(deviceMat, rows, columns, allocationHeight, &
+                             & hackSize, hackCount, elementType) result(res) &
+        & bind(c, name = 'FallocHdiagDevice')
       use iso_c_binding
-      integer(c_int)        :: res
-      integer(c_int), value :: rows,columns,allocationHeight,hackSize,&
-           & hackCount,elementType
       type(c_ptr)           :: deviceMat
+      integer(c_int), value :: rows, columns, allocationHeight, &
+                             & hackSize, hackCount, elementType
+      integer(c_int)  :: res
     end function FallocHdiagDevice
   end interface
 
-
   interface 
-    function sizeofHdiagDeviceDouble(deviceMat) &
-         & result(res) bind(c,name='sizeofHdiagDeviceDouble') 
+    function sizeofHdiagDeviceDouble(deviceMat) result(res) &
+        & bind(c, name = 'sizeofHdiagDeviceDouble') 
       use iso_c_binding
-      integer(c_long_long) :: res
       type(c_ptr), value  :: deviceMat
+      integer(c_long_long)  :: res
     end function sizeofHdiagDeviceDouble
   end interface
 
   interface writeHdiagDevice
-
-    function writeHdiagDeviceFloat(deviceMat,val,hdiaOffsets, hackOffsets) &
-         & result(res) bind(c,name='writeHdiagDeviceFloat')
+    function writeHdiagDeviceFloat(deviceMat, val, hdiaOffsets, hackOffsets) result(res) &
+        & bind(c, name = 'writeHdiagDeviceFloat')
       use iso_c_binding
-      integer(c_int)      :: res
       type(c_ptr), value  :: deviceMat
-      real(c_float)      :: val(*)
+      real(c_float)       :: val(*)
       integer(c_int)      :: hdiaOffsets(*), hackOffsets(*)
+      integer(c_int)  :: res
     end function writeHdiagDeviceFloat
 
-    function writeHdiagDeviceDouble(deviceMat,val,hdiaOffsets, hackOffsets) &
-         & result(res) bind(c,name='writeHdiagDeviceDouble')
+    function writeHdiagDeviceDouble(deviceMat, val, hdiaOffsets, hackOffsets) result(res) &
+        & bind(c, name = 'writeHdiagDeviceDouble')
       use iso_c_binding
-      integer(c_int)      :: res
       type(c_ptr), value  :: deviceMat
       real(c_double)      :: val(*)
       integer(c_int)      :: hdiaOffsets(*), hackOffsets(*)
+      integer(c_int)  :: res
     end function writeHdiagDeviceDouble
-
   end interface writeHdiagDevice
 
-!!$  interface readHdiagDevice 
-!!$
-!!$    function readHdiagDeviceFloat(deviceMat,val,ja,ldj,irn) &
-!!$         & result(res) bind(c,name='readHdiagDeviceFloat')
-!!$      use iso_c_binding
-!!$      integer(c_int)      :: res
-!!$      type(c_ptr), value  :: deviceMat
-!!$      integer(c_int), value :: ldj
-!!$      real(c_float)       :: val(ldj,*)
-!!$      integer(c_int)      :: ja(ldj,*),irn(*)
-!!$    end function readHdiagDeviceFloat
-!!$
-!!$    function readHdiagDeviceDouble(deviceMat,a,off,n) &
-!!$         & result(res) bind(c,name='readHdiagDeviceDouble')
-!!$      use iso_c_binding
-!!$      integer(c_int)      :: res
-!!$      type(c_ptr), value  :: deviceMat
-!!$      integer(c_int),value :: n
-!!$      real(c_double)      :: a(n,*)
-!!$      integer(c_int)      :: off(*)
-!!$    end function readHdiagDeviceDouble
-!!$
-!!$    function readHdiagDeviceFloatComplex(deviceMat,val,ja,ldj,irn) &
-!!$         & result(res) bind(c,name='readHdiagDeviceFloatComplex')
-!!$      use iso_c_binding
-!!$      integer(c_int)           :: res
-!!$      type(c_ptr), value       :: deviceMat
-!!$      integer(c_int), value    :: ldj
-!!$      complex(c_float_complex) :: val(ldj,*)
-!!$      integer(c_int)           :: ja(ldj,*),irn(*)
-!!$    end function readHdiagDeviceFloatComplex
-!!$
-!!$    function readHdiagDeviceDoubleComplex(deviceMat,val,ja,ldj,irn) &
-!!$         & result(res) bind(c,name='readHdiagDeviceDoubleComplex')
-!!$      use iso_c_binding
-!!$      integer(c_int)           :: res
-!!$      type(c_ptr), value       :: deviceMat
-!!$      integer(c_int), value    :: ldj
-!!$      complex(c_double_complex) :: val(ldj,*)
-!!$      integer(c_int)           :: ja(ldj,*),irn(*)
-!!$    end function readHdiagDeviceDoubleComplex
-!!$
-!!$  end interface readHdiagDevice
-!!$
+  !!$  interface readHdiagDevice
+  !!$    function readHdiagDeviceFloat(deviceMat, val, ja, ldj, irn) &
+  !!$        & result(res) bind(c, name = 'readHdiagDeviceFloat')
+  !!$      use iso_c_binding
+  !!$      integer(c_int)      :: res
+  !!$      type(c_ptr), value  :: deviceMat
+  !!$      integer(c_int), value :: ldj
+  !!$      real(c_float)       :: val(ldj, *)
+  !!$      integer(c_int)      :: ja(ldj, *), irn(*)
+  !!$    end function readHdiagDeviceFloat
+  !!$
+  !!$    function readHdiagDeviceDouble(deviceMat, a, off, n) &
+  !!$        & result(res) bind(c, name = 'readHdiagDeviceDouble')
+  !!$      use iso_c_binding
+  !!$      integer(c_int)      :: res
+  !!$      type(c_ptr), value  :: deviceMat
+  !!$      integer(c_int), value :: n
+  !!$      real(c_double)      :: a(n, *)
+  !!$      integer(c_int)      :: off(*)
+  !!$    end function readHdiagDeviceDouble
+  !!$
+  !!$    function readHdiagDeviceFloatComplex(deviceMat, val, ja, ldj, irn) &
+  !!$        & result(res) bind(c, name = 'readHdiagDeviceFloatComplex')
+  !!$      use iso_c_binding
+  !!$      integer(c_int)           :: res
+  !!$      type(c_ptr), value       :: deviceMat
+  !!$      integer(c_int), value    :: ldj
+  !!$      complex(c_float_complex) :: val(ldj, *)
+  !!$      integer(c_int)           :: ja(ldj, *), irn(*)
+  !!$    end function readHdiagDeviceFloatComplex
+  !!$
+  !!$    function readHdiagDeviceDoubleComplex(deviceMat, val, ja, ldj, irn) &
+  !!$        & result(res) bind(c, name = 'readHdiagDeviceDoubleComplex')
+  !!$      use iso_c_binding
+  !!$      integer(c_int)           :: res
+  !!$      type(c_ptr), value       :: deviceMat
+  !!$      integer(c_int), value    :: ldj
+  !!$      complex(c_double_complex) :: val(ldj, *)
+  !!$      integer(c_int)           :: ja(ldj, *), irn(*)
+  !!$    end function readHdiagDeviceDoubleComplex
+  !!$  end interface readHdiagDevice
+
   interface 
-    subroutine  freeHdiagDevice(deviceMat) &
-         & bind(c,name='freeHdiagDevice')
+    subroutine freeHdiagDevice(deviceMat) &
+        & bind(c, name = 'freeHdiagDevice')
       use iso_c_binding
       type(c_ptr), value  :: deviceMat
     end subroutine freeHdiagDevice
   end interface
 
-
   interface spmvHdiagDevice
-    function spmvHdiagDeviceFloat(deviceMat,alpha,x,beta,y) &
-         & result(res) bind(c,name='spmvHdiagDeviceFloat')
+    function spmvHdiagDeviceFloatF(deviceMat, alpha, x, beta, y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceFloatF')
       use iso_c_binding
-      integer(c_int)		:: res
-      type(c_ptr), value 	:: deviceMat, x, y
-      real(c_float),value     	:: alpha, beta
-    end function spmvHdiagDeviceFloat
-    function spmvHdiagDeviceDouble(deviceMat,alpha,x,beta,y) &
-         & result(res) bind(c,name='spmvHdiagDeviceDouble')
-      use iso_c_binding
-      integer(c_int)		:: res
-      type(c_ptr), value	:: deviceMat, x, y 
-      real(c_double),value     	:: alpha,  beta
-    end function spmvHdiagDeviceDouble
-!!$    function spmvHdiagDeviceFloatComplex(deviceMat,alpha,x,beta,y) &
-!!$         & result(res) bind(c,name='spmvHdiagDeviceFloatComplex')
-!!$      use iso_c_binding
-!!$      integer(c_int)		     :: res
-!!$      type(c_ptr), value	     :: deviceMat, x, y 
-!!$      complex(c_float_complex),value :: alpha,  beta
-!!$    end function spmvHdiagDeviceFloatComplex
-!!$    function spmvHdiagDeviceDoubleComplex(deviceMat,alpha,x,beta,y) &
-!!$         & result(res) bind(c,name='spmvHdiagDeviceDoubleComplex')
-!!$      use iso_c_binding
-!!$      integer(c_int)		      :: res
-!!$      type(c_ptr), value	      :: deviceMat, x, y 
-!!$      complex(c_double_complex),value :: alpha,  beta
-!!$    end function spmvHdiagDeviceDoubleComplex
-  end interface spmvHdiagDevice
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_float), value  :: alpha, beta
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceFloatF
 
+    function spmvHdiagDeviceFloatMV(deviceMat, alpha, x, beta, y, idx_y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceFloatMV')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_float), value  :: alpha, beta
+      integer(c_int), value :: idx_y
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceFloatMV
+    
+    function spmvHdiagDeviceFloatVM(deviceMat, alpha, x, idx_x, beta, y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceFloatVM')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_float), value  :: alpha, beta
+      integer(c_int), value :: idx_x
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceFloatVM
+    
+    function spmvHdiagDeviceFloatMMi(deviceMat, alpha, x, idx_x, beta, y, idx_y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceFloatMMi')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_float), value  :: alpha, beta
+      integer(c_int), value :: idx_x, idx_y
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceFloatMMi
+
+    function spmvHdiagDeviceDoubleF(deviceMat, alpha, x, beta, y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceDoubleF')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_double), value :: alpha, beta
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceDoubleF
+
+    function spmvHdiagDeviceDoubleMV(deviceMat, alpha, x, beta, y, idx_y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceDoubleMV')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_double), value :: alpha, beta
+      integer(c_int), value :: idx_y
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceDoubleMV
+    
+    function spmvHdiagDeviceDoubleVM(deviceMat, alpha, x, idx_x, beta, y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceDoubleVM')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_double), value :: alpha, beta
+      integer(c_int), value :: idx_x
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceDoubleVM
+    
+    function spmvHdiagDeviceDoubleMMi(deviceMat, alpha, x, idx_x, beta, y, idx_y) &
+        & result(res) bind(c, name = 'spmvHdiagDeviceDoubleMMi')
+      use iso_c_binding
+      type(c_ptr), value    :: deviceMat, x, y
+      real(c_double), value :: alpha, beta
+      integer(c_int), value :: idx_x, idx_y
+      integer(c_int)  :: res
+    end function spmvHdiagDeviceDoubleMMi
+
+    !!$  function spmvHdiagDeviceFloatComplex(deviceMat, alpha, x, beta, y) &
+    !!$       & result(res) bind(c, name = 'spmvHdiagDeviceFloatComplex')
+    !!$    use iso_c_binding
+    !!$    integer(c_int)		     :: res
+    !!$    type(c_ptr), value	     :: deviceMat, x, y
+    !!$    complex(c_float_complex), value :: alpha, beta
+    !!$  end function spmvHdiagDeviceFloatComplex
+
+    !!$  function spmvHdiagDeviceDoubleComplex(deviceMat, alpha, x, beta, y) &
+    !!$       & result(res) bind(c, name = 'spmvHdiagDeviceDoubleComplex')
+    !!$    use iso_c_binding
+    !!$    integer(c_int)		      :: res
+    !!$    type(c_ptr), value	      :: deviceMat, x, y
+    !!$    complex(c_double_complex), value :: alpha, beta
+    !!$  end function spmvHdiagDeviceDoubleComplex
+  end interface spmvHdiagDevice
 end module hdiagdev_mod

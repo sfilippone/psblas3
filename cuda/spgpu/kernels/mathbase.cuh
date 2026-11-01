@@ -1,7 +1,9 @@
 #pragma once
 
 __device__ __host__ static float zero_float() { return 0.0f; }
+__device__ __host__ static float one_float() { return 1.0f; }
 __device__ __host__ static cuFloatComplex zero_cuFloatComplex() { return make_cuFloatComplex(0.0, 0.0); }
+__device__ __host__ static cuFloatComplex one_cuFloatComplex() { return make_cuFloatComplex(1.0, 0.0); }
 __device__ __host__ static bool float_isNotZero(float x) { return x != 0.0f; }
 __device__ __host__ static bool float_isZero(float x) { return x == 0.0f; }
 __device__ __host__ static bool int_isZero(int x) { return x == 0; }
@@ -27,7 +29,9 @@ __device__ static cuFloatComplex readValue_cuFloatComplex(cuFloatComplex fetch) 
 // host or c.c >= 1.3 
 #if (__CUDA_ARCH__ >= 130) || (!__CUDA_ARCH__)
 __device__ __host__ static double zero_double() { return 0.0; }
+__device__ __host__ static double one_double() { return 1.0; }
 __device__ __host__ static cuDoubleComplex zero_cuDoubleComplex() { return make_cuDoubleComplex(0.0, 0.0); }
+__device__ __host__ static cuDoubleComplex one_cuDoubleComplex() { return make_cuDoubleComplex(1.0, 0.0); }
 __device__ __host__ static bool double_isNotZero(double x) { return x != 0.0; }
 __device__ __host__ static bool double_isZero(double x) { return x == 0.0; }
 

@@ -28,7 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module base_cusparse_mod
   use iso_c_binding 
@@ -80,34 +79,33 @@ module base_cusparse_mod
   end enum
 
   interface 
-    function FcusparseCreate() &
-         & bind(c,name="FcusparseCreate") result(res)
+    function FcusparseCreate() result(res) &
+            & bind(c, name = "FcusparseCreate")
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function FcusparseCreate
   end interface
 
   interface 
-    function FcusparseDestroy() &
-         & bind(c,name="FcusparseDestroy") result(res)
+    function FcusparseDestroy() result(res) &
+         & bind(c, name = "FcusparseDestroy")
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function FcusparseDestroy
   end interface
 
 contains
-  
   function initFcusparse() result(res)
     implicit none 
-    integer(c_int) :: res
+    integer(c_int)  :: res
     
     res = FcusparseCreate()
   end function initFcusparse
 
   function closeFcusparse() result(res)
     implicit none 
-    integer(c_int) :: res
+    integer(c_int)  :: res
+
     res = FcusparseDestroy()
   end function closeFcusparse
-
 end module base_cusparse_mod

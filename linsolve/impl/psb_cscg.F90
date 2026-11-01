@@ -1,24 +1,28 @@
-subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
+subroutine psb_cscg_vect(a, prec, b, x, s, eps, desc_a, info, &
                       & itmax, iter, err, itrace, istop, &
                       & base_type, eigext, Gram_solver, FGS_sweeps)
   use psb_base_mod
   use psb_prec_mod
-  use psb_z_linsolve_conv_mod
+  use psb_c_linsolve_conv_mod
   use psb_linsolve_mod
   use psb_pMPK_mod
+#if defined(PSB_HAVE_CUDA)
+  use psb_cuda_mod
+#endif
+
   implicit none
-  type(psb_zspmat_type), intent(in)     :: a
-  class(psb_zprec_type), intent(inout)  :: prec
-  type(psb_z_vect_type), intent(inout)  :: b, x
+  type(psb_cspmat_type), intent(in)     :: a
+  class(psb_cprec_type), intent(inout)  :: prec
+  type(psb_c_vect_type), intent(inout)  :: b, x
   integer(psb_ipk_), intent(in)         :: s
-  real(psb_dpk_), intent(in)            :: eps
+  real(psb_spk_), intent(in)            :: eps
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
   integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
   integer(psb_ipk_), optional, intent(out)  :: iter
-  real(psb_dpk_), optional, intent(out)     :: err
+  real(psb_spk_), optional, intent(out)     :: err
   character, optional, intent(in)           :: base_type
-  complex(psb_dpk_), optional, intent(in)      :: eigext(2)
+  complex(psb_spk_), optional, intent(in)      :: eigext(2)
   character(len=3), optional, intent(in)    :: Gram_solver
   integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
 
@@ -28,26 +32,50 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   character(len=3)    :: base_type_, Gram_solver_
   integer(psb_ipk_)   :: err_act, np, me, debug_level, debug_unit, n_col, n_row
   integer(psb_lpk_)   :: mglob
-  character(len=20)           :: name = 'psb_zscg'
+  character(len=20)           :: name = 'psb_cscg'
   character(len=*), parameter :: methdbasename = 'sStepCG'
   character(len=20)           :: methdfullname
 
-  complex(psb_dpk_), allocatable     :: alpha(:), beta(:, :), W(:, :), temp_fa(:, :)
+  complex(psb_spk_), allocatable     :: alpha(:), beta(:, :), W(:, :), temp_fa(:, :)
   integer(psb_ipk_), allocatable  :: pW(:)
-  type(psb_z_vect_type)           :: r  
-  type(psb_z_multivect_type)      :: Z, Q, P, V, temp_mv
-  complex(psb_dpk_)                  :: cheb_coeff(3)
+  type(psb_c_vect_type)           :: r  
+  type(psb_c_multivect_type)      :: Z, Q, P, V, temp_mv
+  complex(psb_spk_)                  :: cheb_coeff(3)
   integer(psb_ipk_)               :: itidx
   
   type(psb_itconv_type)         :: stopdat
   real(psb_dpk_)                :: derr
 
-  type(psb_z_multivect_type), target  :: aux_mv
-  complex(psb_dpk_), allocatable, target :: aux_fa(:)
+  type(psb_c_multivect_type), target  :: aux_mv
+  complex(psb_spk_), allocatable, target :: aux_fa(:)
 
   character(len=3), parameter   :: forwardGS = "FGS"
   character(len=3), parameter   :: lapackLU = "LLU"
   character(len=3), parameter   :: lapackCC = "LCC"
+  
+  class(psb_c_base_multivect_type), pointer :: mvect_mold
+  class(psb_c_base_vect_type), pointer      :: vect_mold
+  type(psb_c_base_multivect_type), target   :: mvect_base
+  type(psb_c_base_vect_type), target        :: vect_base
+#if defined(PSB_HAVE_CUDA)
+  type(psb_c_multivect_cuda), target        :: mvect_cuda
+  type(psb_c_vect_cuda), target             :: vect_cuda
+#endif
+
+#if defined(PSB_HAVE_CUDA)
+  select type(in_v => x%v)
+    type is(psb_c_vect_cuda)
+      mvect_mold  => mvect_cuda
+      vect_mold   => vect_cuda
+    
+    class default
+      mvect_mold  => mvect_base
+      vect_mold  => vect_base
+  end select
+#else
+  mvect_mold => mvect_base
+  vect_mold  => vect_base
+#endif
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -57,7 +85,7 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-  if(debug_level >= psb_debug_ext_) &
+  if (debug_level >= psb_debug_ext_) &
        & write(debug_unit, *) me, ' ', trim(name), ': from psb_info ', np
   
   if(s < 1) then
@@ -68,18 +96,18 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   write(methdfullname, '(A, "(", I0, ")")') methdbasename, s
 
-  if((.not. allocated(b%v)) .or. (.not.allocated(x%v))) then 
+  if ((.not. allocated(b%v)) .or. (.not.allocated(x%v))) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
   istop_ = 2
-  if(present(istop)) istop_ = istop
+  if (present(istop)) istop_ = istop
   
   !  ISTOP_ = 1:  Normwise backward error, infinity norm 
   !  ISTOP_ = 2:  ||r||/||b||, 2-norm 
-  if((istop_ < 1 ) .or. (istop_ > 2 )) then
+  if ((istop_ < 1 ) .or. (istop_ > 2 )) then
     info = psb_err_invalid_istop_
     err = info
     call psb_errpush(info, name, i_err = (/istop_/))
@@ -87,19 +115,19 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   endif
 
   itmax_ = 1000
-  if(present(itmax)) itmax_ = itmax
+  if (present(itmax)) itmax_ = itmax
 
   itrace_ = 0
-  if(present(itrace)) itrace_ = itrace
+  if (present(itrace)) itrace_ = itrace
 
   base_type_ = "C"
-  if(present(base_type)) base_type_ = base_type
+  if (present(base_type)) base_type_ = base_type
 
   Gram_solver_ = lapackCC
-  if(present(Gram_solver)) Gram_solver_ = Gram_solver
+  if (present(Gram_solver)) Gram_solver_ = Gram_solver
   
   FGS_sweeps_ = 30
-  if(present(FGS_sweeps)) FGS_sweeps_ = FGS_sweeps
+  if (present(FGS_sweeps)) FGS_sweeps_ = FGS_sweeps
 
   mglob = desc_a%get_global_rows()
   n_row = desc_a%get_local_rows()
@@ -121,31 +149,31 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   !Allocate and assembly data structure
   allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, s + 1), aux_fa(4*n_col), stat = info)
-  if(info == psb_success_) call psb_geall(r, desc_a, info)
-  if(info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(P, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(V, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(temp_mv, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(aux_mv, desc_a, info, n = 3)
-  if(info == psb_success_) call psb_geasb(r, desc_a, info)
-  if(info == psb_success_) call psb_geasb(Z, desc_a, info)
-  if(info == psb_success_) call psb_geasb(Q, desc_a, info)
-  if(info == psb_success_) call psb_geasb(P, desc_a, info)
-  if(info == psb_success_) call psb_geasb(V, desc_a, info)
-  if(info == psb_success_) call psb_geasb(temp_mv, desc_a, info)
-  if(info == psb_success_) call psb_geasb(aux_mv, desc_a, info)
+  if (info == psb_success_) call psb_geall(r, desc_a, info)
+  if (info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(P, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(V, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(temp_mv, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(aux_mv, desc_a, info, n = 3)
+  if (info == psb_success_) call psb_geasb(r, desc_a, info, mold = vect_mold)
+  if (info == psb_success_) call psb_geasb(Z, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(Q, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(P, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(V, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(temp_mv, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(aux_mv, desc_a, info, mold = mvect_mold)
 
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
   end if
 
   ! First residual calculation
-  call psb_geaxpby(zone, b, zzero, r, desc_a, info)
-  if(info == psb_success_) call psb_spmm(-zone, a, x, zone, r, desc_a, info)
-  if(info /= psb_success_) then 
+  call psb_geaxpby(cone, b, czero, r, desc_a, info)
+  if (info == psb_success_) call psb_spmm(-cone, a, x, cone, r, desc_a, info)
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -153,7 +181,7 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   ! Init converence
   call psb_init_conv(methdfullname, istop_, itrace_, itmax_, a, x, b, eps, desc_a, stopdat, info)
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -164,16 +192,16 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   ! Chebyshev coefficient calculation
   select case (base_type_)
     case("M")
-      cheb_coeff = zzero
+      cheb_coeff = czero
     case("C")
-      cheb_coeff = psb_z_chebyshev_coefficients(a, prec, desc_a, info, eigext)
+      cheb_coeff = psb_c_chebyshev_coefficients(a, prec, desc_a, info, eigext)
     case default
       info = psb_err_invalid_input_ 
       call psb_errpush(info, name)
       goto 9999
   end select
 
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -183,7 +211,7 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
                   & mvec_temp = aux_mv, farr_temp = aux_fa)
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -199,14 +227,14 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     alpha = temp_fa(:, s + 1)
 
     ! Factor matrix W (if soving with LU or Cholesky factorization)
-    if(Gram_solver_ == lapackLU) call zgetrf(s, s, W, s, pW, info)
-    if(Gram_solver_ == lapackCC) call zpotrf('L', s, W, s, info)
+    if(Gram_solver_ == lapackLU) call cgetrf(s, s, W, s, pW, info)
+    if(Gram_solver_ == lapackCC) call cpotrf('L', s, W, s, info)
 
     ! Solve for alpha
     select case(Gram_solver_)
       case(forwardGS);  call inner_solver_fgs_1D(W, alpha, FGS_sweeps_)
-      case(lapackLU);   call zgetrs('N', s, 1, W, s, pW, alpha, s, info)
-      case(lapackCC);   call zpotrs('L', s, 1, W, s, alpha, s, info)
+      case(lapackLU);   call cgetrs('N', s, 1, W, s, pW, alpha, s, info)
+      case(lapackCC);   call cpotrs('L', s, 1, W, s, alpha, s, info)
       case default
         info = psb_err_invalid_input_ 
         call psb_errpush(info, name)
@@ -232,8 +260,8 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     ! Solve for beta
     select case(Gram_solver_)
       case(forwardGS);  call inner_solver_fgs_2D(W, beta, FGS_sweeps_)
-      case(lapackLU);   call zgetrs('N', s, s, W, s, pW, beta, s, info)
-      case(lapackCC);   call zpotrs('L', s, s, W, s, beta, s, info)
+      case(lapackLU);   call cgetrs('N', s, s, W, s, pW, beta, s, info)
+      case(lapackCC);   call cpotrs('L', s, s, W, s, beta, s, info)
       case default
         info = psb_err_invalid_input_ 
         call psb_errpush(info, name)
@@ -242,25 +270,25 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
 
     ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
     call psb_geaxpby(P, beta, temp_mv, desc_a, info, .false.)
-    call psb_geaxpby(zone, Z, zone, temp_mv, P, desc_a, info)
+    call psb_geaxpby(cone, Z, cone, temp_mv, P, desc_a, info)
     call psb_geaxpby(V, beta, temp_mv, desc_a, info, .false.)
-    call psb_geaxpby(zone, Q, zone, temp_mv, V, desc_a, info)
+    call psb_geaxpby(cone, Q, cone, temp_mv, V, desc_a, info)
   end do
 
   call psb_end_conv(methdfullname, itidx, desc_a, stopdat, info, derr, iter)
-  if(present(err)) err = derr
-  if(present(iter)) iter = iter * s
+  if (present(err)) err = derr
+  if (present(iter)) iter = iter * s
 
-  if(info == psb_success_) call psb_gefree(r, desc_a, info)
-  if(info == psb_success_) call psb_gefree(Z, desc_a, info)
-  if(info == psb_success_) call psb_gefree(Q, desc_a, info)
-  if(info == psb_success_) call psb_gefree(P, desc_a, info)
-  if(info == psb_success_) call psb_gefree(V, desc_a, info)
-  if(info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
-  if(info == psb_success_) call psb_gefree(aux_mv, desc_a, info)
+  if (info == psb_success_) call psb_gefree(r, desc_a, info)
+  if (info == psb_success_) call psb_gefree(Z, desc_a, info)
+  if (info == psb_success_) call psb_gefree(Q, desc_a, info)
+  if (info == psb_success_) call psb_gefree(P, desc_a, info)
+  if (info == psb_success_) call psb_gefree(V, desc_a, info)
+  if (info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
+  if (info == psb_success_) call psb_gefree(aux_mv, desc_a, info)
 
-  if(info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, aux_fa, stat = info)
-  if(info /= psb_success_) then
+  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, aux_fa, stat = info)
+  if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
   end if
@@ -272,16 +300,16 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   return
 
 contains
-  function psb_z_chebyshev_coefficients(a, prec, desc, info, eigext) result(coeff)
+  function psb_c_chebyshev_coefficients(a, prec, desc, info, eigext) result(coeff)
     use psb_eigsolve_mod
-    type(psb_zspmat_type), intent(in)     :: a
-    class(psb_zprec_type), intent(inout)  :: prec
+    type(psb_cspmat_type), intent(in)     :: a
+    class(psb_cprec_type), intent(inout)  :: prec
     type(psb_desc_type), intent(in)       :: desc
     integer(psb_ipk_), intent(out)        :: info
-    complex(psb_dpk_), optional, intent(in)  :: eigext(2)
+    complex(psb_spk_), optional, intent(in)  :: eigext(2)
     
-    complex(psb_dpk_) :: lambda_max, lambda_min
-    complex(psb_dpk_) :: coeff(3)
+    complex(psb_spk_) :: lambda_max, lambda_min
+    complex(psb_spk_) :: coeff(3)
  
     info = psb_success_
 
@@ -290,38 +318,38 @@ contains
       lambda_max = eigext(2)
     else 
       call psb_powermethod(a, prec, lambda_max, desc, info)
-      lambda_min = zzero
+      lambda_min = czero
     end if
 
-    if(info /= psb_success_) then 
+    if (info /= psb_success_) then 
       info = psb_err_from_subroutine_
       return
     end if
 
-    if((aimag(lambda_min) /= dzero) .or. (aimag(lambda_max) /= dzero)) then
+    if ((aimag(lambda_min) /= szero) .or. (aimag(lambda_max) /= szero)) then
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
 
-    if((real(lambda_min) < 0) .or. (real(lambda_max) < real(lambda_min))) then 
+    if ((real(lambda_min) < 0) .or. (real(lambda_max) < real(lambda_min))) then 
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
 
-    coeff(1) = 2_psb_dpk_ / (lambda_max - lambda_min)
+    coeff(1) = 2_psb_spk_ / (lambda_max - lambda_min)
     coeff(2) = (lambda_max + lambda_min) / (lambda_max - lambda_min)
-    coeff(3) = zone
-  end function psb_z_chebyshev_coefficients
+    coeff(3) = cone
+  end function psb_c_chebyshev_coefficients
 
   subroutine inner_solver_fgs_1D(M, rhs, num_iter)
-    complex(psb_dpk_), intent(in)    :: M(:, :)
-    complex(psb_dpk_), intent(inout) :: rhs(:)
+    complex(psb_spk_), intent(in)    :: M(:, :)
+    complex(psb_spk_), intent(inout) :: rhs(:)
     integer(psb_ipk_), intent(in) :: num_iter
 
     integer(psb_ipk_) :: iter_idx, i, j, n
-    complex(psb_dpk_)    :: sol(size(rhs))
+    complex(psb_spk_)    :: sol(size(rhs))
 
-    sol = zzero
+    sol = czero
     n = size(sol)
     do iter_idx = 1, num_iter
       do i = 1, n
@@ -336,14 +364,14 @@ contains
   end subroutine inner_solver_fgs_1D
 
   subroutine inner_solver_fgs_2D(M, rhs, num_iter)
-    complex(psb_dpk_), intent(in)    :: M(:, :)
-    complex(psb_dpk_), intent(inout) :: rhs(:, :)
+    complex(psb_spk_), intent(in)    :: M(:, :)
+    complex(psb_spk_), intent(inout) :: rhs(:, :)
     integer(psb_ipk_), intent(in) :: num_iter
 
     integer(psb_ipk_) :: iter_idx, i, j, n
-    complex(psb_dpk_)    :: sol(size(rhs, 1), size(rhs, 2))
+    complex(psb_spk_)    :: sol(size(rhs, 1), size(rhs, 2))
 
-    sol = zzero
+    sol = czero
     n = size(sol, 1)
     do iter_idx = 1, num_iter
       do i = 1, n
@@ -356,30 +384,33 @@ contains
     end do
     rhs = sol
   end subroutine inner_solver_fgs_2D
-end subroutine psb_zscg_vect
+end subroutine psb_cscg_vect
 
-subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
+subroutine psb_cscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
                         & itmax, iter, err, itrace, istop, &
                         & base_type, eigext, Gram_solver, FGS_sweeps)
   use psb_base_mod
   use psb_prec_mod
-  use psb_z_linsolve_conv_mod
+  use psb_c_linsolve_conv_mod
   use psb_linsolve_mod
   use psb_pMPK_mod
+#if defined(PSB_HAVE_CUDA)
+  use psb_cuda_mod
+#endif
 
   implicit none
-  type(psb_zspmat_type), intent(in)     :: a
-  class(psb_zprec_type), intent(inout)  :: prec
-  type(psb_z_vect_type), intent(inout)  :: b, x
+  type(psb_cspmat_type), intent(in)     :: a
+  class(psb_cprec_type), intent(inout)  :: prec
+  type(psb_c_vect_type), intent(inout)  :: b, x
   integer(psb_ipk_), intent(in)         :: s
-  real(psb_dpk_), intent(in)            :: eps
+  real(psb_spk_), intent(in)            :: eps
   type(psb_desc_type), intent(in)       :: desc_a
   integer(psb_ipk_), intent(out)        :: info
   integer(psb_ipk_), optional, intent(in)   :: itmax, itrace, istop
   integer(psb_ipk_), optional, intent(out)  :: iter
-  real(psb_dpk_), optional, intent(out)     :: err
+  real(psb_spk_), optional, intent(out)     :: err
   character, optional, intent(in)           :: base_type
-  complex(psb_dpk_), optional, intent(in)      :: eigext(2)
+  complex(psb_spk_), optional, intent(in)      :: eigext(2)
   character(len=3), optional, intent(in)    :: Gram_solver
   integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
 
@@ -390,26 +421,50 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   integer(psb_ipk_)   :: err_act, np, me, debug_level, debug_unit, &
                           & n_col, n_row
   integer(psb_lpk_)   :: mglob
-  character(len=20)           :: name = 'psb_zscg'
+  character(len=20)           :: name = 'psb_cscg'
   character(len=*), parameter :: methdbasename = 'sStepCGv2'
   character(len=20)           :: methdfullname
 
-  complex(psb_dpk_), allocatable     :: alpha(:), beta(:, :), W(:, :), temp_fa(:, :), B2(:, :), c0(:)
+  complex(psb_spk_), allocatable     :: alpha(:), beta(:, :), W(:, :), temp_fa(:, :), B2(:, :), c0(:)
   integer(psb_ipk_), allocatable  :: pW(:)
-  type(psb_z_vect_type)           :: r  
-  type(psb_z_multivect_type)      :: Z, Q, P, V, temp_mv
-  complex(psb_dpk_)                  :: cheb_coeff(3)
+  type(psb_c_vect_type)           :: r  
+  type(psb_c_multivect_type)      :: Z, Q, P, V, temp_mv
+  complex(psb_spk_)                  :: cheb_coeff(3)
   integer(psb_ipk_)               :: itidx
   
   type(psb_itconv_type)         :: stopdat
   real(psb_dpk_)                :: derr 
 
-  type(psb_z_multivect_type), target  :: aux_mv
-  complex(psb_dpk_), allocatable, target :: aux_fa(:)
+  type(psb_c_multivect_type), target  :: aux_mv
+  complex(psb_spk_), allocatable, target :: aux_fa(:)
 
   character(len=3), parameter   :: forwardGS = "FGS"
   character(len=3), parameter   :: lapackLU = "LLU"
   character(len=3), parameter   :: lapackCC = "LCC"
+  
+  class(psb_c_base_multivect_type), pointer :: mvect_mold
+  class(psb_c_base_vect_type), pointer      :: vect_mold
+  type(psb_c_base_multivect_type), target   :: mvect_base
+  type(psb_c_base_vect_type), target        :: vect_base
+#if defined(PSB_HAVE_CUDA)
+  type(psb_c_multivect_cuda), target        :: mvect_cuda
+  type(psb_c_vect_cuda), target             :: vect_cuda
+#endif
+
+#if defined(PSB_HAVE_CUDA)
+  select type(in_v => x%v)
+    type is(psb_c_vect_cuda)
+      mvect_mold  => mvect_cuda
+      vect_mold   => vect_cuda
+    
+    class default
+      mvect_mold  => mvect_base
+      vect_mold  => vect_base
+  end select
+#else
+  mvect_mold => mvect_base
+  vect_mold  => vect_base
+#endif
 
   info = psb_success_
   call psb_erractionsave(err_act)
@@ -419,7 +474,7 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   ctxt = desc_a%get_context()
   call psb_info(ctxt, me, np)
-  if(debug_level >= psb_debug_ext_) &
+  if (debug_level >= psb_debug_ext_) &
        & write(debug_unit, *) me, ' ', trim(name), ': from psb_info ', np
   
   if(s < 1) then
@@ -430,18 +485,18 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   write(methdfullname, '(A, "(", I0, ")")') methdbasename, s
 
-  if((.not. allocated(b%v)) .or. (.not.allocated(x%v))) then 
+  if ((.not. allocated(b%v)) .or. (.not.allocated(x%v))) then 
     info = psb_err_invalid_vect_state_
     call psb_errpush(info, name)
     goto 9999
   endif
 
   istop_ = 2
-  if(present(istop)) istop_ = istop
+  if (present(istop)) istop_ = istop
   
   !  ISTOP_ = 1:  Normwise backward error, infinity norm 
   !  ISTOP_ = 2:  ||r||/||b||, 2-norm 
-  if((istop_ < 1 ) .or. (istop_ > 2 )) then
+  if ((istop_ < 1 ) .or. (istop_ > 2 )) then
     info = psb_err_invalid_istop_
     err = info
     call psb_errpush(info, name, i_err = (/istop_/))
@@ -449,19 +504,19 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   endif
 
   itmax_ = 1000
-  if(present(itmax)) itmax_ = itmax
+  if (present(itmax)) itmax_ = itmax
 
   itrace_ = 0
-  if(present(itrace)) itrace_ = itrace
+  if (present(itrace)) itrace_ = itrace
 
   base_type_ = "C"
-  if(present(base_type)) base_type_ = base_type
+  if (present(base_type)) base_type_ = base_type
 
   Gram_solver_ = lapackCC
-  if(present(Gram_solver)) Gram_solver_ = Gram_solver
+  if (present(Gram_solver)) Gram_solver_ = Gram_solver
   
   FGS_sweeps_ = 30
-  if(present(FGS_sweeps)) FGS_sweeps_ = FGS_sweeps
+  if (present(FGS_sweeps)) FGS_sweeps_ = FGS_sweeps
 
   mglob = desc_a%get_global_rows()
   n_row = desc_a%get_local_rows()
@@ -483,31 +538,31 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   !Allocate and assembly data structure
   allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, 2*s + 1), B2(s, s), c0(s), aux_fa(4*n_col), stat = info)
-  if(info == psb_success_) call psb_geall(r, desc_a, info)
-  if(info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(P, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(V, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(temp_mv, desc_a, info, n = s)
-  if(info == psb_success_) call psb_geall(aux_mv, desc_a, info, n = 3)
-  if(info == psb_success_) call psb_geasb(r, desc_a, info)
-  if(info == psb_success_) call psb_geasb(Z, desc_a, info)
-  if(info == psb_success_) call psb_geasb(Q, desc_a, info)
-  if(info == psb_success_) call psb_geasb(P, desc_a, info)
-  if(info == psb_success_) call psb_geasb(V, desc_a, info)
-  if(info == psb_success_) call psb_geasb(temp_mv, desc_a, info)
-  if(info == psb_success_) call psb_geasb(aux_mv, desc_a, info)
+  if (info == psb_success_) call psb_geall(r, desc_a, info)
+  if (info == psb_success_) call psb_geall(Z, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(Q, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(P, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(V, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(temp_mv, desc_a, info, n = s)
+  if (info == psb_success_) call psb_geall(aux_mv, desc_a, info, n = 3)
+  if (info == psb_success_) call psb_geasb(r, desc_a, info, mold = vect_mold)
+  if (info == psb_success_) call psb_geasb(Z, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(Q, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(P, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(V, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(temp_mv, desc_a, info, mold = mvect_mold)
+  if (info == psb_success_) call psb_geasb(aux_mv, desc_a, info, mold = mvect_mold)
 
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
   end if
 
   ! First residual calculation
-  call psb_geaxpby(zone, b, zzero, r, desc_a, info)
-  if(info == psb_success_) call psb_spmm(-zone, a, x, zone, r, desc_a, info)
-  if(info /= psb_success_) then 
+  call psb_geaxpby(cone, b, czero, r, desc_a, info)
+  if (info == psb_success_) call psb_spmm(-cone, a, x, cone, r, desc_a, info)
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -515,7 +570,7 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
 
   ! Init converence
   call psb_init_conv(methdfullname, istop_, itrace_, itmax_, a, x, b, eps, desc_a, stopdat, info)
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -526,16 +581,16 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   ! Chebyshev coefficient calculation
   select case (base_type_)
     case("M")
-      cheb_coeff = zzero
+      cheb_coeff = czero
     case("C")
-      cheb_coeff = psb_z_chebyshev_coefficients(a, prec, desc_a, info, eigext)
+      cheb_coeff = psb_c_chebyshev_coefficients(a, prec, desc_a, info, eigext)
     case default
       info = psb_err_invalid_input_ 
       call psb_errpush(info, name)
       goto 9999
   end select
 
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -545,7 +600,7 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                   & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
                   & mvec_temp = aux_mv, farr_temp = aux_fa)
-  if(info /= psb_success_) then 
+  if (info /= psb_success_) then 
     info = psb_err_from_subroutine_ 
     call psb_errpush(info, name)
     goto 9999
@@ -562,14 +617,14 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   ! Loop until convergence (or maxiter)
   do itidx = 1, itmax_
     ! Factor matrix W (if soving with LU or Cholesky factorization)
-    if(Gram_solver_ == lapackLU) call zgetrf(s, s, W, s, pW, info)
-    if(Gram_solver_ == lapackCC) call zpotrf('L', s, W, s, info)
+    if(Gram_solver_ == lapackLU) call cgetrf(s, s, W, s, pW, info)
+    if(Gram_solver_ == lapackCC) call cpotrf('L', s, W, s, info)
 
     ! Solve for alpha
     select case(Gram_solver_)
       case(forwardGS);  call inner_solver_fgs_1D(W, alpha, FGS_sweeps_)
-      case(lapackLU);   call zgetrs('N', s, 1, W, s, pW, alpha, s, info)
-      case(lapackCC);   call zpotrs('L', s, 1, W, s, alpha, s, info)
+      case(lapackLU);   call cgetrs('N', s, 1, W, s, pW, alpha, s, info)
+      case(lapackCC);   call cpotrs('L', s, 1, W, s, alpha, s, info)
       case default
         info = psb_err_invalid_input_ 
         call psb_errpush(info, name)
@@ -601,8 +656,8 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
     beta = B2
     select case(Gram_solver_)
       case(forwardGS);  call inner_solver_fgs_2D(W, beta, FGS_sweeps_)
-      case(lapackLU);   call zgetrs('N', s, s, W, s, pW, beta, s, info)
-      case(lapackCC);   call zpotrs('L', s, s, W, s, beta, s, info)
+      case(lapackLU);   call cgetrs('N', s, s, W, s, pW, beta, s, info)
+      case(lapackCC);   call cpotrs('L', s, s, W, s, beta, s, info)
       case default
         info = psb_err_invalid_input_ 
         call psb_errpush(info, name)
@@ -611,32 +666,32 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
 
     ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
     call psb_geaxpby(P, beta, temp_mv, desc_a, info, upd_flag = .false.)
-    call psb_geaxpby(zone, Z, zone, temp_mv, P, desc_a, info)
+    call psb_geaxpby(cone, Z, cone, temp_mv, P, desc_a, info)
     call psb_geaxpby(V, beta, temp_mv, desc_a, info, upd_flag = .false.)
-    call psb_geaxpby(zone, Q, zone, temp_mv, V, desc_a, info)
+    call psb_geaxpby(cone, Q, cone, temp_mv, V, desc_a, info)
 
     !Compute new Gram matrix
     W = temp_fa(:, s+1 : 2*s)
-    call zgemm('T', 'N', s, s, s, -zone, beta, s, B2, s, zone, W, s)
+    call cgemm('T', 'N', s, s, s, -cone, beta, s, B2, s, cone, W, s)
     
     !Compute new rhs for alpha
     alpha = temp_fa(:, 2*s + 1)
   end do
 
   call psb_end_conv(methdfullname, itidx, desc_a, stopdat, info, derr, iter)
-  if(present(err)) err = derr
-  if(present(iter)) iter = iter * s
+  if (present(err)) err = derr
+  if (present(iter)) iter = iter * s
 
-  if(info == psb_success_) call psb_gefree(r, desc_a, info)
-  if(info == psb_success_) call psb_gefree(Z, desc_a, info)
-  if(info == psb_success_) call psb_gefree(Q, desc_a, info)
-  if(info == psb_success_) call psb_gefree(P, desc_a, info)
-  if(info == psb_success_) call psb_gefree(V, desc_a, info)
-  if(info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
-  if(info == psb_success_) call psb_gefree(aux_mv, desc_a, info)
+  if (info == psb_success_) call psb_gefree(r, desc_a, info)
+  if (info == psb_success_) call psb_gefree(Z, desc_a, info)
+  if (info == psb_success_) call psb_gefree(Q, desc_a, info)
+  if (info == psb_success_) call psb_gefree(P, desc_a, info)
+  if (info == psb_success_) call psb_gefree(V, desc_a, info)
+  if (info == psb_success_) call psb_gefree(temp_mv, desc_a, info)
+  if (info == psb_success_) call psb_gefree(aux_mv, desc_a, info)
 
-  if(info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, B2, c0, aux_fa, stat = info)
-  if(info /= psb_success_) then
+  if (info == psb_success_) deallocate(alpha, beta, W, pW, temp_fa, B2, c0, aux_fa, stat = info)
+  if (info /= psb_success_) then
     call psb_errpush(info, name)
     goto 9999
   end if
@@ -648,16 +703,16 @@ subroutine psb_zscg2_vect(a, prec, b, x, s, eps, desc_a, info, &
   return
 
 contains 
-  function psb_z_chebyshev_coefficients(a, prec, desc, info, eigext) result(coeff)
+  function psb_c_chebyshev_coefficients(a, prec, desc, info, eigext) result(coeff)
     use psb_eigsolve_mod
-    type(psb_zspmat_type), intent(in)     :: a
-    class(psb_zprec_type), intent(inout)  :: prec
+    type(psb_cspmat_type), intent(in)     :: a
+    class(psb_cprec_type), intent(inout)  :: prec
     type(psb_desc_type), intent(in)       :: desc
     integer(psb_ipk_), intent(out)        :: info
-    complex(psb_dpk_), optional, intent(in)  :: eigext(2)
+    complex(psb_spk_), optional, intent(in)  :: eigext(2)
     
-    complex(psb_dpk_) :: lambda_max, lambda_min
-    complex(psb_dpk_) :: coeff(3)
+    complex(psb_spk_) :: lambda_max, lambda_min
+    complex(psb_spk_) :: coeff(3)
  
     info = psb_success_
 
@@ -666,38 +721,38 @@ contains
       lambda_max = eigext(2)
     else 
       call psb_powermethod(a, prec, lambda_max, desc, info)
-      lambda_min = zzero
+      lambda_min = czero
     end if
 
-    if(info /= psb_success_) then 
+    if (info /= psb_success_) then 
       info = psb_err_from_subroutine_
       return
     end if
 
-    if((aimag(lambda_min) /= dzero) .or. (aimag(lambda_max) /= dzero)) then
+    if ((aimag(lambda_min) /= szero) .or. (aimag(lambda_max) /= szero)) then
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
 
-    if((real(lambda_min) < 0) .or. (real(lambda_max) < real(lambda_min))) then 
+    if ((real(lambda_min) < 0) .or. (real(lambda_max) < real(lambda_min))) then 
       info = psb_err_fatal_ ! TODO: set the correct error
       return
     end if
 
-    coeff(1) = 2_psb_dpk_ / (lambda_max - lambda_min)
+    coeff(1) = 2_psb_spk_ / (lambda_max - lambda_min)
     coeff(2) = (lambda_max + lambda_min) / (lambda_max - lambda_min)
-    coeff(3) = zone
-  end function psb_z_chebyshev_coefficients
+    coeff(3) = cone
+  end function psb_c_chebyshev_coefficients
 
   subroutine inner_solver_fgs_1D(M, rhs, num_iter)
-    complex(psb_dpk_), intent(in)    :: M(:, :)
-    complex(psb_dpk_), intent(inout) :: rhs(:)
+    complex(psb_spk_), intent(in)    :: M(:, :)
+    complex(psb_spk_), intent(inout) :: rhs(:)
     integer(psb_ipk_), intent(in) :: num_iter
 
     integer(psb_ipk_) :: iter_idx, i, j, n
-    complex(psb_dpk_)    :: sol(size(rhs))
+    complex(psb_spk_)    :: sol(size(rhs))
 
-    sol = zzero
+    sol = czero
     n = size(sol)
     do iter_idx = 1, num_iter
       do i = 1, n
@@ -712,14 +767,14 @@ contains
   end subroutine inner_solver_fgs_1D
 
   subroutine inner_solver_fgs_2D(M, rhs, num_iter)
-    complex(psb_dpk_), intent(in)    :: M(:, :)
-    complex(psb_dpk_), intent(inout) :: rhs(:, :)
+    complex(psb_spk_), intent(in)    :: M(:, :)
+    complex(psb_spk_), intent(inout) :: rhs(:, :)
     integer(psb_ipk_), intent(in) :: num_iter
 
     integer(psb_ipk_) :: iter_idx, i, j, n
-    complex(psb_dpk_)    :: sol(size(rhs, 1), size(rhs, 2))
+    complex(psb_spk_)    :: sol(size(rhs, 1), size(rhs, 2))
 
-    sol = zzero
+    sol = czero
     n = size(sol, 1)
     do iter_idx = 1, num_iter
       do i = 1, n
@@ -732,4 +787,4 @@ contains
     end do
     rhs = sol
   end subroutine inner_solver_fgs_2D
-end subroutine psb_zscg2_vect
+end subroutine psb_cscg2_vect

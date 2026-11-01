@@ -110,10 +110,351 @@ subroutine psb_s_cuda_dnsg_vect_mv(alpha,a,x,beta,y,info,trans)
   return
 
 9999 call psb_error_handler(err_act)
-
   return
- 
 end subroutine psb_s_cuda_dnsg_vect_mv
+
+subroutine psb_s_cuda_dnsg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+  use psb_base_mod
+  use cusparse_mod
+  use dnsdev_mod
+  use psb_vectordev_mod
+  use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_mvect_mv
+  use psb_s_cuda_vect_mod
+  use psb_s_cuda_multivect_mod
+  implicit none
+  real(psb_spk_), intent(in)                    :: alpha, beta
+  class(psb_s_cuda_dnsg_sparse_mat), intent(in) :: a
+  class(psb_s_base_vect_type), intent(inout)    :: x
+  class(psb_s_base_multivect_type), intent(inout)   :: y
+  integer(psb_ipk_), intent(in)                 :: idx_y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act, m, n, k 
+  character(len=20) :: name = 's_cuda_dnsg_mvect_mv'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
+
+  if (.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (trans_ == 'N') then
+    m = a%get_nrows()
+    n = 1
+    k = a%get_ncols()
+  else
+    m = a%get_ncols()
+    n = 1
+    k = a%get_nrows()
+  end if
+
+  select type(x) 
+    type is (psb_s_vect_cuda)
+      select type(y) 
+        type is (psb_s_multivect_cuda)
+          if(a%is_host()) call a%sync()
+          if(x%is_host()) call x%sync()
+          if(beta /= szero) then 
+            if(y%is_host()) call y%sync()
+          end if
+          info = spmvDnsDevice(trans_, m, n, k, alpha, a%deviceMat, x%deviceVect, beta, y%deviceVect, idx_y)
+          if (info /= psb_success_) then 
+            call psb_errpush(psb_err_from_subroutine_ai_, name, a_err = 'spmvDnsDevice', &
+                            & i_err = (/info, izero, izero, izero, izero/))
+            info = psb_err_from_subroutine_ai_
+            goto 9999
+          end if
+          call y%set_dev()
+
+        class default
+          call fallback()
+      end select
+      
+    class default
+      call fallback()
+  end select
+  
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    real(psb_spk_), allocatable :: rx(:), ry(:, :)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx, beta, ry(:, idx_y), info)
+    call y%bld(ry)
+  end subroutine fallback
+end subroutine psb_s_cuda_dnsg_mvect_mv
+
+subroutine psb_s_cuda_dnsg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use dnsdev_mod
+  use psb_vectordev_mod
+  use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_mvect_vm
+  use psb_s_cuda_vect_mod
+  use psb_s_cuda_multivect_mod
+  implicit none
+  real(psb_spk_), intent(in)                    :: alpha, beta
+  class(psb_s_cuda_dnsg_sparse_mat), intent(in) :: a
+  class(psb_s_base_multivect_type), intent(inout)   :: x
+  integer(psb_ipk_), intent(in)                 :: idx_x
+  class(psb_s_base_vect_type), intent(inout)    :: y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act, m, n, k 
+  character(len=20) :: name = 's_cuda_dnsg_mvect_mv'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
+
+  if (.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (trans_ == 'N') then
+    m = a%get_nrows()
+    n = 1
+    k = a%get_ncols()
+  else
+    m = a%get_ncols()
+    n = 1
+    k = a%get_nrows()
+  end if
+
+  select type(x) 
+    type is (psb_s_multivect_cuda)
+      select type(y) 
+        type is (psb_s_vect_cuda)
+          if(a%is_host()) call a%sync()
+          if(x%is_host()) call x%sync()
+          if(beta /= szero) then 
+            if(y%is_host()) call y%sync()
+          end if
+          info = spmvDnsDevice(trans_, m, n, k, alpha, a%deviceMat, x%deviceVect, idx_x, beta, y%deviceVect)
+          if (info /= psb_success_) then 
+            call psb_errpush(psb_err_from_subroutine_ai_, name, a_err = 'spmvDnsDevice', &
+                            & i_err = (/info, izero, izero, izero, izero/))
+            info = psb_err_from_subroutine_ai_
+            goto 9999
+          end if
+          call y%set_dev()
+
+        class default
+          call fallback()
+      end select
+      
+    class default
+      call fallback()
+  end select
+  
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    real(psb_spk_), allocatable :: rx(:, :), ry(:)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx(:, idx_x), beta, ry, info)
+    call y%bld(ry)
+  end subroutine fallback
+end subroutine psb_s_cuda_dnsg_mvect_vm
+
+subroutine psb_s_cuda_dnsg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use dnsdev_mod
+  use psb_vectordev_mod
+  use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_mvect_mm_idxs
+  use psb_s_cuda_multivect_mod
+  implicit none
+  real(psb_spk_), intent(in)                    :: alpha, beta
+  class(psb_s_cuda_dnsg_sparse_mat), intent(in) :: a
+  class(psb_s_base_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(in)                 :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act, m, n, k 
+  character(len=20) :: name = 's_cuda_dnsg_mvect_mv'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
+
+  if (.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (trans_ == 'N') then
+    m = a%get_nrows()
+    n = 1
+    k = a%get_ncols()
+  else
+    m = a%get_ncols()
+    n = 1
+    k = a%get_nrows()
+  end if
+
+  select type(x) 
+    type is (psb_s_multivect_cuda)
+      select type(y) 
+        type is (psb_s_multivect_cuda)
+          if(a%is_host()) call a%sync()
+          if(x%is_host()) call x%sync()
+          if(beta /= szero) then 
+            if(y%is_host()) call y%sync()
+          end if
+          info = spmvDnsDevice(trans_, m, n, k, alpha, a%deviceMat, x%deviceVect, idx_x, beta, y%deviceVect, idx_y)
+          if (info /= psb_success_) then 
+            call psb_errpush(psb_err_from_subroutine_ai_, name, a_err = 'spmvDnsDevice', &
+                            & i_err = (/info, izero, izero, izero, izero/))
+            info = psb_err_from_subroutine_ai_
+            goto 9999
+          end if
+          call y%set_dev()
+
+        class default
+          call fallback()
+      end select
+      
+    class default
+      call fallback()
+  end select
+  
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    real(psb_spk_), allocatable :: rx(:, :), ry(:, :)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx(:, idx_x), beta, ry(:, idx_y), info)
+    call y%bld(ry)
+  end subroutine fallback
+end subroutine psb_s_cuda_dnsg_mvect_mm_idxs
+
+subroutine psb_s_cuda_dnsg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use dnsdev_mod
+  use psb_vectordev_mod
+  use psb_s_cuda_dnsg_mat_mod, psb_protect_name => psb_s_cuda_dnsg_mvect_mm_full
+  use psb_s_cuda_multivect_mod
+  implicit none
+  real(psb_spk_), intent(in)                    :: alpha, beta
+  class(psb_s_cuda_dnsg_sparse_mat), intent(in) :: a
+  class(psb_s_base_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act, m, n, k 
+  character(len=20) :: name = 's_cuda_dnsg_mvect_mv'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = psb_toupper(trans)
+
+  if (.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  if (trans_ == 'N') then
+    m = a%get_nrows()
+    n = x%get_ncols()
+    k = a%get_ncols()
+  else
+    m = a%get_ncols()
+    n = x%get_ncols()
+    k = a%get_nrows()
+  end if
+
+  select type(x) 
+    type is (psb_s_multivect_cuda)
+      select type(y) 
+        type is (psb_s_multivect_cuda)
+          if(a%is_host()) call a%sync()
+          if(x%is_host()) call x%sync()
+          if(beta /= szero) then 
+            if(y%is_host()) call y%sync()
+          end if
+          info = spmvDnsDevice(trans_, m, n, k, alpha, a%deviceMat, x%deviceVect, beta, y%deviceVect)
+          if (info /= psb_success_) then 
+            call psb_errpush(psb_err_from_subroutine_ai_, name, a_err = 'spmvDnsDevice', &
+                            & i_err = (/info, izero, izero, izero, izero/))
+            info = psb_err_from_subroutine_ai_
+            goto 9999
+          end if
+          call y%set_dev()
+
+        class default
+          call fallback()
+      end select
+      
+    class default
+      call fallback()
+  end select
+  
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    real(psb_spk_), allocatable :: rx(:, :), ry(:, :)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx, beta, ry, info)
+    call y%bld(ry)
+  end subroutine fallback
+end subroutine psb_s_cuda_dnsg_mvect_mm_full
 
 
 subroutine psb_s_cuda_dnsg_mold(a,b,info) 
@@ -156,7 +497,7 @@ end subroutine psb_s_cuda_dnsg_mold
 !!$
 !!$  interface 
 !!$    subroutine psb_s_cuda_dnsg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
-!!$      import :: psb_ipk_, psb_s_cuda_dnsg_sparse_mat, psb_spk_,  psb_s_base_vect_type
+!!$      import :: psb_ipk_, psb_s_cuda_dnsg_sparse_mat, psb_dpk_,  psb_s_base_vect_type
 !!$      class(psb_s_cuda_dnsg_sparse_mat), intent(in)    :: a
 !!$      real(psb_spk_), intent(in)                 :: alpha, beta
 !!$      class(psb_s_base_vect_type), intent(inout) :: x, y

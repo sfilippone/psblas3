@@ -34,160 +34,165 @@ module psb_cuda_env_mod
   use psb_base_mod
   use iso_c_binding
   use base_cusparse_mod
-!  interface psb_cuda_init
-!    module procedure  psb_cuda_init
-!  end interface
   use core_mod
+
+  !  interface psb_cuda_init
+  !    module procedure psb_cuda_init
+  !  end interface
   
   interface 
-    function psb_cudaGetHandle() &
-         & result(res) bind(c,name='psb_cudaGetHandle')
+    function psb_cudaGetHandle() result(res) &
+            & bind(c, name = 'psb_cudaGetHandle')
       use iso_c_binding   
-      type(c_ptr)		:: res
+      type(c_ptr) :: res
     end function psb_cudaGetHandle
   end interface
 
   interface 
-    function psb_cudaGetStream() &
-         & result(res) bind(c,name='psb_cudaGetStream')
+    function psb_cudaGetStream()  result(res)&
+            & bind(c, name = 'psb_cudaGetStream')
       use iso_c_binding   
-      type(c_ptr)		:: res
+      type(c_ptr) :: res
     end function psb_cudaGetStream
   end interface
 
   interface 
-    function psb_C_gpu_init(dev) &
-         & result(res) bind(c,name='gpuInit')
+    function psb_C_gpu_init(dev) result(res) &
+            & bind(c, name = 'gpuInit')
       use iso_c_binding   
-      integer(c_int),value	:: dev
-      integer(c_int)		:: res
+      integer(c_int), value :: dev
+      integer(c_int)  :: res
     end function psb_C_gpu_init
   end interface
 
   interface 
-    function psb_cuda_inner_getDeviceCount() &
-         & result(res) bind(c,name='getDeviceCount')
+    function psb_cuda_inner_getDeviceCount() result(res) &
+            & bind(c, name = 'getDeviceCount')
       use iso_c_binding   
-      integer(c_int)		:: res
+      integer(c_int)  :: res
     end function psb_cuda_inner_getDeviceCount
   end interface
 
   interface 
-    function psb_cuda_getDevice() &
-         & result(res) bind(c,name='getDevice')
+    function psb_cuda_getDevice() result(res) &
+            & bind(c, name = 'getDevice')
       use iso_c_binding   
-      integer(c_int)		:: res
+      integer(c_int)  :: res
     end function psb_cuda_getDevice
   end interface
 
   interface 
-    function psb_cuda_setDevice(dev) &
-         & result(res) bind(c,name='setDevice')
+    function psb_cuda_setDevice(dev) result(res) &
+            & bind(c, name = 'setDevice')
       use iso_c_binding   
-      integer(c_int), value	:: dev
-      integer(c_int)		:: res
+      integer(c_int), value :: dev
+      integer(c_int)  :: res
     end function psb_cuda_setDevice
   end interface
   
-
   interface 
     subroutine psb_cudaCreateHandle() &
-         & bind(c,name='psb_cudaCreateHandle')
+              & bind(c, name = 'psb_cudaCreateHandle')
       use iso_c_binding   
     end subroutine psb_cudaCreateHandle
   end interface
 
   interface 
-    subroutine psb_cudaSetStream(handle,stream) &
-         & bind(c,name='psb_cudaSetStream')
+    subroutine psb_cudaSetStream(handle, stream) &
+              & bind(c, name = 'psb_cudaSetStream')
       use iso_c_binding   
-      type(c_ptr), value :: handle, stream
+      type(c_ptr), value  :: handle, stream
     end subroutine psb_cudaSetStream
   end interface
 
   interface 
     subroutine psb_cudaDestroyHandle() &
-         & bind(c,name='psb_cudaDestroyHandle')
+              & bind(c, name = 'psb_cudaDestroyHandle')
       use iso_c_binding   
     end subroutine psb_cudaDestroyHandle
   end interface
 
   interface 
     subroutine psb_cuda_innerReset() &
-         & bind(c,name='cudaReset')
+              & bind(c, name = 'cudaReset')
       use iso_c_binding   
     end subroutine psb_cuda_innerReset
   end interface
 
   interface 
     subroutine psb_cuda_innerClose() &
-         & bind(c,name='gpuClose')
+              & bind(c, name = 'gpuClose')
       use iso_c_binding   
     end subroutine psb_cuda_innerClose
   end interface
 
   interface 
-    function psb_C_DeviceHasUVA() &
-         & result(res) bind(c,name='DeviceHasUVA')
+    function psb_C_DeviceHasUVA() result(res) &
+            & bind(c, name = 'DeviceHasUVA')
       use iso_c_binding   
-      integer(c_int)		:: res
+      integer(c_int)  :: res
     end function psb_C_DeviceHasUVA
   end interface
 
   interface 
-    function psb_C_get_MultiProcessors() &
-         & result(res) bind(c,name='getGPUMultiProcessors')
+    function psb_C_get_MultiProcessors() result(res) &
+            & bind(c, name = 'getGPUMultiProcessors')
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function psb_C_get_MultiProcessors
-    function psb_C_get_MemoryBusWidth() &
-         & result(res) bind(c,name='getGPUMemoryBusWidth')
+
+    function psb_C_get_MemoryBusWidth() result(res) &
+            & bind(c, name = 'getGPUMemoryBusWidth')
       use iso_c_binding
       integer(c_int) :: res
     end function psb_C_get_MemoryBusWidth
+
 #if (PSB_CUDA_VERSION >= 13000)    
-    function psb_C_get_MemoryClockRate(dev) &
-         & result(res) bind(c,name='getGPUMemoryClockRate')
+    function psb_C_get_MemoryClockRate(dev) result(res) &
+            & bind(c, name = 'getGPUMemoryClockRate')
       use iso_c_binding
       integer(c_int), value :: dev
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function psb_C_get_MemoryClockRate
 #else
-    function psb_C_get_MemoryClockRate() &
-         & result(res) bind(c,name='getGPUMemoryClockRate')
+    function psb_C_get_MemoryClockRate() result(res) &
+            & bind(c, name = 'getGPUMemoryClockRate')
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function psb_C_get_MemoryClockRate
 #endif
-    function psb_C_get_WarpSize() &
-         & result(res) bind(c,name='getGPUWarpSize')
+
+    function psb_C_get_WarpSize() result(res) &
+            & bind(c, name = 'getGPUWarpSize')
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function psb_C_get_WarpSize
-    function psb_C_get_MaxThreadsPerMP() &
-         & result(res) bind(c,name='getGPUMaxThreadsPerMP')
+
+    function psb_C_get_MaxThreadsPerMP() result(res) &
+            & bind(c, name = 'getGPUMaxThreadsPerMP')
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function psb_C_get_MaxThreadsPerMP
-    function psb_C_get_MaxRegistersPerBlock() &
-         & result(res) bind(c,name='getGPUMaxRegistersPerBlock')
+
+    function psb_C_get_MaxRegistersPerBlock() result(res) &
+            & bind(c, name = 'getGPUMaxRegistersPerBlock')
       use iso_c_binding
-      integer(c_int) :: res
+      integer(c_int)  :: res
     end function psb_C_get_MaxRegistersPerBlock
   end interface
+
   interface 
     subroutine psb_C_cpy_NameString(cstring) &
-         & bind(c,name='cpyGPUNameString')
+              & bind(c, name = 'cpyGPUNameString')
       use iso_c_binding
       character(c_char) :: cstring(*) 
     end subroutine psb_C_cpy_NameString
   end interface
 
-  logical, private, save :: gpu_do_maybe_free_buffer = .false.
+  logical, private, save  :: gpu_do_maybe_free_buffer = .false.
   integer(c_int), private, save :: myDevice
   
-Contains
-  
+contains
   function psb_cuda_get_maybe_free_buffer() result(res)
     logical :: res
     res = gpu_do_maybe_free_buffer
@@ -195,6 +200,7 @@ Contains
 
   subroutine psb_cuda_set_maybe_free_buffer(val)
     logical, intent(in) :: val
+
     gpu_do_maybe_free_buffer = val
   end subroutine psb_cuda_set_maybe_free_buffer
   
@@ -203,24 +209,22 @@ Contains
   ! Environment handling 
   !
   ! !!!!!!!!!!!!!!!!!!!!!!
-
-
-  subroutine psb_cuda_init(ctxt,dev)
+  subroutine psb_cuda_init(ctxt, dev)
     use psb_penv_mod
     use psb_const_mod
     use psb_error_mod
     type(psb_ctxt_type), intent(in) :: ctxt
-    integer, intent(in), optional   :: dev
+    integer, intent(in), optional :: dev
 
     integer :: np, npavail, iam, info, count, dev_
-    Integer(Psb_ipk_)  :: err_act
+    Integer(psb_ipk_) :: err_act
 
     info = psb_success_
     call psb_erractionsave(err_act)
 #if defined(PSB_SERIAL_MPI) 
     iam = 0
 #else
-    call psb_info(ctxt,iam,np)
+    call psb_info(ctxt, iam, np)
 #endif
 
     count = psb_cuda_getDeviceCount()
@@ -229,28 +233,28 @@ Contains
       info = psb_C_gpu_init(dev)
       myDevice = dev
     else
-      if (count >0) then 
-        dev_ = mod(iam,count)
+      if (count > 0) then 
+        dev_ = mod(iam, count)
       else
         dev_ = 0
       end if
       info = psb_C_gpu_init(dev_)
       myDevice = dev_
     end if
-    if (info == 0) info = initFcusparse()
-    if (info /= 0) then 
-      call psb_errpush(psb_err_internal_error_,'psb_cuda_init')
+
+    if (info == psb_success_) info = initFcusparse()
+    if (info /= psb_success_) then 
+      call psb_errpush(psb_err_internal_error_, 'psb_cuda_init')
       goto 9999
     end if
+
     call psb_cudaCreateHandle()
     call psb_erractionrestore(err_act)
     return
-9999 call psb_error_handler(ctxt,err_act)
 
+  9999 call psb_error_handler(ctxt, err_act)
     return
-
   end subroutine psb_cuda_init
-
 
   subroutine psb_cuda_DeviceSync()
     call psb_cudaSync()
@@ -263,48 +267,48 @@ Contains
 
   subroutine psb_cuda_exit()
     integer :: res
-    res =  closeFcusparse()
+    res = closeFcusparse()
     call psb_cuda_innerClose()
     call psb_cuda_innerReset()
   end subroutine psb_cuda_exit
 
   function psb_cuda_DeviceHasUVA() result(res)
     logical :: res
-    res =  (psb_C_DeviceHasUVA() == 1)
+    res = (psb_C_DeviceHasUVA() == 1)
   end function psb_cuda_DeviceHasUVA
 
   function psb_cuda_MultiProcessors() result(res)     
     integer(psb_ipk_) :: res
-    res =  psb_C_get_MultiProcessors()
+    res = psb_C_get_MultiProcessors()
   end function psb_cuda_MultiProcessors
 
   function psb_cuda_MaxRegistersPerBlock() result(res)     
     integer(psb_ipk_) :: res
-    res =  psb_C_get_MaxRegistersPerBlock()
+    res = psb_C_get_MaxRegistersPerBlock()
   end function psb_cuda_MaxRegistersPerBlock
 
   function psb_cuda_MaxThreadsPerMP() result(res)     
     integer(psb_ipk_) :: res
-    res =  psb_C_get_MaxThreadsPerMP()
+    res = psb_C_get_MaxThreadsPerMP()
   end function psb_cuda_MaxThreadsPerMP
 
   function psb_cuda_WarpSize() result(res)     
     integer(psb_ipk_) :: res
-    res =  psb_C_get_WarpSize()
+    res = psb_C_get_WarpSize()
   end function psb_cuda_WarpSize
 
   function psb_cuda_MemoryClockRate() result(res)     
     integer(psb_ipk_) :: res
 #if (PSB_CUDA_VERSION >= 13000)    
-    res =  psb_C_get_MemoryClockRate(myDevice)
+    res = psb_C_get_MemoryClockRate(myDevice)
 #else
-    res =  psb_C_get_MemoryClockRate()
+    res = psb_C_get_MemoryClockRate()
 #endif
   end function psb_cuda_MemoryClockRate
 
   function psb_cuda_MemoryBusWidth() result(res)     
     integer(psb_ipk_) :: res
-    res =  psb_C_get_MemoryBusWidth()
+    res = psb_C_get_MemoryBusWidth()
   end function psb_cuda_MemoryBusWidth
 
   function psb_cuda_MemoryPeakBandwidth() result(res)     
@@ -313,17 +317,17 @@ Contains
     ! normalization: bit/byte, KHz/MHz
     ! output: MBytes/s
 #if PSB_CUDA_VERSION >= 13000
-    res =  2.d0*0.125d0*1.d-3*psb_C_get_MemoryBusWidth()*psb_C_get_MemoryClockRate(myDevice)
+    res = 2.d0 * 0.125d0 * 1.d-3 * psb_C_get_MemoryBusWidth() * psb_C_get_MemoryClockRate(myDevice)
 #else
-    res =  2.d0*0.125d0*1.d-3*psb_C_get_MemoryBusWidth()*psb_C_get_MemoryClockRate()
+    res = 2.d0 * 0.125d0 * 1.d-3 * psb_C_get_MemoryBusWidth() * psb_C_get_MemoryClockRate()
 #endif
   end function psb_cuda_MemoryPeakBandwidth
 
   function psb_cuda_DeviceName() result(res)     
-    character(len=256) :: res
+    character(len=256)  :: res
+
     character :: cstring(256)
     call psb_C_cpy_NameString(cstring)
-    call psb_stringc2f(cstring,res)
+    call psb_stringc2f(cstring, res)
   end function psb_cuda_DeviceName
-
 end module psb_cuda_env_mod

@@ -21,6 +21,7 @@ OBJS=psb_d_pMPK.o psb_s_pMPK.o psb_c_pMPK.o psb_z_pMPK.o\
 LIBNAME=$(METHDLIBNAME)
 COBJS=
 FINCLUDES=$(FMFLAG).. $(FMFLAG)$(MODDIR)
+FDEFINES+=$(FCUDEFINES)
 
 objs:  $(OBJS)
 lib:  objs

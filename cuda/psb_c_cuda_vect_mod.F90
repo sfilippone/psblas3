@@ -28,7 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module psb_c_cuda_vect_mod
   use iso_c_binding
@@ -45,20 +44,19 @@ module psb_c_cuda_vect_mod
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
   
-  type, extends(psb_c_base_vect_type) ::  psb_c_vect_cuda
-    integer     :: state      = is_host
-    type(c_ptr) :: deviceVect = c_null_ptr
+  type, extends(psb_c_base_vect_type) :: psb_c_vect_cuda
+    integer                     :: state      = is_host
+    type(c_ptr)                 :: deviceVect = c_null_ptr
     complex(c_float_complex), allocatable :: pinned_buffer(:)
-    type(c_ptr) :: dt_p_buf = c_null_ptr
+    type(c_ptr)                 :: dt_p_buf = c_null_ptr
     complex(c_float_complex), allocatable :: buffer(:)
-    type(c_ptr) :: dt_buf = c_null_ptr
-    integer :: dt_buf_sz = 0
-    type(c_ptr) :: i_buf = c_null_ptr
-    integer :: i_buf_sz = 0
+    type(c_ptr)                 :: dt_buf = c_null_ptr
+    integer                     :: dt_buf_sz = 0
+    type(c_ptr)                 :: i_buf = c_null_ptr
+    integer                     :: i_buf_sz = 0
   contains
     procedure, pass(x) :: get_nrows => c_cuda_get_nrows
     procedure, nopass  :: get_fmt   => c_cuda_get_fmt
-
     procedure, pass(x) :: all      => c_cuda_all
     procedure, pass(x) :: zero     => c_cuda_zero
     procedure, pass(x) :: asb_m    => c_cuda_asb_m
@@ -76,7 +74,7 @@ module psb_c_cuda_vect_mod
     procedure, pass(x) :: set_dev  => c_cuda_set_dev
     procedure, pass(x) :: set_sync => c_cuda_set_sync
     procedure, pass(x) :: set_scal => c_cuda_set_scal
-!!$    procedure, pass(x) :: set_vect => c_cuda_set_vect
+    !!$ procedure, pass(x) :: set_vect => c_cuda_set_vect
     procedure, pass(x) :: gthzv_x  => c_cuda_gthzv_x
     procedure, pass(y) :: sctb     => c_cuda_sctb
     procedure, pass(y) :: sctb_x   => c_cuda_sctb_x
@@ -113,596 +111,570 @@ module psb_c_cuda_vect_mod
   end interface psb_c_vect_cuda_
 
 contains
-  
   function constructor(x) result(this)
-    complex(psb_spk_)       :: x(:)
+    complex(psb_spk_)        :: x(:)
     type(psb_c_vect_cuda) :: this
+
     integer(psb_ipk_) :: info
 
     this%v = x
-    call this%asb(size(x),info)
-
+    call this%asb(size(x), info)
   end function constructor
     
   subroutine c_cuda_device_wait()
     call psb_cudaSync()
   end subroutine c_cuda_device_wait
 
-  subroutine c_cuda_new_buffer(n,x,info)
+  subroutine c_cuda_new_buffer(n, x, info)
     use psb_realloc_mod
     use psb_cuda_env_mod
-    implicit none 
+    implicit none
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)              :: n
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)        :: info
 
-
-    if (psb_cuda_DeviceHasUVA()) then       
-      if (allocated(x%combuf)) then 
-        if (size(x%combuf)<n) then 
+    if(psb_cuda_DeviceHasUVA()) then       
+      if(allocated(x%combuf)) then 
+        if(size(x%combuf) < n) then 
           call inner_unregister(x%combuf)
-          deallocate(x%combuf,stat=info)
+          deallocate(x%combuf, stat = info)
         end if
       end if
-      if (.not.allocated(x%combuf)) then 
-        call psb_realloc(n,x%combuf,info)
-        if (info == 0) info = inner_register(x%combuf,x%dt_p_buf)        
+      if(.not. allocated(x%combuf)) then 
+        call psb_realloc(n, x%combuf, info)
+        if(info == psb_success_) info = inner_register(x%combuf, x%dt_p_buf)      
       end if
     else
-      call psb_realloc(n,x%combuf,info)
+      call psb_realloc(n, x%combuf, info)
     end if
-    if (c_associated(x%dt_buf)) then 
-      if (x%dt_buf_sz < n) then
+
+    if(c_associated(x%dt_buf)) then 
+      if(x%dt_buf_sz < n) then
         call freeFloatComplex(x%dt_buf)
         x%dt_buf = c_null_ptr
         x%dt_buf_sz = 0
       end if
     end if
-    if (.not.c_associated(x%dt_buf)) then
-      info       =  allocateFloatComplex(x%dt_buf,n)
+
+    if(.not. c_associated(x%dt_buf)) then
+      info = allocateFloatComplex(x%dt_buf, n)
       x%dt_buf_sz = n
     end if
-    if (c_associated(x%i_buf)) then 
-      if (x%i_buf_sz < n) then
+
+    if(c_associated(x%i_buf)) then 
+      if(x%i_buf_sz < n) then
         call freeInt(x%i_buf)
         x%i_buf = c_null_ptr
         x%i_buf_sz = 0
       end if
     end if
-    if (.not.c_associated(x%i_buf)) then
-      info       =  allocateInt(x%i_buf,n)
+
+    if(.not.c_associated(x%i_buf)) then
+      info = allocateInt(x%i_buf, n)
       x%i_buf_sz = n
     end if
-
   end subroutine c_cuda_new_buffer
 
-  subroutine c_cuda_maybe_free_buffer(x,info)
+  subroutine c_cuda_maybe_free_buffer(x, info)
     use psb_realloc_mod
     use psb_cuda_env_mod
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)        :: info
 
-    info = 0 
-    if (psb_cuda_get_maybe_free_buffer()) &
-         & call x%free_buffer(info)
+    info = psb_success_ 
+    if(psb_cuda_get_maybe_free_buffer()) call x%free_buffer(info)
   end subroutine c_cuda_maybe_free_buffer
 
-  subroutine c_cuda_free_buffer(x,info)
+  subroutine c_cuda_free_buffer(x, info)
     use psb_realloc_mod
     use psb_cuda_env_mod
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(out)             :: info
+    integer(psb_ipk_), intent(out)        :: info
     
-    if (allocated(x%pinned_buffer)) then 
+    if(allocated(x%pinned_buffer)) then 
       call inner_unregister(x%pinned_buffer)
-      deallocate(x%pinned_buffer, stat=info)
+      deallocate(x%pinned_buffer, stat = info)
     end if
-    if (allocated(x%combuf)) then 
-      if (psb_cuda_DeviceHasUVA()) &
-           & call inner_unregister(x%combuf)
-      deallocate(x%combuf, stat=info)
+
+    if(allocated(x%combuf)) then 
+      if(psb_cuda_DeviceHasUVA()) call inner_unregister(x%combuf)
+      deallocate(x%combuf, stat = info)
     end if
-    if (allocated(x%buffer)) then 
-      deallocate(x%buffer, stat=info)
+
+    if(allocated(x%buffer)) then 
+      deallocate(x%buffer, stat = info)
     end if
-    if (c_associated(x%dt_buf)) then 
+
+    if(c_associated(x%dt_buf)) then 
       call freeFloatComplex(x%dt_buf)
       x%dt_buf  = c_null_ptr
     end if
-    if (c_associated(x%i_buf)) then 
+
+    if(c_associated(x%i_buf)) then 
       call freeInt(x%i_buf)
       x%i_buf = c_null_ptr
     end if
-    x%dt_buf_sz=0
-    x%i_buf_sz=0
 
+    x%dt_buf_sz = 0
+    x%i_buf_sz = 0
   end subroutine c_cuda_free_buffer
 
   subroutine c_cuda_check_addr(x)
     class(psb_c_vect_cuda), intent(inout) :: x
+
     integer(psb_ipk_) info;
-    select type(ii=> x) 
-    class is (psb_c_vect_cuda) 
-      info = checkMultiVecDeviceFloatComplex(x%deviceVect)      
-    class default
-      write(0,*) 'Check addr: cuda  version, why am I here? '
+    select type(ii => x) 
+      class is (psb_c_vect_cuda) 
+        info = checkMultiVecDeviceFloatComplex(x%deviceVect)
+      class default
+        write(0, *) 'Check addr: cuda version, why am I here? '
     end select
   end subroutine c_cuda_check_addr
 
-  subroutine c_cuda_gthzv_x(i,n,idx,x,y)
+  subroutine c_cuda_gthzv_x(i, n, idx, x, y)
     use psb_cuda_env_mod
     use psi_serial_mod
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_)           :: i
+    integer(psb_mpk_)           :: n
     class(psb_i_base_vect_type) :: idx
-    complex(psb_spk_) ::  y(:)
-    class(psb_c_vect_cuda) :: x
-    integer ::  info, ni
+    class(psb_c_vect_cuda)      :: x
+    complex(psb_spk_)              :: y(:)
+    
+    integer :: info, ni
 
-    info = 0 
+    info = psb_success_
 
-    select type(ii=> idx) 
-    class is (psb_i_vect_cuda) 
-      if (ii%is_host()) call ii%sync()
-      if (x%is_host())  call x%sync()
+    select type(ii => idx) 
+      class is (psb_i_vect_cuda) 
+        if(ii%is_host()) call ii%sync()
+        if(x%is_host())  call x%sync()
 
-      if (psb_cuda_DeviceHasUVA()) then 
-        !
-        ! Only need a sync in this branch; in the others
-        ! cudamemCpy acts as a sync point.
-        !
-        if (allocated(x%pinned_buffer)) then  
-          if (size(x%pinned_buffer) < n) then 
-            call inner_unregister(x%pinned_buffer)
-            deallocate(x%pinned_buffer, stat=info)
+        if(psb_cuda_DeviceHasUVA()) then 
+          !
+          ! Only need a sync in this branch; in the others
+          ! cudamemCpy acts as a sync point.
+          !
+          if(allocated(x%pinned_buffer)) then  
+            if(size(x%pinned_buffer) < n) then 
+              call inner_unregister(x%pinned_buffer)
+              deallocate(x%pinned_buffer, stat = info)
+            end if
           end if
-        end if
 
-        if (.not.allocated(x%pinned_buffer)) then
-          allocate(x%pinned_buffer(n),stat=info)
-          if (info == 0) info = inner_register(x%pinned_buffer,x%dt_p_buf)        
-          if (info /= 0) &
-               & write(0,*) 'Error from inner_register ',info
+          if(.not. allocated(x%pinned_buffer)) then
+            allocate(x%pinned_buffer(n), stat = info)
+            if(info == psb_success_) info = inner_register(x%pinned_buffer, x%dt_p_buf)        
+            if(info /= psb_success_) write(0, *) 'Error from inner_register ', info
+          endif
+
+          info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect, 0, n, i, &
+                                          & ii%deviceVect, 1, x%dt_p_buf, 1)
+          call psb_cudaSync()
+          y(1 : n) = x%pinned_buffer(1 : n)
+        else
+          if(allocated(x%buffer)) then 
+            if(size(x%buffer) < n) then 
+              deallocate(x%buffer, stat = info)
+            end if
+          end if
+
+          if(.not. allocated(x%buffer)) then
+            allocate(x%buffer(n), stat = info)
+          end if
+
+          if(x%dt_buf_sz < n) then 
+            if(c_associated(x%dt_buf)) then 
+              call freeFloatComplex(x%dt_buf)
+              x%dt_buf = c_null_ptr
+            end if
+            info = allocateFloatComplex(x%dt_buf, n)
+            x%dt_buf_sz = n
+          end if
+          if(info == psb_success_) info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect, &
+                                                  & 0, n, i, ii%deviceVect, 1, x%dt_buf, 1)
+          if(info == psb_success_) info = readFloatComplex(x%dt_buf, y, n)
         endif
-        info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect,&
-             & 0, n, i, ii%deviceVect, 1, x%dt_p_buf, 1)
-        call psb_cudaSync()
-        y(1:n) = x%pinned_buffer(1:n)
 
-      else
-        if (allocated(x%buffer)) then 
-          if (size(x%buffer) < n) then 
-            deallocate(x%buffer, stat=info)
+      class default
+        ! Do not go for brute force, but move the index vector
+        ni = size(ii%v)
+
+        if(x%i_buf_sz < ni) then 
+          if(c_associated(x%i_buf)) then 
+            call freeInt(x%i_buf)
+            x%i_buf = c_null_ptr
+          end if
+          info = allocateInt(x%i_buf, ni)
+          x%i_buf_sz = ni
+        end if
+
+        if(allocated(x%buffer)) then 
+          if(size(x%buffer) < n) then 
+            deallocate(x%buffer, stat = info)
           end if
         end if
 
-        if (.not.allocated(x%buffer)) then
-          allocate(x%buffer(n),stat=info)
+        if(.not. allocated(x%buffer)) then
+          allocate(x%buffer(n), stat = info)
         end if
 
-        if (x%dt_buf_sz < n) then 
-          if (c_associated(x%dt_buf)) then 
+        if(x%dt_buf_sz < n) then 
+          if(c_associated(x%dt_buf)) then 
             call freeFloatComplex(x%dt_buf)
             x%dt_buf = c_null_ptr
           end if
-          info =  allocateFloatComplex(x%dt_buf,n)
-          x%dt_buf_sz=n
+          info = allocateFloatComplex(x%dt_buf, n)
+          x%dt_buf_sz = n
         end if
-        if (info == 0) &
-             & info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect,&
-             & 0, n, i, ii%deviceVect, 1, x%dt_buf, 1)
-        if (info == 0) &
-             &  info = readFloatComplex(x%dt_buf,y,n)
 
-      endif
-
-    class default
-      ! Do not go for brute force, but move the index vector
-      ni = size(ii%v)
-
-      if (x%i_buf_sz < ni) then 
-        if (c_associated(x%i_buf)) then 
-          call freeInt(x%i_buf)
-          x%i_buf = c_null_ptr
-        end if
-        info =  allocateInt(x%i_buf,ni)
-        x%i_buf_sz=ni
-      end if
-      if (allocated(x%buffer)) then 
-        if (size(x%buffer) < n) then 
-          deallocate(x%buffer, stat=info)
-        end if
-      end if
-
-      if (.not.allocated(x%buffer)) then
-        allocate(x%buffer(n),stat=info)
-      end if
-
-      if (x%dt_buf_sz < n) then 
-        if (c_associated(x%dt_buf)) then 
-          call freeFloatComplex(x%dt_buf)
-            x%dt_buf = c_null_ptr
-          end if
-        info =  allocateFloatComplex(x%dt_buf,n)
-        x%dt_buf_sz=n
-      end if
-
-      if (info == 0) &
-           & info = writeInt(x%i_buf,ii%v,ni)
-      if (info == 0) &
-           & info = igathMultiVecDeviceFloatComplex(x%deviceVect,&
-           & 0, n, i, x%i_buf, 1, x%dt_buf, 1)
-      if (info == 0) &
-           &  info = readFloatComplex(x%dt_buf,y,n)
-
+        if(info == psb_success_) info = writeInt(x%i_buf, ii%v, ni)
+        if(info == psb_success_) info = igathMultiVecDeviceFloatComplex(x%deviceVect, &
+                                            & 0, n, i, x%i_buf, 1, x%dt_buf, 1)
+        if(info == psb_success_) info = readFloatComplex(x%dt_buf, y, n)
     end select
-    
   end subroutine c_cuda_gthzv_x
 
-  subroutine c_cuda_gthzbuf(i,n,idx,x)
+  subroutine c_cuda_gthzbuf(i, n, idx, x)
     use psb_cuda_env_mod
     use psi_serial_mod
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_)           :: i
+    integer(psb_mpk_)           :: n
     class(psb_i_base_vect_type) :: idx
-    class(psb_c_vect_cuda)       :: x
-    integer ::  info, ni
+    class(psb_c_vect_cuda)      :: x
 
-    info = 0 
-!!$    write(0,*) 'Starting gth_zbuf'
-    if (.not.allocated(x%combuf)) then
-      call psb_errpush(psb_err_alloc_dealloc_,'gthzbuf')
+    integer ::  info, ni
+    info = psb_success_
+    !!$  write(0, *) 'Starting gth_zbuf'
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf')
       return
     end if
 
-    select type(ii=> idx) 
-    class is (psb_i_vect_cuda) 
-      if (ii%is_host()) call ii%sync()
-      if (x%is_host())  call x%sync()
+    select type(ii => idx) 
+      class is (psb_i_vect_cuda) 
+        if(ii%is_host()) call ii%sync()
+        if(x%is_host())  call x%sync()
 
-      if (psb_cuda_DeviceHasUVA()) then 
-        info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect,&
-             & 0, n, i, ii%deviceVect, i,x%dt_p_buf, 1)
+        if(psb_cuda_DeviceHasUVA()) then 
+          info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect, &
+                            & 0, n, i, ii%deviceVect, i, x%dt_p_buf, 1)
+        else
+          info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect, &
+                              & 0, n, i, ii%deviceVect, i, x%dt_buf, 1)
+          if(info == psb_success_) info = readFloatComplex(i, x%dt_buf, x%combuf(i:), n, 1)
+        endif
 
-      else
-        info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect,&
-             & 0, n, i, ii%deviceVect, i,x%dt_buf, 1)
-        if (info == 0) &
-             &  info = readFloatComplex(i,x%dt_buf,x%combuf(i:),n,1)
-      endif
+      class default
+        ! Do not go for brute force, but move the index vector
+        ni = size(ii%v)
+        info = psb_success_
+        if(.not. c_associated(x%i_buf)) then 
+          info = allocateInt(x%i_buf, ni)
+          x%i_buf_sz = ni
+        end if
 
-    class default
-      ! Do not go for brute force, but move the index vector
-      ni = size(ii%v)
-      info = 0 
-      if (.not.c_associated(x%i_buf)) then 
-        info =  allocateInt(x%i_buf,ni)
-        x%i_buf_sz=ni
-      end if
-      if (info == 0) &
-           & info = writeInt(i,x%i_buf,ii%v(i:),n,1)
-
-      if (info == 0) &
-           & info = igathMultiVecDeviceFloatComplex(x%deviceVect,&
-           & 0, n, i, x%i_buf, i,x%dt_buf, 1)
-      
-      if (info == 0) &
-           &  info = readFloatComplex(i,x%dt_buf,x%combuf(i:),n,1)
-
+        if(info == psb_success_) info = writeInt(i, x%i_buf, ii%v(i:), n, 1)
+        if(info == psb_success_) info = igathMultiVecDeviceFloatComplex(x%deviceVect, &
+                                              & 0, n, i, x%i_buf, i, x%dt_buf, 1)
+        if(info == psb_success_) info = readFloatComplex(i, x%dt_buf, x%combuf(i:), n, 1)
     end select
-
   end subroutine c_cuda_gthzbuf
 
-  subroutine c_cuda_sctb(n,idx,x,beta,y)
+  subroutine c_cuda_sctb(n, idx, x, beta, y)
     implicit none
     !use psb_const_mod
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: idx(:)
-    complex(psb_spk_)        :: beta, x(:)
-    class(psb_c_vect_cuda) :: y
+    integer(psb_mpk_)       :: n
+    integer(psb_ipk_)       :: idx(:)
+    complex(psb_spk_)          :: x(:), beta
+    class(psb_c_vect_cuda)  :: y
+
     integer(psb_ipk_)     :: info
 
-    if (n == 0) return
-    
-    if (y%is_dev())  call y%sync()
-          
-    call y%psb_c_base_vect_type%sctb(n,idx,x,beta)
-    call y%set_host()
+    if(n == 0) return
 
+    if(y%is_dev()) call y%sync()
+
+    call y%psb_c_base_vect_type%sctb(n, idx, x, beta)
+    call y%set_host()
   end subroutine c_cuda_sctb
 
-  subroutine c_cuda_sctb_x(i,n,idx,x,beta,y)
+  subroutine c_cuda_sctb_x(i, n, idx, x, beta, y)
     use psb_cuda_env_mod
     use psi_serial_mod
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
+    integer(psb_ipk_)           :: i
+    integer(psb_mpk_)           :: n
     class(psb_i_base_vect_type) :: idx
-    complex(psb_spk_) :: beta, x(:)
-    class(psb_c_vect_cuda) :: y
+    complex(psb_spk_)              :: x(:), beta
+    class(psb_c_vect_cuda)      :: y
+
     integer :: info, ni
 
-    select type(ii=> idx) 
-    class is (psb_i_vect_cuda) 
-      if (ii%is_host()) call ii%sync()
-      if (y%is_host())  call y%sync()
-      
-      ! 
-      if (psb_cuda_DeviceHasUVA()) then 
-        if (allocated(y%pinned_buffer)) then  
-          if (size(y%pinned_buffer) < n) then 
-            call inner_unregister(y%pinned_buffer)
-            deallocate(y%pinned_buffer, stat=info)
+    select type(ii => idx) 
+      class is (psb_i_vect_cuda) 
+        if(ii%is_host()) call ii%sync()
+        if(y%is_host())  call y%sync()
+        
+        if(psb_cuda_DeviceHasUVA()) then 
+          if(allocated(y%pinned_buffer)) then  
+            if(size(y%pinned_buffer) < n) then 
+              call inner_unregister(y%pinned_buffer)
+              deallocate(y%pinned_buffer, stat = info)
+            end if
+          end if
+
+          if(.not. allocated(y%pinned_buffer)) then
+            allocate(y%pinned_buffer(n), stat = info)
+            if(info == psb_success_) info = inner_register(y%pinned_buffer, y%dt_p_buf)        
+            if(info /= psb_success_) write(0, *) 'Error from inner_register ', info
+          endif
+
+          y%pinned_buffer(1:n) = x(1:n) 
+          info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect, 0, n, i, &
+                                  & ii%deviceVect, 1, y%dt_p_buf, 1, beta)
+        else
+          if(allocated(y%buffer)) then 
+            if(size(y%buffer) < n) then 
+              deallocate(y%buffer, stat = info)
+            end if
+          end if
+          
+          if(.not. allocated(y%buffer)) then
+            allocate(y%buffer(n), stat = info)
+          end if
+
+          if(y%dt_buf_sz < n) then 
+            if(c_associated(y%dt_buf)) then 
+              call freeFloatComplex(y%dt_buf)
+              y%dt_buf = c_null_ptr
+            end if
+            info = allocateFloatComplex(y%dt_buf, n)
+            y%dt_buf_sz = n
+          end if
+          info = writeFloatComplex(y%dt_buf, x, n)
+          info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect, 0, n, i, &
+                                    & ii%deviceVect, 1, y%dt_buf, 1, beta)
+        end if
+        
+      class default
+        ni = size(ii%v)
+        
+        if(y%i_buf_sz < ni) then 
+          if(c_associated(y%i_buf)) then 
+            call freeInt(y%i_buf)
+            y%i_buf = c_null_ptr
+          end if
+          info = allocateInt(y%i_buf, ni)
+          y%i_buf_sz = ni
+        end if
+
+        if(allocated(y%buffer)) then 
+          if(size(y%buffer) < n) then 
+            deallocate(y%buffer, stat = info)
           end if
         end if
 
-        if (.not.allocated(y%pinned_buffer)) then
-          allocate(y%pinned_buffer(n),stat=info)
-          if (info == 0) info = inner_register(y%pinned_buffer,y%dt_p_buf)        
-          if (info /= 0) &
-               & write(0,*) 'Error from inner_register ',info
-        endif
-        y%pinned_buffer(1:n) = x(1:n) 
-        info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
-             & 0, n, i, ii%deviceVect, 1, y%dt_p_buf, 1,beta)
-      else
-        
-        if (allocated(y%buffer)) then 
-          if (size(y%buffer) < n) then 
-            deallocate(y%buffer, stat=info)
-          end if
-        end if
-        
-        if (.not.allocated(y%buffer)) then
-          allocate(y%buffer(n),stat=info)
+        if(.not. allocated(y%buffer)) then
+          allocate(y%buffer(n), stat = info)
         end if
 
-        if (y%dt_buf_sz < n) then 
-          if (c_associated(y%dt_buf)) then 
+        if(y%dt_buf_sz < n) then 
+          if(c_associated(y%dt_buf)) then 
             call freeFloatComplex(y%dt_buf)
             y%dt_buf = c_null_ptr
           end if
-          info =  allocateFloatComplex(y%dt_buf,n)
-          y%dt_buf_sz=n
+          info = allocateFloatComplex(y%dt_buf, n)
+          y%dt_buf_sz = n
         end if
-        info = writeFloatComplex(y%dt_buf,x,n)
-        info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
-             & 0, n, i, ii%deviceVect, 1, y%dt_buf, 1,beta)
 
-      end if
-      
-    class default
-      ni = size(ii%v)
-      
-      if (y%i_buf_sz < ni) then 
-        if (c_associated(y%i_buf)) then 
-          call freeInt(y%i_buf)
-          y%i_buf = c_null_ptr
-        end if
-        info =  allocateInt(y%i_buf,ni)
-        y%i_buf_sz=ni
-      end if
-      if (allocated(y%buffer)) then 
-        if (size(y%buffer) < n) then 
-          deallocate(y%buffer, stat=info)
-        end if
-      end if
-
-      if (.not.allocated(y%buffer)) then
-        allocate(y%buffer(n),stat=info)
-      end if
-
-      if (y%dt_buf_sz < n) then 
-        if (c_associated(y%dt_buf)) then 
-          call freeFloatComplex(y%dt_buf)
-          y%dt_buf = c_null_ptr
-        end if
-        info =  allocateFloatComplex(y%dt_buf,n)
-        y%dt_buf_sz=n
-      end if
-
-      if (info == 0) &
-           & info = writeInt(y%i_buf,ii%v(i:i+n-1),n)
-      info = writeFloatComplex(y%dt_buf,x,n)
-      info = iscatMultiVecDeviceFloatComplex(y%deviceVect,&
-           & 0, n, 1, y%i_buf, 1, y%dt_buf, 1,beta)
-
-
+        if(info == psb_success_) info = writeInt(y%i_buf, ii%v(i:i+n-1), n)
+        info = writeFloatComplex(y%dt_buf, x, n)
+        info = iscatMultiVecDeviceFloatComplex(y%deviceVect, 0, n, 1, &
+                                  & y%i_buf, 1, y%dt_buf, 1, beta)
     end select
+
     !
     !  Need a sync here to make sure we are not reallocating
     !  the buffers before iscatMulti has finished.
     !
     call psb_cudaSync()       
     call y%set_dev()
-
   end subroutine c_cuda_sctb_x
 
-  subroutine c_cuda_sctb_buf(i,n,idx,beta,y)
+  subroutine c_cuda_sctb_buf(i, n, idx, beta, y)
     use psi_serial_mod
     use psb_cuda_env_mod
-    implicit none 
-    integer(psb_mpk_) :: n
-    integer(psb_ipk_) :: i
+    implicit none
+    integer(psb_ipk_)           :: i
+    integer(psb_mpk_)           :: n
     class(psb_i_base_vect_type) :: idx
-    complex(psb_spk_) :: beta
-    class(psb_c_vect_cuda) :: y
+    complex(psb_spk_)              :: beta
+    class(psb_c_vect_cuda)      :: y
+
     integer(psb_ipk_) :: info, ni
     
-!!$    write(0,*) 'Starting sctb_buf'
-    if (.not.allocated(y%combuf)) then 
-      call psb_errpush(psb_err_alloc_dealloc_,'sctb_buf')
+    !!$  write(0, *) 'Starting sctb_buf'
+    if(.not. allocated(y%combuf)) then 
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf')
       return
     end if
     
+    select type(ii => idx) 
+      class is (psb_i_vect_cuda) 
+        if(ii%is_host()) call ii%sync()
+        if(y%is_host())  call y%sync()
+        if(psb_cuda_DeviceHasUVA()) then 
+          info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect, 0, n, i, &
+                                  & ii%deviceVect, i, y%dt_p_buf, 1, beta)
+        else 
+          info = writeFloatComplex(i, y%dt_buf, y%combuf(i:), n, 1)
+          info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect, 0, n, i, &
+                                    & ii%deviceVect, i, y%dt_buf, 1, beta)
+        end if
 
-    select type(ii=> idx) 
-    class is (psb_i_vect_cuda) 
-              
-      if (ii%is_host()) call ii%sync()
-      if (y%is_host())  call y%sync()
-      if (psb_cuda_DeviceHasUVA()) then 
-        info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
-             & 0, n, i, ii%deviceVect, i, y%dt_p_buf, 1,beta)
-      else 
-        info = writeFloatComplex(i,y%dt_buf,y%combuf(i:),n,1)
-        info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
-             & 0, n, i, ii%deviceVect, i, y%dt_buf, 1,beta)
-
-      end if
-
-    class default
-      !call y%sct(n,ii%v(i:),x,beta)
-      ni = size(ii%v)
-      info = 0 
-      if (.not.c_associated(y%i_buf)) then 
-        info =  allocateInt(y%i_buf,ni)
-        y%i_buf_sz=ni
-      end if
-      if (info == 0) &
-           & info = writeInt(i,y%i_buf,ii%v(i:),n,1)
-      if (info == 0) &
-           & info = writeFloatComplex(i,y%dt_buf,y%combuf(i:),n,1)
-      if (info == 0) info = iscatMultiVecDeviceFloatComplex(y%deviceVect,&
-           & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
+      class default
+        !call y%sct(n, ii%v(i:), x, beta)
+        ni = size(ii%v)
+        info = psb_success_
+        if(.not.c_associated(y%i_buf)) then 
+          info = allocateInt(y%i_buf, ni)
+          y%i_buf_sz = ni
+        end if
+        if(info == psb_success_) info = writeInt(i, y%i_buf, ii%v(i:), n, 1)
+        if(info == psb_success_) info = writeFloatComplex(i, y%dt_buf, y%combuf(i:), n, 1)
+        if(info == psb_success_) info = iscatMultiVecDeviceFloatComplex(y%deviceVect, &
+                                        & 0, n, i, y%i_buf, i, y%dt_buf, 1, beta)
     end select
-!!$    write(0,*) 'Done sctb_buf'
-
+    !!$  write(0, *) 'Done sctb_buf'
   end subroutine c_cuda_sctb_buf
 
-
-  subroutine c_cuda_bld_x(x,this,scratch)
+  subroutine c_cuda_bld_x(x, this, scratch)
     use psb_base_mod
-    complex(psb_spk_), intent(in)           :: this(:)
     class(psb_c_vect_cuda), intent(inout) :: x
-    logical, intent(in), optional        :: scratch
+    complex(psb_spk_), intent(in)            :: this(:)
+    logical, intent(in), optional :: scratch
 
     logical :: scratch_
     integer(psb_ipk_) :: info
 
-    if (present(scratch)) then
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    call psb_realloc(size(this),x%v,info)
-    if (info /= 0) then 
-      info=psb_err_alloc_request_
-      call psb_errpush(info,'c_cuda_bld_x',&
-           & i_err=(/size(this),izero,izero,izero,izero/))
+
+    call psb_realloc(size(this), x%v, info)
+    if(info /= psb_success_) then 
+      info = psb_err_alloc_request_
+      call psb_errpush(info, 'c_cuda_bld_x', i_err = (/size(this), izero, izero, izero, izero/))
     end if
-    x%v(:)  = this(:) 
+
+    x%v(:) = this(:) 
     call x%set_host()
     call x%sync()
-
   end subroutine c_cuda_bld_x
 
-  subroutine c_cuda_bld_mn(x,n,scratch)
-    integer(psb_mpk_), intent(in) :: n
+  subroutine c_cuda_bld_mn(x, n, scratch)
     class(psb_c_vect_cuda), intent(inout) :: x
-    logical, intent(in), optional        :: scratch
+    integer(psb_mpk_), intent(in)         :: n
+    logical, intent(in), optional :: scratch
 
     logical :: scratch_
     integer(psb_ipk_) :: info
 
-    if (present(scratch)) then
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    call x%all(n,info)
-    if (info /= 0) then 
-      call psb_errpush(info,'c_cuda_bld_n',i_err=(/n,n,n,n,n/))
-    end if
-    
+
+    call x%all(n, info)
+    if(info /= psb_success_)call psb_errpush(info, 'c_cuda_bld_n', i_err=(/n, n, n, n, n/))
   end subroutine c_cuda_bld_mn
 
   subroutine c_cuda_set_host(x)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
     
     x%state = is_host
   end subroutine c_cuda_set_host
 
   subroutine c_cuda_set_dev(x)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
     
     x%state = is_dev
   end subroutine c_cuda_set_dev
 
   subroutine c_cuda_set_sync(x)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
     
     x%state = is_sync
   end subroutine c_cuda_set_sync
 
   function c_cuda_is_dev(x) result(res)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(in) :: x
-    logical  :: res
+    logical :: res
   
     res = (x%state == is_dev)
   end function c_cuda_is_dev
   
   function c_cuda_is_host(x) result(res)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = (x%state == is_host)
   end function c_cuda_is_host
 
   function c_cuda_is_sync(x) result(res)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(in) :: x
-    logical  :: res
+    logical :: res
 
     res = (x%state == is_sync)
   end function c_cuda_is_sync
 
-  
   function c_cuda_get_nrows(x) result(res)
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(in) :: x
     integer(psb_ipk_) :: res
 
-    res = 0
-    if (allocated(x%v)) res = size(x%v)
+    res = izero
+    if(allocated(x%v)) res = size(x%v)
   end function c_cuda_get_nrows
 
   function c_cuda_get_fmt() result(res)
-    implicit none 
-    character(len=5) :: res
+    implicit none
+    character(len=5)  :: res
     res = 'cGPU'
   end function c_cuda_get_fmt
   
   subroutine c_cuda_all(n, x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)      :: n
+    implicit none
+    integer(psb_ipk_), intent(in)       :: n
     class(psb_c_vect_cuda), intent(out) :: x
-    integer(psb_ipk_), intent(out)     :: info
+    integer(psb_ipk_), intent(out)      :: info
     
-    call psb_realloc(n,x%v,info)
-    if (info == 0) call x%set_host()
-    if (info == 0) call x%sync_space(info)
-    if (info /= 0) then 
-      info=psb_err_alloc_request_
-      call psb_errpush(info,'c_cuda_all',&
-           & i_err=(/n,n,n,n,n/))
+    call psb_realloc(n, x%v, info)
+    if(info == psb_success_) call x%set_host()
+    if(info == psb_success_) call x%sync_space(info)
+    if(info /= psb_success_) then 
+      info = psb_err_alloc_request_
+      call psb_errpush(info, 'c_cuda_all', i_err = (/n, n, n, n, n/))
     end if
   end subroutine c_cuda_all
 
   subroutine c_cuda_zero(x)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    ! Since we are overwriting, make sure to do it
-    ! on the GPU side
+    ! Since we are overwriting, make sure to do it on the GPU side
     call x%set_dev()
     call x%set_scal(czero)
   end subroutine c_cuda_zero
@@ -710,127 +682,118 @@ contains
   subroutine c_cuda_asb_m(n, x, info, scratch)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
-    integer(psb_mpk_), intent(in)        :: n
+    implicit none
+    integer(psb_mpk_), intent(in)         :: n
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(out)       :: info
-    logical, intent(in), optional        :: scratch
+    integer(psb_ipk_), intent(out)        :: info
+    logical, intent(in), optional :: scratch
 
     logical :: scratch_
     integer(psb_mpk_) :: nd
 
-    if (present(scratch)) then
+    if(present(scratch)) then
       scratch_ = scratch
     else
       scratch_ = .false.
     end if
-    if (x%is_dev()) then 
-      nd  = getMultiVecDeviceSize(x%deviceVect)
-      if (nd < n) then 
+
+    if(x%is_dev()) then 
+      nd = getMultiVecDeviceSize(x%deviceVect)
+      if(nd < n) then 
         call x%sync()
-        call x%psb_c_base_vect_type%asb(n,info,scratch=scratch_)      
-        if (info == psb_success_) call x%sync_space(info)
+        call x%psb_c_base_vect_type%asb(n, info, scratch = scratch_)      
+        if(info == psb_success_) call x%sync_space(info)
         call x%set_host()
       end if
-    else   !
-      if (x%get_nrows()<n) then 
-        call x%psb_c_base_vect_type%asb(n,info,scratch=scratch_)      
-        if (info == psb_success_) call x%sync_space(info)
+    else
+      if(x%get_nrows() < n) then 
+        call x%psb_c_base_vect_type%asb(n, info, scratch = scratch_)      
+        if(info == psb_success_) call x%sync_space(info)
         call x%set_host()      
       end if
     end if
-
   end subroutine c_cuda_asb_m
 
-  subroutine c_cuda_sync_space(x,info)
+  subroutine c_cuda_sync_space(x, info)
     use psb_base_mod, only : psb_realloc
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(out)       :: info 
+    integer(psb_ipk_), intent(out)        :: info 
+
     integer(psb_ipk_) :: nh, nd
     
-    info = 0
-    if (x%is_dev()) then 
-      ! 
-      if (.not.allocated(x%v)) then 
-        nh = 0
-      else
-        nh    = size(x%v)
-      end if
-      nd  = getMultiVecDeviceSize(x%deviceVect)
-      if (nh < nd ) then 
-        call psb_realloc(nd,x%v,info)
-      end if
-    else  !    if (x%is_host()) then 
-      if (.not.allocated(x%v)) then 
-        nh = 0
-      else
-        nh    = size(x%v)
-      end if
-      if (c_associated(x%deviceVect)) then 
-        nd  = getMultiVecDeviceSize(x%deviceVect)
-        if (nd < nh ) then 
+    info = psb_success_ 
+    if(.not. allocated(x%v)) then 
+      nh = 0
+    else
+      nh = size(x%v)
+    end if
+
+    if(x%is_dev()) then
+      nd = getMultiVecDeviceSize(x%deviceVect)
+      if(nh < nd ) call psb_realloc(nd, x%v, info)
+    else
+      if(c_associated(x%deviceVect)) then 
+        nd = getMultiVecDeviceSize(x%deviceVect)
+        if(nd < nh ) then 
           call freeMultiVecDevice(x%deviceVect)
-          x%deviceVect=c_null_ptr
+          x%deviceVect = c_null_ptr
         end if
       end if
-      if (.not.c_associated(x%deviceVect)) then 
-        info = FallocMultiVecDevice(x%deviceVect,1,nh,spgpu_type_complex_float)
-        if  (info /= 0) then 
-          if (info == spgpu_outofmem) then 
-            info = psb_err_alloc_request_
-          end if
-        end if
+
+      if(.not. c_associated(x%deviceVect)) then 
+        info = FallocMultiVecDevice(x%deviceVect, 1, nh, spgpu_type_complex_float)
+        if(info == spgpu_outofmem) info = psb_err_alloc_request_
       end if
     end if
-    
   end subroutine c_cuda_sync_space
 
   subroutine c_cuda_sync(x)
     use psb_base_mod, only : psb_realloc
-    implicit none 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_) :: n,info
-    
-    info = 0
-    if (x%is_host()) then 
-      if (.not.c_associated(x%deviceVect)) then 
+
+    integer(psb_ipk_) :: n, info   
+    info = psb_success_
+
+    if(x%is_host()) then 
+      if(.not. c_associated(x%deviceVect)) then 
         n    = size(x%v)
-        info = FallocMultiVecDevice(x%deviceVect,1,n,spgpu_type_complex_float)
+        info = FallocMultiVecDevice(x%deviceVect, 1, n, spgpu_type_complex_float)
       end if
-      if (info == 0) &
-           & info = writeMultiVecDevice(x%deviceVect,x%v)
-    else if (x%is_dev()) then 
+      if(info == psb_success_) info = writeMultiVecDevice(x%deviceVect, x%v)
+    else if(x%is_dev()) then 
       n    = getMultiVecDeviceSize(x%deviceVect)
-      if (.not.allocated(x%v)) then 
-!!$        write(0,*) 'Incoherent situation : x%v not allocated'
-        call psb_realloc(n,x%v,info)
+      if(.not. allocated(x%v)) then 
+        !!$ write(0, *) 'Incoherent situation : x%v not allocated'
+        call psb_realloc(n, x%v, info)
       end if
-      if ((n > size(x%v)).or.(n > x%get_nrows())) then 
-!!$        write(0,*) 'Incoherent situation : sizes',n,size(x%v),x%get_nrows()
-        call psb_realloc(n,x%v,info)
+
+      if((n > size(x%v)) .or. (n > x%get_nrows())) then 
+        !!$ write(0, *) 'Incoherent situation : sizes', n, size(x%v), x%get_nrows()
+        call psb_realloc(n, x%v, info)
       end if
-      info = readMultiVecDevice(x%deviceVect,x%v)
+      info = readMultiVecDevice(x%deviceVect, x%v)
     end if
-    if (info == 0)  call x%set_sync()
-    if (info /= 0) then
-      info=psb_err_internal_error_
-      call psb_errpush(info,'c_cuda_sync')
+
+    if(info == psb_success_) call x%set_sync()
+    if(info /= psb_success_) then
+      info = psb_err_internal_error_
+      call psb_errpush(info, 'c_cuda_sync')
     end if
-    
   end subroutine c_cuda_sync
 
   subroutine c_cuda_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
-    class(psb_c_vect_cuda), intent(inout)  :: x
+    implicit none
+    class(psb_c_vect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)        :: info
     
-    info = 0  
-    if (allocated(x%v)) deallocate(x%v, stat=info)
-    if (c_associated(x%deviceVect)) then
-!!$      write(0,*)'d_cuda_free Calling freeMultiVecDevice'
+    info = psb_success_
+    if(allocated(x%v)) deallocate(x%v, stat = info)
+    if(c_associated(x%deviceVect)) then
+      !!$ write(0, *)'c_cuda_free Calling freeMultiVecDevice'
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect=c_null_ptr
     end if
@@ -838,33 +801,31 @@ contains
     call x%set_sync()
   end subroutine c_cuda_free
 
-  subroutine c_cuda_set_scal(x,val,first,last)
+  subroutine c_cuda_set_scal(x, val, first, last)
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    complex(psb_spk_), intent(in)           :: val
+    complex(psb_spk_), intent(in)            :: val
     integer(psb_ipk_), optional :: first, last
     
     integer(psb_ipk_) :: info, first_, last_
-    
     first_ = 1
     last_  = x%get_nrows()
-    if (present(first)) first_ = max(1,first)
-    if (present(last))  last_  = min(last,last_)
+    if(present(first)) first_ = max(1, first)
+    if(present(last))  last_  = min(last, last_)
     
-    info = setScalDevice(val,first_,last_,1,x%deviceVect)
+    info = setScalDevice(val, first_, last_, 1, x%deviceVect)
     call x%set_dev()
-    
   end subroutine c_cuda_set_scal
 
-
-
-  function c_cuda_dot_v(n,x,y) result(res)
-    implicit none 
-    class(psb_c_vect_cuda), intent(inout)       :: x
-    class(psb_c_base_vect_type), intent(inout) :: y
+  function c_cuda_dot_v(n, x, y) result(res)
+    implicit none
     integer(psb_ipk_), intent(in)              :: n
-    complex(psb_spk_)                :: res
+    class(psb_c_vect_cuda), intent(inout)      :: x
+    class(psb_c_base_vect_type), intent(inout) :: y
+    complex(psb_spk_)  :: res
+
     integer(psb_ipk_) :: info
-    
+
     res = czero
     !
     ! Note: this is the gpu implementation.
@@ -872,492 +833,468 @@ contains
     !  TYPE psb_c_vect
     !
     select type(yy => y)
-    type is (psb_c_vect_cuda)
-      if (x%is_host()) call x%sync()
-      if (yy%is_host()) call yy%sync()
-      info = dotMultiVecDevice(res,n,x%deviceVect,yy%deviceVect)
-      if (info /= 0) then 
-        info = psb_err_internal_error_
-        call psb_errpush(info,'c_cuda_dot_v')
-      end if
+      type is (psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(yy%is_host()) call yy%sync()
+        info = dotMultiVecDevice(res, n, x%deviceVect, yy%deviceVect)
+        if(info /= psb_success_) then 
+          info = psb_err_internal_error_
+          call psb_errpush(info, 'c_cuda_dot_v')
+        end if
 
-    class default
-      ! y%sync is done in dot_a
-      if (x%is_dev()) call x%sync()
-      res = y%dot(n,x%v)
+      class default
+        ! y%sync is done in dot_a
+        if(x%is_dev()) call x%sync()
+        res = y%dot(n, x%v)
     end select
-
   end function c_cuda_dot_v
 
-  function c_cuda_dot_a(n,x,y) result(res)
-    implicit none 
+  function c_cuda_dot_a(n, x, y) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_c_vect_cuda), intent(inout) :: x
-    complex(psb_spk_), intent(in)           :: y(:)
-    integer(psb_ipk_), intent(in)        :: n
-    complex(psb_spk_)                :: res
-    complex(psb_spk_), external      :: cdot
-    
-    if (x%is_dev()) call x%sync()
-    res = cdot(n,y,1,x%v,1)
+    complex(psb_spk_), intent(in)            :: y(:)
+    complex(psb_spk_)  :: res
 
+    complex(psb_spk_), external  :: cdot
+    
+    if(x%is_dev()) call x%sync()
+    res = cdot(n, y, 1, x%v, 1)
   end function c_cuda_dot_a
     
-  subroutine c_cuda_axpby_v(m,alpha, x, beta, y, info)
+  subroutine c_cuda_axpby_v(m, alpha, x, beta, y, info)
     use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)              :: m
-    class(psb_c_base_vect_type), intent(inout) :: x
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent (in)                 :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x
     class(psb_c_vect_cuda), intent(inout)       :: y
-    complex(psb_spk_), intent (in)                :: alpha, beta
-    integer(psb_ipk_), intent(out)             :: info
-    integer(psb_ipk_) :: nx, ny
+    integer(psb_ipk_), intent(out)              :: info
 
+    integer(psb_ipk_) :: nx, ny
     info = psb_success_
 
     select type(xx => x)
-    type is (psb_c_vect_cuda)
-      ! Do something different here 
-      if ((beta /= czero).and.y%is_host())&
-           &  call y%sync()
-      if (xx%is_host()) call xx%sync()
-      nx = getMultiVecDeviceSize(xx%deviceVect)
-      ny = getMultiVecDeviceSize(y%deviceVect)
-      if ((nx<m).or.(ny<m)) then
-        info = psb_err_internal_error_
-      else
-        info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
-      end if
-      call y%set_dev()
-    class default
-      ! Do it on the host side
-      if ((alpha /= czero).and.(x%is_dev()))&
-         & call x%sync()
-      call y%axpby(m,alpha,x%v,beta,info)
-    end select
+      type is (psb_c_vect_cuda)
+        ! Do something different here 
+        if((beta /= czero) .and. y%is_host()) call y%sync()
+        if(xx%is_host()) call xx%sync()
 
+        nx = getMultiVecDeviceSize(xx%deviceVect)
+        ny = getMultiVecDeviceSize(y%deviceVect)
+        if((nx < m) .or. (ny < m)) then
+          info = psb_err_internal_error_
+        else
+          info = axpbyMultiVecDevice(m, alpha, xx%deviceVect, beta, y%deviceVect)
+        end if
+        call y%set_dev()
+
+      class default
+        ! Do it on the host side
+        if((alpha /= czero) .and. (x%is_dev())) call x%sync()
+        call y%axpby(m, alpha, x%v, beta, info)
+    end select
   end subroutine c_cuda_axpby_v
 
-  subroutine c_cuda_upd_xyz(m,alpha, beta, gamma,delta,x, y, z, info)
+  subroutine c_cuda_upd_xyz(m, alpha, beta, gamma, delta, x, y, z, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_c_base_vect_type), intent(inout)  :: x
-    class(psb_c_base_vect_type), intent(inout)  :: y
-    class(psb_c_vect_cuda), intent(inout)  :: z
-    complex(psb_spk_), intent (in)       :: alpha, beta, gamma, delta
+    complex(psb_spk_), intent (in)                 :: alpha, beta, gamma, delta
+    class(psb_c_base_vect_type), intent(inout)  :: x, y
+    class(psb_c_vect_cuda), intent(inout)       :: z
     integer(psb_ipk_), intent(out)              :: info
-    integer(psb_ipk_) :: nx, ny, nz
-    logical :: gpu_done
 
+    integer(psb_ipk_) :: nx, ny, nz
+    logical           :: gpu_done
     info = psb_success_
-    
-    if (.true.) then
-      gpu_done = .false.
-      select type(xx => x)
+    gpu_done = .false.
+
+    select type(xx => x)
       class is (psb_c_vect_cuda)
         select type(yy => y)
-        class is (psb_c_vect_cuda)
-          select type(zz => z)
           class is (psb_c_vect_cuda)
-            ! Do something different here 
-            if ((beta /= czero).and.yy%is_host())&
-                 &  call yy%sync()
-            if ((delta /= czero).and.zz%is_host())&
-                 &  call zz%sync()
-            if (xx%is_host()) call xx%sync()
-            nx = getMultiVecDeviceSize(xx%deviceVect)
-            ny = getMultiVecDeviceSize(yy%deviceVect)
-            nz = getMultiVecDeviceSize(zz%deviceVect)
-            if ((nx<m).or.(ny<m).or.(nz<m)) then
-              info = psb_err_internal_error_
-            else
-              info = upd_xyzMultiVecDevice(m,alpha,beta,gamma,delta,&
-                   & xx%deviceVect,yy%deviceVect,zz%deviceVect)
-            end if
-            call yy%set_dev()
-            call zz%set_dev()
-            gpu_done = .true.
-          end select
+            select type(zz => z)
+              class is (psb_c_vect_cuda)
+                ! Do something different here 
+                if((beta /= czero) .and. yy%is_host()) call yy%sync()
+                if((delta /= czero) .and. zz%is_host()) call zz%sync()
+                if(xx%is_host()) call xx%sync()
+
+                nx = getMultiVecDeviceSize(xx%deviceVect)
+                ny = getMultiVecDeviceSize(yy%deviceVect)
+                nz = getMultiVecDeviceSize(zz%deviceVect)
+
+                if((nx < m) .or. (ny < m) .or. (nz < m)) then
+                  info = psb_err_internal_error_
+                else
+                  info = upd_xyzMultiVecDevice(m, alpha, beta, gamma, delta, &
+                                  & xx%deviceVect, yy%deviceVect, zz%deviceVect)
+                end if
+                call yy%set_dev()
+                call zz%set_dev()
+                gpu_done = .true.
+            end select
         end select
-      end select
+    end select
       
-      if (.not.gpu_done) then 
-        if (x%is_host()) call x%sync()
-        if (y%is_host()) call y%sync()
-        if (z%is_host()) call z%sync()
-        call y%axpby(m,alpha,x,beta,info)
-        call z%axpby(m,gamma,y,delta,info)
-      end if
-    else
-
-      if (x%is_host()) call x%sync()
-      if (y%is_host()) call y%sync()
-      if (z%is_host()) call z%sync()
-      call y%axpby(m,alpha,x,beta,info)
-      call z%axpby(m,gamma,y,delta,info)
+    if(.not. gpu_done) then 
+      if(x%is_host()) call x%sync()
+      if(y%is_host()) call y%sync()
+      if(z%is_host()) call z%sync()
+      call y%axpby(m, alpha, x, beta, info)
+      call z%axpby(m, gamma, y, delta, info)
     end if
-
   end subroutine c_cuda_upd_xyz
 
-  subroutine c_cuda_xyzw(m,a,b,c,d,e,f,x, y, z,w, info)
+  subroutine c_cuda_xyzw(m, a, b, c, d, e, f, x, y, z, w, info)
     use psi_serial_mod
     implicit none
     integer(psb_ipk_), intent(in)               :: m
-    class(psb_c_base_vect_type), intent(inout)  :: x
-    class(psb_c_base_vect_type), intent(inout)  :: y
-    class(psb_c_base_vect_type), intent(inout)  :: z
-    class(psb_c_vect_cuda), intent(inout)  :: w
-    complex(psb_spk_), intent (in)       :: a,b,c,d,e,f
+    complex(psb_spk_), intent (in)                 :: a, b, c, d, e, f
+    class(psb_c_base_vect_type), intent(inout)  :: x, y, z
+    class(psb_c_vect_cuda), intent(inout)       :: w
     integer(psb_ipk_), intent(out)              :: info
+
     integer(psb_ipk_) :: nx, ny, nz, nw
     logical :: gpu_done
 
     info = psb_success_
-
     gpu_done = .false.
-    if ((a==czero).or.(b==czero).or. &
-         & (c==czero).or.(d==czero).or.&
-         & (e==czero).or.(f==czero)) then
-      write(0,*) 'XYZW assumes  a,b,c,d,e,f are all nonzero'
+    if((a == czero) .or. (b == czero) .or.  (c==czero) &
+        &.or. (d==czero)  .or. (e==czero).or.(f==czero)) then
+      write(0, *) 'XYZW assumes  a, b, c, d, e, f are all nonzero'
     else
       select type(xx => x)
-      class is (psb_c_vect_cuda)
-        select type(yy => y)
         class is (psb_c_vect_cuda)
-          select type(zz => z)
-          class is (psb_c_vect_cuda)
-            ! Do something different here 
-            if (xx%is_host()) call xx%sync()
-            if (yy%is_host()) call yy%sync()
-            if (zz%is_host()) call zz%sync()
-            if (w%is_host())  call w%sync()
-            nx = getMultiVecDeviceSize(xx%deviceVect)
-            ny = getMultiVecDeviceSize(yy%deviceVect)
-            nz = getMultiVecDeviceSize(zz%deviceVect)
-            nw = getMultiVecDeviceSize(w%deviceVect)
-            if ((nx<m).or.(ny<m).or.(nz<m).or.(nw<m)) then
-              info = psb_err_internal_error_
-            else
-              info = xyzwMultiVecDevice(m,a,b,c,d,e,f,&
-                   & xx%deviceVect,yy%deviceVect,zz%deviceVect,w%deviceVect)
-            end if
-            call yy%set_dev()
-            call zz%set_dev()
-            call w%set_dev()
-            gpu_done = .true.
+          select type(yy => y)
+            class is (psb_c_vect_cuda)
+              select type(zz => z)
+                class is (psb_c_vect_cuda)
+                  ! Do something different here 
+                  if(xx%is_host()) call xx%sync()
+                  if(yy%is_host()) call yy%sync()
+                  if(zz%is_host()) call zz%sync()
+                  if(w%is_host())  call w%sync()
+                  nx = getMultiVecDeviceSize(xx%deviceVect)
+                  ny = getMultiVecDeviceSize(yy%deviceVect)
+                  nz = getMultiVecDeviceSize(zz%deviceVect)
+                  nw = getMultiVecDeviceSize(w%deviceVect)
+                  if((nx < m) .or. (ny < m) .or. (nz < m) .or. (nw < m)) then
+                    info = psb_err_internal_error_
+                  else
+                    info = xyzwMultiVecDevice(m, a, b, c, d, e, f, &
+                            & xx%deviceVect, yy%deviceVect, zz%deviceVect, w%deviceVect)
+                  end if
+                  call yy%set_dev()
+                  call zz%set_dev()
+                  call w%set_dev()
+                  gpu_done = .true.
+              end select
           end select
-        end select
       end select
       
-      if (.not.gpu_done) then 
-        if (x%is_host()) call x%sync()
-        if (y%is_host()) call y%sync()
-        if (z%is_host()) call z%sync()
-        if (w%is_host()) call w%sync()
-        call y%axpby(m,a,x,b,info)
-        call z%axpby(m,c,y,d,info)
-        call w%axpby(m,e,z,f,info)
+      if(.not. gpu_done) then 
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        if(z%is_host()) call z%sync()
+        if(w%is_host()) call w%sync()
+        call y%axpby(m, a, x, b, info)
+        call z%axpby(m, c, y, d, info)
+        call w%axpby(m, e, z, f, info)
       end if
     end if
-
   end subroutine c_cuda_xyzw
   
-  subroutine c_cuda_axpby_a(m,alpha, x, beta, y, info)
+  subroutine c_cuda_axpby_a(m, alpha, x, beta, y, info)
     use psi_serial_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: m
-    complex(psb_spk_), intent(in)           :: x(:)
+    implicit none
+    integer(psb_ipk_), intent(in)         :: m
+    complex(psb_spk_), intent (in)           :: alpha, beta
+    complex(psb_spk_), intent(in)            :: x(:)
     class(psb_c_vect_cuda), intent(inout) :: y
-    complex(psb_spk_), intent (in)          :: alpha, beta
-    integer(psb_ipk_), intent(out)       :: info
+    integer(psb_ipk_), intent(out)        :: info
     
-    if ((beta /= czero).and.(y%is_dev()))&
-         & call y%sync()
-    call psb_geaxpby(m,alpha,x,beta,y%v,info)
+    if((beta /= czero) .and. (y%is_dev())) call y%sync()
+    call psb_geaxpby(m, alpha, x, beta, y%v, info)
     call y%set_host()
   end subroutine c_cuda_axpby_a
 
   subroutine c_cuda_mlt_v(x, y, info)
     use psi_serial_mod
-    implicit none 
+    implicit none
     class(psb_c_base_vect_type), intent(inout) :: x
-    class(psb_c_vect_cuda), intent(inout)       :: y
+    class(psb_c_vect_cuda), intent(inout)      :: y
     integer(psb_ipk_), intent(out)             :: info
 
     integer(psb_ipk_) :: i, n
     
-    info = 0    
-    n = min(x%get_nrows(),y%get_nrows())
-    select type(xx => x)
-    type is (psb_c_base_vect_type)
-      if (y%is_dev()) call y%sync()
-      do i=1, n
-        y%v(i) = y%v(i) * xx%v(i)
-      end do
-      call y%set_host()
-    type is (psb_c_vect_cuda)
-      ! Do something different here 
-      if (y%is_host())  call y%sync()
-      if (xx%is_host()) call xx%sync()
-      info = axyMultiVecDevice(n,cone,xx%deviceVect,y%deviceVect)
-      call y%set_dev()
-    class default
-      if (xx%is_dev()) call xx%sync()
-      if (y%is_dev())  call y%sync()
-      call y%mlt(xx%v,info)
-      call y%set_host()
-    end select
+    info = psb_success_
+    n = min(x%get_nrows(), y%get_nrows())
 
+    select type(xx => x)
+      type is (psb_c_base_vect_type)
+        if(y%is_dev()) call y%sync()
+        do i = 1, n
+          y%v(i) = y%v(i) * xx%v(i)
+        end do
+        call y%set_host()
+
+      type is (psb_c_vect_cuda)
+        ! Do something different here 
+        if(y%is_host())  call y%sync()
+        if(xx%is_host()) call xx%sync()
+        info = axyMultiVecDevice(n, cone, xx%deviceVect, y%deviceVect)
+        call y%set_dev()
+
+      class default
+        if(xx%is_dev()) call xx%sync()
+        if(y%is_dev())  call y%sync()
+        call y%mlt(xx%v, info)
+        call y%set_host()
+    end select
   end subroutine c_cuda_mlt_v
 
   subroutine c_cuda_mlt_a(x, y, info)
     use psi_serial_mod
-    implicit none 
-    complex(psb_spk_), intent(in)           :: x(:)
+    implicit none
+    complex(psb_spk_), intent(in)            :: x(:)
     class(psb_c_vect_cuda), intent(inout) :: y
-    integer(psb_ipk_), intent(out)       :: info
+    integer(psb_ipk_), intent(out)        :: info
     integer(psb_ipk_) :: i, n
     
-    info = 0    
-    if (y%is_dev()) call y%sync()
-    call y%psb_c_base_vect_type%mlt(x,info)
+    info = psb_success_
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_vect_type%mlt(x, info)
     ! set_host() is invoked in the base method
   end subroutine c_cuda_mlt_a
 
-  subroutine c_cuda_mlt_a_2(alpha,x,y,beta,z,info)
+  subroutine c_cuda_mlt_a_2(alpha, x, y, beta, z, info)
     use psi_serial_mod
-    implicit none 
-    complex(psb_spk_), intent(in)           :: alpha,beta
-    complex(psb_spk_), intent(in)           :: x(:)
-    complex(psb_spk_), intent(in)           :: y(:)
+    implicit none
+    complex(psb_spk_), intent(in)            :: alpha, beta
+    complex(psb_spk_), intent(in)            :: x(:), y(:)
     class(psb_c_vect_cuda), intent(inout) :: z
-    integer(psb_ipk_), intent(out)       :: info
+    integer(psb_ipk_), intent(out)        :: info
+
     integer(psb_ipk_) :: i, n
     
-    info = 0    
-    if (z%is_dev()) call z%sync()
-    call z%psb_c_base_vect_type%mlt(alpha,x,y,beta,info)
+    info = psb_success_
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_vect_type%mlt(alpha, x, y, beta, info)
     ! set_host() is invoked in the base method
   end subroutine c_cuda_mlt_a_2
 
-  subroutine c_cuda_mlt_v_2(alpha,x,y, beta,z,info,conjgx,conjgy)
+  subroutine c_cuda_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
     use psi_serial_mod
     use psb_string_mod
-    implicit none 
-    complex(psb_spk_), intent(in)                 :: alpha,beta
-    class(psb_c_base_vect_type), intent(inout) :: x
-    class(psb_c_base_vect_type), intent(inout) :: y
+    implicit none
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x, y
     class(psb_c_vect_cuda), intent(inout)       :: z
-    integer(psb_ipk_), intent(out)             :: info
-    character(len=1), intent(in), optional     :: conjgx, conjgy
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional      :: conjgx, conjgy
+
     integer(psb_ipk_) :: i, n
     logical :: conjgx_, conjgy_
 
-    if (.false.) then 
+    if(.false.) then 
       ! These are present just for coherence with the
       ! complex versions; they do nothing here. 
-      conjgx_=.false.
-      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-      conjgy_=.false.
-      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
+      conjgx_ = .false.
+      if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+      conjgy_ = .false.
+      if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
     end if
     
-    n = min(x%get_nrows(),y%get_nrows(),z%get_nrows())
-    
+    n = min(x%get_nrows(), y%get_nrows(), z%get_nrows())
+
     !
     ! Need to reconsider BETA in the GPU side
     !  of things.
     !
-    info = 0    
+    info = psb_success_
     select type(xx => x) 
-    type is (psb_c_vect_cuda)
-      select type (yy => y) 
       type is (psb_c_vect_cuda)
-        if (xx%is_host()) call xx%sync()
-        if (yy%is_host()) call yy%sync()
-        if ((beta /= czero).and.(z%is_host())) call z%sync()
-        info = axybzMultiVecDevice(n,alpha,xx%deviceVect,&
-             & yy%deviceVect,beta,z%deviceVect)
-        call z%set_dev()
+        select type (yy => y) 
+          type is (psb_c_vect_cuda)
+            if(xx%is_host()) call xx%sync()
+            if(yy%is_host()) call yy%sync()
+            if((beta /= czero) .and. (z%is_host())) call z%sync()
+            info = axybzMultiVecDevice(n, alpha, xx%deviceVect, &
+                                    & yy%deviceVect, beta, z%deviceVect)
+            call z%set_dev()
+
+          class default
+            if(xx%is_dev()) call xx%sync()
+            if(yy%is_dev()) call yy%sync()
+            if((beta /= czero) .and. (z%is_dev())) call z%sync()
+            call z%psb_c_base_vect_type%mlt(alpha, xx, yy, beta, info)
+            call z%set_host()
+        end select
+        
       class default
-        if (xx%is_dev()) call xx%sync()
-        if (yy%is_dev()) call yy%sync()
-        if ((beta /= czero).and.(z%is_dev())) call z%sync()
-        call z%psb_c_base_vect_type%mlt(alpha,xx,yy,beta,info)
+        if(x%is_dev()) call x%sync()
+        if(y%is_dev()) call y%sync()
+        if((beta /= czero) .and. (z%is_dev())) call z%sync()
+        call z%psb_c_base_vect_type%mlt(alpha, x, y, beta, info)
         call z%set_host()
-      end select
-      
-    class default
-      if (x%is_dev()) call x%sync()
-      if (y%is_dev()) call y%sync()
-      if ((beta /= czero).and.(z%is_dev())) call z%sync()
-      call z%psb_c_base_vect_type%mlt(alpha,x,y,beta,info)
-      call z%set_host()
     end select
   end subroutine c_cuda_mlt_v_2
 
   subroutine c_cuda_scal(alpha, x)
-    implicit none 
+    implicit none
+    complex(psb_spk_), intent (in)           :: alpha
     class(psb_c_vect_cuda), intent(inout) :: x
-    complex(psb_spk_), intent (in)          :: alpha
+
     integer(psb_ipk_) :: info
     
-    if (x%is_host()) call x%sync()
-    info = scalMultiVecDevice(alpha,x%deviceVect)
+    if(x%is_host()) call x%sync()
+    info = scalMultiVecDevice(alpha, x%deviceVect)
     call x%set_dev()
   end subroutine c_cuda_scal
 
-
-  function c_cuda_nrm2(n,x) result(res)
-    implicit none 
+  function c_cuda_nrm2(n, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n
-    real(psb_spk_)                       :: res
+    real(psb_spk_)  :: res
+
     integer(psb_ipk_) :: info
-    ! WARNING: this should be changed. 
-    if (x%is_host()) call x%sync()
-    info = nrm2MultiVecDeviceComplex(res,n,x%deviceVect)
-    
+    ! WARNING: this should be changed.
+    if(x%is_host()) call x%sync()
+    info = nrm2MultiVecDeviceComplex(res, n, x%deviceVect)
   end function c_cuda_nrm2
   
-  function c_cuda_amax(n,x) result(res)
-    implicit none 
+  function c_cuda_amax(n, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n
-    real(psb_spk_)                :: res
+    real(psb_spk_)  :: res
+
     integer(psb_ipk_) :: info
 
-    if (x%is_host()) call x%sync()
-    info = amaxMultiVecDeviceComplex(res,n,x%deviceVect)
-
+    if(x%is_host()) call x%sync()
+    info = amaxMultiVecDeviceComplex(res, n, x%deviceVect)
   end function c_cuda_amax
 
-  function c_cuda_asum(n,x) result(res)
-    implicit none 
+  function c_cuda_asum(n, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)         :: n
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n
-    real(psb_spk_)                :: res
+    real(psb_spk_)  :: res
+
     integer(psb_ipk_) :: info
 
-    if (x%is_host()) call x%sync()
-    info = asumMultiVecDeviceComplex(res,n,x%deviceVect)
-
+    if(x%is_host()) call x%sync()
+    info = asumMultiVecDeviceComplex(res, n, x%deviceVect)
   end function c_cuda_asum
 
-  subroutine  c_cuda_absval1(x) 
-    implicit none 
+  subroutine c_cuda_absval1(x) 
+    implicit none
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_) :: n
-    integer(psb_ipk_) :: info
 
-    if (x%is_host()) call x%sync()
-    n=x%get_nrows()
-    info = absMultiVecDevice(n,cone,x%deviceVect)
+    integer(psb_ipk_) :: n, info
 
+    if(x%is_host()) call x%sync()
+    n = x%get_nrows()
+    info = absMultiVecDevice(n, cone, x%deviceVect)
   end subroutine c_cuda_absval1
 
-  subroutine  c_cuda_absval2(x,y) 
-    implicit none 
-    class(psb_c_vect_cuda), intent(inout) :: x
-    class(psb_c_base_vect_type), intent(inout) :: y
-    integer(psb_ipk_) :: n
-    integer(psb_ipk_) :: info
+  subroutine c_cuda_absval2(x, y) 
+    implicit none
+    class(psb_c_vect_cuda), intent(inout)       :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
 
-    n=min(x%get_nrows(),y%get_nrows())
+    integer(psb_ipk_) :: n, info
+
+    n = min(x%get_nrows(), y%get_nrows())
     select type (yy=> y) 
-    class is (psb_c_vect_cuda)
-      if (x%is_host()) call x%sync()    
-      if (yy%is_host()) call yy%sync()
-      info = absMultiVecDevice(n,cone,x%deviceVect,yy%deviceVect)
-    class default
-      if (x%is_dev()) call x%sync()    
-      if (y%is_dev()) call y%sync()
-      call x%psb_c_base_vect_type%absval(y)
+      class is (psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()    
+        if(yy%is_host()) call yy%sync()
+        info = absMultiVecDevice(n, cone, x%deviceVect, yy%deviceVect)
+      
+      class default
+        if(x%is_dev()) call x%sync()    
+        if(y%is_dev()) call y%sync()
+        call x%psb_c_base_vect_type%absval(y)
     end select
   end subroutine c_cuda_absval2
-
 
   subroutine c_cuda_vect_finalize(x)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
+    implicit none
     type(psb_c_vect_cuda), intent(inout)  :: x
-    integer(psb_ipk_)        :: info
+
+    integer(psb_ipk_) :: info
     
-    info = 0
+    info = psb_success_
     call x%free(info)
   end subroutine c_cuda_vect_finalize
 
-  subroutine c_cuda_ins_v(n,irl,val,dupl,x,maxr,info)
+  subroutine c_cuda_ins_v(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
-    implicit none 
-    class(psb_c_vect_cuda), intent(inout)        :: x
+    implicit none
     integer(psb_ipk_), intent(in)               :: n, dupl, maxr
     class(psb_i_base_vect_type), intent(inout)  :: irl
     class(psb_c_base_vect_type), intent(inout)  :: val
+    class(psb_c_vect_cuda), intent(inout)       :: x
     integer(psb_ipk_), intent(out)              :: info
 
     integer(psb_ipk_) :: i, isz
     logical :: done_cuda
 
-    info = 0
-    if (psb_errstatus_fatal()) return 
+    info = psb_success_
+    if(psb_errstatus_fatal()) return 
 
     done_cuda = .false. 
     select type(virl => irl)
-    class is (psb_i_vect_cuda) 
-      select type(vval => val)
-      class is (psb_c_vect_cuda) 
-        if (vval%is_host()) call vval%sync()
-        if (virl%is_host()) call virl%sync()
-        if (x%is_host())    call x%sync()
-        info = geinsMultiVecDeviceFloatComplex(n,virl%deviceVect,&
-             & vval%deviceVect,dupl,1,x%deviceVect)
-        call x%set_dev()
-        done_cuda=.true.
-      end select
+      class is (psb_i_vect_cuda) 
+        select type(vval => val)
+          class is (psb_c_vect_cuda) 
+            if(vval%is_host()) call vval%sync()
+            if(virl%is_host()) call virl%sync()
+            if(x%is_host())    call x%sync()
+            info = geinsMultiVecDeviceFloatComplex(n, virl%deviceVect, &
+                              & vval%deviceVect, dupl, 1, x%deviceVect)
+            call x%set_dev()
+            done_cuda = .true.
+        end select
     end select
 
-    if (.not.done_cuda) then 
-      if (irl%is_dev()) call irl%sync()
-      if (val%is_dev()) call val%sync()
-      call x%ins(n,irl%v,val%v,dupl,maxr,info)
+    if(.not. done_cuda) then 
+      if(irl%is_dev()) call irl%sync()
+      if(val%is_dev()) call val%sync()
+      call x%ins(n, irl%v, val%v, dupl, maxr, info)
     end if
 
-    if (info /= 0) then 
-      call psb_errpush(info,'cuda_vect_ins')
+    if(info /= psb_success_) then 
+      call psb_errpush(info, 'cuda_vect_ins')
       return
     end if
-
   end subroutine c_cuda_ins_v
   
-  subroutine c_cuda_ins_a(n,irl,val,dupl,x,maxr,info)
+  subroutine c_cuda_ins_a(n, irl, val, dupl, x, maxr, info)
     use psi_serial_mod
-    implicit none 
+    implicit none
+    integer(psb_ipk_), intent(in)         :: n, dupl, maxr
+    integer(psb_ipk_), intent(in)         :: irl(:)
+    complex(psb_spk_), intent(in)            :: val(:)
     class(psb_c_vect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl, maxr
-    integer(psb_ipk_), intent(in)        :: irl(:)
-    complex(psb_spk_), intent(in)           :: val(:)
-    integer(psb_ipk_), intent(out)       :: info
+    integer(psb_ipk_), intent(out)        :: info
 
-    integer(psb_ipk_) :: i
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call x%psb_c_base_vect_type%ins(n,irl,val,dupl,maxr,info)
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call x%psb_c_base_vect_type%ins(n, irl, val, dupl, maxr, info)
     call x%set_host()
-
   end subroutine c_cuda_ins_a
-
 end module psb_c_cuda_vect_mod
-
 
 !
 ! Multivectors
 ! 
-
-
-
 module psb_c_cuda_multivect_mod
   use iso_c_binding
   use psb_const_mod
@@ -1373,48 +1310,117 @@ module psb_c_cuda_multivect_mod
   integer(psb_ipk_), parameter, private :: is_sync = 0 
   integer(psb_ipk_), parameter, private :: is_dev  = 1 
   
-  type, extends(psb_c_base_multivect_type) ::  psb_c_multivect_cuda
-    integer(psb_ipk_)  :: state      = is_host, m_nrows=0, m_ncols=0
-    type(c_ptr) :: deviceVect = c_null_ptr
-    real(c_double), allocatable :: buffer(:,:)
-    type(c_ptr) :: dt_buf = c_null_ptr
+  type, extends(psb_c_base_multivect_type) :: psb_c_multivect_cuda
+    integer(psb_ipk_)           :: state = is_host, m_nrows = 0, m_ncols = 0
+    type(c_ptr)                 :: deviceVect = c_null_ptr
+    complex(c_float_complex), allocatable :: buffer(:, :)
+    type(c_ptr)                 :: dt_buf = c_null_ptr
   contains
+    !
+    !  Constructors/allocators
+    !
+    procedure, pass(x) :: bld_x => c_cuda_multi_bld_x
+    procedure, pass(x) :: bld_n => c_cuda_multi_bld_n
+    procedure, pass(x) :: all   => c_cuda_multi_all
+
+    !
+    ! Insert/set, assembly and free.
+    !
+    procedure, pass(x) :: ins   => c_cuda_multi_ins
+    procedure, pass(x) :: zero  => c_cuda_multi_zero
+    procedure, pass(x) :: asb   => c_cuda_multi_asb
+    procedure, pass(x) :: free  => c_cuda_multi_free
+
+    !
+    ! Basic info
+    !
     procedure, pass(x) :: get_nrows => c_cuda_multi_get_nrows
     procedure, pass(x) :: get_ncols => c_cuda_multi_get_ncols
     procedure, nopass  :: get_fmt   => c_cuda_multi_get_fmt
-!!$    procedure, pass(x) :: dot_v    => c_cuda_multi_dot_v
-!!$    procedure, pass(x) :: dot_a    => c_cuda_multi_dot_a
-!!$    procedure, pass(y) :: axpby_v  => c_cuda_multi_axpby_v
-!!$    procedure, pass(y) :: axpby_a  => c_cuda_multi_axpby_a
-!!$    procedure, pass(y) :: mlt_v    => c_cuda_multi_mlt_v
-!!$    procedure, pass(y) :: mlt_a    => c_cuda_multi_mlt_a
-!!$    procedure, pass(z) :: mlt_a_2  => c_cuda_multi_mlt_a_2
-!!$    procedure, pass(z) :: mlt_v_2  => c_cuda_multi_mlt_v_2
-!!$    procedure, pass(x) :: scal     => c_cuda_multi_scal
-!!$    procedure, pass(x) :: nrm2     => c_cuda_multi_nrm2
-!!$    procedure, pass(x) :: amax     => c_cuda_multi_amax
-!!$    procedure, pass(x) :: asum     => c_cuda_multi_asum
-    procedure, pass(x) :: all      => c_cuda_multi_all
-    procedure, pass(x) :: zero     => c_cuda_multi_zero
-    procedure, pass(x) :: asb      => c_cuda_multi_asb
-    procedure, pass(x) :: sync     => c_cuda_multi_sync
-    procedure, pass(x) :: sync_space => c_cuda_multi_sync_space
-    procedure, pass(x) :: bld_x    => c_cuda_multi_bld_x
-    procedure, pass(x) :: bld_n    => c_cuda_multi_bld_n
-    procedure, pass(x) :: free     => c_cuda_multi_free
-    procedure, pass(x) :: ins      => c_cuda_multi_ins
-    procedure, pass(x) :: is_host  => c_cuda_multi_is_host
-    procedure, pass(x) :: is_dev   => c_cuda_multi_is_dev
-    procedure, pass(x) :: is_sync  => c_cuda_multi_is_sync
-    procedure, pass(x) :: set_host => c_cuda_multi_set_host
-    procedure, pass(x) :: set_dev  => c_cuda_multi_set_dev
-    procedure, pass(x) :: set_sync => c_cuda_multi_set_sync
-    procedure, pass(x) :: set_scal => c_cuda_multi_set_scal
-    procedure, pass(x) :: set_vect => c_cuda_multi_set_vect
-!!$    procedure, pass(x) :: gthzv_x  => c_cuda_multi_gthzv_x
-!!$    procedure, pass(y) :: sctb     => c_cuda_multi_sctb
-!!$    procedure, pass(y) :: sctb_x   => c_cuda_multi_sctb_x
-    final              :: c_cuda_multi_vect_finalize
+
+    !
+    ! Sync: centerpiece of handling of external storage.
+    !
+    procedure, pass(x) :: sync        => c_cuda_multi_sync
+    procedure, pass(x) :: sync_space  => c_cuda_multi_sync_space
+    procedure, pass(x) :: is_host     => c_cuda_multi_is_host
+    procedure, pass(x) :: is_dev      => c_cuda_multi_is_dev
+    procedure, pass(x) :: is_sync     => c_cuda_multi_is_sync
+    procedure, pass(x) :: set_host    => c_cuda_multi_set_host
+    procedure, pass(x) :: set_dev     => c_cuda_multi_set_dev
+    procedure, pass(x) :: set_sync    => c_cuda_multi_set_sync
+
+    !
+    ! Set/get data from/to an external array
+    !
+    procedure, pass(x) :: set_scal  => c_cuda_multi_set_scal
+    procedure, pass(x) :: set_vect  => c_cuda_multi_set_vect
+
+    ! 
+    ! AXPY - like operations 
+    ! 
+    ! single column export as vector
+    procedure, pass(x) :: extract_col   => c_cuda_mvect_extract_col
+    ! two term operations - indexed and full versions
+    procedure, pass(y) :: axpby_v_i     => c_cuda_mvect_axpby_v_idxs
+    procedure, pass(y) :: axpby_v_f     => c_cuda_mvect_axpby_v_full
+    procedure, pass(y) :: axpby_m_i     => c_cuda_mvect_axpby_m_idxs
+    procedure, pass(y) :: axpby_m_f     => c_cuda_mvect_axpby_m_full
+    ! two term operations with separate output mv
+    procedure, pass(z) :: axpby_m_f_o   => c_cuda_mvect_axpby_m_full_out
+    ! three term operations
+    procedure, pass(z) :: axpbycz_vv    => c_cuda_mvect_axpbycz_vv
+    procedure, pass(z) :: axpbycz_mv    => c_cuda_mvect_axpbycz_mv
+    procedure, pass(z) :: axpbycz_mm_i  => c_cuda_mvect_axpbycz_mm_idxs
+    procedure, pass(z) :: axpbycz_mm_f  => c_cuda_mvect_axpbycz_mm_full
+    ! three term operations with separate output mv
+    procedure, pass(w) :: axpbycz_mm_o  => c_cuda_mvect_axpbycz_mm_out
+    ! linear combinations of columns of the multivector (rename?)
+    procedure, pass(x) :: colspan1D     => c_cuda_mvect_colspan1D
+    procedure, pass(x) :: colspan2D     => c_cuda_mvect_colspan2D
+
+    ! 
+    ! DOT - like operations 
+    !
+    procedure, pass(x) :: dot_mm  => c_cuda_mvect_dot_mm
+    procedure, pass(x) :: dot_mv  => c_cuda_mvect_dot_mv
+
+    !
+    ! Element wise multiplications 
+    !
+    ! two input with in place output
+    procedure, pass(y) :: mlt_v_f    => c_cuda_mvect_mlt_v_full
+    procedure, pass(y) :: mlt_v_i    => c_cuda_mvect_mlt_v_idxs
+    procedure, pass(y) :: mlt_m_f    => c_cuda_mvect_mlt_m_full
+    procedure, pass(y) :: mlt_m_i    => c_cuda_mvect_mlt_m_idxs
+    ! two input with separate output
+    procedure, pass(z) :: mlt_vv_f_o  => c_cuda_mvect_mlt_vv_full_out
+    procedure, pass(z) :: mlt_vv_i_o  => c_cuda_mvect_mlt_vv_idxs_out
+    procedure, pass(z) :: mlt_vm_f_o  => c_cuda_mvect_mlt_vm_full_out
+    procedure, pass(z) :: mlt_vm_i_o  => c_cuda_mvect_mlt_vm_idxs_out
+    procedure, pass(z) :: mlt_mm_f_o  => c_cuda_mvect_mlt_mm_full_out
+    procedure, pass(z) :: mlt_mm_i_o  => c_cuda_mvect_mlt_mm_idxs_out
+    ! Element wise multiplication operations with externel vector output
+    procedure, pass(y) :: mlt_vm_e    => c_cuda_mvect_mlt_vm_ext
+    procedure, pass(y) :: mlt_mm_e    => c_cuda_mvect_mlt_mm_ext
+
+    !
+    ! Scaling and norms
+    !
+    procedure, pass(x) :: nrm2_f  => c_cuda_mvect_nrm2_full
+    procedure, pass(x) :: nrm2_i  => c_cuda_mvect_nrm2_idxs
+    
+    ! OLD ones
+    procedure, pass(x) :: scal     => c_cuda_mvect_scal
+    procedure, pass(x) :: amax     => c_cuda_mvect_amax
+    procedure, pass(x) :: asum     => c_cuda_mvect_asum
+    procedure, pass(x) :: absval1  => c_cuda_mvect_absval1
+    procedure, pass(x) :: absval2  => c_cuda_mvect_absval2
+
+    !!$ procedure, pass(x) :: gthzv_x  => c_cuda_multi_gthzv_x
+    !!$ procedure, pass(y) :: sctb     => c_cuda_multi_sctb
+    !!$ procedure, pass(y) :: sctb_x   => c_cuda_multi_sctb_x
+    final :: c_cuda_multi_vect_finalize
   end type psb_c_multivect_cuda
 
   public  :: psb_c_multivect_cuda
@@ -1424,705 +1430,1722 @@ module psb_c_cuda_multivect_mod
   end interface
 
 contains
-  
   function mconstructor(x) result(this)
-    complex(psb_spk_)       :: x(:,:)
-    type(psb_c_multivect_cuda) :: this
+    complex(psb_spk_)  :: x(:, :)
+    type(psb_c_multivect_cuda)  :: this
+
     integer(psb_ipk_) :: info
 
     this%v = x
-    call this%asb(size(x,1),size(x,2),info)
-
+    call this%asb(size(x, 1), size(x, 2), info)
   end function mconstructor
     
+  !!$  subroutine c_cuda_multi_gthzv_x(i, n, idx, x, y)
+  !!$    use psi_serial_mod
+  !!$    integer(psb_ipk_) :: i, n
+  !!$    class(psb_i_base_multivect_type) :: idx
+  !!$    complex(psb_spk_) ::  y(:)
+  !!$    class(psb_c_multivect_cuda) :: x
+  !!$
+  !!$    select type(ii => idx) 
+  !!$    class is (psb_i_vect_cuda) 
+  !!$      if(ii%is_host()) call ii%sync()
+  !!$      if(x%is_host())  call x%sync()
+  !!$
+  !!$      if(allocated(x%buffer)) then 
+  !!$        if(size(x%buffer) < n) then 
+  !!$          call inner_unregister(x%buffer)
+  !!$          deallocate(x%buffer, stat = info)
+  !!$        end if
+  !!$      end if
+  !!$      
+  !!$      if(.not. allocated(x%buffer)) then
+  !!$        allocate(x%buffer(n), stat = info)
+  !!$        if(info == psb_success_) info = inner_register(x%buffer, x%dt_buf)        
+  !!$      endif
+  !!$      info = igathMultiVecDeviceFloatComplex(x%deviceVect, &
+  !!$           & 0, i, n, ii%deviceVect, x%dt_buf, 1)
+  !!$      call psb_cudaSync()
+  !!$      y(1:n) = x%buffer(1:n)
+  !!$      
+  !!$    class default
+  !!$      call x%gth(n, ii%v(i:), y)
+  !!$    end select
+  !!$  end subroutine c_cuda_multi_gthzv_x
 
-!!$  subroutine c_cuda_multi_gthzv_x(i,n,idx,x,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: i,n
-!!$    class(psb_i_base_multivect_type) :: idx
-!!$    complex(psb_spk_) ::  y(:)
-!!$    class(psb_c_multivect_cuda) :: x
-!!$
-!!$    select type(ii=> idx) 
-!!$    class is (psb_i_vect_cuda) 
-!!$      if (ii%is_host()) call ii%sync()
-!!$      if (x%is_host())  call x%sync()
-!!$
-!!$      if (allocated(x%buffer)) then 
-!!$        if (size(x%buffer) < n) then 
-!!$          call inner_unregister(x%buffer)
-!!$          deallocate(x%buffer, stat=info)
-!!$        end if
-!!$      end if
-!!$      
-!!$      if (.not.allocated(x%buffer)) then
-!!$        allocate(x%buffer(n),stat=info)
-!!$        if (info == 0) info = inner_register(x%buffer,x%dt_buf)        
-!!$      endif
-!!$      info = igathMultiVecDeviceDouble(x%deviceVect,&
-!!$           & 0, i, n, ii%deviceVect, x%dt_buf, 1)
-!!$      call psb_cudaSync()
-!!$      y(1:n) = x%buffer(1:n)
-!!$      
-!!$    class default
-!!$      call x%gth(n,ii%v(i:),y)
-!!$    end select
-!!$
-!!$
-!!$  end subroutine c_cuda_multi_gthzv_x
-!!$
-!!$
-!!$
-!!$  subroutine c_cuda_multi_sctb(n,idx,x,beta,y)
-!!$    implicit none
-!!$    !use psb_const_mod
-!!$    integer(psb_ipk_)     :: n, idx(:)
-!!$    complex(psb_spk_)        :: beta, x(:)
-!!$    class(psb_c_multivect_cuda) :: y
-!!$    integer(psb_ipk_)     :: info
-!!$
-!!$    if (n == 0) return
-!!$    
-!!$    if (y%is_dev())  call y%sync()
-!!$          
-!!$    call y%psb_c_base_multivect_type%sctb(n,idx,x,beta)
-!!$    call y%set_host()
-!!$
-!!$  end subroutine c_cuda_multi_sctb
-!!$
-!!$  subroutine c_cuda_multi_sctb_x(i,n,idx,x,beta,y)
-!!$    use psi_serial_mod
-!!$    integer(psb_ipk_) :: i, n
-!!$    class(psb_i_base_multivect_type) :: idx
-!!$    complex(psb_spk_) :: beta, x(:)
-!!$    class(psb_c_multivect_cuda) :: y
-!!$
-!!$    select type(ii=> idx) 
-!!$    class is (psb_i_vect_cuda) 
-!!$      if (ii%is_host()) call ii%sync()
-!!$      if (y%is_host())  call y%sync()
-!!$
-!!$      if (allocated(y%buffer)) then 
-!!$        if (size(y%buffer) < n) then 
-!!$          call inner_unregister(y%buffer)
-!!$          deallocate(y%buffer, stat=info)
-!!$        end if
-!!$      end if
-!!$      
-!!$      if (.not.allocated(y%buffer)) then
-!!$        allocate(y%buffer(n),stat=info)
-!!$        if (info == 0) info = inner_register(y%buffer,y%dt_buf)        
-!!$      endif
-!!$      y%buffer(1:n) = x(1:n) 
-!!$      info = iscatMultiVecDeviceDouble(y%deviceVect,&
-!!$           & 0, i, n, ii%deviceVect, y%dt_buf, 1,beta)
-!!$
-!!$      call y%set_dev()
-!!$      call psb_cudaSync()   
-!!$      
-!!$    class default
-!!$      call y%sct(n,ii%v(i:),x,beta)
-!!$    end select
-!!$
-!!$  end subroutine c_cuda_multi_sctb_x
+  !!$  subroutine c_cuda_multi_sctb(n, idx, x, beta, y)
+  !!$    implicit none
+  !!$    !use psb_const_mod
+  !!$    integer(psb_ipk_)     :: n, idx(:)
+  !!$    complex(psb_spk_)        :: beta, x(:)
+  !!$    class(psb_c_multivect_cuda) :: y
+  !!$    integer(psb_ipk_)     :: info
+  !!$
+  !!$    if(n == 0) return
+  !!$    
+  !!$    if(y%is_dev())  call y%sync()
+  !!$          
+  !!$    call y%psb_c_base_multivect_type%sctb(n, idx, x, beta)
+  !!$    call y%set_host()
+  !!$  end subroutine c_cuda_multi_sctb
 
+  !!$  subroutine c_cuda_multi_sctb_x(i, n, idx, x, beta, y)
+  !!$    use psi_serial_mod
+  !!$    integer(psb_ipk_) :: i, n
+  !!$    class(psb_i_base_multivect_type) :: idx
+  !!$    complex(psb_spk_) :: beta, x(:)
+  !!$    class(psb_c_multivect_cuda) :: y
+  !!$
+  !!$    select type(ii => idx) 
+  !!$    class is (psb_i_vect_cuda) 
+  !!$      if(ii%is_host()) call ii%sync()
+  !!$      if(y%is_host())  call y%sync()
+  !!$
+  !!$      if(allocated(y%buffer)) then 
+  !!$        if(size(y%buffer) < n) then 
+  !!$          call inner_unregister(y%buffer)
+  !!$          deallocate(y%buffer, stat = info)
+  !!$        end if
+  !!$      end if
+  !!$      
+  !!$      if(.not. allocated(y%buffer)) then
+  !!$        allocate(y%buffer(n), stat = info)
+  !!$        if(info == psb_success_) info = inner_register(y%buffer, y%dt_buf)        
+  !!$      endif
+  !!$      y%buffer(1:n) = x(1:n) 
+  !!$      info = iscatMultiVecDeviceFloatComplex(y%deviceVect, &
+  !!$           & 0, i, n, ii%deviceVect, y%dt_buf, 1, beta)
+  !!$
+  !!$      call y%set_dev()
+  !!$      call psb_cudaSync()   
+  !!$      
+  !!$    class default
+  !!$      call y%sct(n, ii%v(i:), x, beta)
+  !!$    end select
+  !!$  end subroutine c_cuda_multi_sctb_x
 
-  subroutine c_cuda_multi_bld_x(x,this)
+  subroutine c_cuda_multi_bld_x(x, this)
     use psb_base_mod
-    complex(psb_spk_), intent(in)           :: this(:,:)
-    class(psb_c_multivect_cuda), intent(inout) :: x
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    complex(psb_spk_), intent(in)                  :: this(:, :)
+
     integer(psb_ipk_) :: info, m, n
-    
-    m=size(this,1)
-    n=size(this,2)
+    m = size(this, 1)
+    n = size(this, 2)
     x%m_nrows = m
     x%m_ncols = n
-    call psb_realloc(m,n,x%v,info)
-    if (info /= 0) then 
-      info=psb_err_alloc_request_
-      call psb_errpush(info,'c_cuda_multi_bld_x',&
-           & i_err=(/size(this,1),size(this,2),izero,izero,izero,izero/))
+    call psb_realloc(m, n, x%v, info)
+    if(info /= psb_success_) then 
+      info = psb_err_alloc_request_
+      call psb_errpush(info, 'c_cuda_multi_bld_x', &
+           & i_err = (/size(this, 1), size(this, 2), izero, izero, izero, izero/))
     end if
-    x%v(1:m,1:n)  = this(1:m,1:n) 
+    x%v(1 : m, 1 : n)  = this(1 : m, 1 : n) 
     call x%set_host()
     call x%sync()
-
   end subroutine c_cuda_multi_bld_x
 
-  subroutine c_cuda_multi_bld_n(x,m,n,scratch)
-    integer(psb_ipk_), intent(in) :: m,n
-    class(psb_c_multivect_cuda), intent(inout) :: x
+  subroutine c_cuda_multi_bld_n(x, m, n, scratch)
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: m, n
+    logical, intent(in), optional :: scratch
+
     integer(psb_ipk_) :: info
-    logical, intent(in), optional        :: scratch
-
-    call x%all(m,n,info)
-    call x%asb(m,n,info,scratch=scratch)
-    if (info /= 0) then 
-      call psb_errpush(info,'c_cuda_multi_bld_n',i_err=(/m,n,n,n,n/))
-    end if
-    
+    call x%all(m, n, info)
+    call x%asb(m, n, info, scratch = scratch)
+    if(info /= psb_success_) call psb_errpush(info, 'c_cuda_multi_bld_n', i_err = (/m, n, n, n, n/))
   end subroutine c_cuda_multi_bld_n
+  
+  subroutine c_cuda_multi_all(m, n, x, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    integer(psb_ipk_), intent(in)             :: m, n
+    class(psb_c_multivect_cuda), intent(out)  :: x
+    integer(psb_ipk_), intent(out)            :: info
+    
+    call psb_realloc(m, n, x%v, info, pad = czero)
+    x%m_nrows = m
+    x%m_ncols = n
+    if(info == psb_success_) call x%set_host()
+    if(info == psb_success_) call x%sync_space(info)
+    if(info /= psb_success_) then 
+      info = psb_err_alloc_request_
+      call psb_errpush(info, 'c_cuda_multi_all', i_err = (/m, n, n, n, n/))
+    end if
+  end subroutine c_cuda_multi_all
 
+  subroutine c_cuda_multi_ins(n, irl, val, dupl, x, maxr, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: n, dupl, maxr
+    integer(psb_ipk_), intent(in)               :: irl(:)
+    complex(psb_spk_), intent(in)                  :: val(:, :)
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    integer(psb_ipk_), intent(out)              :: info
+
+    info = psb_success_
+    if(x%is_dev()) call x%sync()
+    call x%psb_c_base_multivect_type%ins(n, irl, val, dupl, maxr, info)
+    call x%set_host()
+  end subroutine c_cuda_multi_ins
+
+  subroutine c_cuda_multi_zero(x)
+    use psi_serial_mod
+    implicit none
+    class(psb_c_multivect_cuda), intent(inout) :: x
+    
+    if(allocated(x%v)) x%v = czero
+    call x%set_host()
+  end subroutine c_cuda_multi_zero
+
+  subroutine c_cuda_multi_asb(m, n, x, info, scratch)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, n
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in), optional               :: scratch
+
+    integer(psb_ipk_) :: nd, nc
+
+    info = psb_success_
+    x%m_nrows = m
+    x%m_ncols = n
+    if(x%is_host()) then 
+      call x%psb_c_base_multivect_type%asb(m, n, info, scratch)
+      if(info == psb_success_) call x%sync_space(info)
+    else if(x%is_dev()) then 
+      nd = getMultiVecDevicePitch(x%deviceVect)
+      nc = getMultiVecDeviceCount(x%deviceVect)
+      if((nd < m) .or. (nc < n)) then 
+        call x%sync()
+        call x%psb_c_base_multivect_type%asb(m, n, info)      
+        if(info == psb_success_) call x%sync_space(info)
+        call x%set_host()
+      end if
+    end if
+  end subroutine c_cuda_multi_asb
+
+  subroutine c_cuda_multi_free(x, info)
+    use psi_serial_mod
+    use psb_realloc_mod
+    implicit none
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    integer(psb_ipk_), intent(out)              :: info
+    
+    info = psb_success_
+    if(c_associated(x%deviceVect)) then 
+      call freeMultiVecDevice(x%deviceVect)
+      x%deviceVect = c_null_ptr
+    end if
+
+    if(allocated(x%buffer)) then 
+      !!$ call inner_unregister(x%buffer)
+      deallocate(x%buffer, stat = info)
+    end if
+
+    if(allocated(x%v)) deallocate(x%v, stat = info)
+    call x%set_sync()
+  end subroutine c_cuda_multi_free
+
+  function c_cuda_multi_get_nrows(x) result(res)
+    implicit none
+    class(psb_c_multivect_cuda), intent(in) :: x
+    integer(psb_ipk_) :: res
+
+    res = x%m_nrows
+  end function c_cuda_multi_get_nrows
+  
+  function c_cuda_multi_get_ncols(x) result(res)
+    implicit none
+    class(psb_c_multivect_cuda), intent(in) :: x
+    integer(psb_ipk_) :: res
+
+    res = x%m_ncols
+  end function c_cuda_multi_get_ncols
+
+  function c_cuda_multi_get_fmt() result(res)
+    implicit none
+    character(len=5) :: res
+    res = 'cGPU'
+  end function c_cuda_multi_get_fmt
+
+  subroutine c_cuda_multi_sync(x)
+    implicit none
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+
+    integer(psb_ipk_) :: n, info
+    info = psb_success_
+
+    if(x%is_host()) then 
+      if(.not. c_associated(x%deviceVect)) call x%sync_space(info)
+      if(info == psb_success_) info = writeMultiVecDevice(x%deviceVect, x%v, size(x%v, 1))
+    else if(x%is_dev()) then 
+      info = readMultiVecDevice(x%deviceVect, x%v, size(x%v, 1))
+    end if
+
+    if(info == psb_success_) call x%set_sync()
+
+    if(info /= psb_success_) then
+      info = psb_err_internal_error_
+      call psb_errpush(info, 'c_cuda_multi_sync')
+    end if
+  end subroutine c_cuda_multi_sync
+
+  subroutine c_cuda_multi_sync_space(x, info)
+    use psb_realloc_mod
+    implicit none
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    integer(psb_ipk_), intent(out)              :: info 
+
+    integer(psb_ipk_) :: mh, nh, md, nd
+
+    info = psb_success_
+
+    if(allocated(x%v)) then 
+      mh = size(x%v, 1)
+      nh = size(x%v, 2)
+    else
+      mh = 0
+      nh = 0
+    end if
+
+    if(x%is_host()) then 
+      if(c_associated(x%deviceVect)) then 
+        md = getMultiVecDevicePitch(x%deviceVect)
+        nd = getMultiVecDeviceCount(x%deviceVect)
+        if((md < mh) .or. (nd < nh)) then 
+          call freeMultiVecDevice(x%deviceVect)
+          x%deviceVect = c_null_ptr
+        end if
+      end if
+
+      if(.not. c_associated(x%deviceVect)) then 
+        info = FallocMultiVecDevice(x%deviceVect, nh, mh, spgpu_type_complex_float)
+        if(info == psb_success_) call psb_realloc(getMultiVecDevicePitch(x%deviceVect), &
+                          & getMultiVecDeviceCount(x%deviceVect), x%v, info, pad = czero)
+        if(info /= psb_success_) then 
+          !!$ write(0, *) 'Error from FallocMultiVecDevice', info, n
+          if(info == spgpu_outofmem) info = psb_err_alloc_request_
+        end if
+      end if
+    else if(x%is_dev()) then 
+      md = getMultiVecDevicePitch(x%deviceVect)
+      nd = getMultiVecDeviceCount(x%deviceVect)
+      if((mh /= md) .or. (nh /= nd)) then 
+        call psb_realloc(getMultiVecDevicePitch(x%deviceVect), &
+                          & getMultiVecDeviceCount(x%deviceVect), x%v, info, pad = czero)
+      end if
+    end if
+  end subroutine c_cuda_multi_sync_space
+
+  function c_cuda_multi_is_dev(x) result(res)
+    implicit none
+    class(psb_c_multivect_cuda), intent(in) :: x
+    logical :: res
+  
+    res = (x%state == is_dev)
+  end function c_cuda_multi_is_dev
+  
+  function c_cuda_multi_is_host(x) result(res)
+    implicit none
+    class(psb_c_multivect_cuda), intent(in) :: x
+    logical :: res
+
+    res = (x%state == is_host)
+  end function c_cuda_multi_is_host
+
+  function c_cuda_multi_is_sync(x) result(res)
+    implicit none
+    class(psb_c_multivect_cuda), intent(in) :: x
+    logical :: res
+
+    res = (x%state == is_sync)
+  end function c_cuda_multi_is_sync
 
   subroutine c_cuda_multi_set_host(x)
-    implicit none 
+    implicit none
     class(psb_c_multivect_cuda), intent(inout) :: x
     
     x%state = is_host
   end subroutine c_cuda_multi_set_host
 
   subroutine c_cuda_multi_set_dev(x)
-    implicit none 
+    implicit none
     class(psb_c_multivect_cuda), intent(inout) :: x
     
     x%state = is_dev
   end subroutine c_cuda_multi_set_dev
 
   subroutine c_cuda_multi_set_sync(x)
-    implicit none 
+    implicit none
     class(psb_c_multivect_cuda), intent(inout) :: x
     
     x%state = is_sync
   end subroutine c_cuda_multi_set_sync
 
-  function c_cuda_multi_is_dev(x) result(res)
-    implicit none 
-    class(psb_c_multivect_cuda), intent(in) :: x
-    logical  :: res
+  !!$  function c_cuda_multi_dot_v(n, x, y) result(res)
+  !!$    implicit none
+  !!$    class(psb_c_multivect_cuda), intent(inout)       :: x
+  !!$    class(psb_c_base_multivect_type), intent(inout) :: y
+  !!$    integer(psb_ipk_), intent(in)              :: n
+  !!$    complex(psb_spk_)                :: res
+  !!$    complex(psb_spk_), external      :: cdot
+  !!$    integer(psb_ipk_) :: info
+  !!$    
+  !!$    res = czero
+  !!$    !
+  !!$    ! Note: this is the gpu implementation.
+  !!$    !  When we get here, we are sure that X is of
+  !!$    !  TYPE psb_c_vect
+  !!$    !
+  !!$    select type(yy => y)
+  !!$    type is (psb_c_base_multivect_type)
+  !!$      if(x%is_dev()) call x%sync()
+  !!$      res = cdot(n, x%v, 1, yy%v, 1)
+  !!$    type is (psb_c_multivect_cuda)
+  !!$      if(x%is_host()) call x%sync()
+  !!$      if(yy%is_host()) call yy%sync()
+  !!$      info = dotMultiVecDevice(res, n, x%deviceVect, yy%deviceVect)
+  !!$      if(info /= psb_success_) then 
+  !!$        info = psb_err_internal_error_
+  !!$        call psb_errpush(info, 'c_cuda_multi_dot_v')
+  !!$      end if
+  !!$
+  !!$    class default
+  !!$      ! y%sync is done in dot_a
+  !!$      call x%sync()      
+  !!$      res = y%dot(n, x%v)
+  !!$    end select
+  !!$  end function c_cuda_multi_dot_v
+
+  !!$  function c_cuda_multi_dot_a(n, x, y) result(res)
+  !!$    implicit none
+  !!$    class(psb_c_multivect_cuda), intent(inout) :: x
+  !!$    complex(psb_spk_), intent(in)           :: y(:)
+  !!$    integer(psb_ipk_), intent(in)        :: n
+  !!$    complex(psb_spk_)                :: res
+  !!$    complex(psb_spk_), external      :: cdot
+  !!$    
+  !!$    if(x%is_dev()) call x%sync()
+  !!$    res = cdot(n, y, 1, x%v, 1)
+  !!$  end function c_cuda_multi_dot_a
   
-    res = (x%state == is_dev)
-  end function c_cuda_multi_is_dev
+  !!$  subroutine c_cuda_multi_axpby_v(m, alpha, x, beta, y, info)
+  !!$    use psi_serial_mod
+  !!$    implicit none
+  !!$    integer(psb_ipk_), intent(in)              :: m
+  !!$    class(psb_c_base_multivect_type), intent(inout) :: x
+  !!$    class(psb_c_multivect_cuda), intent(inout)       :: y
+  !!$    complex(psb_spk_), intent (in)                :: alpha, beta
+  !!$    integer(psb_ipk_), intent(out)             :: info
+  !!$    integer(psb_ipk_) :: nx, ny
+  !!$
+  !!$    info = psb_success_
+  !!$
+  !!$    select type(xx => x)
+  !!$    type is (psb_c_base_multivect_type)
+  !!$      if((beta /= czero).and.(y%is_dev()))&
+  !!$           & call y%sync()
+  !!$      call psb_geaxpby(m, alpha, xx%v, beta, y%v, info)
+  !!$      call y%set_host()
+  !!$    type is (psb_c_multivect_cuda)
+  !!$      ! Do something different here 
+  !!$      if((beta /= czero).and.y%is_host())&
+  !!$           &  call y%sync()
+  !!$      if(xx%is_host()) call xx%sync()
+  !!$      nx = getMultiVecDeviceSize(xx%deviceVect)
+  !!$      ny = getMultiVecDeviceSize(y%deviceVect)
+  !!$      if((nx<m).or.(ny<m)) then
+  !!$        info = psb_err_internal_error_
+  !!$        info = psb_err_internal_error_
+  !!$      else
+  !!$        info = axpbyMultiVecDevice(m, alpha, xx%deviceVect, beta, y%deviceVect)
+  !!$      end if
+  !!$      call y%set_dev()
+  !!$    class default
+  !!$      call x%sync()
+  !!$      call y%axpby(m, alpha, x%v, beta, info)
+  !!$    end select
+  !!$  end subroutine c_cuda_multi_axpby_v
   
-  function c_cuda_multi_is_host(x) result(res)
-    implicit none 
-    class(psb_c_multivect_cuda), intent(in) :: x
-    logical  :: res
-
-    res = (x%state == is_host)
-  end function c_cuda_multi_is_host
-
-  function c_cuda_multi_is_sync(x) result(res)
-    implicit none 
-    class(psb_c_multivect_cuda), intent(in) :: x
-    logical  :: res
-
-    res = (x%state == is_sync)
-  end function c_cuda_multi_is_sync
-
+  !!$  subroutine c_cuda_multi_axpby_a(m, alpha, x, beta, y, info)
+  !!$    use psi_serial_mod
+  !!$    implicit none
+  !!$    integer(psb_ipk_), intent(in)        :: m
+  !!$    complex(psb_spk_), intent(in)           :: x(:)
+  !!$    class(psb_c_multivect_cuda), intent(inout) :: y
+  !!$    complex(psb_spk_), intent (in)          :: alpha, beta
+  !!$    integer(psb_ipk_), intent(out)       :: info
+  !!$
+  !!$    if(y%is_dev()) call y%sync()
+  !!$    call psb_geaxpby(m, alpha, x, beta, y%v, info)
+  !!$    call y%set_host()
+  !!$  end subroutine c_cuda_multi_axpby_a
   
-  function c_cuda_multi_get_nrows(x) result(res)
-    implicit none 
-    class(psb_c_multivect_cuda), intent(in) :: x
-    integer(psb_ipk_) :: res
-
-    res = x%m_nrows
-
-  end function c_cuda_multi_get_nrows
+  !!$  subroutine c_cuda_multi_mlt_v(x, y, info)
+  !!$    use psi_serial_mod
+  !!$    implicit none
+  !!$    class(psb_c_base_multivect_type), intent(inout) :: x
+  !!$    class(psb_c_multivect_cuda), intent(inout)       :: y
+  !!$    integer(psb_ipk_), intent(out)             :: info
+  !!$
+  !!$    integer(psb_ipk_) :: i, n
+  !!$    
+  !!$    info = psb_success_
+  !!$    n = min(x%get_nrows(), y%get_nrows())
+  !!$    select type(xx => x)
+  !!$    type is (psb_c_base_multivect_type)
+  !!$      if(y%is_dev()) call y%sync()
+  !!$      do i=1, n
+  !!$        y%v(i) = y%v(i) * xx%v(i)
+  !!$      end do
+  !!$      call y%set_host()
+  !!$    type is (psb_c_multivect_cuda)
+  !!$      ! Do something different here 
+  !!$      if(y%is_host())  call y%sync()
+  !!$      if(xx%is_host()) call xx%sync()
+  !!$      info = axyMultiVecDevice(n, cone, xx%deviceVect, y%deviceVect)
+  !!$      call y%set_dev()
+  !!$    class default
+  !!$      call xx%sync()
+  !!$      call y%mlt(xx%v, info)
+  !!$      call y%set_host()
+  !!$    end select
+  !!$
+  !!$  end subroutine c_cuda_multi_mlt_v
   
-  function c_cuda_multi_get_ncols(x) result(res)
-    implicit none 
-    class(psb_c_multivect_cuda), intent(in) :: x
-    integer(psb_ipk_) :: res
+  !!$  subroutine c_cuda_multi_mlt_a(x, y, info)
+  !!$    use psi_serial_mod
+  !!$    implicit none
+  !!$    complex(psb_spk_), intent(in)           :: x(:)
+  !!$    class(psb_c_multivect_cuda), intent(inout) :: y
+  !!$    integer(psb_ipk_), intent(out)       :: info
+  !!$    integer(psb_ipk_) :: i, n
+  !!$    
+  !!$    info = psb_success_
+  !!$    call y%sync()
+  !!$    call y%psb_c_base_multivect_type%mlt(x, info)
+  !!$    call y%set_host()
+  !!$  end subroutine c_cuda_multi_mlt_a
+  
+  !!$  subroutine c_cuda_multi_mlt_a_2(alpha, x, y, beta, z, info)
+  !!$    use psi_serial_mod
+  !!$    implicit none
+  !!$    complex(psb_spk_), intent(in)           :: alpha, beta
+  !!$    complex(psb_spk_), intent(in)           :: x(:)
+  !!$    complex(psb_spk_), intent(in)           :: y(:)
+  !!$    class(psb_c_multivect_cuda), intent(inout) :: z
+  !!$    integer(psb_ipk_), intent(out)       :: info
+  !!$    integer(psb_ipk_) :: i, n
+  !!$    
+  !!$    info = psb_success_
+  !!$    if(z%is_dev()) call z%sync()
+  !!$    call z%psb_c_base_multivect_type%mlt(alpha, x, y, beta, info)
+  !!$    call z%set_host()
+  !!$  end subroutine c_cuda_multi_mlt_a_2
+  !!$
+  !!$  subroutine c_cuda_multi_mlt_v_2(alpha, x, y, beta, z, info, conjgx, conjgy)
+  !!$    use psi_serial_mod
+  !!$    use psb_string_mod
+  !!$    implicit none
+  !!$    complex(psb_spk_), intent(in)                 :: alpha, beta
+  !!$    class(psb_c_base_multivect_type), intent(inout) :: x
+  !!$    class(psb_c_base_multivect_type), intent(inout) :: y
+  !!$    class(psb_c_multivect_cuda), intent(inout)       :: z
+  !!$    integer(psb_ipk_), intent(out)             :: info
+  !!$    character(len=1), intent(in), optional     :: conjgx, conjgy
+  !!$    integer(psb_ipk_) :: i, n
+  !!$    logical :: conjgx_, conjgy_
+  !!$
+  !!$    if(.false.) then 
+  !!$      ! These are present just for coherence with the
+  !!$      ! complex versions; they do nothing here. 
+  !!$      conjgx_=.false.
+  !!$      if(present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
+  !!$      conjgy_=.false.
+  !!$      if(present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
+  !!$    end if
+  !!$    
+  !!$    n = min(x%get_nrows(), y%get_nrows(), z%get_nrows())
+  !!$    
+  !!$    !
+  !!$    ! Need to reconsider BETA in the GPU side
+  !!$    !  of things.
+  !!$    !
+  !!$    info = psb_success_
+  !!$    select type(xx => x) 
+  !!$    type is (psb_c_multivect_cuda)
+  !!$      select type (yy => y) 
+  !!$      type is (psb_c_multivect_cuda)
+  !!$        if(xx%is_host()) call xx%sync()
+  !!$        if(yy%is_host()) call yy%sync()
+  !!$        ! Z state is irrelevant: it will be done on the GPU. 
+  !!$        info = axybzMultiVecDevice(n, alpha, xx%deviceVect, &
+  !!$             & yy%deviceVect, beta, z%deviceVect)
+  !!$        call z%set_dev()
+  !!$      class default
+  !!$        call xx%sync()
+  !!$        call yy%sync()
+  !!$        call z%psb_c_base_multivect_type%mlt(alpha, xx, yy, beta, info)
+  !!$        call z%set_host()
+  !!$      end select
+  !!$      
+  !!$    class default
+  !!$      call x%sync()
+  !!$      call y%sync()
+  !!$      call z%psb_c_base_multivect_type%mlt(alpha, x, y, beta, info)
+  !!$      call z%set_host()
+  !!$    end select
+  !!$  end subroutine c_cuda_multi_mlt_v_2
 
-    res = x%m_ncols
-
-  end function c_cuda_multi_get_ncols
-
-  function c_cuda_multi_get_fmt() result(res)
-    implicit none 
-    character(len=5) :: res
-    res = 'cGPU'
-  end function c_cuda_multi_get_fmt
-
-!!$  function c_cuda_multi_dot_v(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_c_multivect_cuda), intent(inout)       :: x
-!!$    class(psb_c_base_multivect_type), intent(inout) :: y
-!!$    integer(psb_ipk_), intent(in)              :: n
-!!$    complex(psb_spk_)                :: res
-!!$    complex(psb_spk_), external      :: ddot
-!!$    integer(psb_ipk_) :: info
-!!$    
-!!$    res = czero
-!!$    !
-!!$    ! Note: this is the gpu implementation.
-!!$    !  When we get here, we are sure that X is of
-!!$    !  TYPE psb_c_vect
-!!$    !
-!!$    select type(yy => y)
-!!$    type is (psb_c_base_multivect_type)
-!!$      if (x%is_dev()) call x%sync()
-!!$      res = ddot(n,x%v,1,yy%v,1)
-!!$    type is (psb_c_multivect_cuda)
-!!$      if (x%is_host()) call x%sync()
-!!$      if (yy%is_host()) call yy%sync()
-!!$      info = dotMultiVecDevice(res,n,x%deviceVect,yy%deviceVect)
-!!$      if (info /= 0) then 
-!!$        info = psb_err_internal_error_
-!!$        call psb_errpush(info,'c_cuda_multi_dot_v')
-!!$      end if
-!!$
-!!$    class default
-!!$      ! y%sync is done in dot_a
-!!$      call x%sync()      
-!!$      res = y%dot(n,x%v)
-!!$    end select
-!!$
-!!$  end function c_cuda_multi_dot_v
-!!$
-!!$  function c_cuda_multi_dot_a(n,x,y) result(res)
-!!$    implicit none 
-!!$    class(psb_c_multivect_cuda), intent(inout) :: x
-!!$    complex(psb_spk_), intent(in)           :: y(:)
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    complex(psb_spk_)                :: res
-!!$    complex(psb_spk_), external      :: ddot
-!!$    
-!!$    if (x%is_dev()) call x%sync()
-!!$    res = ddot(n,y,1,x%v,1)
-!!$
-!!$  end function c_cuda_multi_dot_a
-!!$    
-!!$  subroutine c_cuda_multi_axpby_v(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)              :: m
-!!$    class(psb_c_base_multivect_type), intent(inout) :: x
-!!$    class(psb_c_multivect_cuda), intent(inout)       :: y
-!!$    complex(psb_spk_), intent (in)                :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)             :: info
-!!$    integer(psb_ipk_) :: nx, ny
-!!$
-!!$    info = psb_success_
-!!$
-!!$    select type(xx => x)
-!!$    type is (psb_c_base_multivect_type)
-!!$      if ((beta /= czero).and.(y%is_dev()))&
-!!$           & call y%sync()
-!!$      call psb_geaxpby(m,alpha,xx%v,beta,y%v,info)
-!!$      call y%set_host()
-!!$    type is (psb_c_multivect_cuda)
-!!$      ! Do something different here 
-!!$      if ((beta /= czero).and.y%is_host())&
-!!$           &  call y%sync()
-!!$      if (xx%is_host()) call xx%sync()
-!!$      nx = getMultiVecDeviceSize(xx%deviceVect)
-!!$      ny = getMultiVecDeviceSize(y%deviceVect)
-!!$      if ((nx<m).or.(ny<m)) then
-!!$        info = psb_err_internal_error_
-!!$        info = psb_err_internal_error_
-!!$      else
-!!$        info = axpbyMultiVecDevice(m,alpha,xx%deviceVect,beta,y%deviceVect)
-!!$      end if
-!!$      call y%set_dev()
-!!$    class default
-!!$      call x%sync()
-!!$      call y%axpby(m,alpha,x%v,beta,info)
-!!$    end select
-!!$
-!!$  end subroutine c_cuda_multi_axpby_v
-!!$
-!!$  subroutine c_cuda_multi_axpby_a(m,alpha, x, beta, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    integer(psb_ipk_), intent(in)        :: m
-!!$    complex(psb_spk_), intent(in)           :: x(:)
-!!$    class(psb_c_multivect_cuda), intent(inout) :: y
-!!$    complex(psb_spk_), intent (in)          :: alpha, beta
-!!$    integer(psb_ipk_), intent(out)       :: info
-!!$
-!!$    if (y%is_dev()) call y%sync()
-!!$    call psb_geaxpby(m,alpha,x,beta,y%v,info)
-!!$    call y%set_host()
-!!$  end subroutine c_cuda_multi_axpby_a
-!!$
-!!$  subroutine c_cuda_multi_mlt_v(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    class(psb_c_base_multivect_type), intent(inout) :: x
-!!$    class(psb_c_multivect_cuda), intent(inout)       :: y
-!!$    integer(psb_ipk_), intent(out)             :: info
-!!$
-!!$    integer(psb_ipk_) :: i, n
-!!$    
-!!$    info = 0    
-!!$    n = min(x%get_nrows(),y%get_nrows())
-!!$    select type(xx => x)
-!!$    type is (psb_c_base_multivect_type)
-!!$      if (y%is_dev()) call y%sync()
-!!$      do i=1, n
-!!$        y%v(i) = y%v(i) * xx%v(i)
-!!$      end do
-!!$      call y%set_host()
-!!$    type is (psb_c_multivect_cuda)
-!!$      ! Do something different here 
-!!$      if (y%is_host())  call y%sync()
-!!$      if (xx%is_host()) call xx%sync()
-!!$      info = axyMultiVecDevice(n,done,xx%deviceVect,y%deviceVect)
-!!$      call y%set_dev()
-!!$    class default
-!!$      call xx%sync()
-!!$      call y%mlt(xx%v,info)
-!!$      call y%set_host()
-!!$    end select
-!!$
-!!$  end subroutine c_cuda_multi_mlt_v
-!!$
-!!$  subroutine c_cuda_multi_mlt_a(x, y, info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    complex(psb_spk_), intent(in)           :: x(:)
-!!$    class(psb_c_multivect_cuda), intent(inout) :: y
-!!$    integer(psb_ipk_), intent(out)       :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$    
-!!$    info = 0    
-!!$    call y%sync()
-!!$    call y%psb_c_base_multivect_type%mlt(x,info)
-!!$    call y%set_host()
-!!$  end subroutine c_cuda_multi_mlt_a
-!!$
-!!$  subroutine c_cuda_multi_mlt_a_2(alpha,x,y,beta,z,info)
-!!$    use psi_serial_mod
-!!$    implicit none 
-!!$    complex(psb_spk_), intent(in)           :: alpha,beta
-!!$    complex(psb_spk_), intent(in)           :: x(:)
-!!$    complex(psb_spk_), intent(in)           :: y(:)
-!!$    class(psb_c_multivect_cuda), intent(inout) :: z
-!!$    integer(psb_ipk_), intent(out)       :: info
-!!$    integer(psb_ipk_) :: i, n
-!!$    
-!!$    info = 0    
-!!$    if (z%is_dev()) call z%sync()
-!!$    call z%psb_c_base_multivect_type%mlt(alpha,x,y,beta,info)
-!!$    call z%set_host()
-!!$  end subroutine c_cuda_multi_mlt_a_2
-!!$
-!!$  subroutine c_cuda_multi_mlt_v_2(alpha,x,y, beta,z,info,conjgx,conjgy)
-!!$    use psi_serial_mod
-!!$    use psb_string_mod
-!!$    implicit none 
-!!$    complex(psb_spk_), intent(in)                 :: alpha,beta
-!!$    class(psb_c_base_multivect_type), intent(inout) :: x
-!!$    class(psb_c_base_multivect_type), intent(inout) :: y
-!!$    class(psb_c_multivect_cuda), intent(inout)       :: z
-!!$    integer(psb_ipk_), intent(out)             :: info
-!!$    character(len=1), intent(in), optional     :: conjgx, conjgy
-!!$    integer(psb_ipk_) :: i, n
-!!$    logical :: conjgx_, conjgy_
-!!$
-!!$    if (.false.) then 
-!!$      ! These are present just for coherence with the
-!!$      ! complex versions; they do nothing here. 
-!!$      conjgx_=.false.
-!!$      if (present(conjgx)) conjgx_ = (psb_toupper(conjgx)=='C')
-!!$      conjgy_=.false.
-!!$      if (present(conjgy)) conjgy_ = (psb_toupper(conjgy)=='C')
-!!$    end if
-!!$    
-!!$    n = min(x%get_nrows(),y%get_nrows(),z%get_nrows())
-!!$    
-!!$    !
-!!$    ! Need to reconsider BETA in the GPU side
-!!$    !  of things.
-!!$    !
-!!$    info = 0    
-!!$    select type(xx => x) 
-!!$    type is (psb_c_multivect_cuda)
-!!$      select type (yy => y) 
-!!$      type is (psb_c_multivect_cuda)
-!!$        if (xx%is_host()) call xx%sync()
-!!$        if (yy%is_host()) call yy%sync()
-!!$        ! Z state is irrelevant: it will be done on the GPU. 
-!!$        info = axybzMultiVecDevice(n,alpha,xx%deviceVect,&
-!!$             & yy%deviceVect,beta,z%deviceVect)
-!!$        call z%set_dev()
-!!$      class default
-!!$        call xx%sync()
-!!$        call yy%sync()
-!!$        call z%psb_c_base_multivect_type%mlt(alpha,xx,yy,beta,info)
-!!$        call z%set_host()
-!!$      end select
-!!$      
-!!$    class default
-!!$      call x%sync()
-!!$      call y%sync()
-!!$      call z%psb_c_base_multivect_type%mlt(alpha,x,y,beta,info)
-!!$      call z%set_host()
-!!$    end select
-!!$  end subroutine c_cuda_multi_mlt_v_2
-
-
-  subroutine c_cuda_multi_set_scal(x,val)
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    complex(psb_spk_), intent(in)           :: val
+  subroutine c_cuda_multi_set_scal(x, val, rfirst, rlast)
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    complex(psb_spk_), intent(in)                  :: val
+    integer(psb_ipk_), optional :: rfirst, rlast
         
     integer(psb_ipk_) :: info
 
-    if (x%is_dev()) call x%sync()
-    call x%psb_c_base_multivect_type%set_scal(val)
+    if(x%is_dev()) call x%sync()
+    call x%psb_c_base_multivect_type%set_scal(val, rfirst = rfirst, rlast = rlast)
     call x%set_host()
   end subroutine c_cuda_multi_set_scal
 
-  subroutine c_cuda_multi_set_vect(x,val)
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    complex(psb_spk_), intent(in)           :: val(:,:)
-    integer(psb_ipk_) :: nr
-    integer(psb_ipk_) :: info
+  subroutine c_cuda_multi_set_vect(x, val)
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    complex(psb_spk_), intent(in)                  :: val(:, :)
 
-    if (x%is_dev()) call x%sync()
+    integer(psb_ipk_) :: nr, info
+
+    if(x%is_dev()) call x%sync()
     call x%psb_c_base_multivect_type%set_vect(val)
     call x%set_host()
-
   end subroutine c_cuda_multi_set_vect
 
-
-
-!!$  subroutine c_cuda_multi_scal(alpha, x)
-!!$    implicit none 
-!!$    class(psb_c_multivect_cuda), intent(inout) :: x
-!!$    complex(psb_spk_), intent (in)          :: alpha
-!!$    
-!!$    if (x%is_dev()) call x%sync()
-!!$    call x%psb_c_base_multivect_type%scal(alpha)
-!!$    call x%set_host()
-!!$  end subroutine c_cuda_multi_scal
-!!$
-!!$
-!!$  function c_cuda_multi_nrm2(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_c_multivect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_spk_)                       :: res
-!!$    integer(psb_ipk_) :: info
-!!$    ! WARNING: this should be changed. 
-!!$    if (x%is_host()) call x%sync()
-!!$    info = nrm2MultiVecDevice(res,n,x%deviceVect)
-!!$    
-!!$  end function c_cuda_multi_nrm2
-!!$  
-!!$  function c_cuda_multi_amax(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_c_multivect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_spk_)                :: res
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$    res =  maxval(abs(x%v(1:n)))
-!!$
-!!$  end function c_cuda_multi_amax
-!!$
-!!$  function c_cuda_multi_asum(n,x) result(res)
-!!$    implicit none 
-!!$    class(psb_c_multivect_cuda), intent(inout) :: x
-!!$    integer(psb_ipk_), intent(in)        :: n
-!!$    real(psb_spk_)                :: res
-!!$
-!!$    if (x%is_dev()) call x%sync()
-!!$    res =  sum(abs(x%v(1:n)))
-!!$
-!!$  end function c_cuda_multi_asum
-  
-  subroutine c_cuda_multi_all(m,n, x, info)
+  subroutine c_cuda_mvect_extract_col(m, alpha, x, idx_x, beta, y, info)
     use psi_serial_mod
-    use psb_realloc_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)      :: m,n
-    class(psb_c_multivect_cuda), intent(out) :: x
-    integer(psb_ipk_), intent(out)     :: info
-    
-    call psb_realloc(m,n,x%v,info,pad=czero)
-    x%m_nrows = m
-    x%m_ncols = n
-    if (info == 0) call x%set_host()
-    if (info == 0) call x%sync_space(info)
-    if (info /= 0) then 
-      info=psb_err_alloc_request_
-      call psb_errpush(info,'c_cuda_multi_all',&
-           & i_err=(/m,n,n,n,n/))
-    end if
-  end subroutine c_cuda_multi_all
-
-  subroutine c_cuda_multi_zero(x)
-    use psi_serial_mod
-    implicit none 
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    
-    if (allocated(x%v)) x%v=czero
-    call x%set_host()
-  end subroutine c_cuda_multi_zero
-
-  subroutine c_cuda_multi_asb(m,n, x, info, scratch)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none 
-    integer(psb_ipk_), intent(in)        :: m,n
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(out)       :: info
-    integer(psb_ipk_) :: nd, nc
-    logical, intent(in), optional        :: scratch
-
-    info = 0
-
-    x%m_nrows = m
-    x%m_ncols = n
-    if (x%is_host()) then 
-      call x%psb_c_base_multivect_type%asb(m,n,info,scratch)
-      if (info == psb_success_) call x%sync_space(info)
-    else if (x%is_dev()) then 
-      nd  = getMultiVecDevicePitch(x%deviceVect)
-      nc  = getMultiVecDeviceCount(x%deviceVect)
-      if ((nd < m).or.(nc<n)) then 
-        call x%sync()
-        call x%psb_c_base_multivect_type%asb(m,n,info)      
-        if (info == psb_success_) call x%sync_space(info)
-        call x%set_host()
-      end if
-    end if
-  end subroutine c_cuda_multi_asb
-
-  subroutine c_cuda_multi_sync_space(x,info)
-    use psb_realloc_mod
-    implicit none 
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(out)       :: info 
-    integer(psb_ipk_) :: mh,nh,md,nd
-    
-    info = 0
-    if (x%is_host()) then 
-      if (allocated(x%v)) then 
-        mh = size(x%v,1)
-        nh = size(x%v,2)
-      else
-        mh=0
-        nh=0
-      end if
-      if (c_associated(x%deviceVect)) then 
-        md  = getMultiVecDevicePitch(x%deviceVect)
-        nd  = getMultiVecDeviceCount(x%deviceVect)
-        if ((md < mh).or.(nd<nh)) then 
-          call freeMultiVecDevice(x%deviceVect)
-          x%deviceVect=c_null_ptr
-        end if
-      end if
-
-      if (.not.c_associated(x%deviceVect)) then 
-        info = FallocMultiVecDevice(x%deviceVect,nh,mh,spgpu_type_complex_float)
-        if (info == 0) &
-             & call psb_realloc(getMultiVecDevicePitch(x%deviceVect),&
-             & getMultiVecDeviceCount(x%deviceVect),x%v,info,pad=czero)
-        if  (info /= 0) then 
-!!$          write(0,*) 'Error from FallocMultiVecDevice',info,n
-          if (info == spgpu_outofmem) then 
-            info = psb_err_alloc_request_
-          end if
-        end if
-        
-      end if
-    else if (x%is_dev()) then 
-      ! 
-      if (allocated(x%v)) then 
-        mh = size(x%v,1)
-        nh = size(x%v,2)
-      else
-        mh=0
-        nh=0
-      end if
-      md  = getMultiVecDevicePitch(x%deviceVect)
-      nd  = getMultiVecDeviceCount(x%deviceVect)
-      if ((mh /= md).or.(nh /= nd)) then 
-        call psb_realloc(getMultiVecDevicePitch(x%deviceVect),&
-             & getMultiVecDeviceCount(x%deviceVect),x%v,info,pad=czero)
-      end if
-      
-    end if
-    
-  end subroutine c_cuda_multi_sync_space
-
-  subroutine c_cuda_multi_sync(x)
-    implicit none 
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    integer(psb_ipk_) :: n,info
-    
-    info = 0
-    if (x%is_host()) then 
-      if (.not.c_associated(x%deviceVect)) then 
-        call x%sync_space(info)
-      end if
-      if (info == 0) &
-           & info = writeMultiVecDevice(x%deviceVect,x%v,size(x%v,1))
-    else if (x%is_dev()) then 
-      info = readMultiVecDevice(x%deviceVect,x%v,size(x%v,1))
-    end if
-    if (info == 0)  call x%set_sync()
-    if (info /= 0) then
-      info=psb_err_internal_error_
-      call psb_errpush(info,'c_cuda_multi_sync')
-    end if
-    
-  end subroutine c_cuda_multi_sync
-
-  subroutine c_cuda_multi_free(x, info)
-    use psi_serial_mod
-    use psb_realloc_mod
-    implicit none 
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, idx_x
+    complex(psb_spk_), intent(in)                  :: alpha, beta
     class(psb_c_multivect_cuda), intent(inout)  :: x
-    integer(psb_ipk_), intent(out)        :: info
-    
-    info = 0
-    if (c_associated(x%deviceVect)) then 
-      call freeMultiVecDevice(x%deviceVect)
-      x%deviceVect=c_null_ptr
-    end if
-    if (allocated(x%buffer)) then 
-!!$      call inner_unregister(x%buffer)
-      deallocate(x%buffer, stat=info)
-    end if
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
 
-    if (allocated(x%v)) deallocate(x%v, stat=info)
-    call x%set_sync()
-  end subroutine c_cuda_multi_free
+    select type(y)
+      type is(psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = axpbyMultiVecDevice(m, alpha, x%deviceVect, idx_x, beta, y%deviceVect)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call x%psb_c_base_multivect_type%axpby(m, alpha, idx_x, beta, y, info)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_extract_col
+
+  subroutine c_cuda_mvect_axpby_v_idxs(m, alpha, x, beta, y, idx_y, info)
+    use psi_serial_mod
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, idx_y
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_multivect_cuda), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect, idx_y)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%axpby(m, alpha, x, beta, idx_y, info)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_axpby_v_idxs
+
+  subroutine c_cuda_mvect_axpby_v_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_multivect_cuda), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%axpby(m, alpha, x, beta, info)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_axpby_v_full
+
+  subroutine c_cuda_mvect_axpby_m_idxs(m, alpha, x, idx_x, beta, y, idx_y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    class(psb_c_multivect_cuda), intent(inout)      :: y
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = axpbyMultiVecDevice(m, alpha, x%deviceVect, idx_x, beta, y%deviceVect, idx_y)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+    
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%axpby(m, alpha, x, idx_x, beta, idx_y, info)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_axpby_m_idxs
+
+  subroutine c_cuda_mvect_axpby_m_full(m, alpha, x, beta, y, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    class(psb_c_multivect_cuda), intent(inout)      :: y
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%axpby(m, alpha, x, beta, info)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_axpby_m_full
+
+  subroutine c_cuda_mvect_axpby_m_full_out(m, alpha, x, beta, y, z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x, y
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect, z%deviceVect)
+            if(info == psb_success_) call z%set_dev()
+
+          class default
+            goto 9999
+        end select
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call z%psb_c_base_multivect_type%axpby(m, alpha, x, beta, y, info)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_axpby_m_full_out
+
+  subroutine c_cuda_mvect_axpbycz_vv(m, alpha, x, beta, y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m, idx_z
+    complex(psb_spk_), intent(in)                  :: alpha, beta, gamma
+    class(psb_c_base_vect_type), intent(inout)   :: x, y
+    class(psb_c_multivect_cuda), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(y)
+          type is(psb_c_vect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+            info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect, gamma, z%deviceVect, idx_z)
+            if(info == psb_success_) call z%set_dev()
+
+          class default
+            goto 9999
+        end select
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%axpby(m, alpha, x, beta, y, gamma, idx_z, info)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_axpbycz_vv
+
+  subroutine c_cuda_mvect_axpbycz_mv(m, alpha, x, beta, y, idx_y, gamma, z, idx_z, info)
+    use psi_serial_mod
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_y, idx_z
+    complex(psb_spk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_c_base_vect_type), intent(inout)      :: x
+    class(psb_c_base_multivect_type), intent(inout) :: y
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+            info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect, idx_y, gamma, z%deviceVect, idx_z)
+            if(info == psb_success_) call z%set_dev()
+
+          class default
+            goto 9999
+        end select
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%axpby(m, alpha, x, beta, y, idx_y, gamma, idx_z, info)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_axpbycz_mv
+
+  subroutine c_cuda_mvect_axpbycz_mm_idxs(m, alpha, x, idx_x, beta, y, idx_y, z, gamma, idx_z, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z
+    complex(psb_spk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_c_base_multivect_type), intent(inout) :: x, y
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+            info = axpbyMultiVecDevice(m, alpha, x%deviceVect, idx_x, beta, y%deviceVect, idx_y, gamma, z%deviceVect, idx_z)
+            if(info == psb_success_) call z%set_dev()
+
+          class default
+            goto 9999
+        end select
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%axpby(m, alpha, x, idx_x, beta, y, idx_y, gamma, idx_z, info)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_axpbycz_mm_idxs
+
+  subroutine c_cuda_mvect_axpbycz_mm_full(m, alpha, x, beta, y, z, gamma, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_c_base_multivect_type), intent(inout) :: x, y
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+            info = axpbyMultiVecDevice(m, alpha, x%deviceVect, beta, y%deviceVect, gamma, z%deviceVect)
+            if(info == psb_success_) call z%set_dev()
+
+          class default
+            goto 9999
+        end select
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%axpby(m, alpha, x, beta, y, gamma, info)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_axpbycz_mm_full
+
+  subroutine c_cuda_mvect_axpbycz_mm_out(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, w, idx_w, info)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m, idx_x, idx_y, idx_z, idx_w
+    complex(psb_spk_), intent(in)                      :: alpha, beta, gamma
+    class(psb_c_base_multivect_type), intent(inout) :: x, y, z
+    class(psb_c_multivect_cuda), intent(inout)      :: w
+    integer(psb_ipk_), intent(out)                  :: info
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            select type(z)
+              type is(psb_c_multivect_cuda)
+                if(x%is_host()) call x%sync()
+                if(y%is_host()) call y%sync()
+                if(z%is_host()) call z%sync()
+                if(w%is_host()) call w%sync()
+                info = axpbyMultiVecDevice(m, alpha, x%deviceVect, idx_x, beta, y%deviceVect, idx_y, &
+                                                      & gamma, z%deviceVect, idx_z, w%deviceVect, idx_w)
+                if(info == psb_success_) call w%set_dev()
+
+              class default
+                goto 9999
+            end select
+
+          class default
+            goto 9999
+        end select
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    if(w%is_dev()) call w%sync()
+    call w%psb_c_base_multivect_type%axpby(m, alpha, x, idx_x, beta, y, idx_y, gamma, z, idx_z, idx_w, info)
+    if(info == psb_success_) call w%set_host()
+  end subroutine c_cuda_mvect_axpbycz_mm_out
+
+  subroutine c_cuda_mvect_colspan1D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    complex(psb_spk_), intent(in)                  :: coeff(:)
+    class(psb_c_base_vect_type), intent(inout)  :: y 
+    integer(psb_ipk_), intent(out)              :: info
+    logical, intent(in)                         :: upd_flag
+
+    logical(c_bool) :: upd_flag_c
+
+    select type(y)
+      type is(psb_c_vect_cuda)
+        !WIP: not optimized
+        if(x%is_host()) call x%sync()
+        if((upd_flag) .and. (y%is_host())) call y%sync()
+        upd_flag_c = upd_flag
+        info = axpbyMultiVecDevice(m, x%deviceVect, coeff, y%deviceVect, upd_flag_c)
+        if(info == psb_success_) call y%set_dev()
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call x%psb_c_base_multivect_type%axpby(m, coeff, y, info, upd_flag)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_colspan1D
+
+  subroutine c_cuda_mvect_colspan2D(m, x, coeff, y, info, upd_flag)
+    use psi_serial_mod
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_c_multivect_cuda), intent(inout)      :: x
+    class(psb_c_base_multivect_type), intent(inout) :: y
+    complex(psb_spk_), intent(in)                      :: coeff(:, :)
+    integer(psb_ipk_), intent(out)                  :: info
+    logical, intent(in)                             :: upd_flag
+
+    logical(c_bool) :: upd_flag_c
+
+    select type(y)
+      type is(psb_c_multivect_cuda)
+        !WIP: not optimized
+        if(x%is_host()) call x%sync()
+        if((upd_flag) .and. (y%is_host())) call y%sync()
+        upd_flag_c = upd_flag
+        info = axpbyMultiVecDevice(m, x%deviceVect, coeff, y%deviceVect, upd_flag_c)
+        if(info == psb_success_) call y%set_dev()
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call x%psb_c_base_multivect_type%axpby(m, coeff, y, info, upd_flag)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_colspan2D
+
+  subroutine c_cuda_mvect_dot_mm(m, x, y, res, info)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    class(psb_c_multivect_cuda), intent(inout)      :: x
+    class(psb_c_base_multivect_type), intent(inout) :: y
+    complex(psb_spk_), intent(out)                     :: res(:, :)
+    integer(psb_ipk_), intent(out)                  :: info
+
+    res = czero
+    select type(y)        
+      type is (psb_c_multivect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = dotMultiVecDevice(res, m, x%deviceVect, y%deviceVect)
+        if(info /= psb_success_) then 
+          info = psb_err_internal_error_
+          call psb_errpush(info, 'c_cuda_multi_dot_mm')
+        end if
+  
+      class default
+        if(x%is_dev()) call x%sync()
+        if(y%is_dev()) call y%sync()
+        call x%psb_c_base_multivect_type%dotsbr(m, y, res, info)
+    end select
+  end subroutine c_cuda_mvect_dot_mm
+
+  subroutine c_cuda_mvect_dot_mv(m, x, y, res, info)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    class(psb_c_base_vect_type), intent(inout)  :: y
+    complex(psb_spk_), intent(out)                 :: res(:)
+    integer(psb_ipk_), intent(out)              :: info
+
+    res = czero
+    select type(y)        
+      type is (psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        info = dotMultiVecDevice(res, m, x%deviceVect, y%deviceVect)
+        if(info /= psb_success_) then 
+          info = psb_err_internal_error_
+          call psb_errpush(info, 'c_cuda_multi_dot_mv')
+        end if
+  
+      class default
+        if(x%is_dev()) call x%sync()
+        if(y%is_dev()) call y%sync()
+        call x%psb_c_base_multivect_type%dotsbr(m, y, res, info)
+    end select
+  end subroutine c_cuda_mvect_dot_mv
+
+  subroutine c_cuda_mvect_mlt_v_full(m, alpha, x, y, beta, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_multivect_cuda), intent(inout)  :: y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+
+        !Temp
+        conjgx_ = .false.
+        if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+        conjgy_ = .false.
+        if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+        info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, beta, conjgx_, conjgy_)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%mlt(m, alpha, x, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_mlt_v_full
+
+  subroutine c_cuda_mvect_mlt_v_idxs(m, alpha, x, y, idx_y, beta, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x
+    class(psb_c_multivect_cuda), intent(inout)  :: y
+    integer(psb_ipk_), intent(in)               :: idx_y
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+
+        !Temp
+        conjgx_ = .false.
+        if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+        conjgy_ = .false.
+        if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+        info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, idx_y, beta, conjgx_, conjgy_)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%mlt(m, alpha, x, idx_y, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_mlt_v_idxs
+
+  subroutine c_cuda_mvect_mlt_m_full(m, alpha, x, y, beta, info, conjgx, conjgy)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    class(psb_c_multivect_cuda), intent(inout)      :: y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+
+        !Temp
+        conjgx_ = .false.
+        if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+        conjgy_ = .false.
+        if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+        info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, beta, conjgx_, conjgy_)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%mlt(m, alpha, x, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_mlt_m_full
+
+  subroutine c_cuda_mvect_mlt_m_idxs(m, alpha, x, idx_x, y, idx_y, beta, info, conjgx, conjgy)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+    class(psb_c_multivect_cuda), intent(inout)      :: y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+
+        !Temp
+        conjgx_ = .false.
+        if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+        conjgy_ = .false.
+        if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+        info = mltMultiVecDevice(m, alpha, x%deviceVect, idx_x, y%deviceVect, idx_y, beta, conjgx_, conjgy_)
+        if(info == psb_success_) call y%set_dev()
+
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    call y%psb_c_base_multivect_type%mlt(m, alpha, x, idx_x, idx_y, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_mlt_m_idxs
+
+  subroutine c_cuda_mvect_mlt_vv_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x, y
+    class(psb_c_multivect_cuda), intent(inout)  :: z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(y)
+          type is(psb_c_vect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, beta, z%deviceVect, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%mlt(m, alpha, x, y, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_vv_full_out
+
+  subroutine c_cuda_mvect_mlt_vv_idxs_out(m, alpha, x, y, beta, z, idx_z, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    complex(psb_spk_), intent(in)                  :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)  :: x, y
+    class(psb_c_multivect_cuda), intent(inout)  :: z
+    integer(psb_ipk_), intent(in)               :: idx_z
+    integer(psb_ipk_), intent(out)              :: info
+    character(len=1), intent(in), optional  :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(y)
+          type is(psb_c_vect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, beta, z%deviceVect, idx_z, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%mlt(m, alpha, x, y, beta, idx_z, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_vv_idxs_out
+
+  subroutine c_cuda_mvect_mlt_vm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)      :: x
+    class(psb_c_base_multivect_type), intent(inout) :: y
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional          :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, beta, z%deviceVect, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%mlt(m, alpha, x, y, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_vm_full_out
+
+  subroutine c_cuda_mvect_mlt_vm_idxs_out(m, alpha, x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)      :: x
+    class(psb_c_base_multivect_type), intent(inout) :: y
+    integer(psb_ipk_), intent(in)                   :: idx_y, idx_z
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional          :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, idx_y, beta, z%deviceVect, idx_z, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%mlt(m, alpha, x, y, idx_y, beta, idx_z, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_vm_idxs_out
+
+  subroutine c_cuda_mvect_mlt_mm_full_out(m, alpha, x, y, beta, z, info, conjgx, conjgy)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x, y
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional          :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, beta, z%deviceVect, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%mlt(m, alpha, x, y, beta, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_mm_full_out
+
+  subroutine c_cuda_mvect_mlt_mm_idxs_out(m, alpha, x, idx_x, y, idx_y, beta, z, idx_z, info, conjgx, conjgy)
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y, idx_z
+    class(psb_c_multivect_cuda), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional          :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(y)
+          type is(psb_c_multivect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, idx_x, y%deviceVect, idx_y, &
+                                        & beta, z%deviceVect, idx_z, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call z%psb_c_base_multivect_type%mlt(m, alpha, x, idx_x, y, idx_y, beta, idx_z, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_mm_idxs_out
+
+  subroutine c_cuda_mvect_mlt_vm_ext(m, alpha, x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_vect_type), intent(inout)      :: x, z
+    class(psb_c_multivect_cuda), intent(inout)      :: y
+    integer(psb_ipk_), intent(in)                   :: idx_y
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional          :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_vect_cuda)
+        select type(z)
+          type is(psb_c_vect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, y%deviceVect, idx_y, beta, z%deviceVect, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call y%psb_c_base_multivect_type%mlt(m, alpha, x, idx_y, beta, z, info, conjgx, conjgy)
+    if(info == psb_success_) call y%set_host()
+  end subroutine c_cuda_mvect_mlt_vm_ext
+
+  subroutine c_cuda_mvect_mlt_mm_ext(m, alpha, x, idx_x, y, idx_y, beta, z, info, conjgx, conjgy)
+    use psb_c_cuda_vect_mod, only : psb_c_vect_cuda
+    implicit none
+    integer(psb_ipk_), intent(in)                   :: m
+    complex(psb_spk_), intent(in)                      :: alpha, beta
+    class(psb_c_base_multivect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+    class(psb_c_multivect_cuda), intent(inout)      :: y
+    class(psb_c_base_vect_type), intent(inout)      :: z
+    integer(psb_ipk_), intent(out)                  :: info
+    character(len=1), intent(in), optional          :: conjgx, conjgy
+
+    logical(c_bool) :: conjgx_, conjgy_
+
+    select type(x)
+      type is(psb_c_multivect_cuda)
+        select type(z)
+          type is(psb_c_vect_cuda)
+            if(x%is_host()) call x%sync()
+            if(y%is_host()) call y%sync()
+            if(z%is_host()) call z%sync()
+
+            !Temp
+            conjgx_ = .false.
+            if(present(conjgx)) conjgx_ = (psb_toupper(conjgx) == 'C')
+            conjgy_ = .false.
+            if(present(conjgy)) conjgy_ = (psb_toupper(conjgy) == 'C')
+
+            info = mltMultiVecDevice(m, alpha, x%deviceVect, idx_x, y%deviceVect, idx_y, beta, z%deviceVect, conjgx_, conjgy_)
+            if(info == psb_success_) call y%set_dev()
+
+          class default
+            goto 9999
+        end select
+      
+      class default
+        goto 9999
+    end select
+    return
+
+  9999 continue
+    if(x%is_dev()) call x%sync()
+    if(y%is_dev()) call y%sync()
+    if(z%is_dev()) call z%sync()
+    call y%psb_c_base_multivect_type%mlt(m, alpha, x, idx_x, idx_y, beta, z, info, conjgx, conjgy)
+    if(info == psb_success_) call z%set_host()
+  end subroutine c_cuda_mvect_mlt_mm_ext
+
+  function c_cuda_mvect_nrm2_full(m, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    real(psb_spk_), allocatable :: res(:)
+
+    integer(psb_ipk_) :: info
+    ! WARNING: this should be changed.
+    allocate(res(x%get_ncols()), stat = info)
+    if(x%is_host()) call x%sync()
+    info = nrm2MultiVecDeviceComplex(res, m, x%deviceVect)
+  end function c_cuda_mvect_nrm2_full
+  
+  function c_cuda_mvect_nrm2_idxs(m, x, idx) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)               :: m
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    integer(psb_ipk_), intent(in)               :: idx
+    real(psb_spk_)  :: res
+    
+    integer(psb_ipk_) :: info
+    ! WARNING: this should be changed.
+    if(x%is_host()) call x%sync()
+    info = nrm2MultiVecDeviceComplex(res, m, x%deviceVect, idx)
+  end function c_cuda_mvect_nrm2_idxs
+
+  subroutine c_cuda_mvect_scal(alpha, x)
+    implicit none
+    complex(psb_spk_), intent(in)                  :: alpha
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    
+    if(x%is_dev()) call x%sync()
+    call x%psb_c_base_multivect_type%scal(alpha)
+    call x%set_host()
+  end subroutine c_cuda_mvect_scal
+  
+  function c_cuda_mvect_amax(n, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)               :: n
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    real(psb_spk_), allocatable :: res(:)
+    
+    if(x%is_dev()) call x%sync()
+    res = x%psb_c_base_multivect_type%amax(n)
+  end function c_cuda_mvect_amax
+
+  function c_cuda_mvect_asum(n, x) result(res)
+    implicit none
+    integer(psb_ipk_), intent(in)               :: n
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+    real(psb_spk_), allocatable :: res(:)
+    
+    if(x%is_dev()) call x%sync()
+    res = x%psb_c_base_multivect_type%asum(n)
+  end function c_cuda_mvect_asum
+
+  subroutine c_cuda_mvect_absval1(x)
+    implicit none
+    class(psb_c_multivect_cuda), intent(inout)  :: x
+
+    if(x%is_host()) call x%sync()
+    call x%psb_c_base_multivect_type%absval1()
+    call x%set_host()
+  end subroutine c_cuda_mvect_absval1
+
+  subroutine c_cuda_mvect_absval2(x, y)
+    implicit none
+    class(psb_c_multivect_cuda), intent(inout)      :: x
+    class(psb_c_base_multivect_type), intent(inout) :: y
+    
+    integer(psb_ipk_) :: info
+
+    select type(y)
+      class is (psb_c_multivect_cuda)
+        if(x%is_host()) call x%sync()
+        if(y%is_host()) call y%sync()
+        call y%axpby(min(x%get_nrows(), y%get_nrows()), cone, x, czero, info)
+        call y%absval()
+
+      class default
+        if(x%is_dev()) call x%sync()
+        call x%psb_c_base_multivect_type%absval2(y)
+        call x%set_host()
+    end select
+  end subroutine c_cuda_mvect_absval2
 
   subroutine c_cuda_multi_vect_finalize(x)
     use psi_serial_mod
     use psb_realloc_mod
-    implicit none 
-    type(psb_c_multivect_cuda), intent(inout)  :: x
-    integer(psb_ipk_)        :: info
-    
-    info = 0
-    if (c_associated(x%deviceVect)) then 
+    implicit none
+    type(psb_c_multivect_cuda), intent(inout) :: x
+
+    integer(psb_ipk_) :: info
+    info = psb_success_
+
+    if(c_associated(x%deviceVect)) then 
       call freeMultiVecDevice(x%deviceVect)
-      x%deviceVect=c_null_ptr
-    end if
-    if (allocated(x%buffer)) then 
-!!$      call inner_unregister(x%buffer)
-      deallocate(x%buffer, stat=info)
+      x%deviceVect = c_null_ptr
     end if
 
-    if (allocated(x%v)) deallocate(x%v, stat=info)
+    if(allocated(x%buffer)) then 
+      !!$ call inner_unregister(x%buffer)
+      deallocate(x%buffer, stat = info)
+    end if
+
+    if(allocated(x%v)) deallocate(x%v, stat = info)
     call x%set_sync()
   end subroutine c_cuda_multi_vect_finalize
-
-  subroutine c_cuda_multi_ins(n,irl,val,dupl,x,maxr,info)
-    use psi_serial_mod
-    implicit none 
-    class(psb_c_multivect_cuda), intent(inout) :: x
-    integer(psb_ipk_), intent(in)        :: n, dupl,maxr
-    integer(psb_ipk_), intent(in)        :: irl(:)
-    complex(psb_spk_), intent(in)           :: val(:,:)
-    integer(psb_ipk_), intent(out)       :: info
-
-    integer(psb_ipk_) :: i
-
-    info = 0
-    if (x%is_dev()) call x%sync()
-    call x%psb_c_base_multivect_type%ins(n,irl,val,dupl,maxr,info)
-    call x%set_host()
-
-  end subroutine c_cuda_multi_ins
-
 end module psb_c_cuda_multivect_mod
-
-
-

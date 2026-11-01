@@ -44,7 +44,7 @@
 
 int FcusparseCreate();
 int FcusparseDestroy();
-cusparseHandle_t *getHandle();
+cusparseHandle_t* getHandle();
 
 #define CHECK_CUDA(func)                                                       \
 {                                                                              \
@@ -66,7 +66,4 @@ cusparseHandle_t *getHandle();
     }                                                                          \
 }
 
-
 #endif
-
-

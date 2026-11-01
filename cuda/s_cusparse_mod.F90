@@ -28,7 +28,6 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module s_cusparse_mod
   use base_cusparse_mod
@@ -44,269 +43,298 @@ module s_cusparse_mod
 #endif
   
   interface CSRGDeviceFree
-    function s_CSRGDeviceFree(Mat) &
-         & bind(c,name="s_CSRGDeviceFree") result(res)
+    function s_CSRGDeviceFree(Mat) result(res) &
+        & bind(c, name = "s_CSRGDeviceFree")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)   :: Mat
       integer(c_int) :: res
     end function s_CSRGDeviceFree
   end interface
   
   interface CSRGDeviceSetMatType
-    function s_CSRGDeviceSetMatType(Mat,type) &
-         & bind(c,name="s_CSRGDeviceSetMatType") result(res)
+    function s_CSRGDeviceSetMatType(Mat, type) result(res) &
+        & bind(c, name = "s_CSRGDeviceSetMatType")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_CSRGDeviceSetMatType
   end interface
   
   interface CSRGDeviceSetMatFillMode
-    function s_CSRGDeviceSetMatFillMode(Mat,type) &
-         & bind(c,name="s_CSRGDeviceSetMatFillMode") result(res)
+    function s_CSRGDeviceSetMatFillMode(Mat, type) result(res) &
+        & bind(c, name = "s_CSRGDeviceSetMatFillMode")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_CSRGDeviceSetMatFillMode
   end interface
   
   interface CSRGDeviceSetMatDiagType
-    function s_CSRGDeviceSetMatDiagType(Mat,type) &
-         & bind(c,name="s_CSRGDeviceSetMatDiagType") result(res)
+    function s_CSRGDeviceSetMatDiagType(Mat, type) result(res) &
+        & bind(c, name = "s_CSRGDeviceSetMatDiagType")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_CSRGDeviceSetMatDiagType
   end interface
   
   interface CSRGDeviceSetMatIndexBase
-    function s_CSRGDeviceSetMatIndexBase(Mat,type) &
-         & bind(c,name="s_CSRGDeviceSetMatIndexBase") result(res)
+    function s_CSRGDeviceSetMatIndexBase(Mat, type) result(res) &
+        & bind(c, name = "s_CSRGDeviceSetMatIndexBase")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_CSRGDeviceSetMatIndexBase
   end interface
   
 #if PSB_CUDA_SHORT_VERSION <= 10  
   interface CSRGDeviceCsrsmAnalysis
-    function s_CSRGDeviceCsrsmAnalysis(Mat) &
-         & bind(c,name="s_CSRGDeviceCsrsmAnalysis") result(res)
+    function s_CSRGDeviceCsrsmAnalysis(Mat) result(res) &
+        & bind(c, name = "s_CSRGDeviceCsrsmAnalysis")
       use iso_c_binding
-      import  s_Cmat
-      type(s_Cmat)          :: Mat
-      integer(c_int)        :: res
+      import s_Cmat
+      type(s_Cmat)    :: Mat
+      integer(c_int)  :: res
     end function s_CSRGDeviceCsrsmAnalysis
   end interface
 #else
   interface CSRGIsNullSvBuffer
-    function s_CSRGIsNullSvBuffer(Mat) &
-         & bind(c,name="s_CSRGIsNullSvBuffer") result(res)
+    function s_CSRGIsNullSvBuffer(Mat) result(res) &
+        & bind(c, name = "s_CSRGIsNullSvBuffer")
       use iso_c_binding
-      import  s_Cmat
-      type(s_Cmat)          :: Mat
-      integer(c_int)        :: res
+      import s_Cmat
+      type(s_Cmat)    :: Mat
+      integer(c_int)  :: res
     end function s_CSRGIsNullSvBuffer
   end interface
 #endif
 
   interface CSRGDeviceAlloc
-    function s_CSRGDeviceAlloc(Mat,nr,nc,nz) &
-         & bind(c,name="s_CSRGDeviceAlloc") result(res)
+    function s_CSRGDeviceAlloc(Mat, nr, nc, nz) result(res) &
+        & bind(c, name = "s_CSRGDeviceAlloc")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
       integer(c_int), value :: nr, nc, nz
-      integer(c_int)        :: res
+      integer(c_int)  :: res
     end function s_CSRGDeviceAlloc
   end interface
 
   interface CSRGDeviceGetParms
-    function s_CSRGDeviceGetParms(Mat,nr,nc,nz) &
-         & bind(c,name="s_CSRGDeviceGetParms") result(res)
+    function s_CSRGDeviceGetParms(Mat, nr, nc, nz) result(res) &
+        & bind(c, name = "s_CSRGDeviceGetParms")
       use iso_c_binding
-      import  s_Cmat
-      type(s_Cmat)          :: Mat
-      integer(c_int)        :: nr, nc, nz
-      integer(c_int)        :: res
+      import s_Cmat
+      type(s_Cmat)    :: Mat
+      integer(c_int)  :: nr, nc, nz
+      integer(c_int)  :: res
     end function s_CSRGDeviceGetParms
   end interface
   
   interface spsvCSRGDevice
-    function s_spsvCSRGDevice(Mat,alpha,x,beta,y) &
-         &  bind(c,name="s_spsvCSRGDevice") result(res)
+    function s_spsvCSRGDevice(Mat, alpha, x, beta, y) result(res) &
+        & bind(c, name = "s_spsvCSRGDevice")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
       type(c_ptr), value    :: x
       type(c_ptr), value    :: y
-      real(c_float), value :: alpha,beta
-      integer(c_int)        :: res
+      real(c_float), value :: alpha, beta
+      integer(c_int)  :: res
     end function s_spsvCSRGDevice
   end interface
   
   interface spmvCSRGDevice
-    function s_spmvCSRGDevice(Mat,alpha,x,beta,y) &
-         &  bind(c,name="s_spmvCSRGDevice") result(res)
+    function s_spmvCSRGDeviceF(mat, alpha, x, beta, y) result(res) &
+        & bind(c, name = "s_spmvCSRGDeviceF")
       use iso_c_binding
-      import  s_Cmat
-      type(s_Cmat)          :: Mat
-      type(c_ptr), value    :: x
-      type(c_ptr), value    :: y
-      real(c_float), value :: alpha,beta
-      integer(c_int)        :: res
-    end function s_spmvCSRGDevice
+      import s_Cmat
+      type(s_Cmat)          :: mat
+      real(c_float), value :: alpha, beta
+      type(c_ptr), value    :: x, y
+      integer(c_int)  :: res
+    end function s_spmvCSRGDeviceF
+
+    function s_spmvCSRGDeviceMV(mat, alpha, x, beta, y, idx_y) result(res) &
+        & bind(c, name = "s_spmvCSRGDeviceMV")
+      use iso_c_binding
+      import s_Cmat
+      type(s_Cmat)          :: mat
+      real(c_float), value :: alpha, beta
+      type(c_ptr), value    :: x, y
+      integer(c_int), value :: idx_y
+      integer(c_int)  :: res
+    end function s_spmvCSRGDeviceMV
+
+    function s_spmvCSRGDeviceVM(mat, alpha, x, idx_x, beta, y) result(res) &
+        & bind(c, name = "s_spmvCSRGDeviceVM")
+      use iso_c_binding
+      import s_Cmat
+      type(s_Cmat)          :: mat
+      real(c_float), value :: alpha, beta
+      type(c_ptr), value    :: x, y
+      integer(c_int), value :: idx_x
+      integer(c_int)  :: res
+    end function s_spmvCSRGDeviceVM
+    
+    function s_spmvCSRGDeviceMMi(mat, alpha, x, idx_x, beta, y, idx_y) result(res) &
+        & bind(c, name = "s_spmvCSRGDeviceMMi")
+      use iso_c_binding
+      import s_Cmat
+      type(s_Cmat)          :: mat
+      real(c_float), value :: alpha, beta
+      type(c_ptr), value    :: x, y
+      integer(c_int), value :: idx_x, idx_y
+      integer(c_int)  :: res
+    end function s_spmvCSRGDeviceMMi
   end interface
   
   interface CSRGHost2Device
-    function s_CSRGHost2Device(Mat,m,n,nz,irp,ja,val) &
-         &  bind(c,name="s_CSRGHost2Device") result(res)
+    function s_CSRGHost2Device(Mat, m, n, nz, irp, ja, val) result(res) &
+        & bind(c, name = "s_CSRGHost2Device")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
-      integer(c_int), value :: m,n,nz
+      integer(c_int), value :: m, n, nz
       integer(c_int)        :: irp(*), ja(*)
-      real(c_float)         :: val(*)
-      integer(c_int)        :: res
+      real(c_float)        :: val(*)
+      integer(c_int)  :: res
     end function s_CSRGHost2Device
   end interface
   
   interface CSRGDevice2Host
-    function s_CSRGDevice2Host(Mat,m,n,nz,irp,ja,val) &
-         &  bind(c,name="s_CSRGDevice2Host") result(res)
+    function s_CSRGDevice2Host(Mat, m, n, nz, irp, ja, val) result(res) &
+        & bind(c, name = "s_CSRGDevice2Host")
       use iso_c_binding
-      import  s_Cmat
+      import s_Cmat
       type(s_Cmat)          :: Mat
-      integer(c_int), value :: m,n,nz
+      integer(c_int), value :: m, n, nz
       integer(c_int)        :: irp(*), ja(*)
-      real(c_float)         :: val(*)
-      integer(c_int)        :: res
+      real(c_float)        :: val(*)
+      integer(c_int)  :: res
     end function s_CSRGDevice2Host
   end interface
   
 #if PSB_CUDA_SHORT_VERSION <= 10
   interface HYBGDeviceAlloc
-    function s_HYBGDeviceAlloc(Mat,nr,nc,nz) &
-         & bind(c,name="s_HYBGDeviceAlloc") result(res)
+    function s_HYBGDeviceAlloc(Mat, nr, nc, nz) result(res) &
+        & bind(c, name = "s_HYBGDeviceAlloc")
       use iso_c_binding
-      import  s_hmat
+      import s_hmat
       type(s_Hmat)          :: Mat
       integer(c_int), value :: nr, nc, nz
-      integer(c_int)        :: res
+      integer(c_int)  :: res
     end function s_HYBGDeviceAlloc
   end interface
   
   interface HYBGDeviceFree
-    function s_HYBGDeviceFree(Mat) &
-         & bind(c,name="s_HYBGDeviceFree") result(res)
+    function s_HYBGDeviceFree(Mat) result(res) &
+        & bind(c, name = "s_HYBGDeviceFree")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)   :: Mat
       integer(c_int) :: res
     end function s_HYBGDeviceFree
   end interface
   
   interface HYBGDeviceSetMatType 
-    function s_HYBGDeviceSetMatType(Mat,type) &
-         & bind(c,name="s_HYBGDeviceSetMatType") result(res)
+    function s_HYBGDeviceSetMatType(Mat, type) result(res) &
+        & bind(c, name = "s_HYBGDeviceSetMatType")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_HYBGDeviceSetMatType
   end interface
   
   interface HYBGDeviceSetMatFillMode
-    function s_HYBGDeviceSetMatFillMode(Mat,type) &
-         & bind(c,name="s_HYBGDeviceSetMatFillMode") result(res)
+    function s_HYBGDeviceSetMatFillMode(Mat, type) result(res) &
+        & bind(c, name = "s_HYBGDeviceSetMatFillMode")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_HYBGDeviceSetMatFillMode
   end interface
   
   interface HYBGDeviceSetMatDiagType
-    function s_HYBGDeviceSetMatDiagType(Mat,type) &
-         & bind(c,name="s_HYBGDeviceSetMatDiagType") result(res)
+    function s_HYBGDeviceSetMatDiagType(Mat, type) result(res) &
+        & bind(c, name = "s_HYBGDeviceSetMatDiagType")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_HYBGDeviceSetMatDiagType
   end interface
   
   interface HYBGDeviceSetMatIndexBase
-    function s_HYBGDeviceSetMatIndexBase(Mat,type) &
-         & bind(c,name="s_HYBGDeviceSetMatIndexBase") result(res)
+    function s_HYBGDeviceSetMatIndexBase(Mat, type) result(res) &
+        & bind(c, name = "s_HYBGDeviceSetMatIndexBase")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      integer(c_int),value  :: type
-      integer(c_int)        :: res
+      integer(c_int), value :: type
+      integer(c_int)  :: res
     end function s_HYBGDeviceSetMatIndexBase
   end interface
   
   interface HYBGDeviceHybsmAnalysis
-    function s_HYBGDeviceHybsmAnalysis(Mat) &
-         & bind(c,name="s_HYBGDeviceHybsmAnalysis") result(res)
+    function s_HYBGDeviceHybsmAnalysis(Mat) result(res) &
+        & bind(c, name = "s_HYBGDeviceHybsmAnalysis")
       use iso_c_binding
-      import  s_Hmat
-      type(s_Hmat)          :: Mat
-      integer(c_int)        :: res
+      import s_Hmat
+      type(s_Hmat)  :: Mat
+      integer(c_int)  :: res
     end function s_HYBGDeviceHybsmAnalysis
   end interface
   
   interface spsvHYBGDevice
-    function s_spsvHYBGDevice(Mat,alpha,x,beta,y) &
-         &  bind(c,name="s_spsvHYBGDevice") result(res)
+    function s_spsvHYBGDevice(Mat, alpha, x, beta, y) result(res) &
+        & bind(c, name = "s_spsvHYBGDevice")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      type(c_ptr), value    :: x
-      type(c_ptr), value    :: y
-      real(c_float), value  :: alpha,beta
-      integer(c_int)        :: res
+      real(c_float), value :: alpha, beta
+      type(c_ptr), value    :: x, y
+      integer(c_int)  :: res
     end function s_spsvHYBGDevice
   end interface
   
   interface spmvHYBGDevice
-    function s_spmvHYBGDevice(Mat,alpha,x,beta,y) &
-         &  bind(c,name="s_spmvHYBGDevice") result(res)
+    function s_spmvHYBGDevice(Mat, alpha, x, beta, y) result(res) &
+        & bind(c, name = "s_spmvHYBGDevice")
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      type(c_ptr), value    :: x
-      type(c_ptr), value    :: y
-      real(c_float), value  :: alpha,beta
-      integer(c_int)        :: res
+      real(c_float), value :: alpha, beta
+      type(c_ptr), value    :: x, y
+      integer(c_int)  :: res
     end function s_spmvHYBGDevice
   end interface
   
   interface HYBGHost2Device
-    function s_HYBGHost2Device(Mat,m,n,nz,irp,ja,val) &
-         &  bind(c,name="s_HYBGHost2Device") result(res)
+    function s_HYBGHost2Device(Mat, m, n, nz, irp, ja, val) &
+        & bind(c, name = "s_HYBGHost2Device") result(res)
       use iso_c_binding
-      import  s_Hmat
+      import s_Hmat
       type(s_Hmat)          :: Mat
-      integer(c_int), value :: m,n,nz
+      integer(c_int), value :: m, n, nz
       integer(c_int)        :: irp(*), ja(*)
-      real(c_float)         :: val(*)
-      integer(c_int)        :: res
+      real(c_float)        :: val(*)
+      integer(c_int)  :: res
     end function s_HYBGHost2Device
   end interface
 #endif
-  
 end module s_cusparse_mod

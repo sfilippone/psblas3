@@ -28,14 +28,11 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module psb_i_cuda_hlg_mat_mod
-
   use iso_c_binding
   use psb_i_mat_mod 
   use psb_i_hll_mat_mod
-
 
   integer(psb_ipk_), parameter, private :: is_host = -1
   integer(psb_ipk_), parameter, private :: is_sync = 0 
@@ -49,11 +46,14 @@ module psb_i_cuda_hlg_mat_mod
     ! 
     type(c_ptr) :: deviceMat = c_null_ptr
     integer     :: devstate  = is_host
-
   contains
     procedure, nopass  :: get_fmt       => i_cuda_hlg_get_fmt
     procedure, pass(a) :: sizeof        => i_cuda_hlg_sizeof
     procedure, pass(a) :: vect_mv       => psb_i_cuda_hlg_vect_mv
+    procedure, pass(a) :: mvt_mv        => psb_i_cuda_hlg_mvect_mv
+    procedure, pass(a) :: mvt_vm        => psb_i_cuda_hlg_mvect_vm
+    procedure, pass(a) :: mvt_mm_i      => psb_i_cuda_hlg_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_f      => psb_i_cuda_hlg_mvect_mm_full
     procedure, pass(a) :: csmm          => psb_i_cuda_hlg_csmm
     procedure, pass(a) :: csmv          => psb_i_cuda_hlg_csmv
     procedure, pass(a) :: in_vect_sv    => psb_i_cuda_hlg_inner_vect_sv
@@ -81,154 +81,201 @@ module psb_i_cuda_hlg_mat_mod
     final              :: i_cuda_hlg_finalize
   end type psb_i_cuda_hlg_sparse_mat
 
-  private :: i_cuda_hlg_get_nzeros, i_cuda_hlg_free,  i_cuda_hlg_get_fmt, &
-       & i_cuda_hlg_get_size, i_cuda_hlg_sizeof, i_cuda_hlg_get_nz_row
-
+  private :: i_cuda_hlg_get_nzeros, i_cuda_hlg_free, i_cuda_hlg_get_fmt, &
+            & i_cuda_hlg_get_size, i_cuda_hlg_sizeof, i_cuda_hlg_get_nz_row
 
   interface 
-    subroutine psb_i_cuda_hlg_vect_mv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_i_cuda_hlg_vect_mv(alpha, a, x, beta, y, info, trans) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_, psb_i_base_vect_type, psb_ipk_
-      class(psb_i_cuda_hlg_sparse_mat), intent(in)    :: a
-      integer(psb_ipk_), intent(in)                 :: alpha, beta
-      class(psb_i_base_vect_type), intent(inout) :: x
-      class(psb_i_base_vect_type), intent(inout) :: y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)            :: trans
+      integer(psb_ipk_), intent(in)                    :: alpha, beta
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+      class(psb_i_base_vect_type), intent(inout)  :: x, y
+      integer(psb_ipk_), intent(out)              :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_i_cuda_hlg_vect_mv
+  end interface
+      
+  interface 
+    subroutine psb_i_cuda_hlg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_vect_type, psb_i_base_multivect_type, &
+              & psb_ipk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                      :: alpha, beta
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)    :: a
+      class(psb_i_base_vect_type), intent(inout)      :: x
+      class(psb_i_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_i_cuda_hlg_mvect_mv
   end interface
 
   interface 
-    subroutine psb_i_cuda_hlg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_i_cuda_hlg_sparse_mat, psb_ipk_,  psb_i_base_vect_type
+    subroutine psb_i_cuda_hlg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+      import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_vect_type, psb_i_base_multivect_type, &
+              & psb_ipk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                      :: alpha, beta
       class(psb_i_cuda_hlg_sparse_mat), intent(in)    :: a
-      integer(psb_ipk_), intent(in)                 :: alpha, beta
-      class(psb_i_base_vect_type), intent(inout) :: x, y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)            :: trans
+      class(psb_i_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_i_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_i_cuda_hlg_mvect_vm
+  end interface
+      
+  interface 
+    subroutine psb_i_cuda_hlg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+      import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_multivect_type, psb_ipk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                      :: alpha, beta
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)    :: a
+      class(psb_i_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_i_cuda_hlg_mvect_mm_idxs
+  end interface
+      
+  interface 
+    subroutine psb_i_cuda_hlg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+      import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_multivect_type, psb_ipk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                      :: alpha, beta
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)    :: a
+      class(psb_i_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_i_cuda_hlg_mvect_mm_full
+  end interface
+
+  interface 
+    subroutine psb_i_cuda_hlg_inner_vect_sv(alpha, a, x, beta, y, info, trans) 
+      import :: psb_ipk_, psb_i_cuda_hlg_sparse_mat, psb_ipk_, psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)                    :: alpha, beta
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+      class(psb_i_base_vect_type), intent(inout)    :: x, y
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_i_cuda_hlg_inner_vect_sv
   end interface
 
   interface
-    subroutine  psb_i_cuda_hlg_reallocate_nz(nz,a) 
+    subroutine psb_i_cuda_hlg_reallocate_nz(nz, a) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_
-      integer(psb_ipk_), intent(in)              :: nz
+      integer(psb_ipk_), intent(in)                   :: nz
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
     end subroutine psb_i_cuda_hlg_reallocate_nz
   end interface
 
   interface
-    subroutine  psb_i_cuda_hlg_allocate_mnnz(m,n,a,nz) 
+    subroutine psb_i_cuda_hlg_allocate_mnnz(m, n, a, nz) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_
-      integer(psb_ipk_), intent(in)              :: m,n
+      integer(psb_ipk_), intent(in)                   :: m, n
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(in), optional    :: nz
+      integer(psb_ipk_), intent(in), optional :: nz
     end subroutine psb_i_cuda_hlg_allocate_mnnz
   end interface
 
   interface 
-    subroutine psb_i_cuda_hlg_mold(a,b,info) 
+    subroutine psb_i_cuda_hlg_mold(a, b, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_sparse_mat, psb_ipk_
-      class(psb_i_cuda_hlg_sparse_mat), intent(in)                  :: a
-      class(psb_i_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)              :: a
+      class(psb_i_base_sparse_mat), intent(inout), allocatable  :: b
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_i_cuda_hlg_mold
   end interface
 
   interface 
-    subroutine psb_i_cuda_hlg_from_gpu(a,info) 
+    subroutine psb_i_cuda_hlg_from_gpu(a, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_i_cuda_hlg_from_gpu
   end interface
 
   interface 
-    subroutine psb_i_cuda_hlg_to_gpu(a,info, nzrm) 
+    subroutine psb_i_cuda_hlg_to_gpu(a, info, nzrm) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: nzrm
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), intent(in), optional :: nzrm
     end subroutine psb_i_cuda_hlg_to_gpu
   end interface
 
   interface 
-    subroutine psb_i_cuda_cp_hlg_from_coo(a,b,info) 
+    subroutine psb_i_cuda_cp_hlg_from_coo(a, b, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_i_coo_sparse_mat, psb_ipk_
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      class(psb_i_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_i_coo_sparse_mat), intent(in)         :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_i_cuda_cp_hlg_from_coo
   end interface
   
   interface 
-    subroutine psb_i_cuda_cp_hlg_from_fmt(a,b,info) 
+    subroutine psb_i_cuda_cp_hlg_from_fmt(a, b, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_sparse_mat, psb_ipk_
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      class(psb_i_base_sparse_mat), intent(in)   :: b
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_i_base_sparse_mat), intent(in)        :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_i_cuda_cp_hlg_from_fmt
   end interface
   
   interface 
-    subroutine psb_i_cuda_mv_hlg_from_coo(a,b,info) 
+    subroutine psb_i_cuda_mv_hlg_from_coo(a, b, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_i_coo_sparse_mat, psb_ipk_
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      class(psb_i_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_i_coo_sparse_mat), intent(inout)      :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_i_cuda_mv_hlg_from_coo
   end interface
   
-
   interface 
-    subroutine psb_i_cuda_mv_hlg_from_fmt(a,b,info) 
+    subroutine psb_i_cuda_mv_hlg_from_fmt(a, b, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_i_base_sparse_mat, psb_ipk_
-      class(psb_i_cuda_hlg_sparse_mat), intent(inout)  :: a
-      class(psb_i_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)              :: info
+      class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
+      class(psb_i_base_sparse_mat), intent(inout)     :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_i_cuda_mv_hlg_from_fmt
   end interface
   
   interface 
-    subroutine psb_i_cuda_hlg_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_i_cuda_hlg_csmv(alpha, a, x, beta, y, info, trans) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_, psb_ipk_
-      class(psb_i_cuda_hlg_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)              :: alpha, beta, x(:)
-      integer(psb_ipk_), intent(inout)           :: y(:)
-      integer(psb_ipk_), intent(out)          :: info
-      character, optional, intent(in)         :: trans
+      integer(psb_ipk_), intent(in)                    :: alpha, beta, x(:)
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+      integer(psb_ipk_), intent(inout)                 :: y(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_i_cuda_hlg_csmv
   end interface
+
   interface 
-    subroutine psb_i_cuda_hlg_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_i_cuda_hlg_csmm(alpha, a, x, beta, y, info, trans) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_, psb_ipk_
-      class(psb_i_cuda_hlg_sparse_mat), intent(in) :: a
-      integer(psb_ipk_), intent(in)              :: alpha, beta, x(:,:)
-      integer(psb_ipk_), intent(inout)           :: y(:,:)
-      integer(psb_ipk_), intent(out)          :: info
-      character, optional, intent(in)         :: trans
+      integer(psb_ipk_), intent(in)                    :: alpha, beta, x(:, :)
+      class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+      integer(psb_ipk_), intent(inout)                 :: y(:, :)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_i_cuda_hlg_csmm
   end interface
   
   interface 
-    subroutine psb_i_cuda_hlg_scal(d,a,info, side) 
+    subroutine psb_i_cuda_hlg_scal(d, a, info, side) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                      :: d(:)
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(in)                 :: d(:)
-      integer(psb_ipk_), intent(out)             :: info
-      character, intent(in), optional            :: side
+      integer(psb_ipk_), intent(out)                  :: info
+      character, intent(in), optional :: side
     end subroutine psb_i_cuda_hlg_scal
   end interface
   
   interface
-    subroutine psb_i_cuda_hlg_scals(d,a,info) 
+    subroutine psb_i_cuda_hlg_scals(d, a, info) 
       import :: psb_i_cuda_hlg_sparse_mat, psb_ipk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                      :: d
       class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(in)                 :: d
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_i_cuda_hlg_scals
   end interface
-  
-
 contains 
 
   ! == ===================================
@@ -239,20 +286,16 @@ contains
   !
   !
   !
-  !
-  !
   ! == ===================================
 
-  
   function i_cuda_hlg_sizeof(a) result(res)
     implicit none 
-    class(psb_i_cuda_hlg_sparse_mat), intent(in) :: a
+    class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
     integer(psb_epk_) :: res
 
-    
-    if (a%is_dev()) call a%sync()
+    if(a%is_dev()) call a%sync()
     res = 8 
-    res = res + psb_sizeof_ip  * size(a%val)
+    res = res + psb_sizeof_ip * size(a%val)
     res = res + psb_sizeof_ip * size(a%irn)
     res = res + psb_sizeof_ip * size(a%idiag)
     res = res + psb_sizeof_ip * size(a%hkoffs)
@@ -260,7 +303,6 @@ contains
     ! Should we account for the shadow data structure
     ! on the GPU device side? 
     ! res = 2*res
-      
   end function i_cuda_hlg_sizeof
 
   function i_cuda_hlg_get_fmt() result(res)
@@ -269,8 +311,6 @@ contains
     res = 'HLG'
   end function i_cuda_hlg_get_fmt
   
-
-
   ! == ===================================
   !
   !
@@ -279,41 +319,35 @@ contains
   !
   !
   !
-  !
-  !
   ! == ===================================  
 
-  subroutine  i_cuda_hlg_free(a) 
+  subroutine i_cuda_hlg_free(a) 
     use hlldev_mod
     implicit none 
     integer(psb_ipk_) :: info
     class(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         & call freeHllDevice(a%deviceMat)
+    if(c_associated(a%deviceMat)) call freeHllDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
     call a%psb_i_hll_sparse_mat%free()
-    
     return
-
   end subroutine i_cuda_hlg_free
 
-  
-  subroutine  i_cuda_hlg_sync(a) 
+  subroutine i_cuda_hlg_sync(a) 
     implicit none 
     class(psb_i_cuda_hlg_sparse_mat), target, intent(in) :: a
+
     class(psb_i_cuda_hlg_sparse_mat), pointer :: tmpa
     integer(psb_ipk_) :: info
 
     tmpa => a
-    if (tmpa%is_host()) then 
+    if(tmpa%is_host()) then 
       call tmpa%to_gpu(info)
-    else if (tmpa%is_dev()) then 
+    else if(tmpa%is_dev()) then 
       call tmpa%from_gpu(info)
     end if
     call tmpa%set_sync()
     return
-
   end subroutine i_cuda_hlg_sync
 
   subroutine i_cuda_hlg_set_host(a)
@@ -339,39 +373,35 @@ contains
 
   function i_cuda_hlg_is_dev(a) result(res)
     implicit none 
-    class(psb_i_cuda_hlg_sparse_mat), intent(in) :: a
-    logical  :: res
+    class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+    logical :: res
   
     res = (a%devstate == is_dev)
   end function i_cuda_hlg_is_dev
   
   function i_cuda_hlg_is_host(a) result(res)
     implicit none 
-    class(psb_i_cuda_hlg_sparse_mat), intent(in) :: a
-    logical  :: res
+    class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+    logical :: res
 
     res = (a%devstate == is_host)
   end function i_cuda_hlg_is_host
-
+  
   function i_cuda_hlg_is_sync(a) result(res)
     implicit none 
-    class(psb_i_cuda_hlg_sparse_mat), intent(in) :: a
-    logical  :: res
+    class(psb_i_cuda_hlg_sparse_mat), intent(in)  :: a
+    logical :: res
 
     res = (a%devstate == is_sync)
   end function i_cuda_hlg_is_sync
 
-
-  subroutine  i_cuda_hlg_finalize(a) 
+  subroutine i_cuda_hlg_finalize(a) 
     use hlldev_mod
     implicit none 
-    type(psb_i_cuda_hlg_sparse_mat), intent(inout) :: a
+    type(psb_i_cuda_hlg_sparse_mat), intent(inout)  :: a
 
-    if (c_associated(a%deviceMat)) &
-         &  call freeHllDevice(a%deviceMat)
+    if(c_associated(a%deviceMat)) call freeHllDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
-    
     return
   end subroutine i_cuda_hlg_finalize
-
 end module psb_i_cuda_hlg_mat_mod

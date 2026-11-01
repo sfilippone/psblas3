@@ -119,3 +119,366 @@ subroutine psb_z_cuda_elg_vect_mv(alpha,a,x,beta,y,info,trans)
   return
 
 end subroutine psb_z_cuda_elg_vect_mv
+
+subroutine psb_z_cuda_elg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_elg_mvect_mv
+  use psb_z_cuda_vect_mod
+  use psb_z_cuda_multivect_mod
+  implicit none
+  complex(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_z_cuda_elg_sparse_mat), intent(in)    :: a
+  class(psb_z_base_vect_type), intent(inout)      :: x
+  class(psb_z_base_multivect_type), intent(inout) :: y
+  integer(psb_ipk_), intent(in)                   :: idx_y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name = 'z_cuda_elg_vect_mm_idxs'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = trans
+
+  if(.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  tra = (psb_toupper(trans_) == 'T') .or. (psb_toupper(trans_) == 'C')
+
+  if(tra) then 
+    if(a%is_dev()) call a%sync()
+    if(.not. x%is_host()) call x%sync()
+    if(beta /= zzero) then 
+      if(.not. y%is_host()) call y%sync()
+    end if
+    call a%psb_z_ell_sparse_mat%spmm(alpha, x, beta, y, idx_y, info, trans) 
+    call y%set_host()
+  else
+    if(a%is_host()) call a%sync()    
+    select type(x) 
+      type is (psb_z_vect_cuda)
+        select type(y) 
+          type is (psb_z_multivect_cuda)
+            if(a%is_host()) call a%sync()
+            if(x%is_host()) call x%sync()
+            if(beta /= zzero) then 
+              if(y%is_host()) call y%sync()
+            end if
+
+            info = spmvEllDevice(a%deviceMat, alpha, x%deviceVect, beta, y%deviceVect, idx_y)
+
+            if(info /= psb_success_) then 
+              call psb_errpush(psb_err_from_subroutine_ai_, name,  a_err = 'spmvELLDevice', &
+                              & i_err = (/info, izero, izero, izero, izero/))
+              info = psb_err_from_subroutine_ai_
+              goto 9999
+            end if
+            call y%set_dev()
+
+          class default
+            call fallback()
+        end select
+
+      class default
+        call fallback()
+      end select
+  end if
+
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    complex(psb_dpk_), allocatable :: rx(:), ry(:, :)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx, beta, ry(:, idx_y), info)
+    call y%bld(ry)    
+  end subroutine fallback
+end subroutine psb_z_cuda_elg_mvect_mv
+
+subroutine psb_z_cuda_elg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_elg_mvect_vm
+  use psb_z_cuda_vect_mod
+  use psb_z_cuda_multivect_mod
+  implicit none
+  complex(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_z_cuda_elg_sparse_mat), intent(in)    :: a
+  class(psb_z_base_multivect_type), intent(inout) :: x
+  integer(psb_ipk_), intent(in)                   :: idx_x
+  class(psb_z_base_vect_type), intent(inout)      :: y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name = 'z_cuda_elg_vect_vm'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = trans
+
+  if(.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  tra = (psb_toupper(trans_) == 'T') .or. (psb_toupper(trans_) == 'C')
+
+  if(tra) then 
+    if(a%is_dev()) call a%sync()
+    if(.not. x%is_host()) call x%sync()
+    if(beta /= zzero) then 
+      if(.not. y%is_host()) call y%sync()
+    end if
+    call a%psb_z_ell_sparse_mat%spmm(alpha, x, idx_x, beta, y, info, trans) 
+    call y%set_host()
+  else
+    if(a%is_host()) call a%sync()    
+    select type(x) 
+      type is (psb_z_multivect_cuda)
+        select type(y) 
+          type is (psb_z_vect_cuda)
+            if(a%is_host()) call a%sync()
+            if(x%is_host()) call x%sync()
+            if(beta /= zzero) then 
+              if(y%is_host()) call y%sync()
+            end if
+
+            info = spmvEllDevice(a%deviceMat, alpha, x%deviceVect, idx_x, beta, y%deviceVect)
+
+            if(info /= psb_success_) then 
+              call psb_errpush(psb_err_from_subroutine_ai_, name,  a_err = 'spmvELLDevice', &
+                              & i_err = (/info, izero, izero, izero, izero/))
+              info = psb_err_from_subroutine_ai_
+              goto 9999
+            end if
+            call y%set_dev()
+
+          class default
+            call fallback()
+        end select
+
+      class default
+        call fallback()
+      end select
+  end if
+
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    complex(psb_dpk_), allocatable :: rx(:, :), ry(:)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx(:, idx_x), beta, ry, info)
+    call y%bld(ry)    
+  end subroutine fallback
+end subroutine psb_z_cuda_elg_mvect_vm
+
+subroutine psb_z_cuda_elg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_elg_mvect_mm_idxs
+  use psb_z_cuda_multivect_mod
+  implicit none
+  complex(psb_dpk_), intent(in)                      :: alpha, beta
+  class(psb_z_cuda_elg_sparse_mat), intent(in)    :: a
+  class(psb_z_base_multivect_type), intent(inout) :: x, y
+  integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+  integer(psb_ipk_), intent(out)                  :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name = 'z_cuda_elg_vect_mm_idxs'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = trans
+
+  if(.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  tra = (psb_toupper(trans_) == 'T') .or. (psb_toupper(trans_) == 'C')
+
+  if(tra) then 
+    if(a%is_dev()) call a%sync()
+    if(.not. x%is_host()) call x%sync()
+    if(beta /= zzero) then 
+      if(.not. y%is_host()) call y%sync()
+    end if
+    call a%psb_z_ell_sparse_mat%spmm(alpha, x, idx_x, beta, y, idx_y, info, trans) 
+    call y%set_host()
+  else
+    if(a%is_host()) call a%sync()    
+    select type(x) 
+      type is (psb_z_multivect_cuda)
+        select type(y) 
+          type is (psb_z_multivect_cuda)
+            if(a%is_host()) call a%sync()
+            if(x%is_host()) call x%sync()
+            if(beta /= zzero) then 
+              if(y%is_host()) call y%sync()
+            end if
+
+            info = spmvEllDevice(a%deviceMat, alpha, x%deviceVect, idx_x, beta, y%deviceVect, idx_y)
+
+            if(info /= psb_success_) then 
+              call psb_errpush(psb_err_from_subroutine_ai_, name,  a_err = 'spmvELLDevice', &
+                              & i_err = (/info, izero, izero, izero, izero/))
+              info = psb_err_from_subroutine_ai_
+              goto 9999
+            end if
+            call y%set_dev()
+
+          class default
+            call fallback()
+        end select
+
+      class default
+        call fallback()
+      end select
+  end if
+
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    complex(psb_dpk_), allocatable :: rx(:, :), ry(:, :)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx(:, idx_x), beta, ry(:, idx_y), info)
+    call y%bld(ry)    
+  end subroutine fallback
+end subroutine psb_z_cuda_elg_mvect_mm_idxs
+
+subroutine psb_z_cuda_elg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+  use psb_base_mod
+  use cusparse_mod
+  use elldev_mod
+  use psb_vectordev_mod
+  use psb_z_cuda_elg_mat_mod, psb_protect_name => psb_z_cuda_elg_mvect_mm_full
+  use psb_z_cuda_multivect_mod
+  implicit none
+  complex(psb_dpk_), intent(in)                    :: alpha, beta
+  class(psb_z_cuda_elg_sparse_mat), intent(in) :: a
+  class(psb_z_base_multivect_type), intent(inout)   :: x, y
+  integer(psb_ipk_), intent(out)                :: info
+  character, optional, intent(in) :: trans
+
+  logical           :: tra
+  character         :: trans_
+  integer(psb_ipk_) :: err_act
+  character(len=20) :: name = 'z_cuda_elg_vect_mm_full'
+
+  call psb_erractionsave(err_act)
+  info = psb_success_
+
+  trans_ = 'N'
+  if(present(trans)) trans_ = trans
+
+  if(.not. a%is_asb()) then 
+    info = psb_err_invalid_mat_state_
+    call psb_errpush(info, name)
+    goto 9999
+  endif
+
+  tra = (psb_toupper(trans_) == 'T') .or. (psb_toupper(trans_) == 'C')
+
+  if(tra) then 
+    if(a%is_dev()) call a%sync()
+    if(.not. x%is_host()) call x%sync()
+    if(beta /= zzero) then 
+      if(.not. y%is_host()) call y%sync()
+    end if
+    call a%psb_z_ell_sparse_mat%spmm(alpha, x, beta, y, info, trans) 
+    call y%set_host()
+  else
+    if(a%is_host()) call a%sync()    
+    select type(x) 
+      type is (psb_z_multivect_cuda)
+        select type(y) 
+          type is (psb_z_multivect_cuda)
+            if(a%is_host()) call a%sync()
+            if(x%is_host()) call x%sync()
+            if(beta /= zzero) then 
+              if(y%is_host()) call y%sync()
+            end if
+
+            info = spmvEllDevice(a%deviceMat, alpha, x%deviceVect, beta, y%deviceVect)
+
+            if(info /= psb_success_) then 
+              call psb_errpush(psb_err_from_subroutine_ai_, name,  a_err = 'spmvELLDevice', &
+                              & i_err = (/info, izero, izero, izero, izero/))
+              info = psb_err_from_subroutine_ai_
+              goto 9999
+            end if
+            call y%set_dev()
+
+          class default
+            call fallback()
+        end select
+
+      class default
+        call fallback()
+      end select
+  end if
+
+  if(info /= psb_success_) goto 9999
+  call psb_erractionrestore(err_act)
+  return
+
+9999 call psb_error_handler(err_act)
+  return
+contains
+  subroutine fallback()
+    complex(psb_dpk_), allocatable :: rx(:, :), ry(:, :)
+    if(a%is_dev()) call a%sync()
+    rx = x%get_vect()
+    ry = y%get_vect()
+    call a%spmm(alpha, rx, beta, ry, info)
+    call y%bld(ry)    
+  end subroutine fallback
+end subroutine psb_z_cuda_elg_mvect_mm_full

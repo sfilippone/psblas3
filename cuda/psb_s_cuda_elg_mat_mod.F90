@@ -28,10 +28,8 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module psb_s_cuda_elg_mat_mod
-
   use iso_c_binding
   use psb_s_mat_mod
   use psb_s_ell_mat_mod
@@ -49,11 +47,14 @@ module psb_s_cuda_elg_mat_mod
     ! 
     type(c_ptr)       :: deviceMat = c_null_ptr
     integer(psb_ipk_) :: devstate  = is_host
-
   contains
     procedure, nopass  :: get_fmt       => s_cuda_elg_get_fmt
     procedure, pass(a) :: sizeof        => s_cuda_elg_sizeof
     procedure, pass(a) :: vect_mv       => psb_s_cuda_elg_vect_mv
+    procedure, pass(a) :: mvt_mv        => psb_s_cuda_elg_mvect_mv
+    procedure, pass(a) :: mvt_vm        => psb_s_cuda_elg_mvect_vm
+    procedure, pass(a) :: mvt_mm_i      => psb_s_cuda_elg_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_f      => psb_s_cuda_elg_mvect_mm_full
     procedure, pass(a) :: csmm          => psb_s_cuda_elg_csmm
     procedure, pass(a) :: csmv          => psb_s_cuda_elg_csmv
     procedure, pass(a) :: in_vect_sv    => psb_s_cuda_elg_inner_vect_sv
@@ -85,173 +86,222 @@ module psb_s_cuda_elg_mat_mod
     final              :: s_cuda_elg_finalize
   end type psb_s_cuda_elg_sparse_mat
 
-  private :: s_cuda_elg_get_nzeros, s_cuda_elg_free,  s_cuda_elg_get_fmt, &
-       & s_cuda_elg_get_size, s_cuda_elg_sizeof, s_cuda_elg_get_nz_row, s_cuda_elg_sync
-
+  private :: s_cuda_elg_get_nzeros, s_cuda_elg_free, s_cuda_elg_get_fmt, &
+            & s_cuda_elg_get_size, s_cuda_elg_sizeof, s_cuda_elg_get_nz_row, s_cuda_elg_sync
 
   interface 
-    subroutine psb_s_cuda_elg_vect_mv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_s_cuda_elg_vect_mv(alpha, a, x, beta, y, info, trans) 
       import :: psb_s_cuda_elg_sparse_mat, psb_spk_, psb_s_base_vect_type, psb_ipk_
-      class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)       :: alpha, beta
-      class(psb_s_base_vect_type), intent(inout) :: x
-      class(psb_s_base_vect_type), intent(inout) :: y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans
+      real(psb_spk_), intent(in)                    :: alpha, beta
+      class(psb_s_cuda_elg_sparse_mat), intent(in)  :: a
+      class(psb_s_base_vect_type), intent(inout)    :: x, y
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_s_cuda_elg_vect_mv
+  end interface
+  
+  interface 
+    subroutine psb_s_cuda_elg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      import :: psb_s_cuda_elg_sparse_mat, psb_s_base_vect_type, psb_s_base_multivect_type, &
+              & psb_spk_, psb_ipk_
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(psb_s_cuda_elg_sparse_mat), intent(in)    :: a
+      class(psb_s_base_vect_type), intent(inout)      :: x
+      class(psb_s_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_s_cuda_elg_mvect_mv
   end interface
 
   interface 
-    subroutine psb_s_cuda_elg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
-      import :: psb_ipk_, psb_s_cuda_elg_sparse_mat, psb_spk_,  psb_s_base_vect_type
-      class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)       :: alpha, beta
-      class(psb_s_base_vect_type), intent(inout) :: x, y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)  :: trans
+    subroutine psb_s_cuda_elg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+      import :: psb_s_cuda_elg_sparse_mat, psb_s_base_vect_type, psb_s_base_multivect_type, &
+              & psb_spk_, psb_ipk_
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(psb_s_cuda_elg_sparse_mat), intent(in)    :: a
+      class(psb_s_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_s_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_s_cuda_elg_mvect_vm
+  end interface
+  
+  interface 
+    subroutine psb_s_cuda_elg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+      import :: psb_s_cuda_elg_sparse_mat, psb_s_base_multivect_type, psb_spk_, psb_ipk_
+      real(psb_spk_), intent(in)                      :: alpha, beta
+      class(psb_s_cuda_elg_sparse_mat), intent(in)    :: a
+      class(psb_s_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_s_cuda_elg_mvect_mm_idxs
+  end interface
+  
+  interface 
+    subroutine psb_s_cuda_elg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+      import :: psb_s_cuda_elg_sparse_mat, psb_s_base_multivect_type, psb_spk_, psb_ipk_
+      real(psb_spk_), intent(in)                    :: alpha, beta
+      class(psb_s_cuda_elg_sparse_mat), intent(in)  :: a
+      class(psb_s_base_multivect_type), intent(inout)   :: x, y
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_s_cuda_elg_mvect_mm_full
+  end interface
+
+  interface 
+    subroutine psb_s_cuda_elg_inner_vect_sv(alpha, a, x, beta, y, info, trans) 
+      import :: psb_ipk_, psb_s_cuda_elg_sparse_mat, psb_spk_, psb_s_base_vect_type
+      real(psb_spk_), intent(in)                    :: alpha, beta
+      class(psb_s_cuda_elg_sparse_mat), intent(in)  :: a
+      class(psb_s_base_vect_type), intent(inout)    :: x, y
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_s_cuda_elg_inner_vect_sv
   end interface
 
   interface
-    subroutine  psb_s_cuda_elg_reallocate_nz(nz,a) 
+    subroutine psb_s_cuda_elg_reallocate_nz(nz, a) 
       import :: psb_s_cuda_elg_sparse_mat, psb_ipk_
-      integer(psb_ipk_), intent(in) :: nz
+      integer(psb_ipk_), intent(in)                   :: nz
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
     end subroutine psb_s_cuda_elg_reallocate_nz
   end interface
 
   interface
-    subroutine  psb_s_cuda_elg_allocate_mnnz(m,n,a,nz) 
+    subroutine psb_s_cuda_elg_allocate_mnnz(m, n, a, nz) 
       import :: psb_s_cuda_elg_sparse_mat, psb_ipk_
-      integer(psb_ipk_), intent(in) :: m,n
+      integer(psb_ipk_), intent(in)                   :: m, n
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(in), optional :: nz
     end subroutine psb_s_cuda_elg_allocate_mnnz
   end interface
 
   interface 
-    subroutine psb_s_cuda_elg_mold(a,b,info) 
+    subroutine psb_s_cuda_elg_mold(a, b, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_s_base_sparse_mat, psb_ipk_
-      class(psb_s_cuda_elg_sparse_mat), intent(in)                  :: a
-      class(psb_s_base_sparse_mat), intent(inout), allocatable :: b
-      integer(psb_ipk_), intent(out)                           :: info
+      class(psb_s_cuda_elg_sparse_mat), intent(in)              :: a
+      class(psb_s_base_sparse_mat), intent(inout), allocatable  :: b
+      integer(psb_ipk_), intent(out)                            :: info
     end subroutine psb_s_cuda_elg_mold
   end interface
   
   interface 
-    subroutine psb_s_cuda_elg_csput_a(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
+    subroutine psb_s_cuda_elg_csput_a(nz, ia, ja, val, a, imin, imax, jmin, jmax, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_spk_, psb_ipk_
+      integer(psb_ipk_), intent(in)                   :: nz, ia(:), ja(:), &
+                                                      & imin, imax, jmin, jmax
+      real(psb_spk_), intent(in)                      :: val(:)
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      real(psb_spk_), intent(in)      :: val(:)
-      integer(psb_ipk_), intent(in)             :: nz,ia(:), ja(:),&
-           &  imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_elg_csput_a
   end interface
-
+  
   interface 
-    subroutine psb_s_cuda_elg_csput_v(nz,ia,ja,val,a,imin,imax,jmin,jmax,info) 
-      import :: psb_s_cuda_elg_sparse_mat, psb_dpk_, psb_ipk_, psb_s_base_vect_type,&
-           & psb_i_base_vect_type
+    subroutine psb_s_cuda_elg_csput_v(nz, ia, ja, val, a, imin, imax, jmin, jmax, info) 
+      import :: psb_s_cuda_elg_sparse_mat, psb_dpk_, psb_ipk_, psb_s_base_vect_type, &
+              & psb_i_base_vect_type
+      integer(psb_ipk_), intent(in)                   :: nz, imin, imax, jmin, jmax
+      class(psb_i_base_vect_type), intent(inout)      :: ia, ja
+      class(psb_s_base_vect_type), intent(inout)      :: val
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      class(psb_s_base_vect_type), intent(inout) :: val
-      class(psb_i_base_vect_type), intent(inout) :: ia, ja
-      integer(psb_ipk_), intent(in)              :: nz, imin,imax,jmin,jmax
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_elg_csput_v
   end interface
 
   interface 
-    subroutine psb_s_cuda_elg_from_gpu(a,info) 
+    subroutine psb_s_cuda_elg_from_gpu(a, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_ipk_
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_elg_from_gpu
   end interface
 
   interface 
-    subroutine psb_s_cuda_elg_to_gpu(a,info, nzrm) 
+    subroutine psb_s_cuda_elg_to_gpu(a, info, nzrm) 
       import :: psb_s_cuda_elg_sparse_mat, psb_ipk_
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      integer(psb_ipk_), intent(out)             :: info
-      integer(psb_ipk_), intent(in), optional    :: nzrm
+      integer(psb_ipk_), intent(out)                  :: info
+      integer(psb_ipk_), intent(in), optional :: nzrm
     end subroutine psb_s_cuda_elg_to_gpu
   end interface
 
   interface 
-    subroutine psb_s_cuda_cp_elg_from_coo(a,b,info) 
+    subroutine psb_s_cuda_cp_elg_from_coo(a, b, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_s_coo_sparse_mat, psb_ipk_
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      class(psb_s_coo_sparse_mat), intent(in)    :: b
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_s_coo_sparse_mat), intent(in)         :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_cp_elg_from_coo
   end interface
   
   interface 
-    subroutine psb_s_cuda_cp_elg_from_fmt(a,b,info) 
+    subroutine psb_s_cuda_cp_elg_from_fmt(a, b, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_s_base_sparse_mat, psb_ipk_
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      class(psb_s_base_sparse_mat), intent(in)   :: b
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_s_base_sparse_mat), intent(in)        :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_cp_elg_from_fmt
   end interface
   
   interface 
-    subroutine psb_s_cuda_mv_elg_from_coo(a,b,info) 
+    subroutine psb_s_cuda_mv_elg_from_coo(a, b, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_s_coo_sparse_mat, psb_ipk_
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      class(psb_s_coo_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)             :: info
+      class(psb_s_coo_sparse_mat), intent(inout)      :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_mv_elg_from_coo
   end interface
   
-
   interface 
-    subroutine psb_s_cuda_mv_elg_from_fmt(a,b,info) 
+    subroutine psb_s_cuda_mv_elg_from_fmt(a, b, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_s_base_sparse_mat, psb_ipk_
-      class(psb_s_cuda_elg_sparse_mat), intent(inout)  :: a
-      class(psb_s_base_sparse_mat), intent(inout) :: b
-      integer(psb_ipk_), intent(out)              :: info
+      class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
+      class(psb_s_base_sparse_mat), intent(inout)     :: b
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_mv_elg_from_fmt
   end interface
 
   interface 
-    subroutine psb_s_cuda_elg_csmv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_s_cuda_elg_csmv(alpha, a, x, beta, y, info, trans) 
       import :: psb_s_cuda_elg_sparse_mat, psb_spk_, psb_ipk_
-      class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)          :: alpha, beta, x(:)
-      real(psb_spk_), intent(inout)       :: y(:)
-      integer(psb_ipk_), intent(out)     :: info
-      character, optional, intent(in)    :: trans
+      real(psb_spk_), intent(in)                    :: alpha, beta, x(:)
+      class(psb_s_cuda_elg_sparse_mat), intent(in)  :: a
+      real(psb_spk_), intent(inout)                 :: y(:)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_s_cuda_elg_csmv
   end interface
+
   interface 
-    subroutine psb_s_cuda_elg_csmm(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_s_cuda_elg_csmm(alpha, a, x, beta, y, info, trans) 
       import :: psb_s_cuda_elg_sparse_mat, psb_spk_, psb_ipk_
-      class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
-      real(psb_spk_), intent(in)          :: alpha, beta, x(:,:)
-      real(psb_spk_), intent(inout)       :: y(:,:)
-      integer(psb_ipk_), intent(out)      :: info
-      character, optional, intent(in)     :: trans
+      real(psb_spk_), intent(in)                    :: alpha, beta, x(:, :)
+      class(psb_s_cuda_elg_sparse_mat), intent(in)  :: a
+      real(psb_spk_), intent(inout)                 :: y(:, :)
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_s_cuda_elg_csmm
   end interface
   
   interface 
-    subroutine psb_s_cuda_elg_scal(d,a,info, side) 
+    subroutine psb_s_cuda_elg_scal(d, a, info, side) 
       import :: psb_s_cuda_elg_sparse_mat, psb_spk_, psb_ipk_
+      real(psb_spk_), intent(in)                      :: d(:)
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      real(psb_spk_), intent(in)      :: d(:)
-      integer(psb_ipk_), intent(out)  :: info
+      integer(psb_ipk_), intent(out)                  :: info
       character, intent(in), optional :: side
     end subroutine psb_s_cuda_elg_scal
   end interface
   
   interface
-    subroutine psb_s_cuda_elg_scals(d,a,info) 
+    subroutine psb_s_cuda_elg_scals(d, a, info) 
       import :: psb_s_cuda_elg_sparse_mat, psb_spk_, psb_ipk_
+      real(psb_spk_), intent(in)                      :: d
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-      real(psb_spk_), intent(in)      :: d
-      integer(psb_ipk_), intent(out)  :: info
+      integer(psb_ipk_), intent(out)                  :: info
     end subroutine psb_s_cuda_elg_scals
   end interface
   
@@ -261,8 +311,6 @@ module psb_s_cuda_elg_mat_mod
       class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a   
     end subroutine psb_s_cuda_elg_asb
   end interface
-  
-
 contains 
 
   ! == ===================================
@@ -273,36 +321,30 @@ contains
   !
   !
   !
-  !
-  !
   ! == ===================================
 
-  
   function s_cuda_elg_sizeof(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
     integer(psb_epk_) :: res
 
-    if (a%is_dev()) call a%sync()
+    if(a%is_dev()) call a%sync()
     res = 8 
-    res = res + psb_sizeof_sp  * size(a%val)
+    res = res + psb_sizeof_sp * size(a%val)
     res = res + psb_sizeof_ip * size(a%irn)
     res = res + psb_sizeof_ip * size(a%idiag)
     res = res + psb_sizeof_ip * size(a%ja)
     ! Should we account for the shadow data structure
     ! on the GPU device side? 
     ! res = 2*res
-      
   end function s_cuda_elg_sizeof
 
   function s_cuda_elg_get_fmt() result(res)
-    implicit none 
+    implicit none
     character(len=5) :: res
     res = 'ELG'
   end function s_cuda_elg_get_fmt
   
-
-
   ! == ===================================
   !
   !
@@ -311,112 +353,105 @@ contains
   !
   !
   !
-  !
-  !
-  ! == ===================================  
-  subroutine  s_cuda_elg_reinit(a,clear) 
-    use elldev_mod
-    implicit none 
-    integer(psb_ipk_) :: info
+  ! == ===================================
 
+  subroutine s_cuda_elg_reinit(a, clear) 
+    use elldev_mod
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
     logical, intent(in), optional :: clear
+
+    integer(psb_ipk_) :: info
     integer(psb_ipk_) :: isz, err_act
-    character(len=20)  :: name='reinit'
-    logical            :: clear_
-    logical, parameter :: debug=.false.
+    character(len=20) :: name = 'reinit'
+    logical           :: clear_
+    logical, parameter :: debug = .false.
 
     call psb_erractionsave(err_act)
     info = psb_success_
 
-    if (present(clear)) then 
+    if(present(clear)) then 
       clear_ = clear
     else
       clear_ = .true.
     end if
 
-    if (a%is_bld() .or. a%is_upd()) then 
+    if(a%is_bld() .or. a%is_upd()) then 
       ! do nothing
       return
-    else if (a%is_asb()) then
-      if (a%is_dev().or.a%is_sync()) then
-        if (clear_) call zeroEllDevice(a%deviceMat)
+    else if(a%is_asb()) then
+      if(a%is_dev() .or. a%is_sync()) then
+        if(clear_) call zeroEllDevice(a%deviceMat)
         call a%set_dev()
-      else if (a%is_host()) then 
-        a%val(:,:) = szero
+      else if(a%is_host()) then 
+        a%val(:, :) = szero
       end if
       call a%set_upd()
     else
       info = psb_err_invalid_mat_state_
-      call psb_errpush(info,name)
+      call psb_errpush(info, name)
       goto 9999
     end if
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(err_act)
+  9999 call psb_error_handler(err_act)
     return
-
   end subroutine s_cuda_elg_reinit
 
-  subroutine  s_cuda_elg_free(a) 
+  subroutine s_cuda_elg_free(a) 
     use elldev_mod
-    implicit none 
-    integer(psb_ipk_) :: info
-
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
-    
-    if (c_associated(a%deviceMat)) &
-         & call freeEllDevice(a%deviceMat)
+
+    if(c_associated(a%deviceMat)) call freeEllDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
     call a%psb_s_ell_sparse_mat%free()
     call a%set_sync()
-    
     return
-
   end subroutine s_cuda_elg_free
 
-  subroutine  s_cuda_elg_sync(a) 
-    implicit none 
+  subroutine s_cuda_elg_sync(a) 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), target, intent(in) :: a
+
     class(psb_s_cuda_elg_sparse_mat), pointer :: tmpa
     integer(psb_ipk_) :: info
 
     tmpa => a
-    if (tmpa%is_host()) then 
+    if(tmpa%is_host()) then 
       call tmpa%to_gpu(info)
-    else if (tmpa%is_dev()) then 
+    else if(tmpa%is_dev()) then 
       call tmpa%from_gpu(info)
     end if
     call tmpa%set_sync()
     return
-
   end subroutine s_cuda_elg_sync
 
   subroutine s_cuda_elg_set_host(a)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
     
     a%devstate = is_host
   end subroutine s_cuda_elg_set_host
 
   subroutine s_cuda_elg_set_dev(a)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
     
     a%devstate = is_dev
   end subroutine s_cuda_elg_set_dev
 
   subroutine s_cuda_elg_set_sync(a)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
     
     a%devstate = is_sync
   end subroutine s_cuda_elg_set_sync
 
   function s_cuda_elg_is_dev(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
     logical  :: res
   
@@ -424,7 +459,7 @@ contains
   end function s_cuda_elg_is_dev
   
   function s_cuda_elg_is_host(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
     logical  :: res
 
@@ -432,23 +467,20 @@ contains
   end function s_cuda_elg_is_host
 
   function s_cuda_elg_is_sync(a) result(res)
-    implicit none 
+    implicit none
     class(psb_s_cuda_elg_sparse_mat), intent(in) :: a
     logical  :: res
 
     res = (a%devstate == is_sync)
   end function s_cuda_elg_is_sync
 
-  subroutine  s_cuda_elg_finalize(a) 
+  subroutine s_cuda_elg_finalize(a) 
     use elldev_mod
-    implicit none 
+    implicit none
     type(psb_s_cuda_elg_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         & call freeEllDevice(a%deviceMat)
+    if(c_associated(a%deviceMat)) call freeEllDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
     return
-
   end subroutine s_cuda_elg_finalize
-
 end module psb_s_cuda_elg_mat_mod

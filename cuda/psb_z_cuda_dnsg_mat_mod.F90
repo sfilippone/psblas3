@@ -28,10 +28,8 @@
 !    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !    POSSIBILITY OF SUCH DAMAGE.
 !   
-  
 
 module psb_z_cuda_dnsg_mat_mod
-
   use iso_c_binding
   use psb_z_mat_mod 
   use psb_z_dns_mat_mod
@@ -44,18 +42,21 @@ module psb_z_cuda_dnsg_mat_mod
     ! into the GPU. 
     ! 
     type(c_ptr) :: deviceMat = c_null_ptr
-
   contains
     procedure, nopass  :: get_fmt       => z_cuda_dnsg_get_fmt
     ! procedure, pass(a) :: sizeof        => z_cuda_dnsg_sizeof
     procedure, pass(a) :: vect_mv       => psb_z_cuda_dnsg_vect_mv
-!!$    procedure, pass(a) :: csmm          => psb_z_cuda_dnsg_csmm
-!!$    procedure, pass(a) :: csmv          => psb_z_cuda_dnsg_csmv
-!!$    procedure, pass(a) :: in_vect_sv    => psb_z_cuda_dnsg_inner_vect_sv
-!!$    procedure, pass(a) :: scals         => psb_z_cuda_dnsg_scals
-!!$    procedure, pass(a) :: scalv         => psb_z_cuda_dnsg_scal
-!!$    procedure, pass(a) :: reallocate_nz => psb_z_cuda_dnsg_reallocate_nz
-!!$    procedure, pass(a) :: allocate_mnnz => psb_z_cuda_dnsg_allocate_mnnz
+    procedure, pass(a) :: mvt_mv        => psb_z_cuda_dnsg_mvect_mv
+    procedure, pass(a) :: mvt_vm        => psb_z_cuda_dnsg_mvect_vm
+    procedure, pass(a) :: mvt_mm_i      => psb_z_cuda_dnsg_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_f      => psb_z_cuda_dnsg_mvect_mm_full
+    !!$ procedure, pass(a) :: csmm          => psb_z_cuda_dnsg_csmm
+    !!$ procedure, pass(a) :: csmv          => psb_z_cuda_dnsg_csmv
+    !!$ procedure, pass(a) :: in_vect_sv    => psb_z_cuda_dnsg_inner_vect_sv
+    !!$ procedure, pass(a) :: scals         => psb_z_cuda_dnsg_scals
+    !!$ procedure, pass(a) :: scalv         => psb_z_cuda_dnsg_scal
+    !!$ procedure, pass(a) :: reallocate_nz => psb_z_cuda_dnsg_reallocate_nz
+    !!$ procedure, pass(a) :: allocate_mnnz => psb_z_cuda_dnsg_allocate_mnnz
     ! Note: we *do* need the TO methods, because of the need to invoke SYNC
     ! 
     procedure, pass(a) :: cp_from_coo   => psb_z_cuda_cp_dnsg_from_coo
@@ -68,52 +69,101 @@ module psb_z_cuda_dnsg_mat_mod
     final              :: z_cuda_dnsg_finalize
   end type psb_z_cuda_dnsg_sparse_mat
 
-  private :: z_cuda_dnsg_get_nzeros, z_cuda_dnsg_free,  z_cuda_dnsg_get_fmt, &
-       & z_cuda_dnsg_get_size, z_cuda_dnsg_get_nz_row
-
+  private :: z_cuda_dnsg_get_nzeros, z_cuda_dnsg_free, z_cuda_dnsg_get_fmt, &
+            & z_cuda_dnsg_get_size, z_cuda_dnsg_get_nz_row
 
   interface 
-    subroutine psb_z_cuda_dnsg_vect_mv(alpha,a,x,beta,y,info,trans) 
+    subroutine psb_z_cuda_dnsg_vect_mv(alpha, a, x, beta, y, info, trans) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_z_base_vect_type, psb_ipk_
-      class(psb_z_cuda_dnsg_sparse_mat), intent(in)    :: a
-      complex(psb_dpk_), intent(in)                 :: alpha, beta
-      class(psb_z_base_vect_type), intent(inout) :: x
-      class(psb_z_base_vect_type), intent(inout) :: y
-      integer(psb_ipk_), intent(out)             :: info
-      character, optional, intent(in)            :: trans
+      complex(psb_dpk_), intent(in)                    :: alpha, beta
+      class(psb_z_cuda_dnsg_sparse_mat), intent(in) :: a
+      class(psb_z_base_vect_type), intent(inout)    :: x, y
+      integer(psb_ipk_), intent(out)                :: info
+      character, optional, intent(in) :: trans
     end subroutine psb_z_cuda_dnsg_vect_mv
   end interface
-!!$
-!!$  interface 
-!!$    subroutine psb_z_cuda_dnsg_inner_vect_sv(alpha,a,x,beta,y,info,trans) 
-!!$      import :: psb_ipk_, psb_z_cuda_dnsg_sparse_mat, psb_dpk_,  psb_z_base_vect_type
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(in)    :: a
-!!$      complex(psb_dpk_), intent(in)                 :: alpha, beta
-!!$      class(psb_z_base_vect_type), intent(inout) :: x, y
-!!$      integer(psb_ipk_), intent(out)             :: info
-!!$      character, optional, intent(in)            :: trans
-!!$    end subroutine psb_z_cuda_dnsg_inner_vect_sv
-!!$  end interface
+      
+  interface
+    subroutine psb_z_cuda_dnsg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      import :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_vect_type, psb_z_base_multivect_type, &
+              & psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_dnsg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_vect_type), intent(inout)      :: x
+      class(psb_z_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_dnsg_mvect_mv
+  end interface
 
-!!$  interface
-!!$    subroutine  psb_z_cuda_dnsg_reallocate_nz(nz,a) 
-!!$      import :: psb_z_cuda_dnsg_sparse_mat, psb_ipk_
-!!$      integer(psb_ipk_), intent(in)              :: nz
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
-!!$    end subroutine psb_z_cuda_dnsg_reallocate_nz
-!!$  end interface
-!!$
-!!$  interface
-!!$    subroutine  psb_z_cuda_dnsg_allocate_mnnz(m,n,a,nz) 
-!!$      import :: psb_z_cuda_dnsg_sparse_mat, psb_ipk_
-!!$      integer(psb_ipk_), intent(in)              :: m,n
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
-!!$      integer(psb_ipk_), intent(in), optional    :: nz
-!!$    end subroutine psb_z_cuda_dnsg_allocate_mnnz
-!!$  end interface
+  interface
+    subroutine psb_z_cuda_dnsg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+      import   :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_vect_type, psb_z_base_multivect_type, &
+              & psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_dnsg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_z_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_dnsg_mvect_vm
+  end interface
+  
+  interface
+    subroutine psb_z_cuda_dnsg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+      import :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_multivect_type, psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_dnsg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_dnsg_mvect_mm_idxs
+  end interface
+  
+  interface
+    subroutine psb_z_cuda_dnsg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+      import :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_multivect_type, psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_dnsg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_dnsg_mvect_mm_full
+  end interface
+
+  !!$ interface 
+  !!$   subroutine psb_z_cuda_dnsg_inner_vect_sv(alpha, a, x, beta, y, info, trans) 
+  !!$     import :: psb_ipk_, psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_z_base_vect_type
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(in)    :: a
+  !!$     complex(psb_dpk_), intent(in)                 :: alpha, beta
+  !!$     class(psb_z_base_vect_type), intent(inout) :: x, y
+  !!$     integer(psb_ipk_), intent(out)             :: info
+  !!$     character, optional, intent(in)            :: trans
+  !!$   end subroutine psb_z_cuda_dnsg_inner_vect_sv
+  !!$ end interface
+  !!$ 
+  !!$ interface
+  !!$   subroutine psb_z_cuda_dnsg_reallocate_nz(nz, a) 
+  !!$     import :: psb_z_cuda_dnsg_sparse_mat, psb_ipk_
+  !!$     integer(psb_ipk_), intent(in)              :: nz
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
+  !!$   end subroutine psb_z_cuda_dnsg_reallocate_nz
+  !!$ end interface
+  !!$ 
+  !!$ interface
+  !!$   subroutine psb_z_cuda_dnsg_allocate_mnnz(m, n, a, nz) 
+  !!$     import :: psb_z_cuda_dnsg_sparse_mat, psb_ipk_
+  !!$     integer(psb_ipk_), intent(in)              :: m, n
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
+  !!$     integer(psb_ipk_), intent(in), optional    :: nz
+  !!$   end subroutine psb_z_cuda_dnsg_allocate_mnnz
+  !!$ end interface
 
   interface 
-    subroutine psb_z_cuda_dnsg_mold(a,b,info) 
+    subroutine psb_z_cuda_dnsg_mold(a, b, info) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_sparse_mat, psb_ipk_
       class(psb_z_cuda_dnsg_sparse_mat), intent(in)                  :: a
       class(psb_z_base_sparse_mat), intent(inout), allocatable :: b
@@ -122,7 +172,7 @@ module psb_z_cuda_dnsg_mat_mod
   end interface
 
   interface 
-    subroutine psb_z_cuda_dnsg_to_gpu(a,info) 
+    subroutine psb_z_cuda_dnsg_to_gpu(a, info) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_ipk_
       class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
       integer(psb_ipk_), intent(out)             :: info
@@ -130,7 +180,7 @@ module psb_z_cuda_dnsg_mat_mod
   end interface
 
   interface 
-    subroutine psb_z_cuda_cp_dnsg_from_coo(a,b,info) 
+    subroutine psb_z_cuda_cp_dnsg_from_coo(a, b, info) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_z_coo_sparse_mat, psb_ipk_
       class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
       class(psb_z_coo_sparse_mat), intent(in)    :: b
@@ -139,7 +189,7 @@ module psb_z_cuda_dnsg_mat_mod
   end interface
   
   interface 
-    subroutine psb_z_cuda_cp_dnsg_from_fmt(a,b,info) 
+    subroutine psb_z_cuda_cp_dnsg_from_fmt(a, b, info) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_sparse_mat, psb_ipk_
       class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
       class(psb_z_base_sparse_mat), intent(in)   :: b
@@ -148,7 +198,7 @@ module psb_z_cuda_dnsg_mat_mod
   end interface
   
   interface 
-    subroutine psb_z_cuda_mv_dnsg_from_coo(a,b,info) 
+    subroutine psb_z_cuda_mv_dnsg_from_coo(a, b, info) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_z_coo_sparse_mat, psb_ipk_
       class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
       class(psb_z_coo_sparse_mat), intent(inout) :: b
@@ -156,9 +206,8 @@ module psb_z_cuda_dnsg_mat_mod
     end subroutine psb_z_cuda_mv_dnsg_from_coo
   end interface
   
-
   interface 
-    subroutine psb_z_cuda_mv_dnsg_from_fmt(a,b,info) 
+    subroutine psb_z_cuda_mv_dnsg_from_fmt(a, b, info) 
       import :: psb_z_cuda_dnsg_sparse_mat, psb_z_base_sparse_mat, psb_ipk_
       class(psb_z_cuda_dnsg_sparse_mat), intent(inout)  :: a
       class(psb_z_base_sparse_mat), intent(inout) :: b
@@ -166,47 +215,46 @@ module psb_z_cuda_dnsg_mat_mod
     end subroutine psb_z_cuda_mv_dnsg_from_fmt
   end interface
   
-!!$  interface 
-!!$    subroutine psb_z_cuda_dnsg_csmv(alpha,a,x,beta,y,info,trans) 
-!!$      import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(in) :: a
-!!$      complex(psb_dpk_), intent(in)              :: alpha, beta, x(:)
-!!$      complex(psb_dpk_), intent(inout)           :: y(:)
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$      character, optional, intent(in)         :: trans
-!!$    end subroutine psb_z_cuda_dnsg_csmv
-!!$  end interface
-!!$  interface 
-!!$    subroutine psb_z_cuda_dnsg_csmm(alpha,a,x,beta,y,info,trans) 
-!!$      import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(in) :: a
-!!$      complex(psb_dpk_), intent(in)              :: alpha, beta, x(:,:)
-!!$      complex(psb_dpk_), intent(inout)           :: y(:,:)
-!!$      integer(psb_ipk_), intent(out)          :: info
-!!$      character, optional, intent(in)         :: trans
-!!$    end subroutine psb_z_cuda_dnsg_csmm
-!!$  end interface
-!!$  
-!!$  interface 
-!!$    subroutine psb_z_cuda_dnsg_scal(d,a,info, side) 
-!!$      import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
-!!$      complex(psb_dpk_), intent(in)                 :: d(:)
-!!$      integer(psb_ipk_), intent(out)             :: info
-!!$      character, intent(in), optional            :: side
-!!$    end subroutine psb_z_cuda_dnsg_scal
-!!$  end interface
-!!$  
-!!$  interface
-!!$    subroutine psb_z_cuda_dnsg_scals(d,a,info) 
-!!$      import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
-!!$      class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
-!!$      complex(psb_dpk_), intent(in)                 :: d
-!!$      integer(psb_ipk_), intent(out)             :: info
-!!$    end subroutine psb_z_cuda_dnsg_scals
-!!$  end interface
-!!$  
-
+  !!$ interface 
+  !!$   subroutine psb_z_cuda_dnsg_csmv(alpha, a, x, beta, y, info, trans) 
+  !!$     import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(in) :: a
+  !!$     complex(psb_dpk_), intent(in)              :: alpha, beta, x(:)
+  !!$     complex(psb_dpk_), intent(inout)           :: y(:)
+  !!$     integer(psb_ipk_), intent(out)          :: info
+  !!$     character, optional, intent(in)         :: trans
+  !!$     end subroutine psb_z_cuda_dnsg_csmv
+  !!$ end interface
+  !!$ 
+  !!$ interface 
+  !!$   subroutine psb_z_cuda_dnsg_csmm(alpha, a, x, beta, y, info, trans) 
+  !!$     import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(in) :: a
+  !!$     complex(psb_dpk_), intent(in)              :: alpha, beta, x(:, :)
+  !!$     complex(psb_dpk_), intent(inout)           :: y(:, :)
+  !!$     integer(psb_ipk_), intent(out)          :: info
+  !!$     character, optional, intent(in)         :: trans
+  !!$   end subroutine psb_z_cuda_dnsg_csmm
+  !!$ end interface
+  !!$ 
+  !!$ interface 
+  !!$   subroutine psb_z_cuda_dnsg_scal(d, a, info, side) 
+  !!$     import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
+  !!$     complex(psb_dpk_), intent(in)                 :: d(:)
+  !!$     integer(psb_ipk_), intent(out)             :: info
+  !!$     character, intent(in), optional            :: side
+  !!$   end subroutine psb_z_cuda_dnsg_scal
+  !!$ end interface
+  !!$  
+  !!$ interface
+  !!$   subroutine psb_z_cuda_dnsg_scals(d, a, info) 
+  !!$     import :: psb_z_cuda_dnsg_sparse_mat, psb_dpk_, psb_ipk_
+  !!$     class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
+  !!$     complex(psb_dpk_), intent(in)                 :: d
+  !!$     integer(psb_ipk_), intent(out)             :: info
+  !!$   end subroutine psb_z_cuda_dnsg_scals
+  !!$ end interface
 contains 
 
   ! == ===================================
@@ -217,11 +265,7 @@ contains
   !
   !
   !
-  !
-  !
   ! == ===================================
-
-  
 
   function z_cuda_dnsg_get_fmt() result(res)
     implicit none 
@@ -229,8 +273,6 @@ contains
     res = 'DNSG'
   end function z_cuda_dnsg_get_fmt
   
-
-
   ! == ===================================
   !
   !
@@ -239,35 +281,26 @@ contains
   !
   !
   !
-  !
-  !
   ! == ===================================  
 
-  subroutine  z_cuda_dnsg_free(a) 
+  subroutine z_cuda_dnsg_free(a) 
     use dnsdev_mod
     implicit none 
-    integer(psb_ipk_) :: info
     class(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
-
-    if (c_associated(a%deviceMat)) &
-         & call freeDnsDevice(a%deviceMat)
+    
+    if(c_associated(a%deviceMat)) call freeDnsDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
     call a%psb_z_dns_sparse_mat%free()
-    
     return
-
   end subroutine z_cuda_dnsg_free
 
-  subroutine  z_cuda_dnsg_finalize(a) 
+  subroutine z_cuda_dnsg_finalize(a) 
     use dnsdev_mod
     implicit none 
     type(psb_z_cuda_dnsg_sparse_mat), intent(inout) :: a
 
-    if (c_associated(a%deviceMat)) &
-         &  call freeDnsDevice(a%deviceMat)
+    if(c_associated(a%deviceMat)) call freeDnsDevice(a%deviceMat)
     a%deviceMat = c_null_ptr
-    
     return
   end subroutine z_cuda_dnsg_finalize
-
 end module psb_z_cuda_dnsg_mat_mod

@@ -91,6 +91,7 @@ extern __shared__ int dynShrMem[];
 #define GEN_SPGPU_HELL_NAME(x) CONCAT(CONCAT(spgpu,x),hellspmv_texcache)
 #define GEN_SPGPU_HELL_NAME_TEX(x) CONCAT(CONCAT(spgpu,x),hellspmv_texcache)
 #include "hell_spmv_base_template.cuh"
+
 #undef GEN_SPGPU_HELL_NAME
 #define GEN_SPGPU_HELL_NAME(x) CONCAT(CONCAT(spgpu,x),hellspmv)
 void
@@ -149,3 +150,30 @@ GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)
 	cudaCheckError("CUDA error on hell_spmv");
 }
 
+#define GEN_SPGPU_HELL_NAME_M(x) CONCAT(CONCAT(spgpu,x), hellspmm)
+void 
+GEN_SPGPU_HELL_NAME_M(TYPE_SYMBOL)
+(spgpuHandle_t handle,
+	VALUE_TYPE *z,
+	int ldz,
+	const VALUE_TYPE *y,
+	int ldy,
+	VALUE_TYPE alpha, 
+	const VALUE_TYPE* cM, 
+	const int* rP,
+	int hackSize,
+	const int* hackOffsets, 
+	const int* rS,
+	const int* rIdx, 
+	int avgNnzPerRow,
+	int rows,
+	const VALUE_TYPE *x,
+	int ldx,
+	VALUE_TYPE beta,
+	int mvectCount,
+	int baseIndex)
+{
+	//TODO: Implement a proper GEMM kernel
+	for(int colIdx = 0; colIdx < mvectCount; ++colIdx)
+		GEN_SPGPU_HELL_NAME(TYPE_SYMBOL)(handle, z + (colIdx * ldz), y + (colIdx * ldy), alpha, cM, rP, hackSize, hackOffsets, rS, rIdx, avgNnzPerRow, rows, x + (colIdx * ldx), beta, baseIndex);
+}

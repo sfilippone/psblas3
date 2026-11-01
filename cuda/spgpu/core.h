@@ -8,7 +8,6 @@
  *
  */
 
-
 /*! \mainpage The spGPU library documentation
  *
  * \section intro_sec Introduction
@@ -32,9 +31,20 @@
 
 #include "psb_config.h"
 #include "psb_types.h"
+#include <stddef.h>
+#include "cuda_runtime.h"
 #include "driver_types.h"
 #include "cuComplex.h"
- 
+#include <stdbool.h>
+#include <string.h>
+
+#include "ISO_Fortran_binding.h"
+typedef unsigned char CFIbyte_t;
+#define CFI_AT1(T, d, i) 	(*(T *)((CFIbyte_t*)(d)->base_addr + (ptrdiff_t)(i) * (d)->dim[0].sm))
+#define CFI_AT2(T, d, i, j) (*(T *)((CFIbyte_t*)(d)->base_addr + (ptrdiff_t)(i) * (d)->dim[0].sm + (ptrdiff_t)(j) * (d)->dim[1].sm))
+
+#define IDX_F2C(fIdx) ((size_t) (fIdx) - 1)
+
 /** \addtogroup coreFun Core Routines
  *  @{
  */
@@ -59,9 +69,9 @@ typedef int spgpuStatus_t;
 /// Code to identify a primitive type
 typedef int spgpuType_t;
 
-#define SPGPU_TYPE_INT			0
-#define SPGPU_TYPE_FLOAT		1
-#define SPGPU_TYPE_DOUBLE		2
+#define SPGPU_TYPE_INT				0
+#define SPGPU_TYPE_FLOAT			1
+#define SPGPU_TYPE_DOUBLE			2
 #define SPGPU_TYPE_COMPLEX_FLOAT	3
 #define SPGPU_TYPE_COMPLEX_DOUBLE	4
 
@@ -69,22 +79,28 @@ typedef int spgpuType_t;
 typedef struct spgpuHandleStruct {
 	/// the current stream used by every calls on spgpu routines (passing this handle)
 	cudaStream_t currentStream;
+
 	/// the default stream, created during the handle creation.
 	cudaStream_t defaultStream;
 	/// the device associated to this handle
 	int device;
+
 	/// the warp size for this device
 	int warpSize;
+
 	/// the max threads per block count for this device
 	int maxThreadsPerBlock;
+
 	/// the max size for the X coordinate of the grid dimensions
 	int maxGridSizeX;
 	/// the max size for the Y coordinate of the grid dimensions
 	int maxGridSizeY;
 	/// the max size for the Z coordinate of the grid dimensions
 	int maxGridSizeZ;
-        /// Number of SM
-        int multiProcessorCount;
+
+	/// Number of SM
+	int multiProcessorCount;
+
 	// compute capability
 	int capabilityMajor;
 	int capabilityMinor;
@@ -157,14 +173,34 @@ int baseIndex;
 } spgpuMatrixDesc_t
 */
 
-#define cuFloatComplex_isZero(a) (a.x == 0.0f && a.y == 0.0f)
-#define cuDoubleComplex_isZero(a) (a.x == 0.0 && a.y == 0.0)
-#define cuFloatComplex_isNotZero(a) (a.x != 0.0f || a.y != 0.0f)
-#define cuDoubleComplex_isNotZero(a) (a.x != 0.0 || a.y != 0.0)
+typedef struct 
+{
+	__device void *devBuffer; 
+	size_t devSize; 
+	void *hostBuffer; 
+	size_t hostSize;
+} CFIBuffer;
+
+CFIBuffer* getDotBuffer();
+CFIBuffer* getColspanBuffer();
+
+int resetCFIstaticBuffers();
+
+void CFIdevBufferAlloc(CFIBuffer* buffer, size_t byteCount);
+void CFIhostBufferAlloc(CFIBuffer* buffer, size_t byteCount);
+
+void CFIBufferLoad(spgpuHandle_t handle, const CFI_cdesc_t* cdesc, CFIBuffer* buffer);
+void CFIBufferStore(spgpuHandle_t handle, CFI_cdesc_t* cdesc, CFIBuffer* buffer, size_t bytes);
+
+#define cuFloatComplex_isZero(a) 		(a.x == 0.0f && a.y == 0.0f)
+#define cuDoubleComplex_isZero(a) 		(a.x == 0.0  && a.y == 0.0)
+#define cuFloatComplex_isNotZero(a) 	(a.x != 0.0f || a.y != 0.0f)
+#define cuDoubleComplex_isNotZero(a) 	(a.x != 0.0  || a.y != 0.0)
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @}*/
-
+/** 
+ * @}
+ */

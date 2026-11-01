@@ -51,6 +51,10 @@ module psb_z_cuda_hybg_mat_mod
     procedure, nopass  :: get_fmt       => z_cuda_hybg_get_fmt
     procedure, pass(a) :: sizeof        => z_cuda_hybg_sizeof
     procedure, pass(a) :: vect_mv       => psb_z_cuda_hybg_vect_mv
+    procedure, pass(a) :: mvt_mv        => psb_z_cuda_hybg_mvect_mv
+    procedure, pass(a) :: mvt_vm        => psb_z_cuda_hybg_mvect_vm
+    procedure, pass(a) :: mvt_mm_i      => psb_z_cuda_hybg_mvect_mm_idxs
+    procedure, pass(a) :: mvt_mm_f      => psb_z_cuda_hybg_mvect_mm_full
     procedure, pass(a) :: in_vect_sv    => psb_z_cuda_hybg_inner_vect_sv
     procedure, pass(a) :: csmm          => psb_z_cuda_hybg_csmm
     procedure, pass(a) :: csmv          => psb_z_cuda_hybg_csmv
@@ -96,6 +100,57 @@ module psb_z_cuda_hybg_mat_mod
       integer(psb_ipk_), intent(out)             :: info
       character, optional, intent(in)            :: trans
     end subroutine psb_z_cuda_hybg_vect_mv
+  end interface
+      
+  interface
+    subroutine psb_z_cuda_hybg_mvect_mv(alpha, a, x, beta, y, idx_y, info, trans)
+      import :: psb_z_cuda_hybg_sparse_mat, psb_z_base_vect_type, psb_z_base_multivect_type, &
+              & psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_hybg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_vect_type), intent(inout)      :: x
+      class(psb_z_base_multivect_type), intent(inout) :: y
+      integer(psb_ipk_), intent(in)                   :: idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_hybg_mvect_mv
+  end interface
+
+  interface
+    subroutine psb_z_cuda_hybg_mvect_vm(alpha, a, x, idx_x, beta, y, info, trans) 
+      import :: psb_z_cuda_hybg_sparse_mat, psb_z_base_vect_type, psb_z_base_multivect_type, &
+              & psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_hybg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_multivect_type), intent(inout) :: x
+      integer(psb_ipk_), intent(in)                   :: idx_x
+      class(psb_z_base_vect_type), intent(inout)      :: y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_hybg_mvect_vm
+  end interface
+      
+  interface
+    subroutine psb_z_cuda_hybg_mvect_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, info, trans) 
+      import :: psb_z_cuda_hybg_sparse_mat, psb_z_base_multivect_type, psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_hybg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(in)                   :: idx_x, idx_y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_hybg_mvect_mm_idxs
+  end interface
+      
+  interface
+    subroutine psb_z_cuda_hybg_mvect_mm_full(alpha, a, x, beta, y, info, trans) 
+      import :: psb_z_cuda_hybg_sparse_mat, psb_z_base_multivect_type, psb_dpk_, psb_ipk_
+      complex(psb_dpk_), intent(in)                      :: alpha, beta
+      class(psb_z_cuda_hybg_sparse_mat), intent(in)   :: a
+      class(psb_z_base_multivect_type), intent(inout) :: x, y
+      integer(psb_ipk_), intent(out)                  :: info
+      character, optional, intent(in) :: trans
+    end subroutine psb_z_cuda_hybg_mvect_mm_full
   end interface
 
   interface

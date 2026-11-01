@@ -10,20 +10,29 @@
  
 // Used to avoid mad.f32 instructions on c.c. 1.*
 #if __CUDA_ARCH__ >= 200
-#define PREC_FADD(a,b) ((a) + (b))
-#define PREC_FMUL(a,b) ((a) * (b))
+	#define PREC_FADD(a, b) ((a) + (b))
+	#define PREC_FMUL(a, b) ((a) * (b))
 #else
-#define PREC_FADD(a,b) __fadd_rn((a),(b))
-#define PREC_FMUL(a,b) __fmul_rn((a),(b))
+	#define PREC_FADD(a, b) __fadd_rn((a), (b))
+	#define PREC_FMUL(a, b) __fmul_rn((a), (b))
 #endif
 
-#define PREC_DADD(a,b) ((a) + (b))
-#define PREC_DMUL(a,b) ((a) * (b))
+#define PREC_DADD(a, b) ((a) + (b))
+#define PREC_DMUL(a, b) ((a) * (b))
 
+inline __host__ __device__ float2 make_float2(float s)
+{
+	return make_float2(s, s);
+}
 
 inline __host__ __device__ double2 make_double2(double s)
 {
 	return make_double2(s, s);
+}
+
+inline __host__ __device__ float2 operator+(float2 a, float2 b)
+{
+	return make_float2(a.x + b.x, a.y + b.y);
 }
 
 inline __host__ __device__ double2 operator+(double2 a, double2 b)
@@ -31,9 +40,21 @@ inline __host__ __device__ double2 operator+(double2 a, double2 b)
 	return make_double2(a.x + b.x, a.y + b.y);
 }
 
+inline __host__ __device__ void operator+=(float2 &a, float2 b)
+{
+	a.x += b.x; 
+	a.y += b.y;
+}
+
 inline __host__ __device__ void operator+=(double2 &a, double2 b)
 {
-	a.x += b.x; a.y += b.y;
+	a.x += b.x; 
+	a.y += b.y;
+}
+
+inline __host__ __device__ float2 operator-(float2 a, float2 b)
+{
+	return make_float2(a.x - b.x, a.y - b.y);
 }
 
 inline __host__ __device__ double2 operator-(double2 a, double2 b)
@@ -41,9 +62,21 @@ inline __host__ __device__ double2 operator-(double2 a, double2 b)
 	return make_double2(a.x - b.x, a.y - b.y);
 }
 
+inline __host__ __device__ void operator-=(float2 &a, float2 b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+}
+
 inline __host__ __device__ void operator-=(double2 &a, double2 b)
 {
-	a.x -= b.x; a.y -= b.y;
+	a.x -= b.x;
+	a.y -= b.y;
+}
+
+inline __host__ __device__ float2 operator*(float2 a, float s)
+{
+	return make_float2(a.x * s, a.y * s);
 }
 
 inline __host__ __device__ double2 operator*(double2 a, double s)
@@ -51,12 +84,24 @@ inline __host__ __device__ double2 operator*(double2 a, double s)
 	return make_double2(a.x * s, a.y * s);
 }
 
+inline __host__ __device__ float2 operator*(float s, float2 a)
+{
+	return make_float2(a.x * s, a.y * s);
+}
+
 inline __host__ __device__ double2 operator*(double s, double2 a)
 {
 	return make_double2(a.x * s, a.y * s);
 }
 
+inline __host__ __device__ void operator*=(float2 &a, float s)
+{
+	a.x *= s; 
+	a.y *= s;
+}
+
 inline __host__ __device__ void operator*=(double2 &a, double s)
 {
-	a.x *= s; a.y *= s;
+	a.x *= s; 
+	a.y *= s;
 }
