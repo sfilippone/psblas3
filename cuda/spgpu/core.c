@@ -7,7 +7,8 @@
  */
  
 #include "core.h"
-#include "stdlib.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include "cuda_runtime.h"
 
 spgpuStatus_t spgpuCreate(spgpuHandle_t* pHandle, int device)

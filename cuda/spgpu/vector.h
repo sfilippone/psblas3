@@ -318,7 +318,7 @@ void spgpuSaxpby(spgpuHandle_t handle,
 	__device float* x);
 
 /** 
- * \fn void spgpuDaxpbycz(spgpuHandle_t handle, __device float* w, int n, float gamma, __device float* z, float beta, __device float* y, float alpha, __device float* x);
+ * \fn void spgpuSaxpbycz(spgpuHandle_t handle, __device float* w, int n, float gamma, __device float* z, float beta, __device float* y, float alpha, __device float* x);
  * Computes the float precision w = gamma * z + beta * y + alpha * x. w could be exactly x, y or z (without offset) or another vector.
  * \param handle the spgpu handle used to call this routine
  * \param w the resulting vector
@@ -1306,6 +1306,29 @@ void spgpuCaxpby(spgpuHandle_t handle,
 	__device cuFloatComplex* x);
 
 /** 
+ * \fn void spgpuCaxpbycz(spgpuHandle_t handle, __device cuFloatComplex* w, int n, cuFloatComplex gamma, __device cuFloatComplex* z, cuFloatComplex beta, __device cuFloatComplex* y, cuFloatComplex alpha, __device cuFloatComplex* x);
+ * Computes the single precision complex w = gamma * z + beta * y + alpha * x. w could be exactly x, y or z (without offset) or another vector.
+ * \param handle the spgpu handle used to call this routine
+ * \param w the resulting vector
+ * \param n the vectors' length
+ * \param gamma the gamma value
+ * \param x the first input vector
+ * \param beta the beta value
+ * \param y the second input vector
+ * \param alpha the alpha value
+ * \param x the third input vector
+ */
+void spgpuCaxpbycz(spgpuHandle_t handle,
+	__device cuFloatComplex* w,
+	int n,
+	cuFloatComplex gamma,
+	__device cuFloatComplex* z,
+	cuFloatComplex beta,
+	__device cuFloatComplex* y,
+	cuFloatComplex alpha,
+	__device cuFloatComplex* x);
+
+/** 
  * \fn void spgpuCcolspan(spgpuHandle_t handle, int n, __device cuFloatComplex* x, int countX, int pitchX, CFI_cdesc_t* coeff, __device cuFloatComplex* y, int countY, int pitchY, bool updFlag)
  * Computes the single precision complex y = x * coeff or y = y + x * coeff depending on the updFlag value. y should be a vector if coeff as rank 1 and must be a multivector if coeff is rank 2.
  * \param handle the spgpu handle used to call this routine
@@ -1778,8 +1801,31 @@ void spgpuZaxpby(spgpuHandle_t handle,
 	__device cuDoubleComplex* x);
 
 /** 
+ * \fn void spgpuZaxpbycz(spgpuHandle_t handle, __device cuDoubleComplex* w, int n, cuDoubleComplex gamma, __device cuDoubleComplex* z, cuDoubleComplex beta, __device cuDoubleComplex* y, cuDoubleComplex alpha, __device cuDoubleComplex* x);
+ * Computes the double precision complex w = gamma * z + beta * y + alpha * x. w could be exactly x, y or z (without offset) or another vector.
+ * \param handle the spgpu handle used to call this routine
+ * \param w the resulting vector
+ * \param n the vectors' length
+ * \param gamma the gamma value
+ * \param x the first input vector
+ * \param beta the beta value
+ * \param y the second input vector
+ * \param alpha the alpha value
+ * \param x the third input vector
+ */
+void spgpuZaxpbycz(spgpuHandle_t handle,
+	__device cuDoubleComplex* w,
+	int n,
+	cuDoubleComplex gamma,
+	__device cuDoubleComplex* z,
+	cuDoubleComplex beta,
+	__device cuDoubleComplex* y,
+	cuDoubleComplex alpha,
+	__device cuDoubleComplex* x);
+
+/** 
  * \fn void spgpuZcolspan(spgpuHandle_t handle, int n, __device cuDoubleComplex* x, int countX, int pitchX, CFI_cdesc_t* coeff, __device cuDoubleComplex* y, int countY, int pitchY, bool updFlag)
- * Computes the single precision complex y = x * coeff or y = y + x * coeff depending on the updFlag value. y should be a vector if coeff as rank 1 and must be a multivector if coeff is rank 2.
+ * Computes the double precision complex y = x * coeff or y = y + x * coeff depending on the updFlag value. y should be a vector if coeff as rank 1 and must be a multivector if coeff is rank 2.
  * \param handle the spgpu handle used to call this routine
  * \param n the vectors' length
  * \param x the input multivector

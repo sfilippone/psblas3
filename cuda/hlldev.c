@@ -153,7 +153,7 @@ int spmvHllDeviceFloatF(void *deviceMat, float alpha, void* deviceX, float beta,
   if((x->count_ == 1) && (y->count_ == 1))
     spgpuShellspmv(handle, (float*) y->v_, (float*) y->v_, alpha, (float*) devMat->cM, 
                   devMat->rP, devMat->hackSize, devMat->hackOffs, devMat->rS, NULL, 
-                  devMat->avgNzr, devMat->rows, (double*) x->v_, beta, devMat->baseIndex);
+                  devMat->avgNzr, devMat->rows, (float*) x->v_, beta, devMat->baseIndex);
   else
     spgpuShellspmm(handle, (float*) y->v_, y->pitch_, (float*) y->v_, y->pitch_, alpha, (float*) devMat->cM, 
                   devMat->rP, devMat->hackSize, devMat->hackOffs, devMat->rS, NULL, 
