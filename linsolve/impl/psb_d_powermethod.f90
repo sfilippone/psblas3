@@ -18,17 +18,11 @@ subroutine psb_d_powermethod(a, prec, lambda, desc, info, x, flag, itmax, iter, 
     real(psb_dpk_)          :: tol_
     real(psb_dpk_)          :: lambda_old, norm_factor
     
-    if(present(itmax)) then
-        itmax_ = itmax
-    else
-        itmax_ = 20_psb_ipk_
-    end if
+    itmax_ = 20_psb_ipk_
+    if(present(itmax)) itmax_ = itmax
 
-    if(present(tol)) then
-        tol_ = tol
-    else
-        tol_ = real(1.0e-3, psb_dpk_)
-    end if
+    tol_ = real(1.0e-3, psb_dpk_)
+    if(present(tol)) tol_ = tol
 
     call psb_geall(z, desc, info)
     call psb_geall(q, desc, info)
