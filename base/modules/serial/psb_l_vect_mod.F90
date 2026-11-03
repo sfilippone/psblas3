@@ -810,8 +810,8 @@ module psb_l_multivect_mod
 
   end type psb_l_multivect_type
 
-  public  :: psb_l_multivect, psb_l_multivect_type, psb_l_base_multivect_type, &
-          & psb_set_multivect_default, psb_get_multivect_default
+  public :: psb_l_multivect, psb_l_multivect_type, psb_l_base_multivect_type, &
+          & psb_set_multivect_default, psb_get_multivect_default, psb_swap_multivect
 
   private
   interface psb_l_multivect
@@ -828,8 +828,29 @@ module psb_l_multivect_mod
   interface psb_get_multivect_default
     module procedure psb_l_get_multivect_default
   end interface psb_get_multivect_default
-
+  
+  interface psb_swap_multivect
+    module procedure psb_l_swap_multivect
+  end interface psb_swap_multivect
 contains
+  subroutine psb_l_swap_multivect(x, y, info)
+    implicit none
+    class(psb_l_multivect_type), intent(inout) :: x, y
+    integer(psb_ipk_), intent(out)             :: info
+
+    class(psb_l_base_multivect_type), allocatable :: tmp
+
+    if(.not. allocated(x%v)) then
+      info = psb_err_invalid_mvect_state_
+      return
+    end if
+
+    call move_alloc(x%v, tmp)
+    call move_alloc(y%v, x%v)
+    call move_alloc(tmp, y%v)
+    info = psb_success_
+  end subroutine psb_l_swap_multivect
+  
   function l_mvect_is_remote_build(x) result(res)
     implicit none
     class(psb_l_multivect_type), intent(in) :: x
