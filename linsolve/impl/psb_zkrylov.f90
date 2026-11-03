@@ -81,7 +81,7 @@
 ! 
 subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
                         & itmax, iter, err, itrace, irst, istop, cond, &
-                        & steps, base_type, eigext, Gram_solver, FGS_sweeps)
+                        & steps, base_type, eigext, Gram_solver, FGS_sweeps, alg_version)
 
   use psb_base_mod
   use psb_prec_mod, only : psb_zprec_type
@@ -102,6 +102,7 @@ subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
   complex(psb_dpk_), optional, intent(in)      :: eigext(2)
   character(len=3), optional, intent(in)    :: Gram_solver
   integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+  integer(psb_ipk_), optional, intent(in)   :: alg_version
 
   abstract interface
     subroutine psb_zkryl_vect(a, prec, b, x, eps, desc_a, info, &
@@ -154,7 +155,7 @@ subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
 
     subroutine psb_zkryl_step_vect(a, prec, b, x, s, eps, desc_a, info, &
                                 & itmax, iter, err, itrace, istop, &
-                                & base_type, eigext, Gram_solver, FGS_sweeps)
+                                & base_type, eigext, Gram_solver, FGS_sweeps, alg_version)
       import :: psb_ipk_, psb_dpk_, psb_desc_type, &
            & psb_zspmat_type, psb_zprec_type, psb_z_vect_type
       type(psb_zspmat_type), intent(in)    :: a
@@ -172,17 +173,18 @@ subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
       complex(psb_dpk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+      integer(psb_ipk_), optional, intent(in)   :: alg_version
     end subroutine psb_zkryl_step_vect
   end interface
 
   procedure(psb_zkryl_vect)       :: psb_zbicg_vect, psb_zcgstab_vect, psb_zcgs_vect
   procedure(psb_zkryl_rest_vect)  :: psb_zrgmres_vect, psb_zcgstabl_vect, psb_zgcr_vect
   procedure(psb_zkryl_cond_vect)  :: psb_zcg_vect, psb_zfcg_vect, psb_zminres_vect
-  procedure(psb_zkryl_step_vect)  :: psb_zscg_vect, psb_zscg2_vect
+  procedure(psb_zkryl_step_vect)  :: psb_zscg_vect
 
   logical             :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
-  integer(psb_ipk_)   :: me, np, err_act, itrace_, steps_
+  integer(psb_ipk_)   :: me, np, err_act, itrace_, steps_, alg_version_
   character(len=20)   :: name
 
   info = psb_success_
@@ -194,16 +196,13 @@ subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
   call psb_info(ctxt, me, np)
 
   ! Default return for COND
-  if (present(cond)) cond = dzero
+  if(present(cond)) cond = dzero
 
-  if (present(itrace)) then
-    itrace_ = itrace
-  else
-    itrace_ = -1
-  end if
+  itrace_ = -1
+  if(present(itrace)) itrace_ = itrace
 
   do_alloc_wrk = .not. prec%is_allocated_wrk()
-  if (do_alloc_wrk) call prec%allocate_wrk(info, vmold=x%v, desc=desc_a)
+  if(do_alloc_wrk) call prec%allocate_wrk(info, vmold=x%v, desc=desc_a)
 
   select case(psb_toupper(method))
     case('CG') 
@@ -229,7 +228,7 @@ subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
           & itmax, iter, err, itrace = itrace_, irst = irst, istop = istop)
     case('MINRES', 'PMINRES')
       call psb_zminres_vect(a, prec, b, x, eps, desc_a, info, &
-		  & itmax, iter, err, itrace = itrace_, istop = istop)
+		      & itmax, iter, err, itrace = itrace_, istop = istop)
     case('BICGSTABL')
       call psb_zcgstabl_vect(a, prec, b, x, eps, desc_a, info, &
           & itmax, iter, err, itrace = itrace_, irst = irst, istop = istop)
@@ -237,29 +236,25 @@ subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
       ! steps (default = 5)
       steps_ = 5
       if(present(steps)) steps_ = steps
+
+      ! Algorithm version (default = 2)
+      alg_version_ = 2
+      if(present(alg_version)) alg_version_ = alg_version
       
       call psb_zscg_vect(a, prec, b, x, steps_, eps, desc_a, info, &
           & itmax = itmax, iter = iter, err = err, itrace = itrace_, istop = istop, &
-          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)
+          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, &
+          & FGS_sweeps = FGS_sweeps, alg_version = alg_version_)
       
-    case('SSTEPCG1')
-      ! steps (default = 5)
-      steps_ = 5
-      if(present(steps)) steps_ = steps
-
-      call psb_zscg2_vect(a, prec, b, x, steps_, eps, desc_a, info, &
-          & itmax = itmax, iter = iter, err = err, itrace = itrace_, istop = istop, &
-          & base_type = base_type, eigext = eigext, Gram_solver = Gram_solver, FGS_sweeps = FGS_sweeps)  
-                     
     case default
-      if (me == psb_root_) write(psb_err_unit, *) trim(name) , &
+      if(me == psb_root_) write(psb_err_unit, *) trim(name) , &
           & ': Warning: Unknown method  ', method, ', defaulting to BiCGSTAB'
       
       call psb_zcgstab_vect(a, prec, b, x, eps, desc_a, info, &
           & itmax, iter, err, itrace = itrace_, istop = istop)
   end select
 
-  if ((info == psb_success_) .and. do_alloc_wrk) call prec%free_wrk(info)
+  if((info == psb_success_) .and. do_alloc_wrk) call prec%free_wrk(info)
   
   if(info /= psb_success_) then
     info = psb_err_from_subroutine_

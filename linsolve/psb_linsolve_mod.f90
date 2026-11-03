@@ -40,7 +40,7 @@ module psb_linsolve_mod
   interface psb_krylov
     subroutine psb_skrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
                           & itmax, iter, err, itrace, irst, istop, cond, &
-                          & steps, base_type, eigext, Gram_solver, FGS_sweeps)
+                          & steps, base_type, eigext, Gram_solver, FGS_sweeps, alg_version)
       use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_sspmat_type, psb_spk_, psb_s_vect_type
       use psb_prec_mod, only : psb_sprec_type
       character(len=*)                      :: method
@@ -58,11 +58,12 @@ module psb_linsolve_mod
       real(psb_spk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+      integer(psb_ipk_), optional, intent(in)   :: alg_version
     end subroutine psb_skrylov_vect
 
     subroutine psb_ckrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
                           & itmax, iter, err, itrace, irst, istop, cond, &
-                          & steps, base_type, eigext, Gram_solver, FGS_sweeps)
+                          & steps, base_type, eigext, Gram_solver, FGS_sweeps, alg_version)
       use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_cspmat_type, psb_spk_, psb_c_vect_type
       use psb_prec_mod, only : psb_cprec_type
       character(len=*)                      :: method
@@ -77,14 +78,15 @@ module psb_linsolve_mod
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_spk_), optional, intent(out)     :: err, cond
       character, optional, intent(in)           :: base_type
-      complex(psb_spk_), optional, intent(in)      :: eigext(2)
+      complex(psb_spk_), optional, intent(in)   :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+      integer(psb_ipk_), optional, intent(in)   :: alg_version
     end subroutine psb_ckrylov_vect
 
     subroutine psb_dkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
                           & itmax, iter, err, itrace, irst, istop, cond, &
-                          & steps, base_type, eigext, Gram_solver, FGS_sweeps)
+                          & steps, base_type, eigext, Gram_solver, FGS_sweeps, alg_version)
       use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_dspmat_type, psb_dpk_, psb_d_vect_type
       use psb_prec_mod, only : psb_dprec_type
       character(len=*)                      :: method
@@ -102,11 +104,12 @@ module psb_linsolve_mod
       real(psb_dpk_), optional, intent(in)      :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+      integer(psb_ipk_), optional, intent(in)   :: alg_version
     end subroutine psb_dkrylov_vect
 
     subroutine psb_zkrylov_vect(method, a, prec, b, x, eps, desc_a, info, &
                           & itmax, iter, err, itrace, irst, istop, cond, &
-                          & steps, base_type, eigext, Gram_solver, FGS_sweeps)
+                          & steps, base_type, eigext, Gram_solver, FGS_sweeps, alg_version)
       use psb_base_mod, only : psb_ipk_, psb_desc_type, psb_zspmat_type, psb_dpk_, psb_z_vect_type
       use psb_prec_mod, only : psb_zprec_type
       character(len=*)                      :: method
@@ -121,9 +124,10 @@ module psb_linsolve_mod
       integer(psb_ipk_), optional, intent(out)  :: iter
       real(psb_dpk_), optional, intent(out)     :: err, cond
       character, optional, intent(in)           :: base_type
-      complex(psb_dpk_), optional, intent(in)      :: eigext(2)
+      complex(psb_dpk_), optional, intent(in)   :: eigext(2)
       character(len=3), optional, intent(in)    :: Gram_solver
       integer(psb_ipk_), optional, intent(in)   :: FGS_sweeps
+      integer(psb_ipk_), optional, intent(in)   :: alg_version
     end subroutine psb_zkrylov_vect
   end interface
 
