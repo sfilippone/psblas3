@@ -1,9 +1,5 @@
 #ifndef PSB_C_BASE__
 #define PSB_C_BASE__
-#ifdef __cplusplus
-extern "C" {
-  /*typedef char _Bool;*/
-#endif
 
 #include <float.h>
 #ifdef __cplusplus
@@ -20,6 +16,10 @@ extern "C" {
 #include "psb_config.h"
 #include "psb_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+  /*typedef char _Bool;*/
+#endif
 
   typedef struct PSB_C_DESCRIPTOR {
     void *descriptor;

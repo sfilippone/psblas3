@@ -10,6 +10,10 @@ module psb_base_cbind_mod
   use psb_d_tools_cbind_mod
   use psb_c_tools_cbind_mod
   use psb_z_tools_cbind_mod  
+  use psb_s_sparse_cbind_mod
+  use psb_d_sparse_cbind_mod
+  use psb_c_sparse_cbind_mod
+  use psb_z_sparse_cbind_mod
   use psb_s_comm_cbind_mod
   use psb_d_comm_cbind_mod
   use psb_c_comm_cbind_mod

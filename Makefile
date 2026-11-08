@@ -11,7 +11,7 @@ dirs:
 
 mods: basemods utilmods precmods linslvmods cbindmods extmods $(CUDAMODS) $(OACCMODS)
 
-basemods:
+basemods: dirs
 	$(MAKE) -C base mods
 precmods: basemods
 	$(MAKE) -C prec mods
@@ -81,11 +81,12 @@ install: all
 	   $(INSTALL_DATA) include/*.h $(INSTALL_INCLUDEDIR)
 	mkdir -p  $(INSTALL_DOCSDIR) && \
 	   /bin/cp -fr docs/*pdf docs/html $(INSTALL_DOCSDIR)
-	mkdir -p  $(INSTALL_DOCSDIR) && \
-	   $(INSTALL_DATA) README.md LICENSE  $(INSTALL_DOCSDIR)
 	mkdir -p  $(INSTALL_SAMPLESDIR) && \
 	     /bin/cp -fr test/pdegen test/fileread  $(INSTALL_SAMPLESDIR) && \
 	     mkdir -p  $(INSTALL_SAMPLESDIR)/cbind && /bin/cp -fr cbind/test/pdegen/* $(INSTALL_SAMPLESDIR)/cbind
+	mkdir -p $(INSTALL_SAMPLESDIR)/cbind/sparse_ops && \
+	   $(INSTALL_DATA) cbind/test/sparse_ops/Makefile \
+	     cbind/test/sparse_ops/sparse_ops.c $(INSTALL_SAMPLESDIR)/cbind/sparse_ops
 clean: cleanlib
 	$(MAKE) -C base veryclean
 	$(MAKE) -C prec veryclean 
@@ -99,6 +100,7 @@ cleantest:
 	cd test/fileread && $(MAKE) clean
 	cd test/pdegen && $(MAKE) clean
 	cd test/util && $(MAKE) clean
+	$(MAKE) -C cbind/test/sparse_ops clean
 
 cleanlib:
 	(cd lib; /bin/rm -f *.a *$(.mod) *$(.fh) *.h)
@@ -110,5 +112,3 @@ distclean: clean
 
 check: all
 	make check -C test/serial
-
-

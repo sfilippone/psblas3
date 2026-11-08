@@ -1049,7 +1049,9 @@ set_target_properties(cbind
 # Include directories for the cbind library
 target_include_directories(cbind PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/modules>  # Path for building
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:modules>  # Path for installation
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(cbind PUBLIC base prec linsolve ext util)

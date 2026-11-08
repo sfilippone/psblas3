@@ -71,6 +71,39 @@ psb_i_t	   psb_c_zvect_set_vect(psb_c_zvector *xh, psb_z_t *val, psb_i_t n);
 psb_z_t    psb_c_zvect_get_entry(psb_c_zvector *xh, psb_i_t index);
 psb_i_t    psb_c_zvect_set_entry(psb_c_zvector *xh, psb_i_t index, psb_z_t val);
 
+/* Distributed sparse operators: see cbind/SPARSE_OPERATIONS.md.
+ * Descriptors and all outer handle pointers must be valid. New output
+ * handles must be zero-initialized; inputs retain their storage/layouts.
+ * _2desc insertion accepts locally owned rows only, using global indices
+ * in the base selected by psb_c_set_index_base(). */
+psb_i_t psb_c_zspall_2desc(psb_c_zspmat *ah,
+                              psb_c_descriptor *dr, psb_c_descriptor *dc);
+psb_i_t psb_c_zspins_2desc(psb_i_t nz,
+                              const psb_l_t *rows, const psb_l_t *cols,
+                              const psb_z_t *values, psb_c_zspmat *ah,
+                              psb_c_descriptor *dr, psb_c_descriptor *dc);
+psb_i_t psb_c_zspasb_2desc(psb_c_zspmat *ah,
+                              psb_c_descriptor *dr, psb_c_descriptor *dc);
+psb_i_t psb_c_zglob_transpose(psb_c_zspmat *ah,
+                                 psb_c_descriptor *dr, psb_c_descriptor *dc,
+                                 psb_c_zspmat *bh, psb_c_descriptor *dbcols,
+                                 const char *trans);
+psb_i_t psb_c_zpar_spspmm(psb_c_zspmat *ah,
+                             psb_c_descriptor *dar, psb_c_descriptor *dac,
+                             psb_c_zspmat *bh,
+                             psb_c_descriptor *dbr, psb_c_descriptor *dbc,
+                             psb_c_zspmat *ch, psb_c_descriptor *dcc);
+psb_i_t psb_c_zspmm_2desc(psb_z_t alpha, psb_c_zspmat *ah,
+                             psb_c_zvector *xh, psb_z_t beta, psb_c_zvector *yh,
+                             psb_c_descriptor *dr, psb_c_descriptor *dc,
+                             const char *trans);
+psb_i_t psb_c_zspget_coo(psb_c_zspmat *ah,
+                            psb_c_descriptor *dr, psb_c_descriptor *dc,
+                            psb_i_t capacity, psb_i_t *nz,
+                            psb_l_t *rows, psb_l_t *cols, psb_z_t *values);
+psb_i_t psb_c_zsprowscl(psb_c_zspmat *ah, psb_i_t nr,
+                           const psb_z_t *values);
+
 /* psblas computational routines */
 psb_z_t psb_c_zgedot(psb_c_zvector *xh, psb_c_zvector *yh, psb_c_descriptor *cdh);
 psb_d_t psb_c_zgenrm2(psb_c_zvector *xh, psb_c_descriptor *cdh);

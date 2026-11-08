@@ -71,6 +71,39 @@ psb_s_t    psb_c_svect_get_entry(psb_c_svector *xh, psb_i_t index);
 psb_i_t    psb_c_svect_set_entry(psb_c_svector *xh, psb_i_t index, psb_s_t val);
 
 
+/* Distributed sparse operators: see cbind/SPARSE_OPERATIONS.md.
+ * Descriptors and all outer handle pointers must be valid. New output
+ * handles must be zero-initialized; inputs retain their storage/layouts.
+ * _2desc insertion accepts locally owned rows only, using global indices
+ * in the base selected by psb_c_set_index_base(). */
+psb_i_t psb_c_sspall_2desc(psb_c_sspmat *ah,
+                              psb_c_descriptor *dr, psb_c_descriptor *dc);
+psb_i_t psb_c_sspins_2desc(psb_i_t nz,
+                              const psb_l_t *rows, const psb_l_t *cols,
+                              const psb_s_t *values, psb_c_sspmat *ah,
+                              psb_c_descriptor *dr, psb_c_descriptor *dc);
+psb_i_t psb_c_sspasb_2desc(psb_c_sspmat *ah,
+                              psb_c_descriptor *dr, psb_c_descriptor *dc);
+psb_i_t psb_c_sglob_transpose(psb_c_sspmat *ah,
+                                 psb_c_descriptor *dr, psb_c_descriptor *dc,
+                                 psb_c_sspmat *bh, psb_c_descriptor *dbcols,
+                                 const char *trans);
+psb_i_t psb_c_spar_spspmm(psb_c_sspmat *ah,
+                             psb_c_descriptor *dar, psb_c_descriptor *dac,
+                             psb_c_sspmat *bh,
+                             psb_c_descriptor *dbr, psb_c_descriptor *dbc,
+                             psb_c_sspmat *ch, psb_c_descriptor *dcc);
+psb_i_t psb_c_sspmm_2desc(psb_s_t alpha, psb_c_sspmat *ah,
+                             psb_c_svector *xh, psb_s_t beta, psb_c_svector *yh,
+                             psb_c_descriptor *dr, psb_c_descriptor *dc,
+                             const char *trans);
+psb_i_t psb_c_sspget_coo(psb_c_sspmat *ah,
+                            psb_c_descriptor *dr, psb_c_descriptor *dc,
+                            psb_i_t capacity, psb_i_t *nz,
+                            psb_l_t *rows, psb_l_t *cols, psb_s_t *values);
+psb_i_t psb_c_ssprowscl(psb_c_sspmat *ah, psb_i_t nr,
+                           const psb_s_t *values);
+
 /* psblas computational routines */
 psb_s_t psb_c_sgedot(psb_c_svector *xh, psb_c_svector *yh, psb_c_descriptor *cdh);
 psb_s_t psb_c_sgenrm2(psb_c_svector *xh, psb_c_descriptor *cdh);

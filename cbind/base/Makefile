@@ -17,6 +17,10 @@ FOBJS= psb_objhandle_mod.o psb_base_cbind_mod.o psb_cpenv_mod.o \
       psb_s_comm_cbind_mod.o psb_d_comm_cbind_mod.o \
       psb_c_comm_cbind_mod.o psb_z_comm_cbind_mod.o 
 
+FOBJS += psb_sparse_cbind_mod.o psb_s_sparse_cbind_mod.o \
+         psb_d_sparse_cbind_mod.o psb_c_sparse_cbind_mod.o \
+         psb_z_sparse_cbind_mod.o
+
 COBJS= psb_c_base.o psb_c_sbase.o psb_c_dbase.o psb_c_cbase.o psb_c_zbase.o \
 	psb_c_scomm.o psb_c_dcomm.o psb_c_ccomm.o psb_c_zcomm.o
 CMOD=psb_base_cbind.h psb_c_base.h psb_c_sbase.h  psb_c_dbase.h  psb_c_cbase.h  psb_c_zbase.h \
@@ -36,7 +40,13 @@ lib:  objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-$(COBJS): $(CMOD)
+$(OBJS): Makefile $(TOP)/Make.inc
+$(FOBJS): $(MODDIR)/psb_base_mod$(.mod)
+psb_objhandle_mod.o: $(MODDIR)/psb_cbind_const_mod$(.mod)
+$(COBJS): $(CMOD) $(INCLUDEDIR)/psb_config.h $(INCLUDEDIR)/psb_types.h
+
+psb_base_cbind_mod.o psb_s_tools_cbind_mod.o psb_d_tools_cbind_mod.o \
+psb_c_tools_cbind_mod.o psb_z_tools_cbind_mod.o: $(MODDIR)/psb_ext_mod$(.mod)
 
 psb_base_cbind_mod.o: psb_cpenv_mod.o psb_objhandle_mod.o psb_base_tools_cbind_mod.o \
 	 psb_base_psblas_cbind_mod.o \
@@ -62,6 +72,13 @@ psb_base_psblas_cbind_mod.o: psb_s_psblas_cbind_mod.o psb_d_psblas_cbind_mod.o p
 
 psb_cpenv_mod.o: psb_objhandle_mod.o 
 	$(FC) $(FCOPT) $(FINCLUDES) $(FCUDEFINES) -c psb_cpenv_mod.F90 -o psb_cpenv_mod.o
+
+psb_sparse_cbind_mod.o: psb_objhandle_mod.o
+psb_s_sparse_cbind_mod.o psb_d_sparse_cbind_mod.o \
+psb_c_sparse_cbind_mod.o psb_z_sparse_cbind_mod.o: \
+  psb_sparse_cbind_mod.o psb_cpenv_mod.o psb_objhandle_mod.o
+psb_base_cbind_mod.o: psb_s_sparse_cbind_mod.o psb_d_sparse_cbind_mod.o \
+  psb_c_sparse_cbind_mod.o psb_z_sparse_cbind_mod.o
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

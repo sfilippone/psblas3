@@ -1,4 +1,8 @@
 set(PSB_linsolve_source_files
+  impl/psb_sminres.f90
+  impl/psb_dminres.f90
+  impl/psb_cminres.f90
+  impl/psb_zminres.f90
   psb_base_linsolve_conv_mod.f90
   psb_z_linsolve_conv_mod.f90
   impl/psb_crichardson.f90
