@@ -43,6 +43,7 @@ contains
       fv = vp%get_vect()
       sz = size(fv)
       v(1:sz) = fv(1:sz)
+      res = 0
     end if
 
   end function psb_c_svect_f_get_cpy
@@ -62,6 +63,7 @@ contains
     if (c_associated(xh%item)) then
       call c_f_pointer(xh%item,vp)
       call vp%zero()
+      res = 0
     end if
 
   end function psb_c_svect_zero

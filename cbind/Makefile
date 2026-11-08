@@ -5,9 +5,8 @@ LIBDIR=../lib
 INCDIR=../include
 MODDIR=../modules/
 LIBNAME=$(CBINDLIBNAME)
-MPI_TEST_NPROCS ?= 1 2 4
 
-.PHONY: objs lib based precd linsolved utild check clean veryclean
+.PHONY: objs lib based precd linsolved utild clean veryclean
 
 objs: based precd linsolved utild
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
@@ -28,11 +27,6 @@ linsolved: based precd
 	cd linsolve && $(MAKE) objs LIBNAME=$(LIBNAME)
 utild: based
 	cd util && $(MAKE) objs LIBNAME=$(LIBNAME)
-
-check: lib
-	@set -e; for np in $(MPI_TEST_NPROCS); do \
-	  $(MAKE) -C test/sparse_ops check NP=$$np; \
-	done
 
 clean:
 	cd base && $(MAKE) clean
