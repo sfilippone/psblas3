@@ -3196,7 +3196,7 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
     call move_alloc(tmp%val,a%val)
     call psb_realloc(max(nr+1,nc+1),a%irp,info)
     call tmp%free()
-
+    
   else
 
     if (info /= psb_success_) return
@@ -3246,10 +3246,8 @@ subroutine psb_z_cp_csr_from_coo(a,b,info)
 #endif
 
   call a%set_host()
-
+  call a%trim()
 end subroutine psb_z_cp_csr_from_coo
-
-
 
 subroutine psb_z_cp_csr_to_coo(a,b,info)
   use psb_const_mod
@@ -3293,7 +3291,6 @@ subroutine psb_z_cp_csr_to_coo(a,b,info)
 
 end subroutine psb_z_cp_csr_to_coo
 
-
 subroutine psb_z_mv_csr_to_coo(a,b,info)
   use psb_const_mod
   use psb_realloc_mod
@@ -3335,10 +3332,8 @@ subroutine psb_z_mv_csr_to_coo(a,b,info)
   call b%set_sort_status(psb_row_major_)
   call b%set_asb()
   call b%set_host()
-
+  call b%trim()
 end subroutine psb_z_mv_csr_to_coo
-
-
 
 subroutine psb_z_mv_csr_from_coo(a,b,info)
   use psb_const_mod
@@ -3414,9 +3409,8 @@ subroutine psb_z_mv_csr_from_coo(a,b,info)
 #endif
 
   call a%set_host()
-
+  call a%trim()
 end subroutine psb_z_mv_csr_from_coo
-
 
 subroutine psb_z_mv_csr_to_fmt(a,b,info)
   use psb_const_mod
@@ -3450,14 +3444,13 @@ subroutine psb_z_mv_csr_to_fmt(a,b,info)
     call move_alloc(a%val, b%val)
     call a%free()
     call b%set_host()
-
+    call b%trim()
   class default
     call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
   end select
 
 end subroutine psb_z_mv_csr_to_fmt
-
 
 subroutine psb_z_cp_csr_to_fmt(a,b,info)
   use psb_const_mod
@@ -3511,7 +3504,6 @@ subroutine psb_z_cp_csr_to_fmt(a,b,info)
       end do
       !$omp end parallel do
     end if
-
     call b%set_host()
 
   class default
@@ -3520,7 +3512,6 @@ subroutine psb_z_cp_csr_to_fmt(a,b,info)
   end select
 
 end subroutine psb_z_cp_csr_to_fmt
-
 
 subroutine psb_z_mv_csr_from_fmt(a,b,info)
   use psb_const_mod
@@ -3555,15 +3546,13 @@ subroutine psb_z_mv_csr_from_fmt(a,b,info)
     call move_alloc(b%val, a%val)
     call b%free()
     call a%set_host()
-
+    call a%trim()
   class default
     call b%mv_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
   end select
 
 end subroutine psb_z_mv_csr_from_fmt
-
-
 
 subroutine psb_z_cp_csr_from_fmt(a,b,info)
   use psb_const_mod
@@ -6313,10 +6302,8 @@ subroutine psb_lz_mv_csr_to_coo(a,b,info)
   call b%set_sort_status(psb_row_major_)
   call b%set_asb()
   call b%set_host()
-
+  call b%trim()
 end subroutine psb_lz_mv_csr_to_coo
-
-
 
 subroutine psb_lz_mv_csr_from_coo(a,b,info)
   use psb_const_mod
@@ -6410,7 +6397,7 @@ subroutine psb_lz_mv_csr_to_fmt(a,b,info)
     call move_alloc(a%val, b%val)
     call a%free()
     call b%set_host()
-
+    call b%trim()
   class default
     call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
@@ -6503,7 +6490,6 @@ subroutine psb_lz_mv_csr_from_fmt(a,b,info)
   end select
 
 end subroutine psb_lz_mv_csr_from_fmt
-
 
 
 subroutine psb_lz_cp_csr_from_fmt(a,b,info)

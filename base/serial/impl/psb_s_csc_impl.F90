@@ -2096,8 +2096,6 @@ subroutine psb_s_cp_csc_from_coo(a,b,info)
 
 end subroutine psb_s_cp_csc_from_coo
 
-
-
 subroutine psb_s_cp_csc_to_coo(a,b,info)
   use psb_const_mod
   use psb_s_base_mat_mod
@@ -2178,10 +2176,8 @@ subroutine psb_s_mv_csc_to_coo(a,b,info)
   end do
   call a%free()
   call b%fix(info)
-
+  call b%trim()
 end subroutine psb_s_mv_csc_to_coo
-
-
 
 subroutine psb_s_mv_csc_from_coo(a,b,info)
   use psb_const_mod
@@ -2254,10 +2250,9 @@ subroutine psb_s_mv_csc_from_coo(a,b,info)
   call psi_exscan(nc+1,a%icp,info,shift=ione) 
 #endif
   call a%set_host()
-
+  call a%trim()
 
 end subroutine psb_s_mv_csc_from_coo
-
 
 subroutine psb_s_mv_csc_to_fmt(a,b,info)
   use psb_const_mod
@@ -2291,7 +2286,7 @@ subroutine psb_s_mv_csc_to_fmt(a,b,info)
     call move_alloc(a%val, b%val)
     call a%free()
     call b%set_host()
-
+    call b%trim()
   class default
     call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
@@ -4074,7 +4069,7 @@ subroutine psb_ls_mv_csc_to_coo(a,b,info)
   end do
   call a%free()
   call b%fix(info)
-
+  call b%trim()
 end subroutine psb_ls_mv_csc_to_coo
 
 
@@ -4131,7 +4126,7 @@ subroutine psb_ls_mv_csc_from_coo(a,b,info)
   end do
   a%icp(nc+1) = ip
   call a%set_host()
-
+  call a%trim()
 
 end subroutine psb_ls_mv_csc_from_coo
 
@@ -4168,7 +4163,7 @@ subroutine psb_ls_mv_csc_to_fmt(a,b,info)
     call move_alloc(a%val, b%val)
     call a%free()
     call b%set_host()
-
+    call b%trim()
   class default
     call a%mv_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
@@ -4210,7 +4205,7 @@ subroutine psb_ls_cp_csc_to_fmt(a,b,info)
     if (info == 0) call psb_safe_cpy( a%ia(1:nz),    b%ia  , info)
     if (info == 0) call psb_safe_cpy( a%val(1:nz),   b%val , info)
     call b%set_host()
-
+    !call b%trim()
   class default
     call a%cp_to_coo(tmp,info)
     if (info == psb_success_) call b%mv_from_coo(tmp,info)
@@ -4252,7 +4247,7 @@ subroutine psb_ls_mv_csc_from_fmt(a,b,info)
     call move_alloc(b%val, a%val)
     call b%free()
     call a%set_host()
-
+    call a%trim()
   class default
     call b%mv_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)
@@ -4296,7 +4291,7 @@ subroutine psb_ls_cp_csc_from_fmt(a,b,info)
     if (info == 0) call psb_safe_cpy( b%ia(1:nz),    a%ia  , info)
     if (info == 0) call psb_safe_cpy( b%val(1:nz),   a%val , info)
     call a%set_host()
-
+    !call a%trim()
   class default
     call b%cp_to_coo(tmp,info)
     if (info == psb_success_) call a%mv_from_coo(tmp,info)

@@ -3242,7 +3242,7 @@ subroutine psb_z_cp_coo_to_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='to_coo'
+  character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
 
 
@@ -3274,7 +3274,7 @@ subroutine psb_z_cp_coo_from_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='from_coo'
+  character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: m,n,nz
 
@@ -3328,7 +3328,7 @@ subroutine psb_z_mv_coo_to_coo(a,b,info)
   if (.not.b%is_by_rows()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
-
+  call b%trim()
   call psb_erractionrestore(err_act)
   return
 
@@ -3371,7 +3371,7 @@ subroutine psb_z_mv_coo_from_coo(a,b,info)
   if (.not.a%is_by_rows()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
-
+  call a%trim()
   call psb_erractionrestore(err_act)
   return
 
@@ -3394,7 +3394,7 @@ subroutine psb_z_mv_coo_to_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='to_coo'
+  character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
 
 
@@ -3426,7 +3426,7 @@ subroutine psb_z_mv_coo_from_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='from_coo'
+  character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   integer(psb_ipk_) :: m,n,nz
 
@@ -7099,7 +7099,7 @@ subroutine psb_lz_cp_coo_to_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='to_coo'
+  character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
 
 
@@ -7131,7 +7131,7 @@ subroutine psb_lz_cp_coo_from_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='from_coo'
+  character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   integer(psb_lpk_) :: m,n,nz
 
@@ -7185,7 +7185,7 @@ subroutine psb_lz_mv_coo_to_coo(a,b,info)
   if (.not.b%is_by_rows()) call b%fix(info)
 
   if (info /= psb_success_) goto 9999
-
+  call b%trim()
   call psb_erractionrestore(err_act)
   return
 
@@ -7228,7 +7228,7 @@ subroutine psb_lz_mv_coo_from_coo(a,b,info)
   if (.not.a%is_by_rows()) call a%fix(info)
 
   if (info /= psb_success_) goto 9999
-
+  call a%trim()
   call psb_erractionrestore(err_act)
   return
 
@@ -7251,7 +7251,7 @@ subroutine psb_lz_mv_coo_to_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='to_coo'
+  character(len=20)  :: name='to_fmt'
   logical, parameter :: debug=.false.
 
 
@@ -7283,7 +7283,7 @@ subroutine psb_lz_mv_coo_from_fmt(a,b,info)
   integer(psb_ipk_), intent(out)            :: info
 
   integer(psb_ipk_)  :: err_act
-  character(len=20)  :: name='from_coo'
+  character(len=20)  :: name='from_fmt'
   logical, parameter :: debug=.false.
   integer(psb_lpk_) :: m,n,nz
 
