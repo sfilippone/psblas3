@@ -199,19 +199,19 @@ int T_spmvCSRGDeviceF(T_Cmat* matrix, TYPE alpha, void *deviceX, TYPE beta, void
   struct MultiVectDevice* y = (struct MultiVectDevice*) deviceY;
 
   if((x->count_ == 1) && (y->count_ == 1))
-    return T_spmvCSRGDevice_(matrix, alpha, deviceX, 0, beta, deviceY, 0);
+    return T_spmvCSRGDevice_(matrix, alpha, deviceX, 1, beta, deviceY, 1);
   else
     return T_spmmCSRGDevice_(matrix, alpha, deviceX, beta, deviceY);
 }
 
 int T_spmvCSRGDeviceMV(T_Cmat* matrix, TYPE alpha, void *deviceX, TYPE beta, void *deviceY, int idxY)
 {
-  return T_spmvCSRGDevice_(matrix, alpha, deviceX, 0, beta, deviceY, idxY);
+  return T_spmvCSRGDevice_(matrix, alpha, deviceX, 1, beta, deviceY, idxY);
 }
 
 int T_spmvCSRGDeviceVM(T_Cmat* matrix, TYPE alpha, void *deviceX, int idxX, TYPE beta, void *deviceY)
 {
-  return T_spmvCSRGDevice_(matrix, alpha, deviceX, idxX, beta, deviceY, 0);
+  return T_spmvCSRGDevice_(matrix, alpha, deviceX, idxX, beta, deviceY, 1);
 }
 
 int T_spmvCSRGDeviceMMi(T_Cmat* matrix, TYPE alpha, void *deviceX, int idxX, TYPE beta, void *deviceY, int idxY)
