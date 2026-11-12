@@ -40,7 +40,7 @@ module psb_timers_mod
   use psb_error_mod
   use psb_penv_mod
   
-  public psb_init_timers, psb_get_timer_idx, psb_reset_timers,&
+  public psb_init_timers, psb_get_timer_idx, psb_reset_timers, psb_check_timer, &
        & psb_tic, psb_toc, psb_print_timers, psb_get_timer, psb_free_timers
   private
 
@@ -87,7 +87,7 @@ contains
 
     write(tmpname,'(a)') trim(timer_descr%data)//":"
     
-    write(iout_,'(a36,4(1x,a,f10.2))') tmpname,&
+    write(iout_,'(a36,4(4x,a,f15.6))') tmpname,&
          & "Sum: ",timer(timer_sum_), &
          & "Avg: ",timer(timer_avg_), &
          & "Max: ",timer(timer_max_), &
@@ -230,6 +230,26 @@ contains
     end if
     val          = active_timers
   end function psb_get_timer_idx
+
+  !
+  ! True if a timer with this description is already registered: lets a
+  ! routine called many times per solve (e.g. the MPK) register its timers once.
+  !
+  function psb_check_timer(string) result(val)
+    implicit none
+    logical :: val
+    character(len=*), intent(in) :: string
+    integer(psb_ipk_) :: idx
+
+    val = .false.
+    if (.not. allocated(timers)) return
+    do idx = 1, active_timers
+      if (timers_descr(idx)%data == string) then
+        val = .true.
+        return
+      end if
+    end do
+  end function psb_check_timer
 
   function psb_get_timer(idx) result(val)
     implicit none     
