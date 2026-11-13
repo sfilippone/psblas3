@@ -134,9 +134,6 @@ subroutine psb_d_invt_bld(a,fillin,invfill,thresh,invthresh,&
   nzrmax    = fillin
   sp_thresh = thresh
 
-  call lmat%allocate(n_row,n_row,info,nz=nztota)
-  if (info == psb_success_) call umat%allocate(n_row,n_row,info,nz=nztota)
-
   if (info == 0) call psb_ilut_fact(nzrmax,sp_thresh,&
        & a,lmat,umat,pd,info,blck=blck,iscale=psb_ilu_scale_maxval_)
 
@@ -650,7 +647,7 @@ subroutine psb_d_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
   real(psb_dpk_), intent(inout)       :: row(:)
 
   ! Local Variables
-  integer(psb_ipk_) :: k,j,jj,lastk,iret
+  integer(psb_ipk_) :: k,j,jj,lastk,iret, isz
   real(psb_dpk_)    :: rwk, alpha
 
   info  = psb_success_
@@ -729,8 +726,11 @@ subroutine psb_d_invt_inv(thres,i,nrmi,row,heap,irwt,ja,irp,val,nidx,idxs,info)
     !
 
     nidx       = nidx + 1
-    call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)
-    if (info /= psb_success_) return
+    if (nidx > size(idxs)) then 
+      isz  = max(nidx,int(1.5*size(idxs)))
+      call psb_ensure_size(isz,idxs,info)
+      if (info /= psb_success_) return
+    end if
     idxs(nidx) = k
     irwt(k)    = 0
   end do

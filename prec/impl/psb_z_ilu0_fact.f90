@@ -186,16 +186,16 @@ subroutine psb_zilu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
   end if
   
   m = a%get_nrows() + blck_%get_nrows()
-  if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
+  call ll%allocate(m,m,a%get_nzeros())
+  call uu%allocate(m,m,a%get_nzeros())
+  if ((m /= ll%get_nrows()).or.(m /= uu%get_nrows()).or.&
        & (m > size(d))    ) then
     write(0,*) 'Wrong allocation status for L,D,U? ',&
-         & l%get_nrows(),size(d),u%get_nrows()
+         & m,ll%get_nrows(),size(d),uu%get_nrows()
     info = -1
     return
   end if
 
-  call l%mv_to(ll)
-  call u%mv_to(uu)
   !
   ! Compute the ILU(0) or the MILU(0) factorization, depending on ialg
   !

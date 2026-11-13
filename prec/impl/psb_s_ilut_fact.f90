@@ -198,16 +198,15 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
   end select
 
   m = a%get_nrows() + blck_%get_nrows()
-  if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
+  call ll%allocate(m,m,a%get_nzeros())
+  call uu%allocate(m,m,a%get_nzeros())
+  if ((m /= ll%get_nrows()).or.(m /= uu%get_nrows()).or.&
        & (m > size(d))    ) then
     write(0,*) 'Wrong allocation status for L,D,U? ',&
-         & l%get_nrows(),size(d),u%get_nrows()
+         & m,ll%get_nrows(),size(d),uu%get_nrows()
     info = -1
     return
   end if
-
-  call l%mv_to(ll)
-  call u%mv_to(uu)
 
   !
   ! Compute the ILU(k,t) factorization
@@ -564,7 +563,7 @@ contains
     integer(psb_ipk_)               :: k,j,irb,kin,nz
     integer(psb_ipk_), parameter    :: nrb=40
     real(psb_spk_)        :: dmaxup
-    real(psb_spk_), external    :: dnrm2
+    real(psb_spk_), external    :: snrm2
     character(len=20), parameter  :: name='psb_silut_factint'
 
     info = psb_success_
@@ -623,7 +622,7 @@ contains
       end if
 
       nz   = aa%irp(i+1) - aa%irp(i)
-      nrmi = weight*dnrm2(nz,aa%val(aa%irp(i)),ione)
+      nrmi = weight*snrm2(nz,aa%val(aa%irp(i)),ione)
 
 
     class default
@@ -670,7 +669,7 @@ contains
         ktrw       = ktrw + 1
       enddo
       nz = ktrw - kin
-      nrmi = weight*dnrm2(nz,trw%val(kin),ione)
+      nrmi = weight*snrm2(nz,trw%val(kin),ione)
     end select
 
     call psb_erractionrestore(err_act)
@@ -757,7 +756,7 @@ contains
     real(psb_spk_), intent(inout)       :: row(:), uval(:),d(:)
 
     ! Local Variables
-    integer(psb_ipk_)               :: k,j,jj,lastk,iret
+    integer(psb_ipk_)               :: k,j,jj,lastk,iret, isz
     real(psb_spk_)      :: rwk
 
     info  = psb_success_
@@ -829,8 +828,11 @@ contains
       ! If we get here it is an index we need to keep on copyout.
       !
       nidx       = nidx + 1
-      call psb_ensure_size(nidx,idxs,info,addsz=psb_heap_resize)
-      if (info /= psb_success_) return
+      if (nidx > size(idxs)) then 
+        isz  = max(nidx,int(1.5*size(idxs)))
+        call psb_ensure_size(isz,idxs,info)
+        if (info /= psb_success_) return
+      end if
       idxs(nidx) = k
 
     end do

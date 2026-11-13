@@ -97,11 +97,6 @@ subroutine psb_d_invk_bld(a,fill1, fill2,lmat,d,umat,desc,info,blck)
     goto 9999
   end if
 
-
-  call lmat%allocate(n_row,n_row,info,nz=nztota)
-  if (info == psb_success_) call umat%allocate(n_row,n_row,info,nz=nztota)
-
-
   call psb_iluk_fact(fill1,psb_ilu_n_,a,lmat,umat,pd,info,blck=blck)
        !,uplevs=uplevs)
   !call psb_diluk_fact(fill1,psb_ilu_n_,a,lmat,umat,pd,info,blck=blck)
