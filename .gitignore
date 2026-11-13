@@ -24,3 +24,6 @@ autom4te.cache
 # the executable from tests
 runs
 
+# Bakcup files
+*.bak
+

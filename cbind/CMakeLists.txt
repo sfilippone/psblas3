@@ -1,4 +1,9 @@
 set(PSB_cbind_source_files
+  base/psb_sparse_cbind_mod.F90
+  base/psb_s_sparse_cbind_mod.F90
+  base/psb_d_sparse_cbind_mod.F90
+  base/psb_c_sparse_cbind_mod.F90
+  base/psb_z_sparse_cbind_mod.F90
   base/psb_d_tools_cbind_mod.F90
   base/psb_s_tools_cbind_mod.F90
   base/psb_d_psblas_cbind_mod.f90

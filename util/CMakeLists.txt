@@ -1,4 +1,9 @@
 set(PSB_util_source_files
+  psb_i_mmio_mod.F90
+  psb_s_mmio_mod.F90
+  psb_d_mmio_mod.F90
+  psb_c_mmio_mod.F90
+  psb_z_mmio_mod.F90
   psb_s_mmio_impl.f90
   psb_s_mat_dist_mod.f90
   psb_renum_mod.f90

@@ -6,6 +6,8 @@ INCDIR=../include
 MODDIR=../modules/
 LIBNAME=$(CBINDLIBNAME)
 
+.PHONY: objs lib based precd linsolved utild clean veryclean
+
 objs: based precd linsolved utild
 	/bin/cp -p $(CPUPDFLAG) *.h $(INCDIR)
 	/bin/cp -p $(CPUPDFLAG) *$(.mod) $(MODDIR)
@@ -31,6 +33,7 @@ clean:
 	cd prec && $(MAKE) clean
 	cd linsolve && $(MAKE) clean
 	cd util && $(MAKE) clean
+	$(MAKE) -C test/sparse_ops clean
 
 veryclean: clean
 	cd test/pdegen && $(MAKE) clean
