@@ -308,7 +308,7 @@ subroutine psb_c_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
   integer(psb_ipk_)            :: k,j,irb,kin,nz, err_act
   integer(psb_ipk_), parameter :: nrb=16
   real(psb_dpk_)               :: dmaxup, sign_
-  real(psb_dpk_), external     :: dnrm2
+  real(psb_dpk_), external     :: scnrm2
   character(len=20), parameter :: name='invt_copyin'
 
   info = psb_success_
@@ -360,7 +360,7 @@ subroutine psb_c_invt_copyin(i,m,a,jd,jmin,jmax,nlw,nup,jmaxup,nrmi,row,heap,&
     end if
   end do
   nz   = a%irp(i+1) - a%irp(i)
-  nrmi = dnrm2(nz,a%val(a%irp(i):),ione)
+  nrmi = scnrm2(nz,a%val(a%irp(i):),ione)
 
   return
 
@@ -599,7 +599,7 @@ subroutine psb_c_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       !
       ! Figure out a good reallocation size!
       !
-      isz  = max(int(1.5*l2),l2+100)
+      isz  = max(int(1.2*l2),l2+100)
       call psb_realloc(isz,val,info)
       if (info == psb_success_) call psb_realloc(isz,ja,info)
       if (info /= psb_success_) then

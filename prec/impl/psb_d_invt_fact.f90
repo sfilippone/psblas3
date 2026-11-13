@@ -599,7 +599,7 @@ subroutine psb_d_invt_copyout(fill_in,thres,i,m,nlw,nup,jmaxup,nrmi,row, &
       !
       ! Figure out a good reallocation size!
       !
-      isz  = max(int(1.5*l2),l2+100)
+      isz  = max(int(1.2*l2),l2+100)
       call psb_realloc(isz,val,info)
       if (info == psb_success_) call psb_realloc(isz,ja,info)
       if (info /= psb_success_) then

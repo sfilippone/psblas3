@@ -563,7 +563,7 @@ contains
     integer(psb_ipk_)               :: k,j,irb,kin,nz
     integer(psb_ipk_), parameter    :: nrb=40
     real(psb_spk_)        :: dmaxup
-    real(psb_spk_), external    :: dnrm2
+    real(psb_spk_), external    :: scnrm2
     character(len=20), parameter  :: name='psb_cilut_factint'
 
     info = psb_success_
@@ -622,7 +622,7 @@ contains
       end if
 
       nz   = aa%irp(i+1) - aa%irp(i)
-      nrmi = weight*dnrm2(nz,aa%val(aa%irp(i)),ione)
+      nrmi = weight*scnrm2(nz,aa%val(aa%irp(i)),ione)
 
 
     class default
@@ -669,7 +669,7 @@ contains
         ktrw       = ktrw + 1
       enddo
       nz = ktrw - kin
-      nrmi = weight*dnrm2(nz,trw%val(kin),ione)
+      nrmi = weight*scnrm2(nz,trw%val(kin),ione)
     end select
 
     call psb_erractionrestore(err_act)
@@ -1047,7 +1047,7 @@ contains
         !
         ! Figure out a good reallocation size!
         !
-        isz  = (max((l1/i)*m,int(1.5*l1),l1+100))
+        isz  = (max((l1/i)*m,int(1.2*l1),l1+100))
         call psb_realloc(isz,lval,info)
         if (info == psb_success_) call psb_realloc(isz,lja,info)
         if (info /= psb_success_) then
@@ -1193,7 +1193,7 @@ contains
         !
         ! Figure out a good reallocation size!
         !
-        isz  = max((l2/i)*m,int(1.5*l2),l2+100)
+        isz  = max((l2/i)*m,int(1.2*l2),l2+100)
         call psb_realloc(isz,uval,info)
         if (info == psb_success_) call psb_realloc(isz,uja,info)
         if (info /= psb_success_) then
