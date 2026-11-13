@@ -311,7 +311,7 @@ subroutine psb_sgcr_vect(a,prec,b,x,eps,desc_a,info,&
       
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
       
-      if (j >= irst) exit iteration
+      if (j >= nl) exit iteration
       
       
     end do iteration
