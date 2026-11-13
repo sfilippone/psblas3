@@ -134,9 +134,6 @@ subroutine psb_d_invt_bld(a,fillin,invfill,thresh,invthresh,&
   nzrmax    = fillin
   sp_thresh = thresh
 
-  call lmat%allocate(n_row,n_row,info,nz=nztota)
-  if (info == psb_success_) call umat%allocate(n_row,n_row,info,nz=nztota)
-
   if (info == 0) call psb_ilut_fact(nzrmax,sp_thresh,&
        & a,lmat,umat,pd,info,blck=blck,iscale=psb_ilu_scale_maxval_)
 

@@ -665,8 +665,6 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     n_row  = nrow_a
 
     allocate(lf,uf,stat=info)
-    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
-    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -739,8 +737,6 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
   n_row  = nrow_a
 
   allocate(lf,uf,stat=info)
-  if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
-  if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
   if(info /= psb_success_) then
     info=psb_err_from_subroutine_
@@ -811,8 +807,6 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     n_row  = nrow_a
 
     allocate(lf,uf,stat=info)
-    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
-    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -883,8 +877,6 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     n_row  = nrow_a
 
     allocate(lf,uf,stat=info)
-    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
-    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -955,8 +947,6 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     n_row  = nrow_a
 
     allocate(lf,uf,stat=info)
-    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
-    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_
@@ -1027,8 +1017,6 @@ subroutine psb_z_bjac_precbld(a,desc_a,prec,info,amold,vmold,imold)
     n_row  = nrow_a
 
     allocate(lf,uf,stat=info)
-    if (info == psb_success_) call lf%allocate(n_row,n_row,nztota)
-    if (info == psb_success_) call uf%allocate(n_row,n_row,nztota)
 
     if(info /= psb_success_) then
       info=psb_err_from_subroutine_

@@ -176,16 +176,16 @@ subroutine psb_diluk_fact(fill_in,ialg,a,l,u,d,info,blck,shft)
   end if
 
   m = a%get_nrows() + blck_%get_nrows()
-  if ((m /= l%get_nrows()).or.(m /= u%get_nrows()).or.&
+  call ll%allocate(m,m,a%get_nzeros())
+  call uu%allocate(m,m,a%get_nzeros())
+  if ((m /= ll%get_nrows()).or.(m /= uu%get_nrows()).or.&
        & (m > size(d))    ) then
     write(0,*) 'Wrong allocation status for L,D,U? ',&
-         & l%get_nrows(),size(d),u%get_nrows()
+         & m,ll%get_nrows(),size(d),uu%get_nrows()
     info = -1
     return
   end if
 
-  call ll%allocate(m,m,a%get_nzeros())
-  call uu%allocate(m,m,a%get_nzeros())
   !
   ! Compute the ILU(k) or the MILU(k) factorization, depending on ialg
   !

@@ -191,7 +191,7 @@ Subroutine psb_dkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond,s1=s1,s2=s2)
   case('GCR') 
     call  psb_dgcr_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
+         &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop,s1=s1,s2=s2)
   case('CGS') 
     call  psb_dcgs_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,istop=istop,s1=s1,s2=s2)
