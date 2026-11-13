@@ -38,7 +38,7 @@
 int main(int argc, char **argv)
 {
     psb_c_ctxt *cctxt;
-    psb_i_t iam, np;
+    psb_c_i_t iam, np;
 
     // Initialize PSBLAS context
     cctxt = psb_c_new_ctxt();

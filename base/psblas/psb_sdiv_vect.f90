@@ -93,7 +93,7 @@ subroutine psb_sdiv_vect(x,y,desc_a,info)
   end if
 
   if(desc_a%get_local_rows() > 0) then
-    call x%div(y,info)
+    call y%div(x,info)
   end if
 
   call psb_erractionrestore(err_act)

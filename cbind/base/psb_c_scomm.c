@@ -3,10 +3,10 @@
 #include "psb_c_sbase.h"
 
 
-psb_s_t* psb_c_svgather(psb_c_svector *xh, psb_c_descriptor *cdh)
+psb_c_s_t* psb_c_svgather(psb_c_svector *xh, psb_c_descriptor *cdh)
 { 
-  psb_s_t *temp=NULL;
-  psb_l_t vsize=0; 
+  psb_c_s_t *temp=NULL;
+  psb_c_l_t vsize=0; 
   
   if ((vsize=psb_c_cd_get_global_rows(cdh))<0) 
     return(temp);
@@ -14,7 +14,7 @@ psb_s_t* psb_c_svgather(psb_c_svector *xh, psb_c_descriptor *cdh)
   if (vsize==0) 
     vsize=1;
   
-  if ((temp=(psb_s_t *)malloc(vsize*sizeof(psb_s_t)))!=NULL)
+  if ((temp=(psb_c_s_t *)malloc(vsize*sizeof(psb_c_s_t)))!=NULL)
     psb_c_svgather_f(temp,xh,cdh);
  
  return(temp);

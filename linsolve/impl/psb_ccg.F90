@@ -96,7 +96,7 @@
 ! 
 !
 subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop,cond)
+     & itmax,iter,err,itrace,istop,cond,s1,s2)
   use psb_base_mod
   use psb_prec_mod
   use psb_c_linsolve_conv_mod
@@ -112,6 +112,8 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_spk_), Optional, Intent(out) :: err,cond
+  type(psb_c_vect_type), intent(inout), optional   :: s1, s2
+      
 ! =   Local data
   complex(psb_spk_), allocatable, target   :: aux(:),td(:),tu(:),eig(:),ewrk(:)
   integer(psb_mpk_), allocatable :: ibl(:), ispl(:), iwrk(:)
@@ -245,7 +247,8 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
 
     rho = czero
     
-    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,desc_a,stopdat,info)
+    call psb_init_conv(methdname,istop_,itrace_,itmax_,a,x,b,eps,&
+         &desc_a,stopdat,info,s1=s1,s2=s2)
     if (info /= psb_success_) Then 
       call psb_errpush(psb_err_from_subroutine_non_,name)
       goto 9999
@@ -289,7 +292,7 @@ subroutine psb_ccg_vect(a,prec,b,x,eps,desc_a,info,&
       call psb_geaxpby(alpha,p,cone,x,desc_a,info)
       call psb_geaxpby(-alpha,q,cone,r,desc_a,info)
 
-      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
+      if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info,s1=s1)) exit restart
       if (info /= psb_success_) Then 
         call psb_errpush(psb_err_from_subroutine_non_,name)
         goto 9999

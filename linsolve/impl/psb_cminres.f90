@@ -96,7 +96,7 @@
 !
 !
 subroutine psb_cminres_vect(a,prec,b,x,eps,desc_a,info,&
-& itmax,iter,err,itrace,istop,cond)
+& itmax,iter,err,itrace,istop,cond,s1,s2)
    use psb_base_mod
    use psb_prec_mod
    use psb_c_linsolve_conv_mod
@@ -112,6 +112,7 @@ subroutine psb_cminres_vect(a,prec,b,x,eps,desc_a,info,&
    integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace, istop
    integer(psb_ipk_), Optional, Intent(out)       :: iter
    Real(psb_spk_), Optional, Intent(out) :: err, cond
+   type(psb_c_vect_type), intent(inout), optional   :: s1, s2
 ! =   Local data
    complex(psb_spk_), allocatable, target   :: aux(:)
    type(psb_c_vect_type), allocatable, target :: wwrk(:)

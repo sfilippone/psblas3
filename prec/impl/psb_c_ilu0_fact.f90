@@ -194,8 +194,8 @@ subroutine psb_cilu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
     return
   end if
 
-  call l%mv_to(ll)
-  call u%mv_to(uu)
+  call ll%allocate(m,m,a%get_nzeros())
+  call uu%allocate(m,m,a%get_nzeros())
   !
   ! Compute the ILU(0) or the MILU(0) factorization, depending on ialg
   !

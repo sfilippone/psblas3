@@ -10,10 +10,10 @@ psb_c_zvector* psb_c_new_zvector()
   return(temp);
 }
 
-psb_z_t* psb_c_zvect_get_cpy(psb_c_zvector *xh)
+psb_c_z_t* psb_c_zvect_get_cpy(psb_c_zvector *xh)
 { 
-  psb_z_t *temp=NULL;
-  psb_i_t vsize=0; 
+  psb_c_z_t *temp=NULL;
+  psb_c_i_t vsize=0; 
   
   if ((vsize=psb_c_zvect_get_nrows(xh))<0) 
     return(temp);
@@ -21,7 +21,7 @@ psb_z_t* psb_c_zvect_get_cpy(psb_c_zvector *xh)
   if (vsize==0) 
     vsize=1;
   
-  if ((temp=(psb_z_t *)malloc(vsize*sizeof(psb_z_t)))!=NULL)
+  if ((temp=(psb_c_z_t *)malloc(vsize*sizeof(psb_c_z_t)))!=NULL)
     psb_c_zvect_f_get_cpy(temp,xh);
  
  return(temp);

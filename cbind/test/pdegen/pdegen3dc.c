@@ -120,16 +120,16 @@ double g(double x, double y, double z)
   }
 }
 
-psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
+psb_c_i_t matgen(psb_c_ctxt cctxt, psb_c_i_t nl, psb_c_i_t idim, psb_c_l_t vl[],
 	       psb_c_dspmat *ah,psb_c_descriptor *cdh,
 	       psb_c_dvector *xh, psb_c_dvector *bh, psb_c_dvector *rh)
 {
-  psb_i_t iam, np;
-  psb_l_t ix, iy, iz, el,glob_row;
-  psb_i_t i, k, info,ret;
+  psb_c_i_t iam, np;
+  psb_c_l_t ix, iy, iz, el,glob_row;
+  psb_c_i_t i, k, info,ret;
   double x, y, z, deltah, sqdeltah, deltah2;
   double val[10*NBMAX], zt[NBMAX];
-  psb_l_t irow[10*NBMAX], icol[10*NBMAX];
+  psb_c_l_t irow[10*NBMAX], icol[10*NBMAX];
 
   info = 0;
   psb_c_info(cctxt,&iam,&np);
@@ -224,15 +224,15 @@ psb_i_t matgen(psb_c_ctxt cctxt, psb_i_t nl, psb_i_t idim, psb_l_t vl[],
 int main(int argc, char *argv[])
 {
   psb_c_ctxt *cctxt;
-  psb_i_t iam, np;
+  psb_c_i_t iam, np;
   char methd[40], ptype[20], afmt[8], buffer[LINEBUFSIZE+1];
-  psb_i_t nparms;
-  psb_i_t idim,info,istop,itmax,itrace,irst,iter,ret;
+  psb_c_i_t nparms;
+  psb_c_i_t idim,info,istop,itmax,itrace,irst,iter,ret;
   psb_c_dprec *ph;
   psb_c_dspmat *ah;
   psb_c_dvector *bh, *xh, *rh; 
-  psb_i_t nb,nlr, nl;
-  psb_l_t i,ng, *vl, k;
+  psb_c_i_t nb,nlr, nl;
+  psb_c_l_t i,ng, *vl, k;
   double t1,t2,eps,err;
   double *xv, *bv, *rv;
   double one=1.0, zero=0.0, res2;
@@ -283,15 +283,15 @@ int main(int argc, char *argv[])
   psb_c_set_index_base(0);
 
   /* Simple minded BLOCK data distribution */ 
-  ng = ((psb_l_t) idim)*idim*idim;  
+  ng = ((psb_c_l_t) idim)*idim*idim;  
   nb = (ng+np-1)/np;
   nl = nb;
   if ( (ng -iam*nb) < nl) nl = ng -iam*nb; 
-    if ((vl=malloc(nb*sizeof(psb_l_t)))==NULL) {
+    if ((vl=malloc(nb*sizeof(psb_c_l_t)))==NULL) {
     fprintf(stderr,"On %d: malloc failure\n",iam);
     psb_c_abort(*cctxt);
   }
-  i = ((psb_l_t)iam) * nb;
+  i = ((psb_c_l_t)iam) * nb;
   for (k=0; k<nl; k++)
     vl[k] = i+k; 
 

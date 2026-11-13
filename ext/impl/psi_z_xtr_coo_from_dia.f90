@@ -69,12 +69,10 @@ subroutine psi_z_xtr_coo_from_dia(nr,nc,ia,ja,val,nz,nrd,ncd,data,offsets,info,r
       ir = i + rdisp_
       ic = i + rdisp_ + offsets(j)
       if (debug) write(0,*) ' Loop  I',i,ir,ic
-      if (data(i,j) /= zzero) then 
-        nz = nz + 1
-        ia(nz) = ir
-        ja(nz) = ic 
-        val(nz) = data(i,j)
-      end if
+      nz = nz + 1
+      ia(nz) = ir
+      ja(nz) = ic 
+      val(nz) = data(i,j)
     enddo
   end do
 

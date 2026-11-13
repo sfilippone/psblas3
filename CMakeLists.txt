@@ -428,7 +428,7 @@ if(METIS_FOUND)
   include(CheckTypeSize)
   message(STATUS "METIS PATH ${METIS_INCLUDES} and metis libraries ${METIS_LIBRARIES}")
   # Make sure this path is correct
-#  set(METISINCFILE "metis.h")  # Adjust this to your actual path
+  set(CMAKE_METIS_INCFILE "metis.h")  # Adjust this to your actual path
 
   # Specify the configuration file
   #  set(HEADER_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/util/psb_metis_int.h.in")
@@ -509,7 +509,7 @@ if(METIS_FOUND)
 
   
  # 1. Tell CMake where to find metis.h for the check
-set(CMAKE_EXTRA_INCLUDE_FILES "${METIS_INCLUDES}/metis.h")
+set(CMAKE_EXTRA_INCLUDE_FILES "${METIS_INCLUDES}/${CMAKE_METIS_INCFILE}")
 
 # 2. Check the size of Metis's own type: real_t
 # This replaces checking 'float' and 'double' separately

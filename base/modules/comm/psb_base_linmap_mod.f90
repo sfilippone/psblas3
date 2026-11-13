@@ -49,18 +49,21 @@ module psb_base_linmap_mod
     type(psb_desc_type), pointer :: p_desc_U=>null(), p_desc_V=>null()
     type(psb_desc_type)   :: desc_U, desc_V
   contains
-    procedure, pass(map)  :: sizeof    => base_map_sizeof
-    procedure, pass(map)  :: is_ok     => base_is_ok
-    procedure, pass(map)  :: is_asb    => base_is_asb
-    procedure, pass(map)  :: is_v_repl => base_is_v_repl
-    procedure, pass(map)  :: get_kind  => base_get_kind
-    procedure, pass(map)  :: set_kind  => base_set_kind
-    procedure, pass(map)  :: free      => base_free
-    procedure, pass(map)  :: clone     => base_clone
-    procedure, pass(map)  :: set_pU    => base_set_pU
-    procedure, pass(map)  :: set_pV    => base_set_pV
-    procedure, pass(map)  :: get_pU    => base_get_pU
-    procedure, pass(map)  :: get_pV    => base_get_pV
+    procedure, pass(map)  :: sizeof     => base_map_sizeof
+    procedure, pass(map)  :: is_ok      => base_is_ok
+    procedure, pass(map)  :: is_asb     => base_is_asb
+    procedure, pass(map)  :: is_v_repl  => base_is_v_repl
+    procedure, pass(map)  :: get_kind   => base_get_kind
+    procedure, pass(map)  :: set_kind   => base_set_kind
+    procedure, pass(map)  :: free       => base_free
+    procedure, pass(map)  :: clone      => base_clone
+    procedure, pass(map)  :: set_pU     => base_set_pU
+    procedure, pass(map)  :: set_pV     => base_set_pV
+    procedure, pass(map)  :: get_pU     => base_get_pU
+    procedure, pass(map)  :: get_pV     => base_get_pV
+
+    procedure, pass(map)  :: get_U_ctxt => base_get_U_ctxt
+    procedure, pass(map)  :: get_V_ctxt => base_get_V_ctxt
   end type psb_base_linmap_type
 
 
@@ -267,6 +270,29 @@ contains
 
   end function base_get_pV
 
+  function base_get_U_ctxt(map) result(ctxt)
+    implicit none 
+    class(psb_base_linmap_type) :: map
+    type(psb_ctxt_type)         :: ctxt
 
+    if (associated(map%p_desc_U)) then
+      ctxt = map%p_desc_U%get_ctxt()
+    else
+      ctxt = map%desc_U%get_ctxt()
+    end if
+  end function base_get_U_ctxt
+
+  function base_get_V_ctxt(map) result(ctxt)
+    implicit none 
+    class(psb_base_linmap_type) :: map
+    type(psb_ctxt_type)         :: ctxt
+
+    if (associated(map%p_desc_V)) then
+      ctxt = map%p_desc_V%get_ctxt()
+    else
+      ctxt = map%desc_V%get_ctxt()
+    end if
+  end function base_get_V_ctxt
+ 
 end module psb_base_linmap_mod
 

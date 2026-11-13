@@ -20,6 +20,22 @@ set(PSB_cbind_source_files
   base/psb_d_comm_cbind_mod.f90
   base/psb_z_tools_cbind_mod.F90
   base/psb_cpenv_mod.F90
+  base/psb_c_comm_cbind_impl.f90
+  base/psb_c_psblas_cbind_impl.f90
+  base/psb_c_serial_cbind_impl.F90
+  base/psb_c_tools_cbind_impl.F90
+  base/psb_d_comm_cbind_impl.f90
+  base/psb_d_psblas_cbind_impl.f90
+  base/psb_d_serial_cbind_impl.F90
+  base/psb_d_tools_cbind_impl.F90
+  base/psb_s_comm_cbind_impl.f90
+  base/psb_s_psblas_cbind_impl.f90
+  base/psb_s_serial_cbind_impl.F90
+  base/psb_s_tools_cbind_impl.F90
+  base/psb_z_comm_cbind_impl.f90
+  base/psb_z_psblas_cbind_impl.f90
+  base/psb_z_serial_cbind_impl.F90
+  base/psb_z_tools_cbind_impl.F90
   util/psb_c_util_cbind_mod.f90
   util/psb_s_util_cbind_mod.f90
   util/psb_util_cbind_mod.f90

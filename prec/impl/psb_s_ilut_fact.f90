@@ -206,9 +206,8 @@ subroutine psb_silut_fact(fill_in,thres,a,l,u,d,info,blck,iscale,shft)
     return
   end if
 
-  call l%mv_to(ll)
-  call u%mv_to(uu)
-
+  call ll%allocate(m,m,a%get_nzeros())
+  call uu%allocate(m,m,a%get_nzeros())
   !
   ! Compute the ILU(k,t) factorization
   !

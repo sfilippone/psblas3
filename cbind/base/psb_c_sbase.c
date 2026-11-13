@@ -10,10 +10,10 @@ psb_c_svector* psb_c_new_svector()
   return(temp);
 }
 
-psb_s_t* psb_c_svect_get_cpy(psb_c_svector *xh)
+psb_c_s_t* psb_c_svect_get_cpy(psb_c_svector *xh)
 { 
-  psb_s_t *temp=NULL;
-  psb_i_t vsize=0; 
+  psb_c_s_t *temp=NULL;
+  psb_c_i_t vsize=0; 
   
   if ((vsize=psb_c_svect_get_nrows(xh))<0) 
     return(temp);
@@ -21,7 +21,7 @@ psb_s_t* psb_c_svect_get_cpy(psb_c_svector *xh)
   if (vsize==0) 
     vsize=1;
   
-  if ((temp=(psb_s_t *)malloc(vsize*sizeof(psb_s_t)))!=NULL)
+  if ((temp=(psb_c_s_t *)malloc(vsize*sizeof(psb_c_s_t)))!=NULL)
     psb_c_svect_f_get_cpy(temp,xh);
  
  return(temp);
