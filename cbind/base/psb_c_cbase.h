@@ -75,39 +75,6 @@ psb_c_i_t	   psb_c_cvect_set_vect(psb_c_cvector *xh, psb_c_c_t *val, psb_c_i_t n
 psb_c_c_t    psb_c_cvect_get_entry(psb_c_cvector *xh, psb_c_i_t index);
 psb_c_i_t    psb_c_cvect_set_entry(psb_c_cvector *xh, psb_c_i_t index, psb_c_c_t val);
 
-/* Distributed sparse operators: see cbind/SPARSE_OPERATIONS.md.
- * Descriptors and all outer handle pointers must be valid. New output
- * handles must be zero-initialized; inputs retain their storage/layouts.
- * _2desc insertion accepts locally owned rows only, using global indices
- * in the base selected by psb_c_set_index_base(). */
-psb_c_i_t psb_c_cspall_2desc(psb_c_cspmat *ah,
-                              psb_c_descriptor *dr, psb_c_descriptor *dc);
-psb_c_i_t psb_c_cspins_2desc(psb_c_i_t nz,
-                              const psb_c_l_t *rows, const psb_c_l_t *cols,
-                              const psb_c_c_t *values, psb_c_cspmat *ah,
-                              psb_c_descriptor *dr, psb_c_descriptor *dc);
-psb_c_i_t psb_c_cspasb_2desc(psb_c_cspmat *ah,
-                              psb_c_descriptor *dr, psb_c_descriptor *dc);
-psb_c_i_t psb_c_cglob_transpose(psb_c_cspmat *ah,
-                                 psb_c_descriptor *dr, psb_c_descriptor *dc,
-                                 psb_c_cspmat *bh, psb_c_descriptor *dbcols,
-                                 const char *trans);
-psb_c_i_t psb_c_cpar_spspmm(psb_c_cspmat *ah,
-                             psb_c_descriptor *dar, psb_c_descriptor *dac,
-                             psb_c_cspmat *bh,
-                             psb_c_descriptor *dbr, psb_c_descriptor *dbc,
-                             psb_c_cspmat *ch, psb_c_descriptor *dcc);
-psb_c_i_t psb_c_cspmm_2desc(psb_c_c_t alpha, psb_c_cspmat *ah,
-                             psb_c_cvector *xh, psb_c_c_t beta, psb_c_cvector *yh,
-                             psb_c_descriptor *dr, psb_c_descriptor *dc,
-                             const char *trans);
-psb_c_i_t psb_c_cspget_coo(psb_c_cspmat *ah,
-                            psb_c_descriptor *dr, psb_c_descriptor *dc,
-                            psb_c_i_t capacity, psb_c_i_t *nz,
-                            psb_c_l_t *rows, psb_c_l_t *cols, psb_c_c_t *values);
-psb_c_i_t psb_c_csprowscl(psb_c_cspmat *ah, psb_c_i_t nr,
-                           const psb_c_c_t *values);
-
 /* psblas computational routines */
 psb_c_c_t psb_c_cgedot(psb_c_cvector *xh, psb_c_cvector *yh, psb_c_descriptor *cdh);
 psb_c_s_t psb_c_cgenrm2(psb_c_cvector *xh, psb_c_descriptor *cdh);
