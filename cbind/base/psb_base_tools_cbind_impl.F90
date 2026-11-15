@@ -74,7 +74,7 @@ contains
     ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
-    if (nl <=0) then
+    if (nl <0) then
       write(0,*) 'Invalid size'
       return
     end if
@@ -115,7 +115,7 @@ contains
     ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
-    if (nl <=0) then
+    if (nl <0) then
       write(0,*) 'Invalid size'
       return
     end if
@@ -158,7 +158,7 @@ contains
     ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
-    if (nl <=0) then
+    if (nl <0) then
       write(0,*) 'Invalid size'
       return
     end if
@@ -198,7 +198,7 @@ contains
     ctxt = psb_c2f_ctxt(cctxt)
 
     res = -1
-    if (nl <=0) then
+    if (nl <0) then
       write(0,*) 'Invalid size'
       return
     end if
