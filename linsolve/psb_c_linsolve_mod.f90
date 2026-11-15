@@ -55,7 +55,7 @@ Module psb_c_linsolve_mod
       integer(psb_ipk_), Optional, Intent(in)   :: itmax, itrace, irst,istop
       integer(psb_ipk_), Optional, Intent(out)  :: iter
       Real(psb_spk_), Optional, Intent(out) :: err,cond
-      type(psb_c_vect_type), optional  :: s1,s2
+      type(psb_c_vect_type), intent(inout), optional  :: s1,s2
     end Subroutine psb_ckrylov_vect
   end interface
 
