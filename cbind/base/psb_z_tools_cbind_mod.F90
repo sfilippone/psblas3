@@ -89,6 +89,18 @@ module psb_z_tools_cbind_mod
     end function psb_c_zgeins
   end interface
 
+  interface
+    module function psb_c_zgeins_options(nz,irw,val,xh,cdh,mode) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      integer(psb_c_ipk_), value :: nz
+      integer(psb_c_lpk_) :: irw(*)
+      complex(c_double_complex) :: val(*)
+      type(psb_c_zvector) :: xh
+      type(psb_c_descriptor) :: cdh
+      integer(psb_c_ipk_), value :: mode
+    end function psb_c_zgeins_options
+  end interface
+
   interface 
     module function psb_c_zspall(mh,cdh) bind(c) result(res)
       integer(psb_c_ipk_) :: res

@@ -89,6 +89,18 @@ module psb_s_tools_cbind_mod
     end function psb_c_sgeins
   end interface
 
+  interface
+    module function psb_c_sgeins_options(nz,irw,val,xh,cdh,mode) bind(c) result(res)
+      integer(psb_c_ipk_) :: res
+      integer(psb_c_ipk_), value :: nz
+      integer(psb_c_lpk_) :: irw(*)
+      real(c_float) :: val(*)
+      type(psb_c_svector) :: xh
+      type(psb_c_descriptor) :: cdh
+      integer(psb_c_ipk_), value :: mode
+    end function psb_c_sgeins_options
+  end interface
+
   interface 
     module function psb_c_sspall(mh,cdh) bind(c) result(res)
       integer(psb_c_ipk_) :: res

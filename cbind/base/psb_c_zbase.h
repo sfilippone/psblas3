@@ -32,6 +32,11 @@ psb_c_i_t    psb_c_zgeins(psb_c_i_t nz, const psb_c_l_t *irw, const psb_c_z_t *v
 		    psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_c_i_t    psb_c_zgeins_add(psb_c_i_t nz, const psb_c_l_t *irw, const psb_c_z_t *val,
 			psb_c_zvector *xh, psb_c_descriptor *cdh);
+/* Select duplicate handling, including a zero-length transition to update
+ * state before collective assembly on a process with no outgoing entries. */
+psb_c_i_t psb_c_zgeins_options(psb_c_i_t nz, const psb_c_l_t *irw,
+                             const psb_c_z_t *val, psb_c_zvector *xh,
+                             psb_c_descriptor *cdh, psb_c_i_t mode);
 psb_c_i_t    psb_c_zgeasb(psb_c_zvector *xh, psb_c_descriptor *cdh);
 psb_c_i_t    psb_c_zgeasb_options(psb_c_zvector *xh, psb_c_descriptor *cdh, psb_c_i_t dupl);
 psb_c_i_t	   psb_c_zgeasb_options_format(psb_c_zvector *xh, psb_c_descriptor *cdh,

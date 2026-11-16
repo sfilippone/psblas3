@@ -148,7 +148,7 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
   real(psb_spk_), intent(in), optional :: shft
 
   ! Local variables
-  integer(psb_ipk_)   :: l1, l2, m, err_act
+  integer(psb_ipk_)   :: l1, l2, m, nz, err_act
   type(psb_sspmat_type), pointer  :: blck_
   type(psb_s_csr_sparse_mat)      :: ll, uu
   real(psb_spk_) :: shft_
@@ -185,9 +185,11 @@ subroutine psb_silu0_fact(ialg,a,l,u,d,info,blck, upd,shft)
     shft_ = szero
   end if
   
-  m = a%get_nrows() + blck_%get_nrows()
-  call ll%allocate(m,m,a%get_nzeros())
-  call uu%allocate(m,m,a%get_nzeros())
+  m  = a%get_nrows() + blck_%get_nrows()
+  nz = a%get_nzeros()
+  if (blck_%get_nzeros()>0) nz = nz + blck_%get_nzeros()
+  call ll%allocate(m,m,nz)
+  call uu%allocate(m,m,nz)
   if ((m /= ll%get_nrows()).or.(m /= uu%get_nrows()).or.&
        & (m > size(d))    ) then
     write(0,*) 'Wrong allocation status for L,D,U? ',&
