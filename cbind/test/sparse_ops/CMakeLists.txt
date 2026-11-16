@@ -20,7 +20,7 @@ foreach(family d s c z)
   elseif(family STREQUAL "z")
     target_compile_definitions(${target} PRIVATE TEST_DOUBLE_COMPLEX)
   endif()
-  foreach(ranks 1 2 4)
+  foreach(ranks 1 2 3 4)
     add_test(NAME ${target}_${ranks}_ranks COMMAND
       ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${ranks}
       ${MPIEXEC_PREFLAGS} $<TARGET_FILE:${target}> ${MPIEXEC_POSTFLAGS})

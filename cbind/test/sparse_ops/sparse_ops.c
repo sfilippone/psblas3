@@ -84,6 +84,55 @@ static void expect_error(psb_c_i_t status, const char *what)
   psb_c_clean_errstack();
 }
 
+/* Leave rank zero empty whenever more than one rank participates.  Keep
+ * valid array storage even where nl=0: the C bindings use Fortran arrays.
+ */
+static void check_empty_local_descriptors(void)
+{
+  const psb_c_i_t nl = rank_id == process_count - 1 ? 1 : 0;
+  psb_c_l_t owned[1] = {index_base};
+  psb_c_i_t local_indices[1] = {index_base};
+
+  for (int allocation = 0; allocation < 3; ++allocation) {
+    psb_c_descriptor descriptor = {NULL};
+    vector_t x = {NULL};
+    if (allocation == 0)
+      CHECK(psb_c_cdall_vl(nl, owned, context, &descriptor));
+    else if (allocation == 1)
+      CHECK(psb_c_cdall_vl_lidx(nl, owned, local_indices, context,
+                               &descriptor));
+    else
+      CHECK(psb_c_cdall_nl(nl, context, &descriptor));
+
+    CHECK(psb_c_cdasb(&descriptor));
+    require(psb_c_cd_get_local_rows(&descriptor) == nl,
+            "wrong local size with empty descriptor owners");
+    require(psb_c_cd_get_global_rows(&descriptor) == 1,
+            "wrong global size with empty descriptor owners");
+
+    CHECK(PSB_NAME(geall)(&x, &descriptor));
+    CHECK(PSB_NAME(geasb)(&x, &descriptor));
+    CHECK(PSB_NAME(vect_set_scal)(&x, SCALAR_VALUE(2., 0.)));
+    const double norm = PSB_NAME(genrm2)(&x, &descriptor);
+    require(isfinite(norm) && fabs(norm - 2.) <= TEST_TOL,
+            "wrong global vector norm with empty descriptor owners");
+    CHECK(PSB_NAME(gefree)(&x, &descriptor));
+    CHECK(psb_c_cdfree(&descriptor));
+
+    /* Reject negative counts on every rank, before any native collective. */
+    if (allocation == 0)
+      expect_error(psb_c_cdall_vl(-1, owned, context, &descriptor),
+                   "negative explicit descriptor size accepted");
+    else if (allocation == 1)
+      expect_error(psb_c_cdall_vl_lidx(-1, owned, local_indices, context,
+                                      &descriptor),
+                   "negative indexed descriptor size accepted");
+    else
+      expect_error(psb_c_cdall_nl(-1, context, &descriptor),
+                   "negative contiguous descriptor size accepted");
+  }
+}
+
 static int local_count(int global_size)
 {
   return global_size / process_count +
@@ -403,6 +452,7 @@ static void run_case(int base)
 
   index_base = base;
   psb_c_set_index_base(base);
+  check_empty_local_descriptors();
   transpose_dense(b, PRESSURE_SIZE, VELOCITY_SIZE, bt, 0);
   transpose_dense(b, PRESSURE_SIZE, VELOCITY_SIZE, bh, 1);
   transpose_dense(g, VELOCITY_SIZE, PRESSURE_SIZE, gt, 0);
