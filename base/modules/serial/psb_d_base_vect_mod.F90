@@ -151,6 +151,7 @@ module psb_d_base_vect_mod
     procedure, pass(x) :: dot_v    => d_base_dot_v
     procedure, pass(x) :: dot_a    => d_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(x) :: dot3v    => d_base_dot3v
     procedure, pass(y) :: axpby_v  => d_base_axpby_v
     procedure, pass(y) :: axpby_a  => d_base_axpby_a
     procedure, pass(z) :: axpby_v2  => d_base_axpby_v2
@@ -1012,6 +1013,28 @@ contains
     end select
 
   end function d_base_dot_v
+
+  !
+  !> Function  base_dot3v
+  !! \memberof  psb_d_base_vect_type
+  !! \brief  Local dot products of X with two or three vectors:
+  !!         res(1) = x.y1, res(2) = x.y2, res(3) = x.y3 (if Y3 present).
+  !!         Base version: separate dot products. Device versions override
+  !!         it to compute all of them in a single pass.
+  !! \param n    Number of entries to be considered
+  !!
+  subroutine d_base_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_d_base_vect_type), intent(inout) :: x, y1, y2
+    integer(psb_ipk_), intent(in)              :: n
+    real(psb_dpk_), intent(out)                :: res(:)
+    class(psb_d_base_vect_type), intent(inout), optional :: y3
+
+    res(1) = x%dot(n,y1)
+    res(2) = x%dot(n,y2)
+    if (present(y3)) res(3) = x%dot(n,y3)
+
+  end subroutine d_base_dot3v
 
   !
   ! Base workhorse is good old BLAS1

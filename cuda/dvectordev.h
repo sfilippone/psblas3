@@ -66,6 +66,7 @@ int nrm2MultiVecDeviceDouble(double* y_res, int n, void* devVecA);
 int amaxMultiVecDeviceDouble(double* y_res, int n, void* devVecA);
 int asumMultiVecDeviceDouble(double* y_res, int n, void* devVecA);
 int dotMultiVecDeviceDouble(double* y_res, int n, void* devVecA, void* devVecB);
+int dot3MultiVecDeviceDouble(double* y_res, int n, void* devVecX, void* devVecY1, void* devVecY2, void* devVecY3);
 
 int axpbyMultiVecDeviceDouble(int n, double alpha, void* devVecX, double beta, void* devVecY);
 int upd_xyzMultiVecDeviceDouble(int n,double alpha,double beta, double gamma, double delta, 

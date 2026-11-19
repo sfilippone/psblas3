@@ -150,3 +150,89 @@ void spgpuDmdot(spgpuHandle_t handle, double* y, int n, __device double* a, __de
 		b += pitch;
 	}
 }
+
+
+/*
+ * Fused local dot products sharing the first operand:
+ *   res[0] = x.y1, res[1] = x.y2, res[2] = x.y3 (y3 may be NULL).
+ * One kernel launch and one device->host transfer instead of two or three,
+ * as needed by the FCG iteration (PSBLAS psb_dfcg).
+ */
+#define DOT3_BLOCK_SIZE 256
+#define DOT3_MAX_BLOCKS 128
+
+static __device__ double ddot3ReductionResult[3*DOT3_MAX_BLOCKS];
+
+__global__ void spgpuDdot3_kern(int n, const double* __restrict__ x,
+				const double* __restrict__ y1,
+				const double* __restrict__ y2,
+				const double* __restrict__ y3)
+{
+	__shared__ double s1[DOT3_BLOCK_SIZE];
+	__shared__ double s2[DOT3_BLOCK_SIZE];
+	__shared__ double s3[DOT3_BLOCK_SIZE];
+
+	double a1 = 0.0, a2 = 0.0, a3 = 0.0;
+	int tid = threadIdx.x;
+	int stride = gridDim.x*DOT3_BLOCK_SIZE;
+
+	if (y3 != NULL) {
+		for (int i = tid + blockIdx.x*DOT3_BLOCK_SIZE; i < n; i += stride) {
+			double xi = x[i];
+			a1 = PREC_DADD(a1, PREC_DMUL(xi, y1[i]));
+			a2 = PREC_DADD(a2, PREC_DMUL(xi, y2[i]));
+			a3 = PREC_DADD(a3, PREC_DMUL(xi, y3[i]));
+		}
+	} else {
+		for (int i = tid + blockIdx.x*DOT3_BLOCK_SIZE; i < n; i += stride) {
+			double xi = x[i];
+			a1 = PREC_DADD(a1, PREC_DMUL(xi, y1[i]));
+			a2 = PREC_DADD(a2, PREC_DMUL(xi, y2[i]));
+		}
+	}
+	s1[tid] = a1;
+	s2[tid] = a2;
+	s3[tid] = a3;
+	__syncthreads();
+
+	for (int s = DOT3_BLOCK_SIZE/2; s > 0; s >>= 1) {
+		if (tid < s) {
+			s1[tid] += s1[tid + s];
+			s2[tid] += s2[tid + s];
+			s3[tid] += s3[tid + s];
+		}
+		__syncthreads();
+	}
+
+	if (tid == 0) {
+		ddot3ReductionResult[3*blockIdx.x]   = s1[0];
+		ddot3ReductionResult[3*blockIdx.x+1] = s2[0];
+		ddot3ReductionResult[3*blockIdx.x+2] = s3[0];
+	}
+}
+
+void spgpuDdot3(spgpuHandle_t handle, double* res, int n,
+		__device double* x, __device double* y1,
+		__device double* y2, __device double* y3)
+{
+	res[0] = 0.0;
+	res[1] = 0.0;
+	res[2] = 0.0;
+	if (n <= 0) return;
+
+	int blocks = min(DOT3_MAX_BLOCKS,
+			 min(2*handle->multiProcessorCount,
+			     (n+DOT3_BLOCK_SIZE-1)/DOT3_BLOCK_SIZE));
+	double tRes[3*DOT3_MAX_BLOCKS];
+
+	spgpuDdot3_kern<<<blocks, DOT3_BLOCK_SIZE, 0, handle->currentStream>>>(n, x, y1, y2, y3);
+	cudaMemcpyFromSymbol(tRes, ddot3ReductionResult, 3*blocks*sizeof(double));
+
+	for (int i = 0; i < blocks; ++i) {
+		res[0] += tRes[3*i];
+		res[1] += tRes[3*i+1];
+		res[2] += tRes[3*i+2];
+	}
+
+	cudaCheckError("CUDA error on ddot3");
+}

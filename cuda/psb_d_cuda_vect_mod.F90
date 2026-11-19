@@ -88,6 +88,7 @@ module psb_d_cuda_vect_mod
     procedure, pass(x) :: maybe_free_buffer  => d_cuda_maybe_free_buffer
     procedure, pass(x) :: dot_v    => d_cuda_dot_v
     procedure, pass(x) :: dot_a    => d_cuda_dot_a
+    procedure, pass(x) :: dot3v    => d_cuda_dot3v
     procedure, pass(y) :: axpby_v  => d_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => d_cuda_axpby_a
     procedure, pass(z) :: upd_xyz  => d_cuda_upd_xyz
@@ -852,6 +853,65 @@ contains
     end select
 
   end function d_cuda_dot_v
+
+  !
+  ! Fused local dot products x.y1, x.y2 [, x.y3] in one kernel and one
+  ! device->host transfer. Falls back to the base implementation when an
+  ! operand is not a CUDA vector.
+  !
+  subroutine d_cuda_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_d_vect_cuda), intent(inout)      :: x
+    class(psb_d_base_vect_type), intent(inout) :: y1, y2
+    integer(psb_ipk_), intent(in)              :: n
+    real(psb_dpk_), intent(out)                :: res(:)
+    class(psb_d_base_vect_type), intent(inout), optional :: y3
+    real(c_double)    :: r3(3)
+    integer(psb_ipk_) :: info
+    logical           :: on_dev
+
+    on_dev = .false.
+    select type(yy1 => y1)
+    type is (psb_d_vect_cuda)
+      select type(yy2 => y2)
+      type is (psb_d_vect_cuda)
+        if (present(y3)) then
+          select type(yy3 => y3)
+          type is (psb_d_vect_cuda)
+            on_dev = .true.
+            if (x%is_host())   call x%sync()
+            if (yy1%is_host()) call yy1%sync()
+            if (yy2%is_host()) call yy2%sync()
+            if (yy3%is_host()) call yy3%sync()
+            info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+                 & yy2%deviceVect,yy3%deviceVect)
+          end select
+        else
+          on_dev = .true.
+          if (x%is_host())   call x%sync()
+          if (yy1%is_host()) call yy1%sync()
+          if (yy2%is_host()) call yy2%sync()
+          info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+               & yy2%deviceVect,c_null_ptr)
+        end if
+      end select
+    end select
+
+    if (on_dev) then
+      if (info /= 0) then
+        info = psb_err_internal_error_
+        call psb_errpush(info,'d_cuda_dot3v')
+      end if
+      res(1) = r3(1)
+      res(2) = r3(2)
+      if (present(y3)) res(3) = r3(3)
+    else
+      res(1) = x%dot(n,y1)
+      res(2) = x%dot(n,y2)
+      if (present(y3)) res(3) = x%dot(n,y3)
+    end if
+
+  end subroutine d_cuda_dot3v
 
   function d_cuda_dot_a(n,x,y) result(res)
     implicit none 

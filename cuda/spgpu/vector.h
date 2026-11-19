@@ -395,6 +395,22 @@ void spgpuDscal(spgpuHandle_t handle,
 	__device double* b);
 
 /** 
+* \fn void spgpuDdot3 (spgpuHandle_t handle, double* res, int n, __device double* x, __device double* y1, __device double* y2, __device double* y3)
+ * Computes in a single pass the double precision dot products of x with
+ * y1, y2 and (if not NULL) y3: res[0]=x.y1, res[1]=x.y2, res[2]=x.y3.
+ * \param handle The spgpu handle used to call this routine
+ * \param res host array of 3 results (res[2]=0 if y3 is NULL)
+ * \param n the vectors length
+ */
+void spgpuDdot3(spgpuHandle_t handle,
+	double* res,
+	int n,
+	__device double* x,
+	__device double* y1,
+	__device double* y2,
+	__device double* y3);
+
+/** 
 * \fn void spgpuDabs (spgpuHandle_t handle, __device double* y, int n, double alpha, __device double* x)
  * Computes double precision (y = alpha * abs(x)) for each element in x.
  * \param handle The spgpu handle used to call this routine
