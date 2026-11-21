@@ -115,6 +115,7 @@ int readDouble(void *, double*, int);
 int readMultiDouble(void*, double*, int, int );
 int writeDoubleFirst(int, void *, double*, int, int);
 int readDoubleFirst(int, void *, double*, int, int);
+int copyDeviceRange(void *, int, int, int, int);
 void freeDouble(void *);
 
 int allocateFloatComplex(void **, int);

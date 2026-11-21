@@ -40,7 +40,7 @@ Module psb_z_linsolve_mod
 
   interface psb_krylov
     Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
-         & itmax,iter,err,itrace,irst,istop,cond,s1,s2)
+         & itmax,iter,err,itrace,irst,istop,cond,s1,s2,wrk)
       use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_zspmat_type, &
            & psb_dpk_, psb_z_vect_type
       use psb_prec_mod, only : psb_zprec_type
@@ -56,6 +56,7 @@ Module psb_z_linsolve_mod
       integer(psb_ipk_), Optional, Intent(out)  :: iter
       Real(psb_dpk_), Optional, Intent(out) :: err,cond
       type(psb_z_vect_type), optional  :: s1,s2
+      type(psb_z_vect_type), intent(inout), optional, target :: wrk(:)
     end Subroutine psb_zkrylov_vect
   end interface
 

@@ -98,6 +98,7 @@ module psb_s_vect_mod
     procedure, pass(x) :: dot_v    => s_vect_dot_v
     procedure, pass(x) :: dot_a    => s_vect_dot_a
     generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(x) :: dot3v    => s_vect_dot3v
     procedure, pass(y) :: axpby_v  => s_vect_axpby_v
     procedure, pass(y) :: axpby_a  => s_vect_axpby_a
     procedure, pass(z) :: axpby_v2  => s_vect_axpby_v2
@@ -715,6 +716,24 @@ contains
          & res = x%v%dot(n,y%v)
 
   end function s_vect_dot_v
+
+  subroutine s_vect_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_s_vect_type), intent(inout) :: x, y1, y2
+    integer(psb_ipk_), intent(in)           :: n
+    real(psb_spk_), intent(out)             :: res(:)
+    class(psb_s_vect_type), intent(inout), optional :: y3
+
+    res = szero
+    if (.not.(allocated(x%v).and.allocated(y1%v).and.allocated(y2%v))) return
+    if (present(y3)) then
+      if (.not.allocated(y3%v)) return
+      call x%v%dot3v(n,y1%v,y2%v,res,y3%v)
+    else
+      call x%v%dot3v(n,y1%v,y2%v,res)
+    end if
+
+  end subroutine s_vect_dot3v
 
   function s_vect_dot_a(n,x,y) result(res)
     implicit none

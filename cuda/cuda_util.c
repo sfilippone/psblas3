@@ -31,6 +31,7 @@
   
 
 #include "cuda_util.h"
+#include <mpi.h>
 
 
 static int hasUVA=-1;
@@ -644,6 +645,27 @@ int writeDoubleFirst(int df, void *d_double, double* h_double, int n, int IndexB
   return i;
 }
 
+/*
+ * Copy N elements of ELSIZE bytes inside a device buffer, from 1-based
+ * position SRC to DST, queued on the PSBLAS stream (exchange of a process
+ * with itself when the halo buffer lives in device memory). Type-agnostic.
+ */
+int copyDeviceRange(void *d_buf, int dst, int src, int n, int elsize)
+{
+  cudaError_t err;
+  char *dv = (char *) d_buf;
+  if (n <= 0) return(SPGPU_SUCCESS);
+  err = cudaMemcpyAsync((void *) (dv + ((size_t) (dst-1))*elsize),
+                        (void *) (dv + ((size_t) (src-1))*elsize),
+                        ((size_t) n)*elsize, cudaMemcpyDeviceToDevice,
+                        psb_cudaGetHandle()->currentStream);
+  if (err != cudaSuccess) {
+    fprintf(stderr,"CUDA Error copyDeviceRange: %s\n",cudaGetErrorString(err));
+    return(SPGPU_UNSPECIFIED);
+  }
+  return(SPGPU_SUCCESS);
+}
+
 int readDoubleFirst(int df, void* d_double, double* h_double, int n, int IndexBase)
 { int i;
   double *dv=(double *) d_double;
@@ -833,3 +855,54 @@ double etime()
 }
 
 
+
+/*
+ * Self test of CUDA-aware MPI, run by psb_cuda_init before enabling the halo
+ * exchange on device buffers. Every rank sends a device buffer to the next
+ * rank of a ring and receives one from the previous (a short message and a
+ * large one, i.e. both eager and rendezvous protocols; with several ranks per
+ * node both intra-node and inter-node pairs are exercised), then checks the
+ * data. MPI errors are returned (MPI_ERRORS_RETURN on a private duplicate
+ * communicator) instead of aborting. Returns 1 only if it worked on every rank.
+ * Collective: every rank must call it; WANT=0 on any rank means no test and
+ * no device-buffer exchange anywhere (consistent decision across ranks).
+ */
+#define PSB_AWARE_TEST_N 16384
+
+int psi_c_cuda_aware_selftest(int want)
+{
+  MPI_Comm comm;
+  int rank, np, left, right, ok = 1, allok = 0, allwant = 0, k, i;
+  int sizes[2] = {1, PSB_AWARE_TEST_N};
+  double *d = NULL, *h = NULL;
+
+  if (MPI_Comm_dup(MPI_COMM_WORLD, &comm) != MPI_SUCCESS) return 0;
+  MPI_Comm_set_errhandler(comm, MPI_ERRORS_RETURN);
+  if (MPI_Allreduce(&want, &allwant, 1, MPI_INT, MPI_MIN, comm) != MPI_SUCCESS) allwant = 0;
+  if (!allwant) { MPI_Comm_free(&comm); return 0; }
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &np);
+  right = (rank + 1) % np;
+  left  = (rank - 1 + np) % np;
+
+  h = (double *) malloc(2 * PSB_AWARE_TEST_N * sizeof(double));
+  if (h == NULL) ok = 0;
+  if (ok && cudaMalloc((void **) &d, 2 * PSB_AWARE_TEST_N * sizeof(double)) != cudaSuccess) {
+    d = NULL; ok = 0;
+  }
+  for (k = 0; k < 2 && ok; k++) {
+    int n = sizes[k];
+    for (i = 0; i < n; i++) { h[i] = rank + 1 + k; h[n + i] = -1.0; }
+    if (cudaMemcpy(d, h, 2 * n * sizeof(double), cudaMemcpyHostToDevice) != cudaSuccess) { ok = 0; break; }
+    if (MPI_Sendrecv(d, n, MPI_DOUBLE, right, 4711 + k, d + n, n, MPI_DOUBLE, left, 4711 + k,
+                     comm, MPI_STATUS_IGNORE) != MPI_SUCCESS) { ok = 0; break; }
+    if (cudaMemcpy(h, d, 2 * n * sizeof(double), cudaMemcpyDeviceToHost) != cudaSuccess) { ok = 0; break; }
+    for (i = 0; i < n; i++)
+      if (h[n + i] != (double) (left + 1 + k)) { ok = 0; break; }
+  }
+  if (d != NULL) cudaFree(d);
+  if (h != NULL) free(h);
+  if (MPI_Allreduce(&ok, &allok, 1, MPI_INT, MPI_MIN, comm) != MPI_SUCCESS) allok = 0;
+  MPI_Comm_free(&comm);
+  return allok;
+}

@@ -140,6 +140,12 @@ module psb_l_base_vect_mod
     procedure, pass(y) :: sctb_x   => l_base_sctb_x
     procedure, pass(y) :: sctb_buf => l_base_sctb_buf
     generic, public    :: sct      => sctb, sctb_x, sctb_buf
+    !
+    ! Halo exchange directly on a device buffer (CUDA-aware MPI)
+    !
+    procedure, pass(x) :: dev_comm      => l_base_dev_comm
+    procedure, pass(x) :: dev_comm_buf  => l_base_dev_comm_buf
+    procedure, pass(x) :: comm_buf_copy => l_base_comm_buf_copy
 
 
 
@@ -1016,6 +1022,46 @@ contains
     call y%set_host()
 
   end subroutine l_base_sctb_buf
+
+  !
+  !> Function  base_dev_comm
+  !! \memberof  psb_l_base_vect_type
+  !! \brief  Does the halo exchange of this vector pass device buffers to MPI?
+  !!         Base version: no, MPI works on the host buffer COMBUF.
+  !!
+  function l_base_dev_comm(x) result(res)
+    implicit none
+    class(psb_l_base_vect_type), intent(in) :: x
+    logical :: res
+    res = .false.
+  end function l_base_dev_comm
+
+  !
+  !> Function  base_dev_comm_buf
+  !! \memberof  psb_l_base_vect_type
+  !! \brief  Device address of the communication buffer (same layout as
+  !!         COMBUF), meaningful only when dev_comm() is true.
+  !!
+  function l_base_dev_comm_buf(x) result(res)
+    use iso_c_binding, only : c_ptr, c_null_ptr
+    implicit none
+    class(psb_l_base_vect_type), intent(in) :: x
+    type(c_ptr) :: res
+    res = c_null_ptr
+  end function l_base_dev_comm_buf
+
+  !
+  !> Subroutine  base_comm_buf_copy
+  !! \memberof  psb_l_base_vect_type
+  !! \brief  Copy N entries of the communication buffer from position SRC
+  !!         to position DST (exchange of a process with itself).
+  !!
+  subroutine l_base_comm_buf_copy(x,dst,src,n)
+    implicit none
+    class(psb_l_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: dst, src, n
+    if (n > 0) x%combuf(dst:dst+n-1) = x%combuf(src:src+n-1)
+  end subroutine l_base_comm_buf_copy
 
 
 end module psb_l_base_vect_mod

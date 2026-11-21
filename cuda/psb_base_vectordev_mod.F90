@@ -51,6 +51,15 @@ module psb_base_vectordev_mod
     end function FallocMultiVecDevice
   end interface
 
+  interface
+    function copyDeviceRange(dbuf,dst,src,n,elsize) &
+         & result(res) bind(c,name='copyDeviceRange')
+      use iso_c_binding
+      integer(c_int) :: res
+      type(c_ptr), value   :: dbuf
+      integer(c_int),value :: dst, src, n, elsize
+    end function copyDeviceRange
+  end interface
   interface 
     subroutine  unregisterMapped(buf) &
          & bind(c,name='unregisterMapped')

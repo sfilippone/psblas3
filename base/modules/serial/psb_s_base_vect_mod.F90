@@ -143,6 +143,12 @@ module psb_s_base_vect_mod
     procedure, pass(y) :: sctb_x   => s_base_sctb_x
     procedure, pass(y) :: sctb_buf => s_base_sctb_buf
     generic, public    :: sct      => sctb, sctb_x, sctb_buf
+    !
+    ! Halo exchange directly on a device buffer (CUDA-aware MPI)
+    !
+    procedure, pass(x) :: dev_comm      => s_base_dev_comm
+    procedure, pass(x) :: dev_comm_buf  => s_base_dev_comm_buf
+    procedure, pass(x) :: comm_buf_copy => s_base_comm_buf_copy
 
 
     !
@@ -151,6 +157,7 @@ module psb_s_base_vect_mod
     procedure, pass(x) :: dot_v    => s_base_dot_v
     procedure, pass(x) :: dot_a    => s_base_dot_a
     generic, public    :: dot      => dot_v, dot_a
+    procedure, pass(x) :: dot3v    => s_base_dot3v
     procedure, pass(y) :: axpby_v  => s_base_axpby_v
     procedure, pass(y) :: axpby_a  => s_base_axpby_a
     procedure, pass(z) :: axpby_v2  => s_base_axpby_v2
@@ -1012,6 +1019,30 @@ contains
     end select
 
   end function s_base_dot_v
+
+  !
+  !> Function  base_dot3v
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Local dot products of two or three vectors with X:
+  !!         res(1) = y1.x, res(2) = y2.x, res(3) = y3.x (if Y3 present),
+  !!         where yk.x is yk%dot(n,x), i.e. the same as psb_gedot(yk,x)
+  !!         (conjugated yk in the complex case).
+  !!         Base version: separate dot products. Device versions override
+  !!         it to compute all of them in a single pass.
+  !! \param n    Number of entries to be considered
+  !!
+  subroutine s_base_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_s_base_vect_type), intent(inout) :: x, y1, y2
+    integer(psb_ipk_), intent(in)              :: n
+    real(psb_spk_), intent(out)                :: res(:)
+    class(psb_s_base_vect_type), intent(inout), optional :: y3
+
+    res(1) = y1%dot(n,x)
+    res(2) = y2%dot(n,x)
+    if (present(y3)) res(3) = y3%dot(n,x)
+
+  end subroutine s_base_dot3v
 
   !
   ! Base workhorse is good old BLAS1
@@ -2130,6 +2161,46 @@ contains
     call y%set_host()
 
   end subroutine s_base_sctb_buf
+
+  !
+  !> Function  base_dev_comm
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Does the halo exchange of this vector pass device buffers to MPI?
+  !!         Base version: no, MPI works on the host buffer COMBUF.
+  !!
+  function s_base_dev_comm(x) result(res)
+    implicit none
+    class(psb_s_base_vect_type), intent(in) :: x
+    logical :: res
+    res = .false.
+  end function s_base_dev_comm
+
+  !
+  !> Function  base_dev_comm_buf
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Device address of the communication buffer (same layout as
+  !!         COMBUF), meaningful only when dev_comm() is true.
+  !!
+  function s_base_dev_comm_buf(x) result(res)
+    use iso_c_binding, only : c_ptr, c_null_ptr
+    implicit none
+    class(psb_s_base_vect_type), intent(in) :: x
+    type(c_ptr) :: res
+    res = c_null_ptr
+  end function s_base_dev_comm_buf
+
+  !
+  !> Subroutine  base_comm_buf_copy
+  !! \memberof  psb_s_base_vect_type
+  !! \brief  Copy N entries of the communication buffer from position SRC
+  !!         to position DST (exchange of a process with itself).
+  !!
+  subroutine s_base_comm_buf_copy(x,dst,src,n)
+    implicit none
+    class(psb_s_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: dst, src, n
+    if (n > 0) x%combuf(dst:dst+n-1) = x%combuf(src:src+n-1)
+  end subroutine s_base_comm_buf_copy
 
   !
   !> Function  base_mask_a

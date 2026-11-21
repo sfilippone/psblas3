@@ -185,8 +185,39 @@ module psb_cuda_env_mod
 
   logical, private, save :: gpu_do_maybe_free_buffer = .false.
   integer(c_int), private, save :: myDevice
-  
+  !
+  ! Halo exchange on device buffers with CUDA-aware MPI. Set at psb_cuda_init
+  ! from PSB_CUDA_AWARE (0/1/auto) and what the MPI library reports.
+  !
+  logical, private, save :: gpu_dev_comm = .false.
+
+  interface
+    function psi_c_cuda_aware_mpi() result(res) bind(c,name='psi_c_cuda_aware_mpi')
+      use iso_c_binding
+      integer(c_int) :: res
+    end function psi_c_cuda_aware_mpi
+    function psi_c_node_local_rank() result(res) bind(c,name='psi_c_node_local_rank')
+      use iso_c_binding
+      integer(c_int) :: res
+    end function psi_c_node_local_rank
+    function psi_c_cuda_aware_selftest(want) result(res) bind(c,name='psi_c_cuda_aware_selftest')
+      use iso_c_binding
+      integer(c_int), value :: want
+      integer(c_int) :: res
+    end function psi_c_cuda_aware_selftest
+  end interface
+
 Contains
+
+  function psb_cuda_get_dev_comm() result(res)
+    logical :: res
+    res = gpu_dev_comm
+  end function psb_cuda_get_dev_comm
+
+  subroutine psb_cuda_set_dev_comm(val)
+    logical, intent(in) :: val
+    gpu_dev_comm = val
+  end subroutine psb_cuda_set_dev_comm
   
   function psb_cuda_get_maybe_free_buffer() result(res)
     logical :: res
@@ -212,7 +243,8 @@ Contains
     type(psb_ctxt_type), intent(in) :: ctxt
     integer, intent(in), optional   :: dev
 
-    integer :: np, npavail, iam, info, count, dev_
+    integer :: np, npavail, iam, info, count, dev_, mode
+    integer(c_int) :: want
     Integer(Psb_ipk_)  :: err_act
 
     info = psb_success_
@@ -229,8 +261,15 @@ Contains
       info = psb_C_gpu_init(dev)
       myDevice = dev
     else
-      if (count >0) then 
-        dev_ = mod(iam,count)
+      if (count >0) then
+        !
+        ! Device chosen by the rank inside the node, so that it is correct
+        ! whatever the placement of the ranks; with one visible device per
+        ! process (e.g. bsc_affinity) this is always device 0. Making all the
+        ! devices of the node visible lets CUDA-aware MPI use CUDA IPC/NVLink
+        ! between the GPUs of the same node.
+        !
+        dev_ = mod(psi_c_node_local_rank(),count)
       else
         dev_ = 0
       end if
@@ -243,6 +282,30 @@ Contains
       goto 9999
     end if
     call psb_cudaCreateHandle()
+    !
+    ! Halo exchange on device buffers only if requested/allowed (mode) AND a
+    ! self test with device buffers succeeds on every process; otherwise the
+    ! library silently keeps the host-buffer path (rollback).
+    !
+    mode = psi_c_cuda_aware_mpi()
+    if ((mode == 1).or.(mode == 3)) then
+      want = 1
+    else
+      want = 0
+    end if
+    ! Collective on all processes, decision consistent everywhere
+    gpu_dev_comm = (psi_c_cuda_aware_selftest(want) == 1)
+    if (iam == 0) then
+      if (gpu_dev_comm) then
+        write(psb_out_unit,'(a)') ' PSBLAS CUDA: halo exchange on device buffers (CUDA-aware MPI)'
+      else
+        write(psb_out_unit,'(a)') ' PSBLAS CUDA: halo exchange through host buffers'
+        if (mode == 2) write(psb_out_unit,'(a)') &
+             & ' PSBLAS CUDA: PSB_CUDA_AWARE=1 ignored, MPI reports no CUDA support'
+        if ((mode == 1).or.(mode == 3)) write(psb_out_unit,'(a)') &
+             & ' PSBLAS CUDA: CUDA-aware MPI self test failed, using host buffers'
+      end if
+    end if
     call psb_erractionrestore(err_act)
     return
 9999 call psb_error_handler(ctxt,err_act)

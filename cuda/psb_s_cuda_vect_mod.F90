@@ -86,6 +86,9 @@ module psb_s_cuda_vect_mod
     procedure, nopass  :: device_wait  => s_cuda_device_wait
     procedure, pass(x) :: free_buffer  => s_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => s_cuda_maybe_free_buffer
+    procedure, pass(x) :: dev_comm      => s_cuda_dev_comm
+    procedure, pass(x) :: dev_comm_buf  => s_cuda_dev_comm_buf
+    procedure, pass(x) :: comm_buf_copy => s_cuda_comm_buf_copy
     procedure, pass(x) :: dot_v    => s_cuda_dot_v
     procedure, pass(x) :: dot_a    => s_cuda_dot_a
     procedure, pass(y) :: axpby_v  => s_cuda_axpby_v
@@ -350,7 +353,11 @@ contains
       if (ii%is_host()) call ii%sync()
       if (x%is_host())  call x%sync()
 
-      if (psb_cuda_DeviceHasUVA()) then 
+      if (x%dev_comm()) then
+        ! CUDA-aware MPI: gather into the device buffer, MPI reads it there
+        info = igathMultiVecDeviceFloatVecIdx(x%deviceVect,&
+             & 0, n, i, ii%deviceVect, i,x%dt_buf, 1)
+      else if (psb_cuda_DeviceHasUVA()) then 
         info = igathMultiVecDeviceFloatVecIdx(x%deviceVect,&
              & 0, n, i, ii%deviceVect, i,x%dt_p_buf, 1)
 
@@ -376,12 +383,46 @@ contains
            & info = igathMultiVecDeviceFloat(x%deviceVect,&
            & 0, n, i, x%i_buf, i,x%dt_buf, 1)
       
-      if (info == 0) &
+      if ((info == 0).and.(.not.x%dev_comm())) &
            &  info = readFloat(i,x%dt_buf,x%combuf(i:),n,1)
 
     end select
 
   end subroutine s_cuda_gthzbuf
+
+  !
+  ! Halo exchange on device buffers (CUDA-aware MPI): the communication
+  ! buffer is DT_BUF (device memory, same layout as COMBUF), allocated by
+  ! new_buffer. Active when psb_cuda_init detected/forced CUDA-aware MPI.
+  !
+  function s_cuda_dev_comm(x) result(res)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_s_vect_cuda), intent(in) :: x
+    logical :: res
+    res = psb_cuda_get_dev_comm() .and. c_associated(x%dt_buf)
+  end function s_cuda_dev_comm
+
+  function s_cuda_dev_comm_buf(x) result(res)
+    implicit none
+    class(psb_s_vect_cuda), intent(in) :: x
+    type(c_ptr) :: res
+    res = x%dt_buf
+  end function s_cuda_dev_comm_buf
+
+  subroutine s_cuda_comm_buf_copy(x,dst,src,n)
+    implicit none
+    class(psb_s_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: dst, src, n
+    integer(psb_ipk_) :: info
+    if (n <= 0) return
+    if (x%dev_comm()) then
+      info = copyDeviceRange(x%dt_buf,dst,src,n,int(psb_sizeof_sp,c_int))
+      if (info /= 0) call psb_errpush(psb_err_internal_error_,'s_cuda_comm_buf_copy')
+    else
+      x%combuf(dst:dst+n-1) = x%combuf(src:src+n-1)
+    end if
+  end subroutine s_cuda_comm_buf_copy
 
   subroutine s_cuda_sctb(n,idx,x,beta,y)
     implicit none
@@ -530,7 +571,11 @@ contains
               
       if (ii%is_host()) call ii%sync()
       if (y%is_host())  call y%sync()
-      if (psb_cuda_DeviceHasUVA()) then 
+      if (y%dev_comm()) then
+        ! CUDA-aware MPI: received data are already in the device buffer
+        info = iscatMultiVecDeviceFloatVecIdx(y%deviceVect,&
+             & 0, n, i, ii%deviceVect, i, y%dt_buf, 1,beta)
+      else if (psb_cuda_DeviceHasUVA()) then 
         info = iscatMultiVecDeviceFloatVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_p_buf, 1,beta)
       else 
@@ -550,7 +595,7 @@ contains
       end if
       if (info == 0) &
            & info = writeInt(i,y%i_buf,ii%v(i:),n,1)
-      if (info == 0) &
+      if ((info == 0).and.(.not.y%dev_comm())) &
            & info = writeFloat(i,y%dt_buf,y%combuf(i:),n,1)
       if (info == 0) info = iscatMultiVecDeviceFloat(y%deviceVect,&
            & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
@@ -852,6 +897,7 @@ contains
     end select
 
   end function s_cuda_dot_v
+
 
   function s_cuda_dot_a(n,x,y) result(res)
     implicit none 
