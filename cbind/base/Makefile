@@ -60,7 +60,7 @@ lib:  objs
 	$(AR) $(HERE)/$(LIBNAME) $(OBJS)
 	$(RANLIB) $(HERE)/$(LIBNAME)
 
-$(OBJS): Makefile $(TOP)/Make.inc
+$(OBJS): Makefile $(TOP)/Make.inc	
 $(FOBJS): $(MODDIR)/psb_base_mod$(.mod)
 psb_objhandle_mod.o: $(MODDIR)/psb_cbind_const_mod$(.mod)
 $(COBJS): $(CMOD) $(INCLUDEDIR)/psb_config.h $(INCLUDEDIR)/psb_types.h
