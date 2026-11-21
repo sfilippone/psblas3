@@ -34,7 +34,6 @@ contains
     call psb_set_vect_default(dvetdef)
     call psb_set_vect_default(cvetdef)
     call psb_set_vect_default(zvetdef)
-
   end subroutine psb_init_vect_defaults
 
   subroutine psb_clear_vect_defaults()
@@ -46,7 +45,6 @@ contains
     call psb_d_clear_vect_default()
     call psb_c_clear_vect_default()
     call psb_z_clear_vect_default()
-
   end subroutine psb_clear_vect_defaults
 
 end module psb_vect_mod

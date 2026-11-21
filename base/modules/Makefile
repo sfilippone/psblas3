@@ -444,7 +444,7 @@ penv/psi_collective_mod.o: penv/psi_collective_mod.F90 $(BASIC_MODS)
 	$(FC)   $(FINCLUDES) $(FDEFINES) $(FCOPT) $(EXTRA_OPT) -c $< -o $@
 
 clean:
-	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod) 
+	/bin/rm -f $(MODULES) $(OBJS) $(MPFOBJS) *$(.mod) *.smod
 
 veryclean: clean
 

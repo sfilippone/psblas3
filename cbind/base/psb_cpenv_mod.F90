@@ -7,6 +7,16 @@ module psb_cpenv_mod
 
 contains
 
+  function psb_c_get_vasb_compatible_mode() bind(c) result(res)
+    logical(c_bool) :: res
+    res = psb_get_vasb_compatible_mode()
+  end function psb_c_get_vasb_compatible_mode
+  
+  subroutine psb_c_set_vasb_compatible() bind(c)
+    call psb_set_vasb_compatible()
+  end subroutine psb_c_set_vasb_compatible
+
+
   function psb_c_get_index_base() bind(c) result(res)
     implicit none
 
@@ -46,7 +56,6 @@ contains
     if (info /= 0) return
     call psb_init(ctxt)
     cctxt%item = c_loc(ctxt)
-
   end subroutine psb_c_init
 
 #ifdef PSB_HAVE_CUDA
@@ -83,7 +92,6 @@ contains
     end if
     call psb_cuda_init(ctxt,cdevice_f)
     cctxt%item = c_loc(ctxt)
-
   end subroutine psb_c_cuda_init_opt
 
   subroutine psb_c_cuda_exit() bind(c, name="psb_c_cuda_exit")
@@ -126,7 +134,6 @@ contains
     fmctxt = fint
     call psb_init(ctxt,extcomm=fmctxt)
     cctxt%item = c_loc(ctxt)
-
   end subroutine psb_c_init_from_fint
 
   function psb_c2f_ctxt(cctxt)   result(res)

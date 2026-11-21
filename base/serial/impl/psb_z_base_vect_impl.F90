@@ -188,7 +188,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     call psb_realloc(n,x%v,info)
-    if (try_newins) then
+    if (psb_get_vasb_newins()) then
       call psb_realloc(n,x%iv,info)
       call x%set_ncfs(0)
     end if
@@ -277,7 +277,7 @@ contains
     info = 0
     if (psb_errstatus_fatal()) return
 
-    if (try_newins) then 
+    if (psb_get_vasb_newins()) then 
       if (x%is_bld()) then
         ncfs_ = x%get_ncfs()
         isz = ncfs_ + n
@@ -463,7 +463,7 @@ contains
     else
       scratch_ = .false.
     end if
-    if (try_newins) then 
+    if (psb_get_vasb_newins()) then 
       if (x%is_bld()) then
         ncfs = x%get_ncfs()
         xvsz = psb_size(x%v)
@@ -545,7 +545,7 @@ contains
     else
       scratch_ = .false.
     end if
-    if (try_newins) then
+    if (psb_get_vasb_newins()) then
       if (info /= 0) &
            & call psb_errpush(psb_err_alloc_dealloc_,'vect_asb unhandled')    
       if (x%is_bld()) then
@@ -2376,7 +2376,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
 
     call psb_realloc(m,n,x%v,info)
-    if (try_newins) then
+    if (psb_get_vasb_newins()) then
       call psb_realloc(n,x%iv,info)
       call x%set_ncfs(0)
     end if
@@ -2457,7 +2457,7 @@ contains
     info = 0
     if (psb_errstatus_fatal()) return
 
-    if (try_newins) then 
+    if (psb_get_vasb_newins()) then 
       if (x%is_bld()) then
         nc = size(x%v,2)
         ncfs_ = x%get_ncfs()
@@ -2616,7 +2616,7 @@ contains
     else
       scratch_ = .false.
     end if
-    if (try_newins) then 
+    if (psb_get_vasb_newins()) then 
       if (x%is_bld()) then
         ncfs = x%get_ncfs()
         xvsz = psb_size(x%v)

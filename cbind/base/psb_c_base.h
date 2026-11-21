@@ -60,6 +60,8 @@ extern "C" {
   psb_c_d_t  psb_c_wtime();
   psb_c_i_t psb_c_get_errstatus();
 
+  bool psb_c_get_vasb_compatible();
+  void psb_c_set_vasb_compatible();
   psb_c_i_t psb_c_get_index_base();
   void psb_c_set_index_base(psb_c_i_t base);
   /* GPU environment  routines */

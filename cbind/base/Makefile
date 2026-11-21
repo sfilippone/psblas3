@@ -70,11 +70,7 @@ psb_c_tools_cbind_mod.o psb_z_tools_cbind_mod.o: $(MODDIR)/psb_ext_mod$(.mod)
 
 psb_base_cbind_mod.o: psb_cpenv_mod.o psb_objhandle_mod.o psb_base_tools_cbind_mod.o \
 	 psb_psblas_cbind_mod.o  psb_comm_cbind_mod.o psb_tools_cbind_mod.o \
-	psb_serial_cbind_mod.o \
-	psb_s_psblas_cbind_mod.o \
-       psb_d_psblas_cbind_mod.o \
-       psb_c_psblas_cbind_mod.o \
-       psb_z_psblas_cbind_mod.o  
+	psb_serial_cbind_mod.o 
 
 #psb_s_comm_cbind_mod.o psb_d_comm_cbind_mod.o \
 #     psb_c_comm_cbind_mod.o psb_z_comm_cbind_mod.o
@@ -116,8 +112,8 @@ psb_sparse_cbind_mod.o: psb_objhandle_mod.o
 psb_s_sparse_cbind_mod.o psb_d_sparse_cbind_mod.o \
 psb_c_sparse_cbind_mod.o psb_z_sparse_cbind_mod.o: \
   psb_sparse_cbind_mod.o psb_cpenv_mod.o psb_objhandle_mod.o
-psb_base_cbind_mod.o: psb_s_sparse_cbind_mod.o psb_d_sparse_cbind_mod.o \
-  psb_c_sparse_cbind_mod.o psb_z_sparse_cbind_mod.o
+#psb_base_cbind_mod.o: psb_s_sparse_cbind_mod.o psb_d_sparse_cbind_mod.o \
+#  psb_c_sparse_cbind_mod.o psb_z_sparse_cbind_mod.o
 
 veryclean: clean
 	/bin/rm -f $(HERE)/$(LIBNAME)

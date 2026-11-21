@@ -335,11 +335,37 @@ module psb_const_mod
     procedure, pass(ctxt) :: get_mpic   => get_mpic
     procedure, pass(ctxt) :: set_mpic   => set_mpic
   end type psb_ctxt_type
+
+  logical, private, save  :: vasb_compatible_mode=.false.
+  
   logical, parameter :: try_newins=.true.
 
   private :: get_mpic, set_mpic
   
 contains
+
+  subroutine psb_set_vasb_compatible()
+    call  psb_set_vasb_compatible_mode(.true.) 
+  end subroutine psb_set_vasb_compatible
+
+  subroutine psb_clear_vasb_compatible()
+    call  psb_set_vasb_compatible_mode(.false.) 
+  end subroutine psb_clear_vasb_compatible
+
+  subroutine psb_set_vasb_compatible_mode(val) 
+    logical :: val
+    vasb_compatible_mode = val
+  end subroutine psb_set_vasb_compatible_mode
+
+  function psb_get_vasb_compatible_mode() result(res)
+    logical :: res
+    res = vasb_compatible_mode 
+  end function psb_get_vasb_compatible_mode
+
+  function psb_get_vasb_newins() result(res)
+    logical :: res
+    res = .not.vasb_compatible_mode 
+  end function psb_get_vasb_newins
 
   function psb_cmp_ctxt(ctxt1, ctxt2) result(res)
     type(psb_ctxt_type), intent(in) :: ctxt1, ctxt2

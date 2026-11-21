@@ -101,7 +101,7 @@ subroutine psb_casb_vect(x, desc_a, info, mold, scratch, dupl)
        & write(debug_unit,*) me,' ',trim(name),': sizes: ',nrow,ncol
 
   dupl_ = x%get_dupl()
-  if (try_newins) then    
+  if (psb_get_vasb_newins()) then    
     if (scratch_) then 
       call x%free(info)
       call x%bld(ncol,mold=mold,scratch=scratch_)
