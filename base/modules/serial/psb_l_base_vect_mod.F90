@@ -146,6 +146,8 @@ module psb_l_base_vect_mod
     procedure, pass(x) :: dev_comm      => l_base_dev_comm
     procedure, pass(x) :: dev_comm_buf  => l_base_dev_comm_buf
     procedure, pass(x) :: comm_buf_copy => l_base_comm_buf_copy
+    procedure, pass(x) :: dev_comm_begin => l_base_dev_comm_begin
+    procedure, pass(x) :: dev_comm_end   => l_base_dev_comm_end
 
 
 
@@ -1062,6 +1064,25 @@ contains
     integer(psb_ipk_), intent(in) :: dst, src, n
     if (n > 0) x%combuf(dst:dst+n-1) = x%combuf(src:src+n-1)
   end subroutine l_base_comm_buf_copy
+
+  !
+  !> Subroutine  base_dev_comm_begin / base_dev_comm_end
+  !! \memberof  psb_l_base_vect_type
+  !! \brief  Bracket a halo exchange of N entries (called by psi_swapdata
+  !!         after new_buffer and after the final scatter). A device class
+  !!         may take a device communication buffer here, after which
+  !!         dev_comm() is true. Base version: nothing, host buffers.
+  !!
+  subroutine l_base_dev_comm_begin(x,n)
+    implicit none
+    class(psb_l_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+  end subroutine l_base_dev_comm_begin
+
+  subroutine l_base_dev_comm_end(x)
+    implicit none
+    class(psb_l_base_vect_type), intent(inout) :: x
+  end subroutine l_base_dev_comm_end
 
 
 end module psb_l_base_vect_mod

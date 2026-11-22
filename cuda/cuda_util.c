@@ -666,6 +666,112 @@ int copyDeviceRange(void *d_buf, int dst, int src, int n, int elsize)
   return(SPGPU_SUCCESS);
 }
 
+/*
+ * Per-process shared device buffer for the halo exchange with CUDA-aware
+ * MPI. Every vector exchanging its halo on the device uses this buffer, so
+ * the CUDA IPC handle of a peer's buffer is opened by the MPI library once,
+ * not once per vector. Held by one exchange at a time (acquire/release);
+ * grown in powers of two; psi_c_cuda_ipc_warmup allocates it at 8 MB at
+ * init, enough for the halo of most problems, so that it is not reallocated
+ * (a reallocation makes the peers open a new IPC handle).
+ *   acquire: 0 = ok (*buf set), 1 = busy, 2 = allocation failed
+ */
+static void   *psb_comm_buf      = NULL;
+static size_t  psb_comm_buf_sz   = 0;
+static int     psb_comm_buf_busy = 0;
+
+int psi_c_cuda_comm_buf_acquire(size_t nbytes, void **buf)
+{
+  *buf = NULL;
+  if (psb_comm_buf_busy) return(1);
+  if (nbytes > psb_comm_buf_sz) {
+    size_t sz = 4096;
+    while (sz < nbytes) sz *= 2;
+    if (psb_comm_buf != NULL) cudaFree(psb_comm_buf);
+    psb_comm_buf = NULL;
+    psb_comm_buf_sz = 0;
+    if (cudaMalloc(&psb_comm_buf, sz) != cudaSuccess) {
+      cudaGetLastError();
+      psb_comm_buf = NULL;
+      return(2);
+    }
+    psb_comm_buf_sz = sz;
+    {
+      /* PSB_CUDA_COMM_BUF_VERBOSE=1: report every (re)allocation */
+      static int verbose = -1;
+      static int nalloc = 0;
+      if (verbose < 0) {
+        const char *ev = getenv("PSB_CUDA_COMM_BUF_VERBOSE");
+        verbose = (ev != NULL) && (atoi(ev) > 0);
+      }
+      nalloc++;
+      if (verbose) fprintf(stderr,"PSBLAS CUDA comm buffer: allocation %d, %zu bytes (request %zu)\n",
+                           nalloc, sz, nbytes);
+    }
+  }
+  psb_comm_buf_busy = 1;
+  *buf = psb_comm_buf;
+  return(0);
+}
+
+/*
+ * Warm-up of the device-to-device paths between the GPUs of the same node,
+ * called by psb_cuda_init when the halo exchange runs on device buffers.
+ * The first CUDA IPC transfer towards a peer GPU is expensive (tens of ms)
+ * and its cost grows with the memory already allocated on the device; at
+ * init time the device is almost empty. Every rank exchanges a message with
+ * every other rank of its node through the shared communication buffer.
+ * PSB_CUDA_IPC_WARMUP=0 disables it. Collective on MPI_COMM_WORLD.
+ * Returns the time in ms (max over the processes), -1 if not done.
+ */
+#define PSB_IPC_WARMUP_BYTES (4u << 20)
+double psi_c_cuda_ipc_warmup(void)
+{
+  MPI_Comm node;
+  int nrank, nsize, s, ok = 1, allok = 0, doit = 1;
+  double t0, t = 0.0, tmax = -1.0;
+  void *buf = NULL;
+  const char *ev = getenv("PSB_CUDA_IPC_WARMUP");
+
+  if ((ev != NULL) && (atoi(ev) == 0)) doit = 0;
+  MPI_Allreduce(MPI_IN_PLACE, &doit, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+  if (!doit) return(-1.0);
+  if (MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &node)
+      != MPI_SUCCESS) return(-1.0);
+  MPI_Comm_set_errhandler(node, MPI_ERRORS_RETURN);
+  MPI_Comm_rank(node, &nrank);
+  MPI_Comm_size(node, &nsize);
+  if (psi_c_cuda_comm_buf_acquire(2 * (size_t) PSB_IPC_WARMUP_BYTES, &buf) != 0) ok = 0;
+  MPI_Barrier(MPI_COMM_WORLD);
+  t0 = MPI_Wtime();
+  for (s = 1; (s < nsize) && ok; s++) {
+    int to = (nrank + s) % nsize, from = (nrank - s + nsize) % nsize;
+    if (MPI_Sendrecv(buf, PSB_IPC_WARMUP_BYTES, MPI_BYTE, to, 4721,
+                     (char *) buf + PSB_IPC_WARMUP_BYTES, PSB_IPC_WARMUP_BYTES, MPI_BYTE, from, 4721,
+                     node, MPI_STATUS_IGNORE) != MPI_SUCCESS) ok = 0;
+  }
+  cudaDeviceSynchronize();
+  t = (MPI_Wtime() - t0) * 1e3;
+  if (buf != NULL) psi_c_cuda_comm_buf_release();
+  MPI_Comm_free(&node);
+  MPI_Allreduce(&ok, &allok, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+  MPI_Allreduce(&t, &tmax, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  return(allok ? tmax : -1.0);
+}
+
+void psi_c_cuda_comm_buf_release(void)
+{
+  psb_comm_buf_busy = 0;
+}
+
+void psi_c_cuda_comm_buf_free(void)
+{
+  if (psb_comm_buf != NULL) cudaFree(psb_comm_buf);
+  psb_comm_buf = NULL;
+  psb_comm_buf_sz = 0;
+  psb_comm_buf_busy = 0;
+}
+
 int readDoubleFirst(int df, void* d_double, double* h_double, int n, int IndexBase)
 { int i;
   double *dv=(double *) d_double;

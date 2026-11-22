@@ -275,6 +275,7 @@ subroutine psi_iswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
     call y%new_comid(totxch,info)
     y%comid = mpi_request_null
     ! Device buffer handed to MPI directly (CUDA-aware MPI), or host COMBUF
+    call y%dev_comm_begin(ione*size(idx%v))
     dev_comm = y%dev_comm()
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
@@ -439,6 +440,7 @@ subroutine psi_iswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
+    call y%dev_comm_end()
     if (debug) write(*,*) me,' free buffer'
     call y%maybe_free_buffer(info)
     if (info == 0) call y%free_comid(info)
