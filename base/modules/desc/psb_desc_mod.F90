@@ -37,6 +37,7 @@
 
 module psb_desc_mod
   use psb_const_mod
+  use psb_penv_mod
   use psb_desc_const_mod
   use psb_indx_map_mod
   use psb_i_vect_mod
@@ -56,7 +57,6 @@ module psb_desc_mod
   !|     integer(psb_ipk_), allocatable  :: ovrlap_elem(:,:)
   !|     integer(psb_ipk_), allocatable  :: ovr_mst_idx(:)
   !|     integer(psb_ipk_), allocatable  :: lprm(:)
-  !|     integer(psb_ipk_), allocatable  :: idx_space(:)
   !|     type(psb_desc_type), pointer :: base_desc => null()
   !|  end type psb_desc_type
   !
@@ -215,7 +215,6 @@ module psb_desc_mod
     integer(psb_ipk_), allocatable   :: bnd_elem(:)
     integer(psb_ipk_), allocatable   :: lprm(:)
     type(psb_desc_type), pointer     :: base_desc => null()
-    integer(psb_ipk_), allocatable   :: idx_space(:)
   contains
     procedure, pass(desc) :: is_ok           => psb_is_ok_desc
     procedure, pass(desc) :: is_valid        => psb_is_valid_desc
@@ -230,6 +229,7 @@ module psb_desc_mod
     procedure, pass(desc) :: get_ctxt        => psb_cd_get_context    
     procedure, pass(desc) :: get_local_rows  => psb_cd_get_local_rows
     procedure, pass(desc) :: get_local_cols  => psb_cd_get_local_cols
+    procedure, pass(desc) :: get_halo_size   => psb_cd_get_halo_size
     procedure, pass(desc) :: get_global_rows => psb_cd_get_global_rows
     procedure, pass(desc) :: get_global_cols => psb_cd_get_global_cols
     procedure, pass(desc) :: get_global_indices => psb_cd_get_global_indices
@@ -240,6 +240,8 @@ module psb_desc_mod
     procedure, pass(desc) :: v_get_list      => psb_cd_v_get_list
     generic, public       :: get_list => a_get_list, v_get_list
     procedure, pass(desc) :: sizeof          => psb_cd_sizeof
+    procedure, pass(desc) :: detailed_sizeof => psb_cd_detailed_sizeof
+    procedure, pass(desc) :: print_detailed_sizeof => psb_cd_print_detailed_sizeof
     procedure, pass(desc) :: clone           => psb_cd_clone
     procedure, pass(desc) :: cnv             => psb_cd_cnv
     procedure, pass(desc) :: free            => psb_cdfree
@@ -337,31 +339,81 @@ contains
   end subroutine psb_e_set_sp_a2av_alg
   
   
-  function psb_cd_sizeof(desc)  result(val)
+  function psb_cd_sizeof(desc,global)  result(res)
     implicit none
     !....Parameters...
 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_epk_) :: val
+    integer(psb_epk_) :: res
+    logical, optional :: global
 
-    val = 0 
-    val = val + psb_sizeof_ip*psb_size(desc%halo_index)
-    val = val + psb_sizeof_ip*psb_size(desc%ext_index)
-    val = val + psb_sizeof_ip*psb_size(desc%bnd_elem)
-    val = val + psb_sizeof_ip*psb_size(desc%ovrlap_index)
-    val = val + psb_sizeof_ip*psb_size(desc%ovrlap_elem)
-    val = val + psb_sizeof_ip*psb_size(desc%ovr_mst_idx)
-    val = val + psb_sizeof_ip*psb_size(desc%lprm)
-    val = val + psb_sizeof_ip*psb_size(desc%idx_space)
-    if (allocated(desc%indxmap))  val = val + desc%indxmap%sizeof()
-    val = val + desc%v_halo_index%sizeof()
-    val = val + desc%v_ext_index%sizeof()
-    val = val + desc%v_ovrlap_index%sizeof()
-    val = val + desc%v_ovr_mst_idx%sizeof()
+    integer(psb_epk_) :: val(psb_desc_sz_array_size)
+
+    val = desc%detailed_sizeof(global)
+    res = sum(val)
 
   end function psb_cd_sizeof
 
+  function psb_cd_detailed_sizeof(desc,global)  result(val)
+    implicit none
+    !....Parameters...
 
+    class(psb_desc_type), intent(in) :: desc
+    integer(psb_epk_) :: val(psb_desc_sz_array_size)
+    logical, optional :: global
+
+    logical :: global_
+
+    global_ = .false.
+    if (present(global)) global_ = global
+
+    val(:) = 0
+    if (allocated(desc%indxmap))  val(psb_desc_sz_indxmap) = desc%indxmap%sizeof()
+    val(psb_desc_sz_halo_index)&
+         & = psb_sizeof_ip*psb_size(desc%halo_index) + desc%v_halo_index%sizeof()
+    val(psb_desc_sz_ext_index)&
+         & = psb_sizeof_ip*psb_size(desc%ext_index)  + desc%v_ext_index%sizeof()
+    val(psb_desc_sz_bnd_elem)&
+         & = psb_sizeof_ip*psb_size(desc%bnd_elem)
+    val(psb_desc_sz_ovrlap_index)&
+         & = psb_sizeof_ip*psb_size(desc%ovrlap_index) + desc%v_ovrlap_index%sizeof()
+    val(psb_desc_sz_ovrlap_elem)&
+         & = psb_sizeof_ip*psb_size(desc%ovrlap_elem)
+    val(psb_desc_sz_ovrlap_mst_idx)&
+         & = psb_sizeof_ip*psb_size(desc%ovr_mst_idx) + desc%v_ovr_mst_idx%sizeof()
+
+    if (global_) call psb_sum(desc%get_ctxt(),val)
+  end function psb_cd_detailed_sizeof
+
+  subroutine psb_cd_print_detailed_sizeof(desc,global,unit)  
+    implicit none
+    !....Parameters...
+
+    class(psb_desc_type), intent(in) :: desc
+    integer :: unit
+    logical, optional :: global
+
+    integer(psb_epk_) :: val(psb_desc_sz_array_size)
+    logical :: global_
+    integer(psb_ipk_) :: iam, np
+    type(psb_ctxt_type)    :: ctxt
+    
+    global_ = .false.
+    if (present(global)) global_ = global
+    ctxt = desc%get_ctxt()
+    call psb_info(ctxt,iam,np)
+    val = desc%detailed_sizeof(global_)
+    if ((.not.global_).or.(iam==psb_root_)) then
+      write(unit,*) iam,'          INDXMAP: ',val(psb_desc_sz_indxmap       )
+      write(unit,*) iam,'       HALO_INDEX: ',val(psb_desc_sz_halo_index    )
+      write(unit,*) iam,'        EXT_INDEX: ',val(psb_desc_sz_ext_index     )
+      write(unit,*) iam,'         BND_ELEM: ',val(psb_desc_sz_bnd_elem      )
+      write(unit,*) iam,'     OVRLAP_INDEX: ',val(psb_desc_sz_ovrlap_index  )
+      write(unit,*) iam,'      OVRLAP_ELEM: ',val(psb_desc_sz_ovrlap_elem   )
+      write(unit,*) iam,'   OVRLAP_MST_IDX: ',val(psb_desc_sz_ovrlap_mst_idx)
+      write(unit,*) iam,'       Total Size: ',sum(val)
+    end if
+  end subroutine psb_cd_print_detailed_sizeof
 
   subroutine psb_i_cd_set_hash_threshold(ith)
     implicit none 
@@ -533,6 +585,25 @@ contains
       val = -1
     endif
   end function psb_cd_get_local_cols
+
+  function psb_cd_get_halo_size(desc,global) result(val)
+    implicit none 
+    integer(psb_epk_) :: val 
+    class(psb_desc_type), intent(in) :: desc
+    logical, optional :: global
+
+    logical :: global_
+
+    global_ = .false.
+    if (present(global)) global_ = global
+
+    if (allocated(desc%indxmap)) then 
+      val = desc%indxmap%get_lc()-desc%indxmap%get_lr()
+    else
+      val = 0
+    endif
+    if (global_) call psb_sum(desc%indxmap%get_ctxt(),val)
+  end function psb_cd_get_halo_size
 
   function psb_cd_get_global_rows(desc) result(val)
     implicit none 
@@ -956,9 +1027,6 @@ contains
     if (allocated(desc%lprm)) &
          & deallocate(desc%lprm,stat=info)
 
-    if (allocated(desc%idx_space)) &
-         & deallocate(desc%idx_space,stat=info)
-
     if (allocated(desc%indxmap)) then 
       call desc%indxmap%free()
       deallocate(desc%indxmap, stat=info)
@@ -1032,8 +1100,6 @@ contains
            & call psb_move_alloc( desc%ext_index   ,    desc_out%ext_index    , info)
       if (info == psb_success_)  &
            & call psb_move_alloc( desc%lprm        ,    desc_out%lprm         , info)
-      if (info == psb_success_)  &
-           & call psb_move_alloc( desc%idx_space   ,    desc_out%idx_space    , info)
       if (info == psb_success_) &
            & call move_alloc(desc%indxmap, desc_out%indxmap)
       if (info == psb_success_) &
@@ -1131,8 +1197,6 @@ contains
            & call psb_safe_ab_cpy(desc%ovr_mst_idx,desc_out%ovr_mst_idx,info)
       if (info == psb_success_)&
            & call psb_safe_ab_cpy(desc%lprm,desc_out%lprm,info)
-      if (info == psb_success_)&
-           & call psb_safe_ab_cpy(desc%idx_space,desc_out%idx_space,info)
       if ((info == psb_success_).and.(allocated(desc%indxmap))) &
            & call desc%indxmap%clone(desc_out%indxmap,info)
       if (info == psb_success_) &

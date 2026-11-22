@@ -856,7 +856,6 @@ program psb_d_pde3d
   t2 = psb_wtime() - t1
   call psb_amx(ctxt,t2)
   amatsize = a%sizeof()
-  descsize = desc_a%sizeof()
   precsize = prec%sizeof()
   system_size = desc_a%get_global_rows()
   call psb_sum(ctxt,amatsize)
@@ -880,6 +879,7 @@ program psb_d_pde3d
     write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
+  call desc_a%print_detailed_sizeof(unit=psb_out_unit,global=.true.)
 
 
   !
