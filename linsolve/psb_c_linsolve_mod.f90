@@ -40,7 +40,7 @@ Module psb_c_linsolve_mod
 
   interface psb_krylov
     Subroutine psb_ckrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
-         & itmax,iter,err,itrace,irst,istop,cond,s1,s2)
+         & itmax,iter,err,itrace,irst,istop,cond,s1,s2,wrk)
       use psb_base_mod, only  : psb_ipk_, psb_desc_type, psb_cspmat_type, &
            & psb_spk_, psb_c_vect_type
       use psb_prec_mod, only : psb_cprec_type
@@ -56,6 +56,7 @@ Module psb_c_linsolve_mod
       integer(psb_ipk_), Optional, Intent(out)  :: iter
       Real(psb_spk_), Optional, Intent(out) :: err,cond
       type(psb_c_vect_type), optional  :: s1,s2
+      type(psb_c_vect_type), intent(inout), optional, target :: wrk(:)
     end Subroutine psb_ckrylov_vect
   end interface
 

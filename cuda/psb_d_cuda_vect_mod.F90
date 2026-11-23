@@ -55,6 +55,14 @@ module psb_d_cuda_vect_mod
     integer :: dt_buf_sz = 0
     type(c_ptr) :: i_buf = c_null_ptr
     integer :: i_buf_sz = 0
+    ! Halo exchange on device buffers: DC_BUF is the per-process shared
+    ! device communication buffer, held while DC_ON (see dev_comm_begin)
+    type(c_ptr) :: dc_buf = c_null_ptr
+    logical     :: dc_on  = .false.
+    ! Host COMBUF registered (pinned) for the UVA path, and its device alias;
+    ! separate from DT_P_BUF, which aliases PINNED_BUFFER (gthzv_x/sctb_x)
+    type(c_ptr) :: dt_c_buf = c_null_ptr
+    logical     :: combuf_reg = .false.
   contains
     procedure, pass(x) :: get_nrows => d_cuda_get_nrows
     procedure, nopass  :: get_fmt   => d_cuda_get_fmt
@@ -86,8 +94,14 @@ module psb_d_cuda_vect_mod
     procedure, nopass  :: device_wait  => d_cuda_device_wait
     procedure, pass(x) :: free_buffer  => d_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => d_cuda_maybe_free_buffer
+    procedure, pass(x) :: dev_comm      => d_cuda_dev_comm
+    procedure, pass(x) :: dev_comm_buf  => d_cuda_dev_comm_buf
+    procedure, pass(x) :: comm_buf_copy => d_cuda_comm_buf_copy
+    procedure, pass(x) :: dev_comm_begin => d_cuda_dev_comm_begin
+    procedure, pass(x) :: dev_comm_end   => d_cuda_dev_comm_end
     procedure, pass(x) :: dot_v    => d_cuda_dot_v
     procedure, pass(x) :: dot_a    => d_cuda_dot_a
+    procedure, pass(x) :: dot3v    => d_cuda_dot3v
     procedure, pass(y) :: axpby_v  => d_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => d_cuda_axpby_a
     procedure, pass(z) :: upd_xyz  => d_cuda_upd_xyz
@@ -139,14 +153,15 @@ contains
     if (psb_cuda_DeviceHasUVA()) then       
       if (allocated(x%combuf)) then 
         if (size(x%combuf)<n) then 
-          call inner_unregister(x%combuf)
+          if (x%combuf_reg) call inner_unregister(x%combuf)
+          x%combuf_reg = .false.
+          x%dt_c_buf   = c_null_ptr
           deallocate(x%combuf,stat=info)
         end if
       end if
-      if (.not.allocated(x%combuf)) then 
-        call psb_realloc(n,x%combuf,info)
-        if (info == 0) info = inner_register(x%combuf,x%dt_p_buf)        
-      end if
+      ! Registered lazily (combuf_pin) at the first exchange through the
+      ! host buffer: not needed when the exchange runs on device buffers
+      if (.not.allocated(x%combuf)) call psb_realloc(n,x%combuf,info)
     else
       call psb_realloc(n,x%combuf,info)
     end if
@@ -175,6 +190,25 @@ contains
 
   end subroutine d_cuda_new_buffer
 
+  !
+  ! Register (pin) COMBUF for the UVA host-buffer exchange, once per
+  ! allocation of COMBUF; DT_C_BUF is its device alias.
+  !
+  subroutine d_cuda_combuf_pin(x,info)
+    implicit none
+    class(psb_d_vect_cuda), intent(inout) :: x
+    integer, intent(out) :: info
+    info = 0
+    if (x%combuf_reg) return
+    if (.not.allocated(x%combuf)) then
+      info = -1
+      return
+    end if
+    info = inner_register(x%combuf,x%dt_c_buf)
+    x%combuf_reg = (info == 0)
+    if (info /= 0) write(0,*) 'Error from inner_register (combuf) ',info
+  end subroutine d_cuda_combuf_pin
+
   subroutine d_cuda_maybe_free_buffer(x,info)
     use psb_realloc_mod
     use psb_cuda_env_mod
@@ -194,15 +228,17 @@ contains
     class(psb_d_vect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
+    call x%dev_comm_end()
     if (allocated(x%pinned_buffer)) then 
       call inner_unregister(x%pinned_buffer)
       deallocate(x%pinned_buffer, stat=info)
     end if
     if (allocated(x%combuf)) then 
-      if (psb_cuda_DeviceHasUVA()) &
-           & call inner_unregister(x%combuf)
+      if (x%combuf_reg) call inner_unregister(x%combuf)
       deallocate(x%combuf, stat=info)
     end if
+    x%combuf_reg = .false.
+    x%dt_c_buf   = c_null_ptr
     if (allocated(x%buffer)) then 
       deallocate(x%buffer, stat=info)
     end if
@@ -350,9 +386,14 @@ contains
       if (ii%is_host()) call ii%sync()
       if (x%is_host())  call x%sync()
 
-      if (psb_cuda_DeviceHasUVA()) then 
+      if (x%dev_comm()) then
+        ! CUDA-aware MPI: gather into the device buffer, MPI reads it there
         info = igathMultiVecDeviceDoubleVecIdx(x%deviceVect,&
-             & 0, n, i, ii%deviceVect, i,x%dt_p_buf, 1)
+             & 0, n, i, ii%deviceVect, i,x%dc_buf, 1)
+      else if (psb_cuda_DeviceHasUVA()) then 
+        call d_cuda_combuf_pin(x,info)
+        if (info == 0) info = igathMultiVecDeviceDoubleVecIdx(x%deviceVect,&
+             & 0, n, i, ii%deviceVect, i,x%dt_c_buf, 1)
 
       else
         info = igathMultiVecDeviceDoubleVecIdx(x%deviceVect,&
@@ -372,16 +413,80 @@ contains
       if (info == 0) &
            & info = writeInt(i,x%i_buf,ii%v(i:),n,1)
 
-      if (info == 0) &
-           & info = igathMultiVecDeviceDouble(x%deviceVect,&
-           & 0, n, i, x%i_buf, i,x%dt_buf, 1)
-      
-      if (info == 0) &
-           &  info = readDouble(i,x%dt_buf,x%combuf(i:),n,1)
+      if (info == 0) then
+        if (x%dev_comm()) then
+          info = igathMultiVecDeviceDouble(x%deviceVect,&
+               & 0, n, i, x%i_buf, i,x%dc_buf, 1)
+        else
+          info = igathMultiVecDeviceDouble(x%deviceVect,&
+               & 0, n, i, x%i_buf, i,x%dt_buf, 1)
+          if (info == 0) &
+               &  info = readDouble(i,x%dt_buf,x%combuf(i:),n,1)
+        end if
+      end if
 
     end select
 
   end subroutine d_cuda_gthzbuf
+
+  !
+  ! Halo exchange on device buffers (CUDA-aware MPI). psi_swapdata calls
+  ! dev_comm_begin after new_buffer: when psb_cuda_init enabled CUDA-aware
+  ! MPI and the per-process shared device buffer is free, the vector takes
+  ! it (DC_BUF, same layout as COMBUF) until dev_comm_end. A single buffer
+  ! per process means that the CUDA IPC handles of a peer are opened once,
+  ! not once per vector. If the buffer is held by another vector (split
+  ! send/receive phases) this exchange goes through the host buffers.
+  ! All other users of new_buffer (e.g. psi_swaptran) stay on the host.
+  !
+  subroutine d_cuda_dev_comm_begin(x,n)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_d_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    if (x%dc_on) call x%dev_comm_end()
+    x%dc_buf = c_null_ptr
+    if (.not.psb_cuda_get_dev_comm()) return
+    x%dc_on = psb_cuda_comm_buf_acquire(int(max(n,1),c_size_t)*int(psb_sizeof_dp,c_size_t),&
+         & x%dc_buf)
+  end subroutine d_cuda_dev_comm_begin
+
+  subroutine d_cuda_dev_comm_end(x)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_d_vect_cuda), intent(inout) :: x
+    if (x%dc_on) call psb_cuda_comm_buf_release()
+    x%dc_on  = .false.
+    x%dc_buf = c_null_ptr
+  end subroutine d_cuda_dev_comm_end
+
+  function d_cuda_dev_comm(x) result(res)
+    implicit none
+    class(psb_d_vect_cuda), intent(in) :: x
+    logical :: res
+    res = x%dc_on
+  end function d_cuda_dev_comm
+
+  function d_cuda_dev_comm_buf(x) result(res)
+    implicit none
+    class(psb_d_vect_cuda), intent(in) :: x
+    type(c_ptr) :: res
+    res = x%dc_buf
+  end function d_cuda_dev_comm_buf
+
+  subroutine d_cuda_comm_buf_copy(x,dst,src,n)
+    implicit none
+    class(psb_d_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: dst, src, n
+    integer(psb_ipk_) :: info
+    if (n <= 0) return
+    if (x%dev_comm()) then
+      info = copyDeviceRange(x%dc_buf,dst,src,n,int(psb_sizeof_dp,c_int))
+      if (info /= 0) call psb_errpush(psb_err_internal_error_,'d_cuda_comm_buf_copy')
+    else
+      x%combuf(dst:dst+n-1) = x%combuf(src:src+n-1)
+    end if
+  end subroutine d_cuda_comm_buf_copy
 
   subroutine d_cuda_sctb(n,idx,x,beta,y)
     implicit none
@@ -530,9 +635,14 @@ contains
               
       if (ii%is_host()) call ii%sync()
       if (y%is_host())  call y%sync()
-      if (psb_cuda_DeviceHasUVA()) then 
+      if (y%dev_comm()) then
+        ! CUDA-aware MPI: received data are already in the device buffer
         info = iscatMultiVecDeviceDoubleVecIdx(y%deviceVect,&
-             & 0, n, i, ii%deviceVect, i, y%dt_p_buf, 1,beta)
+             & 0, n, i, ii%deviceVect, i, y%dc_buf, 1,beta)
+      else if (psb_cuda_DeviceHasUVA()) then 
+        call d_cuda_combuf_pin(y,info)
+        if (info == 0) info = iscatMultiVecDeviceDoubleVecIdx(y%deviceVect,&
+             & 0, n, i, ii%deviceVect, i, y%dt_c_buf, 1,beta)
       else 
         info = writeDouble(i,y%dt_buf,y%combuf(i:),n,1)
         info = iscatMultiVecDeviceDoubleVecIdx(y%deviceVect,&
@@ -550,10 +660,16 @@ contains
       end if
       if (info == 0) &
            & info = writeInt(i,y%i_buf,ii%v(i:),n,1)
-      if (info == 0) &
-           & info = writeDouble(i,y%dt_buf,y%combuf(i:),n,1)
-      if (info == 0) info = iscatMultiVecDeviceDouble(y%deviceVect,&
-           & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
+      if (info == 0) then
+        if (y%dev_comm()) then
+          info = iscatMultiVecDeviceDouble(y%deviceVect,&
+               & 0, n, i, y%i_buf, i, y%dc_buf, 1,beta)
+        else
+          info = writeDouble(i,y%dt_buf,y%combuf(i:),n,1)
+          if (info == 0) info = iscatMultiVecDeviceDouble(y%deviceVect,&
+               & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
+        end if
+      end if
     end select
 !!$    write(0,*) 'Done sctb_buf'
 
@@ -852,6 +968,65 @@ contains
     end select
 
   end function d_cuda_dot_v
+
+  !
+  ! Fused local dot products y1.x, y2.x [, y3.x] in one kernel and one
+  ! device->host transfer (same meaning as the base dot3v). Falls back to
+  ! the base implementation when an operand is not a CUDA vector.
+  !
+  subroutine d_cuda_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_d_vect_cuda), intent(inout)      :: x
+    class(psb_d_base_vect_type), intent(inout) :: y1, y2
+    integer(psb_ipk_), intent(in)              :: n
+    real(psb_dpk_), intent(out)                :: res(:)
+    class(psb_d_base_vect_type), intent(inout), optional :: y3
+    real(c_double)    :: r3(3)
+    integer(psb_ipk_) :: info
+    logical           :: on_dev
+
+    on_dev = .false.
+    select type(yy1 => y1)
+    type is (psb_d_vect_cuda)
+      select type(yy2 => y2)
+      type is (psb_d_vect_cuda)
+        if (present(y3)) then
+          select type(yy3 => y3)
+          type is (psb_d_vect_cuda)
+            on_dev = .true.
+            if (x%is_host())   call x%sync()
+            if (yy1%is_host()) call yy1%sync()
+            if (yy2%is_host()) call yy2%sync()
+            if (yy3%is_host()) call yy3%sync()
+            info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+                 & yy2%deviceVect,yy3%deviceVect)
+          end select
+        else
+          on_dev = .true.
+          if (x%is_host())   call x%sync()
+          if (yy1%is_host()) call yy1%sync()
+          if (yy2%is_host()) call yy2%sync()
+          info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+               & yy2%deviceVect,c_null_ptr)
+        end if
+      end select
+    end select
+
+    if (on_dev) then
+      if (info /= 0) then
+        info = psb_err_internal_error_
+        call psb_errpush(info,'d_cuda_dot3v')
+      end if
+      res(1) = r3(1)
+      res(2) = r3(2)
+      if (present(y3)) res(3) = r3(3)
+    else
+      res(1) = y1%dot(n,x)
+      res(2) = y2%dot(n,x)
+      if (present(y3)) res(3) = y3%dot(n,x)
+    end if
+
+  end subroutine d_cuda_dot3v
 
   function d_cuda_dot_a(n,x,y) result(res)
     implicit none 

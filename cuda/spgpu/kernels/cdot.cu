@@ -51,14 +51,14 @@ __global__ void spgpuCdot_kern(int n, cuFloatComplex* x, cuFloatComplex* y)
 		cuFloatComplex x2 = x[0]; x += blockOffset;
 		cuFloatComplex y2 = y[0]; y += blockOffset;
 
-		res = cuCfmaf(x1, y1, res);
-		res = cuCfmaf(x2, y2, res);
+		res = cuCfmaf(cuConjf(x1), y1, res);
+		res = cuCfmaf(cuConjf(x2), y2, res);
 
 	}
 
 	if (numSteps % 2)
 	{
-		res = cuCfmaf(*x, *y, res);
+		res = cuCfmaf(cuConjf(*x), *y, res);
 	}
 
 	if (threadIdx.x >= 32)

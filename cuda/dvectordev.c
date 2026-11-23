@@ -226,6 +226,21 @@ int dotMultiVecDeviceDouble(double* y_res, int n, void* devMultiVecA, void* devM
   return(i);
 }
 
+/* Fused x.y1, x.y2, x.y3 (devVecY3 may be NULL): one kernel, one transfer */
+int dot3MultiVecDeviceDouble(double* y_res, int n, void* devVecX, void* devVecY1,
+			     void* devVecY2, void* devVecY3)
+{ int i=0;
+  struct MultiVectDevice *vX  = (struct MultiVectDevice *) devVecX;
+  struct MultiVectDevice *vY1 = (struct MultiVectDevice *) devVecY1;
+  struct MultiVectDevice *vY2 = (struct MultiVectDevice *) devVecY2;
+  struct MultiVectDevice *vY3 = (struct MultiVectDevice *) devVecY3;
+  spgpuHandle_t handle=psb_cudaGetHandle();
+
+  spgpuDdot3(handle, y_res, n, (double*)vX->v_, (double*)vY1->v_, (double*)vY2->v_,
+	     (vY3 == NULL) ? NULL : (double*)vY3->v_);
+  return(i);
+}
+
 int axpbyMultiVecDeviceDouble(int n,double alpha, void* devMultiVecX, 
 			      double beta, void* devMultiVecY)
 { int j=0, i=0;

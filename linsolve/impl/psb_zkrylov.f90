@@ -80,7 +80,7 @@
 !                                           estimate of) residual 
 ! 
 Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,irst,istop,cond,s1,s2)
+     & itmax,iter,err,itrace,irst,istop,cond,s1,s2,wrk)
 
   use psb_base_mod
   use psb_prec_mod,only : psb_zprec_type
@@ -98,6 +98,8 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   Real(psb_dpk_), Optional, Intent(out) :: err,cond
   type(psb_z_vect_type), intent(inout), optional   :: s1, s2
+  ! Optional persistent workspace, currently used by FCG only (see psb_zfcg)
+  type(psb_z_vect_type), intent(inout), optional, target :: wrk(:)
 
 
   abstract interface
@@ -149,12 +151,30 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
       Real(psb_dpk_), Optional, Intent(out) :: err, cond
       type(psb_z_vect_type), intent(inout), optional   :: s1, s2
     end subroutine psb_zkryl_cond_vect
+    Subroutine psb_zkryl_cond_wrk_vect(a,prec,b,x,eps,desc_a,info,&
+         &itmax,iter,err, itrace,istop,cond,s1,s2,wrk)
+      import :: psb_ipk_, psb_dpk_, psb_desc_type, &
+           & psb_zspmat_type, psb_zprec_type, psb_z_vect_type
+      Type(psb_zspmat_type), Intent(in)    :: a
+      Type(psb_desc_type), Intent(in)      :: desc_a
+      class(psb_zprec_type), intent(inout) :: prec
+      type(psb_z_vect_type), Intent(inout) :: b
+      type(psb_z_vect_type), Intent(inout) :: x
+      Real(psb_dpk_), Intent(in)           :: eps
+      integer(psb_ipk_), intent(out)                 :: info
+      integer(psb_ipk_), Optional, Intent(in)        :: itmax, itrace,istop
+      integer(psb_ipk_), Optional, Intent(out)       :: iter
+      Real(psb_dpk_), Optional, Intent(out) :: err, cond
+      type(psb_z_vect_type), intent(inout), optional   :: s1, s2
+      type(psb_z_vect_type), intent(inout), optional, target :: wrk(:)
+    end subroutine psb_zkryl_cond_wrk_vect
   end interface
 
   procedure(psb_zkryl_vect) :: psb_zbicg_vect, psb_zcgstab_vect,&
        & psb_zcgs_vect
   procedure(psb_zkryl_rest_vect) :: psb_zrgmres_vect, psb_zcgstabl_vect, psb_zgcr_vect
-  procedure(psb_zkryl_cond_vect) :: psb_zcg_vect, psb_zfcg_vect
+  procedure(psb_zkryl_cond_vect) :: psb_zcg_vect
+  procedure(psb_zkryl_cond_wrk_vect) :: psb_zfcg_vect
 
   logical           :: do_alloc_wrk
   type(psb_ctxt_type) :: ctxt
@@ -187,7 +207,7 @@ Subroutine psb_zkrylov_vect(method,a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond,s1=s1,s2=s2)
   case('FCG') 
     call  psb_zfcg_vect(a,prec,b,x,eps,desc_a,info,&
-         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond,s1=s1,s2=s2)
+         &itmax,iter,err,itrace=itrace_,istop=istop,cond=cond,s1=s1,s2=s2,wrk=wrk)
   case('GCR') 
     call  psb_zgcr_vect(a,prec,b,x,eps,desc_a,info,&
          &itmax,iter,err,itrace=itrace_,irst=irst,istop=istop,s1=s1,s2=s2)

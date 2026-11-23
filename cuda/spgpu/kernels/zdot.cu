@@ -43,7 +43,7 @@ __global__ void spgpuZdot_kern(int n, cuDoubleComplex* x, cuDoubleComplex* y)
 
 	while (x < lastX)
     {
-		res = cuCfma(x[0], y[0], res);
+		res = cuCfma(cuConj(x[0]), y[0], res);
 		
 		x += blockOffset;
 		y += blockOffset;

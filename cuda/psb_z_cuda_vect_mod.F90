@@ -55,6 +55,14 @@ module psb_z_cuda_vect_mod
     integer :: dt_buf_sz = 0
     type(c_ptr) :: i_buf = c_null_ptr
     integer :: i_buf_sz = 0
+    ! Halo exchange on device buffers: DC_BUF is the per-process shared
+    ! device communication buffer, held while DC_ON (see dev_comm_begin)
+    type(c_ptr) :: dc_buf = c_null_ptr
+    logical     :: dc_on  = .false.
+    ! Host COMBUF registered (pinned) for the UVA path, and its device alias;
+    ! separate from DT_P_BUF, which aliases PINNED_BUFFER (gthzv_x/sctb_x)
+    type(c_ptr) :: dt_c_buf = c_null_ptr
+    logical     :: combuf_reg = .false.
   contains
     procedure, pass(x) :: get_nrows => z_cuda_get_nrows
     procedure, nopass  :: get_fmt   => z_cuda_get_fmt
@@ -86,6 +94,11 @@ module psb_z_cuda_vect_mod
     procedure, nopass  :: device_wait  => z_cuda_device_wait
     procedure, pass(x) :: free_buffer  => z_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => z_cuda_maybe_free_buffer
+    procedure, pass(x) :: dev_comm      => z_cuda_dev_comm
+    procedure, pass(x) :: dev_comm_buf  => z_cuda_dev_comm_buf
+    procedure, pass(x) :: comm_buf_copy => z_cuda_comm_buf_copy
+    procedure, pass(x) :: dev_comm_begin => z_cuda_dev_comm_begin
+    procedure, pass(x) :: dev_comm_end   => z_cuda_dev_comm_end
     procedure, pass(x) :: dot_v    => z_cuda_dot_v
     procedure, pass(x) :: dot_a    => z_cuda_dot_a
     procedure, pass(y) :: axpby_v  => z_cuda_axpby_v
@@ -139,14 +152,15 @@ contains
     if (psb_cuda_DeviceHasUVA()) then       
       if (allocated(x%combuf)) then 
         if (size(x%combuf)<n) then 
-          call inner_unregister(x%combuf)
+          if (x%combuf_reg) call inner_unregister(x%combuf)
+          x%combuf_reg = .false.
+          x%dt_c_buf   = c_null_ptr
           deallocate(x%combuf,stat=info)
         end if
       end if
-      if (.not.allocated(x%combuf)) then 
-        call psb_realloc(n,x%combuf,info)
-        if (info == 0) info = inner_register(x%combuf,x%dt_p_buf)        
-      end if
+      ! Registered lazily (combuf_pin) at the first exchange through the
+      ! host buffer: not needed when the exchange runs on device buffers
+      if (.not.allocated(x%combuf)) call psb_realloc(n,x%combuf,info)
     else
       call psb_realloc(n,x%combuf,info)
     end if
@@ -175,6 +189,25 @@ contains
 
   end subroutine z_cuda_new_buffer
 
+  !
+  ! Register (pin) COMBUF for the UVA host-buffer exchange, once per
+  ! allocation of COMBUF; DT_C_BUF is its device alias.
+  !
+  subroutine z_cuda_combuf_pin(x,info)
+    implicit none
+    class(psb_z_vect_cuda), intent(inout) :: x
+    integer, intent(out) :: info
+    info = 0
+    if (x%combuf_reg) return
+    if (.not.allocated(x%combuf)) then
+      info = -1
+      return
+    end if
+    info = inner_register(x%combuf,x%dt_c_buf)
+    x%combuf_reg = (info == 0)
+    if (info /= 0) write(0,*) 'Error from inner_register (combuf) ',info
+  end subroutine z_cuda_combuf_pin
+
   subroutine z_cuda_maybe_free_buffer(x,info)
     use psb_realloc_mod
     use psb_cuda_env_mod
@@ -194,15 +227,17 @@ contains
     class(psb_z_vect_cuda), intent(inout) :: x
     integer(psb_ipk_), intent(out)             :: info
     
+    call x%dev_comm_end()
     if (allocated(x%pinned_buffer)) then 
       call inner_unregister(x%pinned_buffer)
       deallocate(x%pinned_buffer, stat=info)
     end if
     if (allocated(x%combuf)) then 
-      if (psb_cuda_DeviceHasUVA()) &
-           & call inner_unregister(x%combuf)
+      if (x%combuf_reg) call inner_unregister(x%combuf)
       deallocate(x%combuf, stat=info)
     end if
+    x%combuf_reg = .false.
+    x%dt_c_buf   = c_null_ptr
     if (allocated(x%buffer)) then 
       deallocate(x%buffer, stat=info)
     end if
@@ -350,9 +385,14 @@ contains
       if (ii%is_host()) call ii%sync()
       if (x%is_host())  call x%sync()
 
-      if (psb_cuda_DeviceHasUVA()) then 
+      if (x%dev_comm()) then
+        ! CUDA-aware MPI: gather into the device buffer, MPI reads it there
         info = igathMultiVecDeviceDoubleComplexVecIdx(x%deviceVect,&
-             & 0, n, i, ii%deviceVect, i,x%dt_p_buf, 1)
+             & 0, n, i, ii%deviceVect, i,x%dc_buf, 1)
+      else if (psb_cuda_DeviceHasUVA()) then 
+        call z_cuda_combuf_pin(x,info)
+        if (info == 0) info = igathMultiVecDeviceDoubleComplexVecIdx(x%deviceVect,&
+             & 0, n, i, ii%deviceVect, i,x%dt_c_buf, 1)
 
       else
         info = igathMultiVecDeviceDoubleComplexVecIdx(x%deviceVect,&
@@ -372,16 +412,80 @@ contains
       if (info == 0) &
            & info = writeInt(i,x%i_buf,ii%v(i:),n,1)
 
-      if (info == 0) &
-           & info = igathMultiVecDeviceDoubleComplex(x%deviceVect,&
-           & 0, n, i, x%i_buf, i,x%dt_buf, 1)
-      
-      if (info == 0) &
-           &  info = readDoubleComplex(i,x%dt_buf,x%combuf(i:),n,1)
+      if (info == 0) then
+        if (x%dev_comm()) then
+          info = igathMultiVecDeviceDoubleComplex(x%deviceVect,&
+               & 0, n, i, x%i_buf, i,x%dc_buf, 1)
+        else
+          info = igathMultiVecDeviceDoubleComplex(x%deviceVect,&
+               & 0, n, i, x%i_buf, i,x%dt_buf, 1)
+          if (info == 0) &
+               &  info = readDoubleComplex(i,x%dt_buf,x%combuf(i:),n,1)
+        end if
+      end if
 
     end select
 
   end subroutine z_cuda_gthzbuf
+
+  !
+  ! Halo exchange on device buffers (CUDA-aware MPI). psi_swapdata calls
+  ! dev_comm_begin after new_buffer: when psb_cuda_init enabled CUDA-aware
+  ! MPI and the per-process shared device buffer is free, the vector takes
+  ! it (DC_BUF, same layout as COMBUF) until dev_comm_end. A single buffer
+  ! per process means that the CUDA IPC handles of a peer are opened once,
+  ! not once per vector. If the buffer is held by another vector (split
+  ! send/receive phases) this exchange goes through the host buffers.
+  ! All other users of new_buffer (e.g. psi_swaptran) stay on the host.
+  !
+  subroutine z_cuda_dev_comm_begin(x,n)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_z_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: n
+    if (x%dc_on) call x%dev_comm_end()
+    x%dc_buf = c_null_ptr
+    if (.not.psb_cuda_get_dev_comm()) return
+    x%dc_on = psb_cuda_comm_buf_acquire(int(max(n,1),c_size_t)*int((2*psb_sizeof_dp),c_size_t),&
+         & x%dc_buf)
+  end subroutine z_cuda_dev_comm_begin
+
+  subroutine z_cuda_dev_comm_end(x)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_z_vect_cuda), intent(inout) :: x
+    if (x%dc_on) call psb_cuda_comm_buf_release()
+    x%dc_on  = .false.
+    x%dc_buf = c_null_ptr
+  end subroutine z_cuda_dev_comm_end
+
+  function z_cuda_dev_comm(x) result(res)
+    implicit none
+    class(psb_z_vect_cuda), intent(in) :: x
+    logical :: res
+    res = x%dc_on
+  end function z_cuda_dev_comm
+
+  function z_cuda_dev_comm_buf(x) result(res)
+    implicit none
+    class(psb_z_vect_cuda), intent(in) :: x
+    type(c_ptr) :: res
+    res = x%dc_buf
+  end function z_cuda_dev_comm_buf
+
+  subroutine z_cuda_comm_buf_copy(x,dst,src,n)
+    implicit none
+    class(psb_z_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: dst, src, n
+    integer(psb_ipk_) :: info
+    if (n <= 0) return
+    if (x%dev_comm()) then
+      info = copyDeviceRange(x%dc_buf,dst,src,n,int((2*psb_sizeof_dp),c_int))
+      if (info /= 0) call psb_errpush(psb_err_internal_error_,'z_cuda_comm_buf_copy')
+    else
+      x%combuf(dst:dst+n-1) = x%combuf(src:src+n-1)
+    end if
+  end subroutine z_cuda_comm_buf_copy
 
   subroutine z_cuda_sctb(n,idx,x,beta,y)
     implicit none
@@ -530,9 +634,14 @@ contains
               
       if (ii%is_host()) call ii%sync()
       if (y%is_host())  call y%sync()
-      if (psb_cuda_DeviceHasUVA()) then 
+      if (y%dev_comm()) then
+        ! CUDA-aware MPI: received data are already in the device buffer
         info = iscatMultiVecDeviceDoubleComplexVecIdx(y%deviceVect,&
-             & 0, n, i, ii%deviceVect, i, y%dt_p_buf, 1,beta)
+             & 0, n, i, ii%deviceVect, i, y%dc_buf, 1,beta)
+      else if (psb_cuda_DeviceHasUVA()) then 
+        call z_cuda_combuf_pin(y,info)
+        if (info == 0) info = iscatMultiVecDeviceDoubleComplexVecIdx(y%deviceVect,&
+             & 0, n, i, ii%deviceVect, i, y%dt_c_buf, 1,beta)
       else 
         info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
         info = iscatMultiVecDeviceDoubleComplexVecIdx(y%deviceVect,&
@@ -550,10 +659,16 @@ contains
       end if
       if (info == 0) &
            & info = writeInt(i,y%i_buf,ii%v(i:),n,1)
-      if (info == 0) &
-           & info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
-      if (info == 0) info = iscatMultiVecDeviceDoubleComplex(y%deviceVect,&
-           & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
+      if (info == 0) then
+        if (y%dev_comm()) then
+          info = iscatMultiVecDeviceDoubleComplex(y%deviceVect,&
+               & 0, n, i, y%i_buf, i, y%dc_buf, 1,beta)
+        else
+          info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
+          if (info == 0) info = iscatMultiVecDeviceDoubleComplex(y%deviceVect,&
+               & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
+        end if
+      end if
     end select
 !!$    write(0,*) 'Done sctb_buf'
 
@@ -852,6 +967,7 @@ contains
     end select
 
   end function z_cuda_dot_v
+
 
   function z_cuda_dot_a(n,x,y) result(res)
     implicit none 

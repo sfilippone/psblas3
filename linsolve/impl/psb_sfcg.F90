@@ -104,7 +104,7 @@
 ! 
 !
 subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
-     & itmax,iter,err,itrace,istop,cond,s1,s2)
+     & itmax,iter,err,itrace,istop,cond,s1,s2,wrk)
   use psb_base_mod
   use psb_prec_mod
   use psb_s_linsolve_conv_mod
@@ -121,8 +121,18 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
   integer(psb_ipk_), Optional, Intent(out)       :: iter
   real(psb_spk_), Optional, Intent(out) :: err,cond
   type(psb_s_vect_type), intent(inout), optional   :: s1, s2
+  !
+  ! Optional persistent workspace: if WRK has at least 5 entries already
+  ! assembled on DESC_A, they are used for V, W, D, Q, R instead of
+  ! allocating (and on GPU registering) new vectors at each call.
+  ! Useful when FCG is called repeatedly, e.g. as a coarse-level solver.
+  !
+  type(psb_s_vect_type), intent(inout), optional, target :: wrk(:)
 ! =   Local data
-  type(psb_s_vect_type)  :: v, w, d , q, r
+  type(psb_s_vect_type), target   :: lwrk(5)
+  type(psb_s_vect_type), pointer  :: v, w, d , q, r
+  logical                         :: use_wrk, fused_dots
+  integer(psb_ipk_)               :: nr_loc
   real(psb_spk_) :: alpha, beta, delta, gamma, theta
   real(psb_dpk_) :: derr
   integer(psb_ipk_) ::  i, idx, nc2l, it, itx, istop_, itmax_, itrace_
@@ -215,17 +225,49 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
   end if
 
 
-  !Assemble w, v, d, q, r, u 
-  call psb_geasb(w, desc_a,info,&
-       & scratch=.true.,mold=x%v)
-  call psb_geasb(v, desc_a,info,&
-       & scratch=.true.,mold=x%v)
-  call psb_geasb(d, desc_a,info,&
-       & scratch=.true.,mold=x%v)
-  call psb_geasb(q, desc_a,info,&
-       & scratch=.true.,mold=x%v)
-  call psb_geasb(r, desc_a,info,&
-       & scratch=.true.,mold=x%v)
+  use_wrk = .false.
+  if (present(wrk)) then
+    if (size(wrk) >= 5) then
+      use_wrk = allocated(wrk(1)%v).and.allocated(wrk(2)%v).and.&
+           & allocated(wrk(3)%v).and.allocated(wrk(4)%v).and.allocated(wrk(5)%v)
+      if (use_wrk) use_wrk = (wrk(1)%get_nrows() >= n_col).and.&
+           & (wrk(2)%get_nrows() >= n_col).and.(wrk(3)%get_nrows() >= n_col).and.&
+           & (wrk(4)%get_nrows() >= n_col).and.(wrk(5)%get_nrows() >= n_col)
+    end if
+  end if
+
+  if (use_wrk) then
+    v => wrk(1)
+    w => wrk(2)
+    d => wrk(3)
+    q => wrk(4)
+    r => wrk(5)
+  else
+    v => lwrk(1)
+    w => lwrk(2)
+    d => lwrk(3)
+    q => lwrk(4)
+    r => lwrk(5)
+    !Assemble w, v, d, q, r, u
+    call psb_geasb(w, desc_a,info,&
+         & scratch=.true.,mold=x%v)
+    call psb_geasb(v, desc_a,info,&
+         & scratch=.true.,mold=x%v)
+    call psb_geasb(d, desc_a,info,&
+         & scratch=.true.,mold=x%v)
+    call psb_geasb(q, desc_a,info,&
+         & scratch=.true.,mold=x%v)
+    call psb_geasb(r, desc_a,info,&
+         & scratch=.true.,mold=x%v)
+  end if
+
+  !
+  ! The local dot products of an iteration share V: compute them in a single
+  ! pass (one kernel and one device->host transfer on GPU). Overlapped
+  ! entries need the per-dot correction done in psb_gedot: fall back there.
+  !
+  nr_loc     = desc_a%get_local_rows()
+  fused_dots = (size(desc_a%ovrlap_elem,1) == 0)
 
   call psb_init_conv(methdname,istop_,itrace_,itmax_,&
        & a,x,b,eps,desc_a,stopdat,info,s1=s1,s2=s2)
@@ -264,8 +306,12 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
     end if
 
 
-    vres(1) = psb_gedot(r, v, desc_a, info, global = .false.) 
-    vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
+    if (fused_dots) then
+      call v%dot3v(nr_loc, r, w, vres(1:2))
+    else
+      vres(1) = psb_gedot(r, v, desc_a, info, global = .false.)
+      vres(2) = psb_gedot(w, v, desc_a, info, global = .false.)
+    end if
 
 
     call psb_sum(ctxt, vres(1:2))
@@ -317,9 +363,13 @@ subroutine psb_sfcg_vect(a,prec,b,x,eps,desc_a,info,&
              & a_err='Error during residual'); goto 9999
       end if
 
-      vres(1) = psb_gedot(r, v, desc_a, info, global = .false.) 
-      vres(2) = psb_gedot(w, v, desc_a, info, global = .false.) 
-      vres(3) = psb_gedot(q, v, desc_a, info, global = .false.) 
+      if (fused_dots) then
+        call v%dot3v(nr_loc, r, w, vres(1:3), q)
+      else
+        vres(1) = psb_gedot(r, v, desc_a, info, global = .false.)
+        vres(2) = psb_gedot(w, v, desc_a, info, global = .false.)
+        vres(3) = psb_gedot(q, v, desc_a, info, global = .false.)
+      end if
 
       call psb_sum(ctxt, vres(1:3))
 

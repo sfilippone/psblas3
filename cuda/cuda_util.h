@@ -115,6 +115,11 @@ int readDouble(void *, double*, int);
 int readMultiDouble(void*, double*, int, int );
 int writeDoubleFirst(int, void *, double*, int, int);
 int readDoubleFirst(int, void *, double*, int, int);
+int copyDeviceRange(void *, int, int, int, int);
+int psi_c_cuda_comm_buf_acquire(size_t, void **);
+void psi_c_cuda_comm_buf_release(void);
+void psi_c_cuda_comm_buf_free(void);
+double psi_c_cuda_ipc_warmup(void);
 void freeDouble(void *);
 
 int allocateFloatComplex(void **, int);
