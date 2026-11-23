@@ -41,12 +41,14 @@ module psb_timers_mod
   use psb_penv_mod
   
   public psb_init_timers, psb_get_timer_idx, psb_reset_timers, psb_check_timer, &
-       & psb_tic, psb_toc, psb_print_timers, psb_get_timer, psb_free_timers
+       & psb_tic, psb_toc, psb_print_timers, psb_get_timer, psb_free_timers, &
+       & psb_enter_timer_session, psb_exit_timer_session
   private
 
   ! Reallocation
   integer(psb_ipk_), parameter :: ntchunk = 50
   integer(psb_ipk_), save      :: active_timers = 0
+  integer(psb_ipk_), save      :: timer_depth = 0
   ! Indices   
   integer(psb_ipk_), parameter :: timer_tic_ = 1, timer_toc_ = 2
   integer(psb_ipk_), parameter :: timer_x_ = 3, timer_sum_ = 4
@@ -231,6 +233,20 @@ contains
     val          = active_timers
   end function psb_get_timer_idx
 
+  function psb_enter_timer_session() result(session_depth)
+    implicit none
+    integer(psb_ipk_) :: session_depth
+    timer_depth = timer_depth + 1
+    session_depth = timer_depth
+  end function psb_enter_timer_session
+
+  function psb_exit_timer_session() result(session_depth)
+    implicit none
+    integer(psb_ipk_) :: session_depth
+    timer_depth = timer_depth - 1
+    session_depth = timer_depth
+  end function psb_exit_timer_session
+
   !
   ! True if a timer with this description is already registered: lets a
   ! routine called many times per solve (e.g. the MPK) register its timers once.
@@ -356,7 +372,7 @@ contains
     call psb_erractionrestore(err_act)
     return
 
-9999 continue
+  9999 continue
     info = err
     call psb_error_handler(err_act)
     return
