@@ -67,13 +67,15 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   ! Per-phase timers, printed at the end of the solve. The MPK adds
   ! 'chebyshev', 'spmv' and 'precapply' (psb_d_pMPK.f90).
   logical, parameter :: doTiming = .true.
-  integer(psb_ipk_)  :: timer_idx_axpby, timer_idx_mpk, timer_idx_dotloc, timer_idx_dotred, &
-                      & timer_idx_GEMM, timer_idx_gramfact, timer_idx_gramsolve
+  integer(psb_ipk_), save :: timer_session_depth
+  integer(psb_ipk_), save :: timer_idx_axpby, timer_idx_mpk, timer_idx_dotloc, timer_idx_dotred, &
+                            & timer_idx_GEMM, timer_idx_gramfact, timer_idx_gramsolve
 
   info = psb_success_
   call psb_erractionsave(err_act)
   if (doTiming) then
-    call psb_init_timers(10_psb_ipk_)
+    timer_session_depth = psb_enter_timer_session()
+    if(timer_session_depth == 1) call psb_init_timers(10_psb_ipk_)
     timer_idx_axpby     = psb_get_timer_idx('axpby')
     timer_idx_mpk       = psb_get_timer_idx('mpk')
     timer_idx_dotloc    = psb_get_timer_idx('dot loc')
@@ -256,7 +258,10 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     goto 9999
   end if
 
-  if (doTiming) call psb_print_timers(ctxt)
+  if (doTiming) then
+    timer_session_depth = psb_exit_timer_session()
+    if(timer_session_depth == 0) call psb_print_timers(ctxt)
+  end if
 
   call psb_erractionrestore(err_act)
   return

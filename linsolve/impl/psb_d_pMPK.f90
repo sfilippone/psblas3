@@ -184,15 +184,20 @@ subroutine psb_d_pMPK_core(spmat, prec, vec_in, Z, offsetZ, Q, offsetQ, s, save_
   ! Sub-timers of the MPK: registered on the first call after the solver
   ! (re)initialises the timers, so the indices are the same in every solve
   logical, parameter      :: doTiming = .true.
+  integer(psb_ipk_), save :: timer_session_depth
   integer(psb_ipk_), save :: timer_idx_cheb = -1, timer_idx_spmv = -1, timer_idx_papply = -1
 
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (doTiming .and. (.not. psb_check_timer('precapply'))) then
-    timer_idx_cheb   = psb_get_timer_idx('chebyshev')
-    timer_idx_spmv   = psb_get_timer_idx('spmv')
-    timer_idx_papply = psb_get_timer_idx('precapply')
+  if (doTiming) then
+    timer_session_depth = psb_enter_timer_session()
+    if(timer_session_depth == 1) call psb_init_timers(3_psb_ipk_)
+    if((.not. psb_check_timer('precapply'))) then
+      timer_idx_cheb   = psb_get_timer_idx('chebyshev')
+      timer_idx_spmv   = psb_get_timer_idx('spmv')
+      timer_idx_papply = psb_get_timer_idx('precapply')
+    end if
   end if
 
   if(present(farr_temp)) then
@@ -230,6 +235,11 @@ subroutine psb_d_pMPK_core(spmat, prec, vec_in, Z, offsetZ, Q, offsetQ, s, save_
   end select
 
   if(.not. present(farr_temp)) deallocate(aux)
+
+  if(doTiming) then
+    timer_session_depth = psb_exit_timer_session()
+    if(timer_session_depth == 0) call psb_print_timers(desc%get_context())
+  end if
 
   call psb_erractionrestore(err_act)
   return
