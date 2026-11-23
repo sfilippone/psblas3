@@ -347,7 +347,7 @@ contains
     integer(psb_epk_) :: res
     logical, optional :: global
 
-    integer(psb_epk_) :: val(psb_desc_sz_array_size)
+    integer(psb_epk_) :: val(psb_desc_sz_array_size_)
 
     val = desc%detailed_sizeof(global)
     res = sum(val)
@@ -359,7 +359,7 @@ contains
     !....Parameters...
 
     class(psb_desc_type), intent(in) :: desc
-    integer(psb_epk_) :: val(psb_desc_sz_array_size)
+    integer(psb_epk_) :: val(psb_desc_sz_array_size_)
     logical, optional :: global
 
     logical :: global_
@@ -368,18 +368,18 @@ contains
     if (present(global)) global_ = global
 
     val(:) = 0
-    if (allocated(desc%indxmap))  val(psb_desc_sz_indxmap) = desc%indxmap%sizeof()
-    val(psb_desc_sz_halo_index)&
+    if (allocated(desc%indxmap))  val(psb_desc_sz_indxmap_) = desc%indxmap%sizeof()
+    val(psb_desc_sz_halo_index_)&
          & = psb_sizeof_ip*psb_size(desc%halo_index) + desc%v_halo_index%sizeof()
-    val(psb_desc_sz_ext_index)&
+    val(psb_desc_sz_ext_index_)&
          & = psb_sizeof_ip*psb_size(desc%ext_index)  + desc%v_ext_index%sizeof()
-    val(psb_desc_sz_bnd_elem)&
+    val(psb_desc_sz_bnd_elem_)&
          & = psb_sizeof_ip*psb_size(desc%bnd_elem)
-    val(psb_desc_sz_ovrlap_index)&
+    val(psb_desc_sz_ovrlap_index_)&
          & = psb_sizeof_ip*psb_size(desc%ovrlap_index) + desc%v_ovrlap_index%sizeof()
-    val(psb_desc_sz_ovrlap_elem)&
+    val(psb_desc_sz_ovrlap_elem_)&
          & = psb_sizeof_ip*psb_size(desc%ovrlap_elem)
-    val(psb_desc_sz_ovrlap_mst_idx)&
+    val(psb_desc_sz_ovrlap_mst_idx_)&
          & = psb_sizeof_ip*psb_size(desc%ovr_mst_idx) + desc%v_ovr_mst_idx%sizeof()
 
     if (global_) call psb_sum(desc%get_ctxt(),val)
@@ -390,28 +390,31 @@ contains
     !....Parameters...
 
     class(psb_desc_type), intent(in) :: desc
-    integer :: unit
+    integer, optional  :: unit
     logical, optional :: global
 
-    integer(psb_epk_) :: val(psb_desc_sz_array_size)
+    integer(psb_epk_) :: val(psb_desc_sz_array_size_)
+    integer(psb_ipk_)  :: unit_
     logical :: global_
     integer(psb_ipk_) :: iam, np
     type(psb_ctxt_type)    :: ctxt
     
     global_ = .false.
     if (present(global)) global_ = global
+    unit_ = psb_out_unit
+    if (present(unit)) unit_ = unit
     ctxt = desc%get_ctxt()
     call psb_info(ctxt,iam,np)
     val = desc%detailed_sizeof(global_)
     if ((.not.global_).or.(iam==psb_root_)) then
-      write(unit,*) iam,'          INDXMAP: ',val(psb_desc_sz_indxmap       )
-      write(unit,*) iam,'       HALO_INDEX: ',val(psb_desc_sz_halo_index    )
-      write(unit,*) iam,'        EXT_INDEX: ',val(psb_desc_sz_ext_index     )
-      write(unit,*) iam,'         BND_ELEM: ',val(psb_desc_sz_bnd_elem      )
-      write(unit,*) iam,'     OVRLAP_INDEX: ',val(psb_desc_sz_ovrlap_index  )
-      write(unit,*) iam,'      OVRLAP_ELEM: ',val(psb_desc_sz_ovrlap_elem   )
-      write(unit,*) iam,'   OVRLAP_MST_IDX: ',val(psb_desc_sz_ovrlap_mst_idx)
-      write(unit,*) iam,'       Total Size: ',sum(val)
+      write(unit_,*) iam,'  Desc        INDXMAP: ',val(psb_desc_sz_indxmap_       )
+      write(unit_,*) iam,'  Desc     HALO_INDEX: ',val(psb_desc_sz_halo_index_    )
+      write(unit_,*) iam,'  Desc      EXT_INDEX: ',val(psb_desc_sz_ext_index_     )
+      write(unit_,*) iam,'  Desc       BND_ELEM: ',val(psb_desc_sz_bnd_elem_      )
+      write(unit_,*) iam,'  Desc   OVRLAP_INDEX: ',val(psb_desc_sz_ovrlap_index_  )
+      write(unit_,*) iam,'  Desc    OVRLAP_ELEM: ',val(psb_desc_sz_ovrlap_elem_   )
+      write(unit_,*) iam,'  Desc OVRLAP_MST_IDX: ',val(psb_desc_sz_ovrlap_mst_idx_)
+      write(unit_,*) iam,'  Desc     Total Size: ',sum(val)
     end if
   end subroutine psb_cd_print_detailed_sizeof
 

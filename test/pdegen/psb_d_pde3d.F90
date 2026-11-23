@@ -879,7 +879,7 @@ program psb_d_pde3d
     write(psb_out_unit,'("Storage format for               A: ",a)') a%get_fmt()
     write(psb_out_unit,'("Storage format for          DESC_A: ",a)') desc_a%get_fmt()
   end if
-  call desc_a%print_detailed_sizeof(unit=psb_out_unit,global=.true.)
+  call desc_a%print_detailed_sizeof(global=.true.)
 
 
   !

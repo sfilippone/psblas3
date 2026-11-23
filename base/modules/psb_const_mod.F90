@@ -324,14 +324,14 @@ module psb_const_mod
   integer(psb_ipk_), parameter, public :: psb_err_invalid_preca_=5004
 
   ! Entry positions for detailed_sizeof()
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_indxmap        = 1
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_halo_index     = 2
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_ext_index      = 3
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_bnd_elem       = 4
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_ovrlap_index   = 5
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_ovrlap_elem    = 6
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_ovrlap_mst_idx = 7
-  integer(psb_ipk_), parameter, public :: psb_desc_sz_array_size     = 7
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_indxmap_        = 1
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_halo_index_     = 2
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_ext_index_      = 3
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_bnd_elem_       = 4
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_ovrlap_index_   = 5
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_ovrlap_elem_    = 6
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_ovrlap_mst_idx_ = 7
+  integer(psb_ipk_), parameter, public :: psb_desc_sz_array_size_     = 7
 
   
   type :: psb_ctxt_type
