@@ -880,6 +880,8 @@ module psb_i_cuda_multivect_mod
   use psb_i_multivect_mod
   use psb_i_base_multivect_mod
   use psb_cuda_env_mod
+  use psb_i_vect_mod
+  use psb_i_cuda_vect_mod
   use psb_i_vectordev_mod
 
   integer(psb_ipk_), parameter, private :: is_host = -1
@@ -891,6 +893,12 @@ module psb_i_cuda_multivect_mod
     type(c_ptr)                 :: deviceVect = c_null_ptr
     integer(c_int), allocatable :: buffer(:, :)
     type(c_ptr)                 :: dt_buf = c_null_ptr
+    ! Halo exchange buffers: device copy of COMBUF (no UVA), mapped pointer to
+    ! the registered COMBUF (UVA) and device copy of the index list.
+    integer                     :: dt_buf_sz = 0
+    type(c_ptr)                 :: dt_p_buf = c_null_ptr
+    type(c_ptr)                 :: i_buf = c_null_ptr
+    integer                     :: i_buf_sz = 0
   contains
     !
     !  Constructors/allocators
@@ -935,6 +943,18 @@ module psb_i_cuda_multivect_mod
     !!$ procedure, pass(x) :: gthzv_x  => i_cuda_multi_gthzv_x
     !!$ procedure, pass(y) :: sctb     => i_cuda_multi_sctb
     !!$ procedure, pass(y) :: sctb_x   => i_cuda_multi_sctb_x
+
+    !
+    ! Halo exchange
+    !
+    procedure, pass(x) :: new_buffer        => i_cuda_multi_new_buffer
+    procedure, nopass  :: device_wait       => i_cuda_multi_device_wait
+    procedure, pass(x) :: free_buffer       => i_cuda_multi_free_buffer
+    procedure, pass(x) :: maybe_free_buffer => i_cuda_multi_maybe_free_buffer
+    procedure, pass(x) :: gthzbuf           => i_cuda_multi_gthzbuf
+    procedure, pass(x) :: gthzbuf_col       => i_cuda_multi_gthzbuf_col
+    procedure, pass(y) :: sctb_buf          => i_cuda_multi_sctb_buf
+    procedure, pass(y) :: sctb_buf_col      => i_cuda_multi_sctb_buf_col
     final :: i_cuda_multi_vect_finalize
   end type psb_i_multivect_cuda
 
@@ -1143,6 +1163,254 @@ contains
     end if
   end subroutine i_cuda_multi_asb
 
+  subroutine i_cuda_multi_device_wait()
+    call psb_cudaSync()
+  end subroutine i_cuda_multi_device_wait
+
+  !
+  ! Communication buffer. COMBUF holds N*NCOLS entries; with UVA it stays
+  ! registered between exchanges, because pinning is expensive and the device
+  ! may be reading it until device_wait. Registered memory must not move, so it
+  ! is released and registered again only when it has to grow.
+  !
+  subroutine i_cuda_multi_new_buffer(n, x, info)
+    use psb_realloc_mod
+    implicit none
+    integer(psb_ipk_), intent(in)              :: n
+    class(psb_i_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    integer(psb_ipk_) :: nb
+
+    info = psb_success_
+    nb   = n * x%get_ncols()
+    if(psb_cuda_DeviceHasUVA()) then
+      if(allocated(x%combuf)) then
+        if(size(x%combuf) < nb) then
+          if(c_associated(x%dt_p_buf)) call inner_unregister(x%combuf)
+          x%dt_p_buf = c_null_ptr
+          deallocate(x%combuf, stat = info)
+        end if
+      end if
+      if(.not. allocated(x%combuf)) then
+        if(info == psb_success_) call psb_realloc(nb, x%combuf, info)
+        if(info == psb_success_) info = inner_register(x%combuf, x%dt_p_buf)
+      end if
+    else
+      call psb_realloc(nb, x%combuf, info)
+      if(c_associated(x%dt_buf) .and. (x%dt_buf_sz < nb)) then
+        call freeInt(x%dt_buf)
+        x%dt_buf    = c_null_ptr
+        x%dt_buf_sz = 0
+      end if
+      if((info == psb_success_) .and. (.not. c_associated(x%dt_buf))) then
+        info = allocateInt(x%dt_buf, nb)
+        if(info == psb_success_) x%dt_buf_sz = nb
+      end if
+    end if
+    if(c_associated(x%i_buf) .and. (x%i_buf_sz < n)) then
+      call freeInt(x%i_buf)
+      x%i_buf    = c_null_ptr
+      x%i_buf_sz = 0
+    end if
+    if((info == psb_success_) .and. (.not. c_associated(x%i_buf))) then
+      info = allocateInt(x%i_buf, n)
+      if(info == psb_success_) x%i_buf_sz = n
+    end if
+    if(info /= psb_success_) call psb_errpush(psb_err_alloc_dealloc_, 'i_cuda_multi_new_buffer')
+  end subroutine i_cuda_multi_new_buffer
+
+  subroutine i_cuda_multi_maybe_free_buffer(x, info)
+    implicit none
+    class(psb_i_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    info = psb_success_
+    if(psb_cuda_get_maybe_free_buffer()) call x%free_buffer(info)
+  end subroutine i_cuda_multi_maybe_free_buffer
+
+  subroutine i_cuda_multi_free_buffer(x, info)
+    implicit none
+    class(psb_i_multivect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(out)             :: info
+
+    info = psb_success_
+    if(allocated(x%combuf)) then
+      if(c_associated(x%dt_p_buf)) call inner_unregister(x%combuf)
+      deallocate(x%combuf, stat = info)
+    end if
+    x%dt_p_buf = c_null_ptr
+    if(c_associated(x%dt_buf)) call freeInt(x%dt_buf)
+    x%dt_buf    = c_null_ptr
+    x%dt_buf_sz = 0
+    if(c_associated(x%i_buf)) call freeInt(x%i_buf)
+    x%i_buf    = c_null_ptr
+    x%i_buf_sz = 0
+  end subroutine i_cuda_multi_free_buffer
+
+  !
+  ! Gather one column from the device into COMBUF(IXB:IXB+N-1); the indices are
+  ! IDX(I:I+N-1). With UVA the data is complete only after device_wait.
+  !
+  subroutine i_cuda_multi_dev_gth(i, ixb, n, idx, col, x)
+    implicit none
+    integer(psb_ipk_), intent(in) :: i, ixb, col
+    integer(psb_mpk_), intent(in) :: n
+    class(psb_i_base_vect_type)   :: idx
+    class(psb_i_multivect_cuda)   :: x
+
+    type(c_ptr) :: hbuf
+    logical     :: uva
+    integer     :: info
+
+    if(n <= 0) return
+    info = psb_success_
+    uva  = psb_cuda_DeviceHasUVA()
+    hbuf = x%dt_buf
+    if(uva) hbuf = x%dt_p_buf
+    select type(ii => idx)
+      class is (psb_i_vect_cuda)
+        if(ii%is_host()) call ii%sync()
+        info = igathMultiVecDeviceIntVecIdx(x%deviceVect, col - 1, n, i, ii%deviceVect, ixb, hbuf, 1)
+        
+      class default
+        info = writeInt(i, x%i_buf, ii%v(i:), n, 1)
+        if(info == psb_success_) info = igathMultiVecDeviceInt(x%deviceVect, col - 1, n, i, x%i_buf, ixb, hbuf, 1)
+    end select
+    if((info == psb_success_) .and. (.not. uva)) info = readInt(ixb, x%dt_buf, x%combuf(ixb:), n, 1)
+    if(info /= psb_success_) call psb_errpush(psb_err_internal_error_, 'i_cuda_multi_dev_gth')
+  end subroutine i_cuda_multi_dev_gth
+
+  !
+  ! Scatter COMBUF(IYB:IYB+N-1) into one column on the device.
+  !
+  subroutine i_cuda_multi_dev_sct(i, iyb, n, idx, col, beta, y)
+    implicit none
+    integer(psb_ipk_), intent(in) :: i, iyb, col
+    integer(psb_mpk_), intent(in) :: n
+    class(psb_i_base_vect_type)   :: idx
+    integer(psb_ipk_), intent(in)    :: beta
+    class(psb_i_multivect_cuda)   :: y
+
+    type(c_ptr) :: hbuf
+    integer     :: info
+
+    if(n <= 0) return
+    info = psb_success_
+    if(psb_cuda_DeviceHasUVA()) then
+      hbuf = y%dt_p_buf
+    else
+      hbuf = y%dt_buf
+      info = writeInt(iyb, y%dt_buf, y%combuf(iyb:), n, 1)
+    end if
+    if(info == psb_success_) then
+      ! The interface names the third and fourth arguments FIRST and N, the C
+      ! routine takes N and FIRST: they are passed by position, as elsewhere.
+      select type(ii => idx)
+        class is (psb_i_vect_cuda)
+          if(ii%is_host()) call ii%sync()
+          info = iscatMultiVecDeviceIntVecIdx(y%deviceVect, col - 1, n, i, ii%deviceVect, iyb, hbuf, 1, beta)
+        class default
+          info = writeInt(i, y%i_buf, ii%v(i:), n, 1)
+          if(info == psb_success_) info = iscatMultiVecDeviceInt(y%deviceVect, col - 1, n, i, y%i_buf, iyb, hbuf, 1, beta)
+      end select
+    end if
+    if(info /= psb_success_) call psb_errpush(psb_err_internal_error_, 'i_cuda_multi_dev_sct')
+  end subroutine i_cuda_multi_dev_sct
+
+  !
+  ! Gather: use the device only when it holds the valid copy; the host path
+  ! avoids moving the whole multivector just to read a few entries.
+  !
+  subroutine i_cuda_multi_gthzbuf(i, ixb, n, idx, x)
+    implicit none
+    integer(psb_ipk_)           :: i, ixb
+    integer(psb_mpk_)           :: n
+    class(psb_i_base_vect_type) :: idx
+    class(psb_i_multivect_cuda) :: x
+    integer(psb_ipk_) :: j
+
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf')
+      return
+    end if
+    if(x%is_dev()) then
+      do j = 1, x%get_ncols()
+        call i_cuda_multi_dev_gth(i, ixb + (j - 1)*n, n, idx, j, x)
+      end do
+    else
+      call x%psb_i_base_multivect_type%gthzbuf(i, ixb, n, idx)
+    end if
+  end subroutine i_cuda_multi_gthzbuf
+
+  subroutine i_cuda_multi_gthzbuf_col(i, ixb, n, idx, col, x)
+    implicit none
+    integer(psb_ipk_)           :: i, ixb, col
+    integer(psb_mpk_)           :: n
+    class(psb_i_base_vect_type) :: idx
+    class(psb_i_multivect_cuda) :: x
+
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf_col')
+      return
+    end if
+    if(x%is_dev()) then
+      call i_cuda_multi_dev_gth(i, ixb, n, idx, col, x)
+    else
+      call x%psb_i_base_multivect_type%gthzbuf_col(i, ixb, n, idx, col)
+    end if
+  end subroutine i_cuda_multi_gthzbuf_col
+
+  !
+  ! Scatter: update every copy that is valid, and leave the state unchanged.
+  ! In the sync state both copies are updated, so neither is invalidated.
+  ! The parent routine is called on the host copy only when that copy is valid.
+  !
+  subroutine i_cuda_multi_sctb_buf(i, iyb, n, idx, beta, y)
+    implicit none
+    integer(psb_ipk_)           :: i, iyb
+    integer(psb_mpk_)           :: n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_)              :: beta
+    class(psb_i_multivect_cuda) :: y
+
+    integer(psb_ipk_) :: j
+    logical           :: was_sync
+
+    if(.not. allocated(y%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf')
+      return
+    end if
+    was_sync = y%is_sync()
+    if(.not. y%is_host()) then
+      do j = 1, y%get_ncols()
+        call i_cuda_multi_dev_sct(i, iyb + (j - 1)*n, n, idx, j, beta, y)
+      end do
+    end if
+    if(.not. y%is_dev()) call y%psb_i_base_multivect_type%sctb_buf(i, iyb, n, idx, beta)
+    if(was_sync) call y%set_sync()
+  end subroutine i_cuda_multi_sctb_buf
+
+  subroutine i_cuda_multi_sctb_buf_col(i, iyb, n, idx, col, beta, y)
+    implicit none
+    integer(psb_ipk_)           :: i, iyb, col
+    integer(psb_mpk_)           :: n
+    class(psb_i_base_vect_type) :: idx
+    integer(psb_ipk_)              :: beta
+    class(psb_i_multivect_cuda) :: y
+    
+    logical :: was_sync
+
+    if(.not. allocated(y%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf_col')
+      return
+    end if
+    was_sync = y%is_sync()
+    if(.not. y%is_host()) call i_cuda_multi_dev_sct(i, iyb, n, idx, col, beta, y)
+    if(.not. y%is_dev())  call y%psb_i_base_multivect_type%sctb_buf_col(i, iyb, n, idx, col, beta)
+    if(was_sync) call y%set_sync()
+  end subroutine i_cuda_multi_sctb_buf_col
+
   subroutine i_cuda_multi_free(x, info)
     use psi_serial_mod
     use psb_realloc_mod
@@ -1151,6 +1419,7 @@ contains
     integer(psb_ipk_), intent(out)              :: info
     
     info = psb_success_
+    call x%free_buffer(info)
     if(c_associated(x%deviceVect)) then 
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect = c_null_ptr
@@ -1549,6 +1818,7 @@ contains
     integer(psb_ipk_) :: info
     info = psb_success_
 
+    call x%free_buffer(info)
     if(c_associated(x%deviceVect)) then 
       call freeMultiVecDevice(x%deviceVect)
       x%deviceVect = c_null_ptr

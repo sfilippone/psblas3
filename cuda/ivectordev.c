@@ -180,7 +180,7 @@ int iscatMultiVecDeviceInt(void* deviceVec, int vectorId, int n, int first, void
 
   idx = &(idx[first-indexBase]);
   hv  = &(hv[hfirst-indexBase]);
-  spgpuIscat(handle, (int *) devVec->v_, n, hv, idx, indexBase, beta);
+  spgpuIscat(handle, (int *) devVec->v_ + vectorId*devVec->pitch_, n, hv, idx, indexBase, beta);
   return SPGPU_SUCCESS;
   
 }

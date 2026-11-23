@@ -148,7 +148,7 @@ int iscatMultiVecDeviceDoubleComplex(void* deviceVec, int vectorId, int n, int f
 
   idx = &(idx[first - indexBase]);
   hv  = &(hv[hfirst - indexBase]);
-  spgpuZscat(handle, (cuDoubleComplex*) devVec->v_, n, hv, idx, indexBase, beta);
+  spgpuZscat(handle, (cuDoubleComplex*) devVec->v_ + vectorId*devVec->pitch_, n, hv, idx, indexBase, beta);
   return SPGPU_SUCCESS;
 }
 

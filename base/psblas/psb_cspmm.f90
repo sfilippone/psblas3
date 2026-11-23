@@ -1222,14 +1222,14 @@ subroutine psb_cspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
         !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
-        if(doswap_) call psi_swapdata(psb_swap_send_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if(doswap_) call psi_swapdata(psb_swap_send_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_, col = idx_x)
         if(do_timings) call psb_toc(mv_phase1)
         if(do_timings) call psb_tic(mv_phase2)
 
         call a%ad%spmm(alpha, x%v, idx_x, beta, y%v, info)
 
         if(do_timings) call psb_tic(mv_phase3)
-        if(doswap_) call psi_swapdata(psb_swap_recv_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if(doswap_) call psi_swapdata(psb_swap_recv_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_, col = idx_x)
         if(do_timings) call psb_toc(mv_phase3)
 
         if(do_timings) call psb_tic(mv_phase4)          
@@ -1243,7 +1243,8 @@ subroutine psb_cspmv_vm(alpha, a, x, idx_x, beta, y, desc_a, info, trans, work, 
         if(do_timings) call psb_barrier(ctxt)
         
         if(do_timings) call psb_tic(mv_phase11)
-        if(doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), czero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if(doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), czero, x%v, desc_a, iwork, info, &
+                                    & data = psb_comm_halo_, col = idx_x)
         if(do_timings) call psb_toc(mv_phase11)
 
         if(do_timings) call psb_tic(mv_phase12)          
@@ -1440,14 +1441,14 @@ subroutine psb_cspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
         !if(me == 0) write(0,*) 'going for overlap ',a%ad%get_fmt(),' ',a%and%get_fmt()
         if(do_timings) call psb_barrier(ctxt)
         if(do_timings) call psb_tic(mv_phase1)
-        if(doswap_) call psi_swapdata(psb_swap_send_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if(doswap_) call psi_swapdata(psb_swap_send_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_, col = idx_x)
         if(do_timings) call psb_toc(mv_phase1)
         if(do_timings) call psb_tic(mv_phase2)
 
         call a%ad%spmm(alpha, x%v, idx_x, beta, y%v, idx_y, info)
 
         if(do_timings) call psb_tic(mv_phase3)
-        if(doswap_) call psi_swapdata(psb_swap_recv_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if(doswap_) call psi_swapdata(psb_swap_recv_, czero, x%v, desc_a, iwork, info, data = psb_comm_halo_, col = idx_x)
         if(do_timings) call psb_toc(mv_phase3)
 
         if(do_timings) call psb_tic(mv_phase4)          
@@ -1461,7 +1462,8 @@ subroutine psb_cspmv_mm_idxs(alpha, a, x, idx_x, beta, y, idx_y, desc_a, info, t
         if(do_timings) call psb_barrier(ctxt)
         
         if(do_timings) call psb_tic(mv_phase11)          
-        if(doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), czero, x%v, desc_a, iwork, info, data = psb_comm_halo_)
+        if(doswap_) call psi_swapdata(ior(psb_swap_send_, psb_swap_recv_), czero, x%v, desc_a, iwork, info, &
+                                    & data = psb_comm_halo_, col = idx_x)
         if(do_timings) call psb_toc(mv_phase11)
 
         if(do_timings) call psb_tic(mv_phase12)          

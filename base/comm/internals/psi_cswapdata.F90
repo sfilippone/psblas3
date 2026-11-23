@@ -39,7 +39,7 @@
 !   a variable all-to-all data exchange (ALLTOALLV in MPI parlance), but 
 !   it is capable of pruning empty exchanges, which are very likely in out 
 !   application environment. All the variants have the same structure 
-!   In all these subroutines X may be:    I    Integer
+!   In all these subroutines X may be:    I    integer
 !                                         S    real(psb_spk_)
 !                                         D    real(psb_dpk_)
 !                                         C    complex(psb_spk_)
@@ -52,24 +52,24 @@
 !   halo indices, and BETA=0, whereas for overlap exchange the receive section 
 !   is scattered in the owned indices, and BETA=1.
 !   The first routine picks the desired exchange index list and passes it to the second.
-!   This version works on encapsulated vectors, and uses their methods to do  GTH and SCT,
+!   This version works on encapsulated vectors, and uses their methods to do  GTH and SCT, 
 !   so that special versions (i.e. GPU vectors can override them 
 ! 
 ! Arguments: 
 !    flag     - integer                 Choose the algorithm for data exchange: 
 !                                       this is chosen through bit fields. 
-!                                        swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
-!                                        swap_sync = iand(flag,psb_swap_sync_) /= 0
-!                                        swap_send = iand(flag,psb_swap_send_) /= 0
-!                                        swap_recv = iand(flag,psb_swap_recv_) /= 0
-!                                       if (swap_mpi):  use underlying MPI_ALLTOALLV.
-!                                       if (swap_sync): use PSB_SND and PSB_RCV in 
+!                                        swap_mpi  = iand(flag, psb_swap_mpi_)  /= 0
+!                                        swap_sync = iand(flag, psb_swap_sync_) /= 0
+!                                        swap_send = iand(flag, psb_swap_send_) /= 0
+!                                        swap_recv = iand(flag, psb_swap_recv_) /= 0
+!                                       if(swap_mpi):  use underlying MPI_ALLTOALLV.
+!                                       if(swap_sync): use PSB_SND and PSB_RCV in 
 !                                                       synchronized pairs
-!                                       if (swap_send .and. swap_recv): use mpi_irecv 
+!                                       if(swap_send .and. swap_recv): use mpi_irecv 
 !                                                       and mpi_send
-!                                       if (swap_send): use psb_snd (but need another 
+!                                       if(swap_send): use psb_snd (but need another 
 !                                                       call with swap_recv to complete)
-!                                       if (swap_recv): use psb_rcv (completing a 
+!                                       if(swap_recv): use psb_rcv (completing a 
 !                                                       previous call with swap_send)
 !
 !
@@ -89,50 +89,48 @@
 !
 !
 ! 
-submodule (psi_c_comm_v_mod)  psi_c_swapdata_impl
+submodule (psi_c_comm_v_mod) psi_c_swapdata_impl
   use psb_base_mod
 contains
-  module subroutine psi_cswapdata_vect(flag,beta,y,desc_a,work,info,data)
-
+  module subroutine psi_cswapdata_vect(flag, beta, y, desc_a, work, info, data)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
-    implicit none
 #ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
-
-    integer(psb_ipk_), intent(in)         :: flag
-    integer(psb_ipk_), intent(out)        :: info
-    class(psb_c_base_vect_type) :: y
-    complex(psb_spk_)           :: beta
-    complex(psb_spk_), target   :: work(:)
-    type(psb_desc_type), target  :: desc_a
-    integer(psb_ipk_), optional           :: data
+    implicit none
+    integer(psb_ipk_), intent(in)   :: flag
+    complex(psb_spk_)                  :: beta
+    class(psb_c_base_vect_type)     :: y
+    complex(psb_spk_), target          :: work(:)
+    type(psb_desc_type), target     :: desc_a
+    integer(psb_ipk_), intent(out)  :: info
+    integer(psb_ipk_), optional :: data
 
     ! locals
     type(psb_ctxt_type) :: ctxt
-    integer(psb_mpk_) :: icomm
-    integer(psb_ipk_) :: np, me, idxs, idxr, totxch, data_, err_act
+    integer(psb_mpk_)   :: icomm
+    integer(psb_ipk_)   :: np, me, idxs, idxr, totxch, data_, err_act
     class(psb_i_base_vect_type), pointer :: d_vidx
-    character(len=20)  :: name
+    character(len=20)   :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    info = psb_success_
+    name = 'psi_swap_datav'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
     icomm = ctxt%get_mpic()
-    call psb_info(ctxt,me,np) 
-    if (np == -1) then
-      info=psb_err_context_error_
-      call psb_errpush(info,name)
+    call psb_info(ctxt, me, np) 
+    if(np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info, name)
       goto 9999
     endif
 
-    if (.not.psb_is_asb_desc(desc_a)) then 
-      info=psb_err_invalid_cd_state_
-      call psb_errpush(info,name)
+    if(.not. psb_is_asb_desc(desc_a)) then 
+      info = psb_err_invalid_cd_state_
+      call psb_errpush(info, name)
       goto 9999
     endif
 
@@ -142,25 +140,22 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
+    call desc_a%get_list_p(data_, d_vidx, totxch, idxr, idxs, info) 
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_internal_error_, name, a_err = 'psb_cd_get_list')
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
-    if (info /= psb_success_) goto 9999
+    call psi_swapdata(ctxt, flag, beta, y, d_vidx, totxch, idxs, idxr, work, info)
+    if(info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+  9999 call psb_error_handler(ctxt, err_act)
     return
   end subroutine psi_cswapdata_vect
 
-
-  !
   !
   ! Subroutine: psi_cswap_vidx_vect
   !   Data exchange among processes.
@@ -171,57 +166,49 @@ contains
   !   The real workhorse: the outer routine will only choose the index list
   !   this one takes the index list and does the actual exchange. 
   !   
-  !   
-  ! 
-  module subroutine psi_cswap_vidx_vect(ctxt,flag,beta,y,idx, &
-       & totxch,totsnd,totrcv,work,info)
-
+  module subroutine psi_cswap_vidx_vect(ctxt, flag, beta, y, idx, totxch, totsnd, totrcv, work, info)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
-    implicit none
 #ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
-
-    type(psb_ctxt_type), intent(in)  :: ctxt
-    integer(psb_ipk_), intent(in)    :: flag
-    integer(psb_ipk_), intent(out)   :: info
-    class(psb_c_base_vect_type) :: y
-    complex(psb_spk_)           :: beta
-    complex(psb_spk_), target   :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
+    implicit none
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    complex(psb_spk_)                              :: beta
+    class(psb_c_base_vect_type)                 :: y
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: totxch, totsnd, totrcv
+    complex(psb_spk_), target                      :: work(:)
+    integer(psb_ipk_), intent(out)              :: info
 
     ! locals
     integer(psb_mpk_)   :: np, me
-    integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size),&
-         & iret, nesd, nerv
-    integer(psb_mpk_) :: icomm
+    integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret, nesd, nerv
+    integer(psb_mpk_)   :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
-    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
-         & snd_pt, rcv_pt, pnti, n
-    logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-         & albf,do_send,do_recv
-    logical, parameter :: usersend=.false., debug=.false.
+    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_, snd_pt, rcv_pt, pnti, n
+    logical :: swap_mpi, swap_sync, swap_send, swap_recv, albf, do_send, do_recv
+    logical, parameter :: usersend = .false., debug = .false.
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    info = psb_success_
+    name = 'psi_swap_datav'
     call psb_erractionsave(err_act)
-    call psb_info(ctxt,me,np) 
-    if (np == -1) then
-      info=psb_err_context_error_
-      call psb_errpush(info,name)
+    call psb_info(ctxt, me, np) 
+    if(np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info, name)
       goto 9999
     endif
     icomm = ctxt%get_mpic()
 
-    n=1
-    swap_mpi  = iand(flag,psb_swap_mpi_) /= 0
-    swap_sync = iand(flag,psb_swap_sync_) /= 0
-    swap_send = iand(flag,psb_swap_send_) /= 0
-    swap_recv = iand(flag,psb_swap_recv_) /= 0
+    n = 1
+    swap_mpi  = iand(flag, psb_swap_mpi_)  /= 0
+    swap_sync = iand(flag, psb_swap_sync_) /= 0
+    swap_send = iand(flag, psb_swap_send_) /= 0
+    swap_recv = iand(flag, psb_swap_recv_) /= 0
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
@@ -229,54 +216,53 @@ contains
     totsnd_ = totsnd * n
     call idx%sync()
 
-    if (debug) write(*,*) me,'Internal buffer'
-    if (do_send) then 
-      if (allocated(y%comid)) then
-        if (any(y%comid /= mpi_request_null)) then 
+    if(debug) write(*, *) me, 'Internal buffer'
+    if(do_send) then 
+      if(allocated(y%comid)) then
+        if(any(y%comid /= mpi_request_null)) then 
           ! 
           ! Unfinished communication? Something is wrong....
           !
-          info=psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/-2/))
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/-2/))
           goto 9999
         end if
       end if
-      if (debug) write(*,*) me,'do_send start'
-      call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(totxch,info)
+      if(debug) write(*, *) me, 'do_send start'
+      call y%new_buffer(ione*size(idx%v), info)
+      call y%new_comid(totxch, info)
       y%comid = mpi_request_null
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(totxch, prcid, info)
       ! First I post all the non blocking receives
-      pnti   = 1
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      pnti = 1
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
 
-        rcv_pt = 1+pnti+psb_n_elem_recv_
-        prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
-        if ((nerv>0).and.(proc_to_comm /= me)) then 
-          if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
+        rcv_pt = 1 + pnti + psb_n_elem_recv_
+        prcid(i) = psb_get_mpi_rank(ctxt, proc_to_comm)      
+        if((nerv > 0) .and. (proc_to_comm /= me)) then 
+          if(debug) write(*, *) me, 'Posting receive from', prcid(i), rcv_pt
           p2ptag = psb_complex_swap_tag
-          call mpi_irecv(y%combuf(rcv_pt),nerv,&
-               & psb_mpi_c_spk_,prcid(i),&
-               & p2ptag, icomm,y%comid(i,2),iret)
+          call mpi_irecv(y%combuf(rcv_pt), nerv, psb_mpi_c_spk_, prcid(i), &
+                        & p2ptag, icomm, y%comid(i, 2), iret)
         end if
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
-      if (debug) write(*,*) me,' Gather '
+      if(debug) write(*, *) me, ' Gather '
       !
       ! Then gather for sending.
       !    
-      pnti   = 1
-      do i=1, totxch
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        snd_pt = 1+pnti+nerv+psb_n_elem_send_
-        rcv_pt = 1+pnti+psb_n_elem_recv_
+      pnti = 1
+      do i = 1, totxch
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        snd_pt = 1 + pnti + nerv + psb_n_elem_send_
+        rcv_pt = 1 + pnti + psb_n_elem_recv_
         idx_pt = snd_pt
-        call y%gth(idx_pt,nesd,idx)
-        pnti   = pnti + nerv + nesd + 3
+        call y%gth(idx_pt, nesd, idx)
+        pnti = pnti + nerv + nesd + 3
       end do
 
       !
@@ -284,104 +270,99 @@ contains
       !
       call y%device_wait()
 
-      if (debug) write(*,*) me,' isend'
+      if(debug) write(*, *) me, ' isend'
       !
       ! Then send
       !
-
-      pnti   = 1
+      pnti = 1
       snd_pt = 1
       rcv_pt = 1
       p2ptag = psb_complex_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        snd_pt = 1+pnti+nerv+psb_n_elem_send_
-        rcv_pt = 1+pnti+psb_n_elem_recv_
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        snd_pt = 1 + pnti + nerv + psb_n_elem_send_
+        rcv_pt = 1 + pnti + psb_n_elem_recv_
 
-        if ((nesd>0).and.(proc_to_comm /= me)) then 
-          call mpi_isend(y%combuf(snd_pt),nesd,&
-               & psb_mpi_c_spk_,prcid(i),&
-               & p2ptag,icomm,y%comid(i,1),iret)
+        if((nesd > 0) .and. (proc_to_comm /= me)) then 
+          call mpi_isend(y%combuf(snd_pt), nesd, psb_mpi_c_spk_, prcid(i), &
+                        & p2ptag, icomm, y%comid(i, 1), iret)
         end if
 
         if(iret /= mpi_success) then
-          info=psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
           goto 9999
         end if
 
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
     end if
 
-    if (do_recv) then 
-      if (debug) write(*,*) me,' do_Recv'
-      if (.not.allocated(y%comid)) then 
+    if(do_recv) then 
+      if(debug) write(*, *) me, ' do_Recv'
+      if(.not.allocated(y%comid)) then 
         ! 
         ! No matching send? Something is wrong....
         !
-        info=psb_err_mpi_error_
-        call psb_errpush(info,name,m_err=(/-2/))
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/-2/))
         goto 9999
       end if
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(totxch, prcid, info)
 
-      if (debug) write(*,*) me,' wait'
-      pnti   = 1
+      if(debug) write(*, *) me, ' wait'
+      pnti = 1
       p2ptag = psb_complex_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        snd_pt = 1+pnti+nerv+psb_n_elem_send_
-        rcv_pt = 1+pnti+psb_n_elem_recv_
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        snd_pt = 1 + pnti + nerv + psb_n_elem_send_
+        rcv_pt = 1 + pnti + psb_n_elem_recv_
 
-        if (proc_to_comm /= me)then 
-          if (nesd>0) then 
-            call mpi_wait(y%comid(i,1),p2pstat,iret)
+        if(proc_to_comm /= me) then 
+          if(nesd > 0) then 
+            call mpi_wait(y%comid(i, 1), p2pstat, iret)
             if(iret /= mpi_success) then
-              info=psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
+              info = psb_err_mpi_error_
+              call psb_errpush(info, name, m_err=(/iret/))
               goto 9999
             end if
           end if
-          if (nerv>0) then 
-            call mpi_wait(y%comid(i,2),p2pstat,iret)
+          if(nerv > 0) then 
+            call mpi_wait(y%comid(i, 2), p2pstat, iret)
             if(iret /= mpi_success) then
-              info=psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
+              info = psb_err_mpi_error_
+              call psb_errpush(info, name, m_err=(/iret/))
               goto 9999
             end if
           end if
-        else if (proc_to_comm == me) then 
-          if (nesd /= nerv) then 
-            write(psb_err_unit,*) &
-                 & 'Fatal error in swapdata: mismatch on self send',&
-                 & nerv,nesd
+        else if(proc_to_comm == me) then 
+          if(nesd /= nerv) then 
+            write(psb_err_unit, *) 'Fatal error in swapdata: mismatch on self send', nerv, nesd
           end if
-          y%combuf(rcv_pt:rcv_pt+nerv-1) = y%combuf(snd_pt:snd_pt+nesd-1)
+          y%combuf(rcv_pt : rcv_pt + nerv-1) = y%combuf(snd_pt : snd_pt + nesd-1)
         end if
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
 
-      if (debug) write(*,*) me,' scatter'      
-      pnti   = 1
+      if(debug) write(*, *) me, ' scatter'      
+      pnti = 1
       snd_pt = 1
       rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        idx_pt = 1+pnti+psb_n_elem_recv_
-        snd_pt = 1+pnti+nerv+psb_n_elem_send_
-        rcv_pt = 1+pnti+psb_n_elem_recv_
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        idx_pt = 1 + pnti + psb_n_elem_recv_
+        snd_pt = 1 + pnti + nerv + psb_n_elem_send_
+        rcv_pt = 1 + pnti + psb_n_elem_recv_
 
-        if (debug) write(0,*)me,' Received from: ',prcid(i),&
-             & y%combuf(rcv_pt:rcv_pt+nerv-1)        
-        call y%sct(rcv_pt,nerv,idx,beta)
-        pnti   = pnti + nerv + nesd + 3
+        if(debug) write(0, *) me, ' Received from: ', prcid(i), y%combuf(rcv_pt : rcv_pt + nerv-1)        
+        call y%sct(rcv_pt, nerv, idx, beta)
+        pnti = pnti + nerv + nesd + 3
       end do
       !
       ! Waited for everybody, clean up
@@ -391,24 +372,22 @@ contains
       !
       ! Then wait for device
       !
-      if (debug) write(*,*) me,' wait'
+      if(debug) write(*, *) me, ' wait'
       call y%device_wait()
-      if (debug) write(*,*) me,' free buffer'
+      if(debug) write(*, *) me, ' free buffer'
       call y%maybe_free_buffer(info)
-      if (info == 0) call y%free_comid(info)
-      if (info /= 0) then 
-        call psb_errpush(psb_err_alloc_dealloc_,name)
+      if(info == 0) call y%free_comid(info)
+      if(info /= 0) then 
+        call psb_errpush(psb_err_alloc_dealloc_, name)
         goto 9999
       end if
-      if (debug) write(*,*) me,' done'
+      if(debug) write(*, *) me, ' done'
     end if
-
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+  9999 call psb_error_handler(ctxt, err_act)
     return
   end subroutine psi_cswap_vidx_vect
 
@@ -418,9 +397,10 @@ contains
   !   Data exchange among processes.
   !
   !   Takes care of Y an encaspulated multivector.
+  !   If COL is present only that column is exchanged; the matching send and
+  !   receive calls must pass the same value.
   !   
-  !   
-  module subroutine psi_cswapdata_multivect(flag,beta,y,desc_a,work,info,data)
+  module subroutine psi_cswapdata_multivect(flag, beta, y, desc_a, work, info, data, col)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
@@ -436,6 +416,7 @@ contains
     complex(psb_spk_), target   :: work(:)
     type(psb_desc_type), target  :: desc_a
     integer(psb_ipk_), optional           :: data
+    integer(psb_ipk_), optional, intent(in) :: col
 
     ! locals
     type(psb_ctxt_type) :: ctxt
@@ -444,22 +425,22 @@ contains
     class(psb_i_base_vect_type), pointer :: d_vidx
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    info = psb_success_
+    name = 'psi_swap_datav'
     call psb_erractionsave(err_act)
 
     ctxt = desc_a%get_context()
     icomm = ctxt%get_mpic()
-    call psb_info(ctxt,me,np) 
-    if (np == -1) then
-      info=psb_err_context_error_
-      call psb_errpush(info,name)
+    call psb_info(ctxt, me, np) 
+    if(np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info, name)
       goto 9999
     endif
 
-    if (.not.psb_is_asb_desc(desc_a)) then 
-      info=psb_err_invalid_cd_state_
-      call psb_errpush(info,name)
+    if(.not.psb_is_asb_desc(desc_a)) then 
+      info = psb_err_invalid_cd_state_
+      call psb_errpush(info, name)
       goto 9999
     endif
 
@@ -469,25 +450,22 @@ contains
       data_ = psb_comm_halo_
     end if
 
-    call desc_a%get_list_p(data_,d_vidx,totxch,idxr,idxs,info) 
-    if (info /= psb_success_) then 
-      call psb_errpush(psb_err_internal_error_,name,a_err='psb_cd_get_list')
+    call desc_a%get_list_p(data_, d_vidx, totxch, idxr, idxs, info) 
+    if(info /= psb_success_) then 
+      call psb_errpush(psb_err_internal_error_, name, a_err = 'psb_cd_get_list')
       goto 9999
     end if
 
-    call psi_swapdata(ctxt,flag,beta,y,d_vidx,totxch,idxs,idxr,work,info)
-    if (info /= psb_success_) goto 9999
+    call psi_swapdata(ctxt, flag, beta, y, d_vidx, totxch, idxs, idxr, work, info, col=col)
+    if(info /= psb_success_) goto 9999
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+  9999 call psb_error_handler(ctxt, err_act)
     return
   end subroutine psi_cswapdata_multivect
 
-
-  !
   !
   ! Subroutine: psi_cswap_vidx_multivect
   !   Data exchange among processes.
@@ -498,57 +476,61 @@ contains
   !   The real workhorse: the outer routine will only choose the index list
   !   this one takes the index list and does the actual exchange. 
   !   
-  !   
-  ! 
-  module subroutine psi_cswap_vidx_multivect(ctxt,flag,beta,y,idx, &
-       & totxch,totsnd,totrcv,work,info)
-
+  module subroutine psi_cswap_vidx_multivect(ctxt, flag, beta, y, idx, totxch, totsnd, totrcv, work, info, col)
 #ifdef PSB_MPI_MOD
     use mpi
 #endif
-    implicit none
 #ifdef PSB_MPI_H
     include 'mpif.h'
 #endif
-
-    type(psb_ctxt_type), intent(in)    :: ctxt
-    integer(psb_ipk_), intent(in)      :: flag
-    integer(psb_ipk_), intent(out)     :: info
-    class(psb_c_base_multivect_type) :: y
-    complex(psb_spk_)         :: beta
-    complex(psb_spk_), target :: work(:)
-    class(psb_i_base_vect_type), intent(inout) :: idx
-    integer(psb_ipk_), intent(in)              :: totxch,totsnd, totrcv
+    implicit none
+    type(psb_ctxt_type), intent(in)             :: ctxt
+    integer(psb_ipk_), intent(in)               :: flag
+    class(psb_c_base_multivect_type)            :: y
+    complex(psb_spk_)                              :: beta
+    complex(psb_spk_), target                      :: work(:)
+    class(psb_i_base_vect_type), intent(inout)  :: idx
+    integer(psb_ipk_), intent(in)               :: totxch, totsnd, totrcv
+    integer(psb_ipk_), intent(out)              :: info
+    integer(psb_ipk_), optional, intent(in) :: col
 
     ! locals
-    integer(psb_mpk_)   :: np, me, nesd, nerv, n
-    integer(psb_mpk_)   :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
+    integer(psb_mpk_) :: np, me, nesd, nerv, n
+    integer(psb_mpk_) :: proc_to_comm, p2ptag, p2pstat(mpi_status_size), iret
     integer(psb_mpk_) :: icomm
     integer(psb_mpk_), allocatable :: prcid(:)
-    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
-         & snd_pt, rcv_pt, pnti
-    logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-         & albf,do_send,do_recv
-    logical, parameter :: usersend=.false., debug=.false.
+    integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_, snd_pt, rcv_pt, pnti
+    logical :: swap_mpi, swap_sync, swap_send, swap_recv, albf, do_send, do_recv
+    logical, parameter :: usersend = .false., debug = .false.
     character(len=20)  :: name
 
-    info=psb_success_
-    name='psi_swap_datav'
+    info = psb_success_
+    name = 'psi_swap_datav'
     call psb_erractionsave(err_act)
-    call psb_info(ctxt,me,np) 
-    if (np == -1) then
-      info=psb_err_context_error_
-      call psb_errpush(info,name)
+    call psb_info(ctxt, me, np) 
+    if(np == -1) then
+      info = psb_err_context_error_
+      call psb_errpush(info, name)
       goto 9999
     endif
     icomm = ctxt%get_mpic()
 
-    n = y%get_ncols()
+    ! With COL present the buffer layout is that of a single column.
+    if(present(col)) then
+      if((col < 1) .or. (col > y%get_ncols())) then
+        info = psb_err_iarg_invalid_value_
+        call psb_errpush(info, name)
+        goto 9999
+      end if
+      n = 1
+    else
+      n = y%get_ncols()
+    end if
 
-    swap_mpi  = iand(flag,psb_swap_mpi_)  /= 0
-    swap_sync = iand(flag,psb_swap_sync_) /= 0
-    swap_send = iand(flag,psb_swap_send_) /= 0
-    swap_recv = iand(flag,psb_swap_recv_) /= 0
+    swap_mpi  = iand(flag, psb_swap_mpi_)  /= 0
+    swap_sync = iand(flag, psb_swap_sync_) /= 0
+    swap_send = iand(flag, psb_swap_send_) /= 0
+    swap_recv = iand(flag, psb_swap_recv_) /= 0
     do_send = swap_mpi .or. swap_sync .or. swap_send
     do_recv = swap_mpi .or. swap_sync .or. swap_recv
 
@@ -557,58 +539,61 @@ contains
 
     call idx%sync()
 
-    if (debug) write(*,*) me,'Internal buffer'
-    if (do_send) then 
-      if (allocated(y%comid)) then 
-        if (any(y%comid /= mpi_request_null)) then 
+    if(debug) write(*, *) me, 'Internal buffer'
+    if(do_send) then 
+      if(allocated(y%comid)) then 
+        if(any(y%comid /= mpi_request_null)) then 
           ! 
           ! Unfinished communication? Something is wrong....
           !
-          info=psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/-2/))
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/-2/))
           goto 9999
         end if
       end if
-      if (debug) write(*,*) me,'do_send start'
-      call y%new_buffer(ione*size(idx%v),info)
-      call y%new_comid(totxch,info)
+      if(debug) write(*, *) me, 'do_send start'
+      call y%new_buffer(ione*size(idx%v), info)
+      call y%new_comid(totxch, info)
       y%comid = mpi_request_null
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(totxch, prcid, info)
       ! First I post all the non blocking receives
-      pnti   = 1
-      snd_pt = totrcv_+1
+      pnti = 1
+      snd_pt = totrcv_ + 1
       rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
-        if ((nerv>0).and.(proc_to_comm /= me)) then 
-          if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        prcid(i) = psb_get_mpi_rank(ctxt, proc_to_comm)      
+        if((nerv > 0) .and. (proc_to_comm /= me)) then 
+          if(debug) write(*, *) me, 'Posting receive from', prcid(i), rcv_pt
           p2ptag = psb_complex_swap_tag
-          call mpi_irecv(y%combuf(rcv_pt),n*nerv,&
-               & psb_mpi_c_spk_,prcid(i),&
-               & p2ptag, icomm,y%comid(i,2),iret)
+          call mpi_irecv(y%combuf(rcv_pt), n*nerv, psb_mpi_c_spk_, prcid(i), &
+                        & p2ptag, icomm, y%comid(i, 2), iret)
         end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
-      if (debug) write(*,*) me,' Gather '
+      if(debug) write(*, *) me, ' Gather '
       !
       ! Then gather for sending.
       !    
-      pnti   = 1
-      snd_pt = totrcv_+1
+      pnti = 1
+      snd_pt = totrcv_ + 1
       rcv_pt = 1
-      do i=1, totxch
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        idx_pt = 1+pnti+nerv+psb_n_elem_send_
-        call y%gth(idx_pt,snd_pt,nesd,idx)
+      do i = 1, totxch
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        idx_pt = 1 + pnti + nerv + psb_n_elem_send_
+        if(present(col)) then
+          call y%gthzbuf_col(idx_pt, snd_pt, nesd, idx, col)
+        else
+          call y%gth(idx_pt, snd_pt, nesd, idx)
+        end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
 
       !
@@ -616,104 +601,103 @@ contains
       !
       call y%device_wait()
 
-      if (debug) write(*,*) me,' isend'
+      if(debug) write(*, *) me, ' isend'
       !
       ! Then send
       !
-
-      pnti   = 1
-      snd_pt = totrcv_+1
+      pnti = 1
+      snd_pt = totrcv_ + 1
       rcv_pt = 1
       p2ptag = psb_complex_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
 
-        if ((nesd>0).and.(proc_to_comm /= me)) then 
-          call mpi_isend(y%combuf(snd_pt),n*nesd,&
-               & psb_mpi_c_spk_,prcid(i),&
-               & p2ptag,icomm,y%comid(i,1),iret)
+        if((nesd > 0) .and. (proc_to_comm /= me)) then 
+          call mpi_isend(y%combuf(snd_pt), n*nesd, psb_mpi_c_spk_, prcid(i), &
+                        & p2ptag, icomm, y%comid(i, 1), iret)
         end if
 
         if(iret /= mpi_success) then
-          info=psb_err_mpi_error_
-          call psb_errpush(info,name,m_err=(/iret/))
+          info = psb_err_mpi_error_
+          call psb_errpush(info, name, m_err=(/iret/))
           goto 9999
         end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
     end if
 
-    if (do_recv) then 
-      if (debug) write(*,*) me,' do_Recv'
-      if (.not.allocated(y%comid)) then 
+    if(do_recv) then 
+      if(debug) write(*, *) me, ' do_Recv'
+      if(.not.allocated(y%comid)) then 
         ! 
         ! No matching send? Something is wrong....
         !
-        info=psb_err_mpi_error_
-        call psb_errpush(info,name,m_err=(/-2/))
+        info = psb_err_mpi_error_
+        call psb_errpush(info, name, m_err=(/-2/))
         goto 9999
       end if
-      call psb_realloc(totxch,prcid,info)
+      call psb_realloc(totxch, prcid, info)
 
-      if (debug) write(*,*) me,' wait'
-      pnti   = 1
-      snd_pt = totrcv_+1
+      if(debug) write(*, *) me, ' wait'
+      pnti = 1
+      snd_pt = totrcv_ + 1
       rcv_pt = 1
       p2ptag = psb_complex_swap_tag
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        if (proc_to_comm /= me)then 
-          if (nesd>0) then 
-            call mpi_wait(y%comid(i,1),p2pstat,iret)
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        if(proc_to_comm /= me) then 
+          if(nesd > 0) then 
+            call mpi_wait(y%comid(i, 1), p2pstat, iret)
             if(iret /= mpi_success) then
-              info=psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
+              info = psb_err_mpi_error_
+              call psb_errpush(info, name, m_err=(/iret/))
               goto 9999
             end if
           end if
-          if (nerv>0) then 
-            call mpi_wait(y%comid(i,2),p2pstat,iret)
+          if(nerv > 0) then 
+            call mpi_wait(y%comid(i, 2), p2pstat, iret)
             if(iret /= mpi_success) then
-              info=psb_err_mpi_error_
-              call psb_errpush(info,name,m_err=(/iret/))
+              info = psb_err_mpi_error_
+              call psb_errpush(info, name, m_err=(/iret/))
               goto 9999
             end if
           end if
-        else if (proc_to_comm == me) then 
-          if (nesd /= nerv) then 
-            write(psb_err_unit,*) &
-                 & 'Fatal error in swapdata: mismatch on self send',&
-                 & nerv,nesd
+        else if(proc_to_comm == me) then 
+          if(nesd /= nerv) then 
+            write(psb_err_unit, *) 'Fatal error in swapdata: mismatch on self send', nerv, nesd
           end if
-          y%combuf(rcv_pt:rcv_pt+n*nerv-1) = y%combuf(snd_pt:snd_pt+n*nesd-1)
+          y%combuf(rcv_pt : rcv_pt + n*nerv-1) = y%combuf(snd_pt : snd_pt + n*nesd-1)
         end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
 
-      if (debug) write(*,*) me,' scatter'      
-      pnti   = 1
-      snd_pt = totrcv_+1
+      if(debug) write(*, *) me, ' scatter'      
+      pnti = 1
+      snd_pt = totrcv_ + 1
       rcv_pt = 1
-      do i=1, totxch
-        proc_to_comm = idx%v(pnti+psb_proc_id_)
-        nerv = idx%v(pnti+psb_n_elem_recv_)
-        nesd = idx%v(pnti+nerv+psb_n_elem_send_)
-        idx_pt = 1+pnti+psb_n_elem_recv_
+      do i = 1, totxch
+        proc_to_comm = idx%v(pnti + psb_proc_id_)
+        nerv = idx%v(pnti + psb_n_elem_recv_)
+        nesd = idx%v(pnti + nerv + psb_n_elem_send_)
+        idx_pt = 1 + pnti + psb_n_elem_recv_
 
-        if (debug) write(0,*)me,' Received from: ',prcid(i),&
-             & y%combuf(rcv_pt:rcv_pt+n*nerv-1)        
-        call y%sct(idx_pt,rcv_pt,nerv,idx,beta)
+        if(debug) write(0, *) me, ' Received from: ', prcid(i), y%combuf(rcv_pt : rcv_pt + n*nerv-1)        
+        if(present(col)) then
+          call y%sctb_buf_col(idx_pt, rcv_pt, nerv, idx, col, beta)
+        else
+          call y%sct(idx_pt, rcv_pt, nerv, idx, beta)
+        end if
         rcv_pt = rcv_pt + n*nerv
         snd_pt = snd_pt + n*nesd
-        pnti   = pnti + nerv + nesd + 3
+        pnti = pnti + nerv + nesd + 3
       end do
       !
       ! Waited for com, cleanup comid
@@ -723,24 +707,22 @@ contains
       !
       ! Then wait for device
       !
-      if (debug) write(*,*) me,' wait'
+      if(debug) write(*, *) me, ' wait'
       call y%device_wait()
-      if (debug) write(*,*) me,' free buffer'
-      call y%free_buffer(info)
-      if (info == 0) call y%free_comid(info)
-      if (info /= 0) then 
-        call psb_errpush(psb_err_alloc_dealloc_,name)
+      if(debug) write(*, *) me, ' free buffer'
+      call y%maybe_free_buffer(info)
+      if(info == 0) call y%free_comid(info)
+      if(info /= 0) then 
+        call psb_errpush(psb_err_alloc_dealloc_, name)
         goto 9999
       end if
-      if (debug) write(*,*) me,' done'
+      if(debug) write(*, *) me, ' done'
     end if
-
 
     call psb_erractionrestore(err_act)
     return
 
-9999 call psb_error_handler(ctxt,err_act)
-
+  9999 call psb_error_handler(ctxt, err_act)
     return
   end subroutine psi_cswap_vidx_multivect
 end submodule psi_c_swapdata_impl

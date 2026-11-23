@@ -2608,11 +2608,13 @@ module psb_z_base_multivect_mod
     procedure, pass(x) :: gthzv_x  => z_base_mlv_gthzv_x
     procedure, pass(x) :: gthzbuf  => z_base_mlv_gthzbuf
     generic, public    :: gth      => gthab, gthzv, gthzm, gthzv_x, gthzbuf
+    procedure, pass(x) :: gthzbuf_col  => z_base_mlv_gthzbuf_col
     procedure, pass(y) :: sctb     => z_base_mlv_sctb
     procedure, pass(y) :: sctbr2   => z_base_mlv_sctbr2
     procedure, pass(y) :: sctb_x   => z_base_mlv_sctb_x
     procedure, pass(y) :: sctb_buf => z_base_mlv_sctb_buf
     generic, public    :: sct      => sctb, sctbr2, sctb_x, sctb_buf
+    procedure, pass(y) :: sctb_buf_col => z_base_mlv_sctb_buf_col
   end type psb_z_base_multivect_type
 
   interface psb_z_base_multivect
@@ -3633,7 +3635,7 @@ contains
     nrx = x%get_nrows()
     nry = y%get_nrows()
 
-    if(nrx /= nry) then
+    if((m > nrx) .or. (m > nry)) then
       info = psb_err_invalid_mvect_size_
       return
     endif
@@ -3641,8 +3643,9 @@ contains
     ncx = x%get_ncols()
     ncy = y%get_ncols()
 
+    if(x%is_dev()) call x%sync()
     if(y%is_dev()) call y%sync()
-    call zgemm('T', 'N', ncx, ncy, nrx, zone, x%v, nrx, y%v, nry, zzero, res, ncx)
+    call zgemm('T', 'N', ncx, ncy, m, zone, x%v, size(x%v, 1), y%v, size(y%v, 1), zzero, res, ncx)
   end subroutine z_base_mvect_dot_mm
 
   subroutine z_base_mvect_dot_mv(m, x, y, res, info)
@@ -3667,15 +3670,16 @@ contains
     nrx = x%get_nrows()
     nry = y%get_nrows()
 
-    if(nry /= nrx) then
+    if((m > nrx) .or. (m > nry)) then
       info = psb_err_invalid_vect_size_
       return
     endif
 
     ncx = x%get_ncols()
 
+    if(x%is_dev()) call x%sync()
     if(y%is_dev()) call y%sync()
-    call zgemv('T', nrx, ncx, zone, x%v, nrx, y%v, 1, zzero, res, 1)
+    call zgemv('T', m, ncx, zone, x%v, size(x%v, 1), y%v, 1, zzero, res, 1)
   end subroutine z_base_mvect_dot_mv
 
   subroutine z_base_mvect_mlt_v_full(m, alpha, x, y, beta, info, conjgx, conjgy)
@@ -4285,6 +4289,32 @@ contains
   end subroutine z_base_mlv_gthzbuf
 
   !
+  !> Function  base_mlv_gthzbuf_col
+  !! \memberof  psb_z_base_multivect_type
+  !! \brief gather one column into the communication buffer
+  !!    combuf(ixb:ixb+n-1) = X(IDX(i:i+n-1), col)
+  !
+  subroutine z_base_mlv_gthzbuf_col(i, ixb, n, idx, col, x)
+    implicit none
+    integer(psb_ipk_)                 :: i, ixb, col
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    class(psb_z_base_multivect_type)  :: x
+
+    integer(psb_ipk_) :: k
+
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf_col')
+      return
+    end if
+    if(idx%is_dev()) call idx%sync()
+    if(x%is_dev()) call x%sync()
+    do k = 1, n
+      x%combuf(ixb + k - 1) = x%v(idx%v(i + k - 1), col)
+    end do
+  end subroutine z_base_mlv_gthzbuf_col
+
+  !
   ! Scatter:
   ! Y(IDX(:), :) = beta*Y(IDX(:), :) + X(:)
   !
@@ -4363,6 +4393,44 @@ contains
     call y%sct(n, idx%v(i:), y%combuf(iyb:), beta)
     call y%set_host()
   end subroutine z_base_mlv_sctb_buf
+
+  !
+  !> Function  base_mlv_sctb_buf_col
+  !! \memberof  psb_z_base_multivect_type
+  !! \brief scatter the communication buffer into one column
+  !!    Y(IDX(i:i+n-1), col) = beta * Y(IDX(i:i+n-1), col) + combuf(iyb:iyb+n-1)
+  !
+  subroutine z_base_mlv_sctb_buf_col(i, iyb, n, idx, col, beta, y)
+    implicit none
+    integer(psb_ipk_)                 :: i, iyb, col
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    complex(psb_dpk_)                    :: beta
+    class(psb_z_base_multivect_type)  :: y
+
+    integer(psb_ipk_) :: k
+
+    if(.not. allocated(y%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf_col')
+      return
+    end if
+    if(y%is_dev()) call y%sync()
+    if(idx%is_dev()) call idx%sync()
+    if(beta == zzero) then
+      do k = 1, n
+        y%v(idx%v(i + k - 1), col) = y%combuf(iyb + k - 1)
+      end do
+    else if(beta == zone) then
+      do k = 1, n
+        y%v(idx%v(i + k - 1), col) = y%v(idx%v(i + k - 1), col) + y%combuf(iyb + k - 1)
+      end do
+    else
+      do k = 1, n
+        y%v(idx%v(i + k - 1), col) = beta * y%v(idx%v(i + k - 1), col) + y%combuf(iyb + k - 1)
+      end do
+    end if
+    call y%set_host()
+  end subroutine z_base_mlv_sctb_buf_col
 
   !
   !> Function  base_device_wait:

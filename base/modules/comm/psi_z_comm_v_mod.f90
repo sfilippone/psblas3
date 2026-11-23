@@ -36,136 +36,140 @@ module psi_z_comm_v_mod
   use psb_z_base_multivect_mod, only : psb_z_base_multivect_type 
 
   interface psi_swapdata
-    module subroutine psi_zswapdata_vect(flag,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_vect_type) :: y
-      complex(psb_dpk_)           :: beta 
-      complex(psb_dpk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
+    module subroutine psi_zswapdata_vect(flag, beta, y, desc_a, work, info, data)
+      integer(psb_ipk_), intent(in)   :: flag
+      complex(psb_dpk_)                  :: beta 
+      class(psb_z_base_vect_type)     :: y
+      type(psb_desc_type), target     :: desc_a
+      complex(psb_dpk_), target          :: work(:)
+      integer(psb_ipk_), intent(out)  :: info
       integer(psb_ipk_), optional :: data
     end subroutine psi_zswapdata_vect
-    module subroutine psi_zswapdata_multivect(flag,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_multivect_type)    :: y
-      complex(psb_dpk_)           :: beta 
-      complex(psb_dpk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional :: data
+
+    module subroutine psi_zswapdata_multivect(flag, beta, y, desc_a, work, info, data, col)
+      integer(psb_ipk_), intent(in)     :: flag
+      complex(psb_dpk_)                    :: beta 
+      class(psb_z_base_multivect_type)  :: y
+      type(psb_desc_type), target       :: desc_a
+      complex(psb_dpk_), target            :: work(:)
+      integer(psb_ipk_), intent(out)    :: info
+      integer(psb_ipk_), optional             :: data
+      integer(psb_ipk_), optional, intent(in) :: col
     end subroutine psi_zswapdata_multivect
-    module subroutine psi_zswap_vidx_vect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)         :: ctxt
-      integer(psb_ipk_), intent(in)           :: flag
-      integer(psb_ipk_), intent(out)          :: info
-      class(psb_z_base_vect_type)             :: y
-      complex(psb_dpk_)                       :: beta
-      complex(psb_dpk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+
+    module subroutine psi_zswap_vidx_vect(ctxt, flag, beta, y, idx, totxch, totsnd, totrcv, work, info)
+      type(psb_ctxt_type), intent(in)             :: ctxt
+      integer(psb_ipk_), intent(in)               :: flag
+      complex(psb_dpk_)                              :: beta
+      class(psb_z_base_vect_type)                 :: y
+      class(psb_i_base_vect_type), intent(inout)  :: idx
+      integer(psb_ipk_), intent(in)               :: totxch, totsnd, totrcv
+      complex(psb_dpk_), target                      :: work(:)
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_zswap_vidx_vect
-    module subroutine psi_zswap_vidx_multivect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)       :: ctxt
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_multivect_type)    :: y
-      complex(psb_dpk_)                       :: beta
-      complex(psb_dpk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+
+    module subroutine psi_zswap_vidx_multivect(ctxt, flag, beta, y, idx, totxch, totsnd, totrcv, work, info, col)
+      type(psb_ctxt_type), intent(in)             :: ctxt
+      integer(psb_ipk_), intent(in)               :: flag
+      complex(psb_dpk_)                              :: beta
+      class(psb_z_base_multivect_type)            :: y
+      class(psb_i_base_vect_type), intent(inout)  :: idx
+      complex(psb_dpk_), target                      :: work(:)
+      integer(psb_ipk_), intent(in)               :: totxch, totsnd, totrcv
+      integer(psb_ipk_), intent(out)              :: info
+      integer(psb_ipk_), optional, intent(in) :: col
     end subroutine psi_zswap_vidx_multivect
   end interface psi_swapdata
 
-
   interface psi_swaptran
-    module subroutine psi_zswaptran_vect(flag,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_vect_type) :: y
-      complex(psb_dpk_)           :: beta
-      complex(psb_dpk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
+    module subroutine psi_zswaptran_vect(flag, beta, y, desc_a, work, info, data)
+      integer(psb_ipk_), intent(in)   :: flag
+      complex(psb_dpk_)                  :: beta
+      class(psb_z_base_vect_type)     :: y
+      integer(psb_ipk_), intent(out)  :: info
+      complex(psb_dpk_), target          :: work(:)
+      type(psb_desc_type), target     :: desc_a
+      integer(psb_ipk_), optional :: data
     end subroutine psi_zswaptran_vect
-    module subroutine psi_zswaptran_multivect(flag,beta,y,desc_a,work,info,data)
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_multivect_type) :: y
-      complex(psb_dpk_)           :: beta
-      complex(psb_dpk_),target    :: work(:)
-      type(psb_desc_type), target :: desc_a
-      integer(psb_ipk_), optional           :: data
+
+    module subroutine psi_zswaptran_multivect(flag, beta, y, desc_a, work, info, data)
+      integer(psb_ipk_), intent(in)     :: flag
+      complex(psb_dpk_)                    :: beta
+      class(psb_z_base_multivect_type)  :: y
+      type(psb_desc_type), target       :: desc_a
+      complex(psb_dpk_), target            :: work(:)
+      integer(psb_ipk_), intent(out)    :: info
+      integer(psb_ipk_), optional :: data
     end subroutine psi_zswaptran_multivect
-    module subroutine psi_ztran_vidx_vect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)       :: ctxt
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_vect_type)          :: y
-      complex(psb_dpk_)                       :: beta
-      complex(psb_dpk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+
+    module subroutine psi_ztran_vidx_vect(ctxt, flag, beta, y, idx, totxch, totsnd, totrcv, work, info)
+      type(psb_ctxt_type), intent(in)             :: ctxt
+      integer(psb_ipk_), intent(in)               :: flag
+      complex(psb_dpk_)                              :: beta
+      class(psb_z_base_vect_type)                 :: y
+      class(psb_i_base_vect_type), intent(inout)  :: idx
+      integer(psb_ipk_), intent(in)               :: totxch, totsnd, totrcv
+      complex(psb_dpk_), target                      :: work(:)
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_ztran_vidx_vect
-    module subroutine psi_ztran_vidx_multivect(ctxt,flag,beta,y,idx,&
-         & totxch,totsnd,totrcv,work,info)
-      type(psb_ctxt_type), intent(in)       :: ctxt
-      integer(psb_ipk_), intent(in)         :: flag
-      integer(psb_ipk_), intent(out)        :: info
-      class(psb_z_base_multivect_type)      :: y
-      complex(psb_dpk_)                       :: beta
-      complex(psb_dpk_), target               :: work(:)
-      class(psb_i_base_vect_type), intent(inout) :: idx
-      integer(psb_ipk_), intent(in)           :: totxch,totsnd, totrcv
+
+    module subroutine psi_ztran_vidx_multivect(ctxt, flag, beta, y, idx, totxch, totsnd, totrcv, work, info)
+      type(psb_ctxt_type), intent(in)             :: ctxt
+      integer(psb_ipk_), intent(in)               :: flag
+      complex(psb_dpk_)                              :: beta
+      class(psb_z_base_multivect_type)            :: y
+      class(psb_i_base_vect_type), intent(inout)  :: idx
+      integer(psb_ipk_), intent(in)               :: totxch, totsnd, totrcv
+      complex(psb_dpk_), target                      :: work(:)
+      integer(psb_ipk_), intent(out)              :: info
     end subroutine psi_ztran_vidx_multivect
   end interface psi_swaptran
 
   interface psi_ovrl_upd
-    module subroutine  psi_zovrl_upd_vect(x,desc_a,update,info)
-      class(psb_z_base_vect_type)       :: x
-      type(psb_desc_type), intent(in)   :: desc_a
-      integer(psb_ipk_), intent(in)               :: update
-      integer(psb_ipk_), intent(out)              :: info
+    module subroutine psi_zovrl_upd_vect(x, desc_a, update, info)
+      class(psb_z_base_vect_type)     :: x
+      type(psb_desc_type), intent(in) :: desc_a
+      integer(psb_ipk_), intent(in)   :: update
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_zovrl_upd_vect
-    module subroutine  psi_zovrl_upd_multivect(x,desc_a,update,info)
-      class(psb_z_base_multivect_type)   :: x
-      type(psb_desc_type), intent(in)      :: desc_a
-      integer(psb_ipk_), intent(in)        :: update
-      integer(psb_ipk_), intent(out)       :: info
+
+    module subroutine psi_zovrl_upd_multivect(x, desc_a, update, info)
+      class(psb_z_base_multivect_type)  :: x
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer(psb_ipk_), intent(in)     :: update
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_zovrl_upd_multivect
   end interface psi_ovrl_upd
 
   interface psi_ovrl_save
-    module subroutine  psi_zovrl_save_vect(x,xs,desc_a,info)
+    module subroutine psi_zovrl_save_vect(x, xs, desc_a, info)
       class(psb_z_base_vect_type)     :: x
-      complex(psb_dpk_), allocatable  :: xs(:)
+      complex(psb_dpk_), allocatable     :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_zovrl_save_vect
-    module subroutine  psi_zovrl_save_multivect(x,xs,desc_a,info)
-      class(psb_z_base_multivect_type)     :: x
-      complex(psb_dpk_), allocatable  :: xs(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+
+    module subroutine psi_zovrl_save_multivect(x, xs, desc_a, info)
+      class(psb_z_base_multivect_type)  :: x
+      complex(psb_dpk_), allocatable       :: xs(:, :)
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_zovrl_save_multivect
   end interface psi_ovrl_save
 
   interface psi_ovrl_restore
-    module subroutine  psi_zovrl_restr_vect(x,xs,desc_a,info)
+    module subroutine psi_zovrl_restr_vect(x, xs, desc_a, info)
       class(psb_z_base_vect_type)     :: x
-      complex(psb_dpk_)               :: xs(:)
+      complex(psb_dpk_)                  :: xs(:)
       type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+      integer(psb_ipk_), intent(out)  :: info
     end subroutine psi_zovrl_restr_vect
-    module subroutine  psi_zovrl_restr_multivect(x,xs,desc_a,info)
-      class(psb_z_base_multivect_type)     :: x
-      complex(psb_dpk_)               :: xs(:,:)
-      type(psb_desc_type), intent(in) :: desc_a
-      integer(psb_ipk_), intent(out)            :: info
+
+    module subroutine psi_zovrl_restr_multivect(x, xs, desc_a, info)
+      class(psb_z_base_multivect_type)  :: x
+      complex(psb_dpk_)                    :: xs(:, :)
+      type(psb_desc_type), intent(in)   :: desc_a
+      integer(psb_ipk_), intent(out)    :: info
     end subroutine psi_zovrl_restr_multivect
   end interface psi_ovrl_restore
-
 end module psi_z_comm_v_mod
-

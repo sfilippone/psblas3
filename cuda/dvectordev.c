@@ -148,7 +148,7 @@ int iscatMultiVecDeviceDouble(void* deviceVec, int vectorId, int n, int first, v
 
   idx = &(idx[first - indexBase]);
   hv  = &(hv[hfirst - indexBase]);
-  spgpuDscat(handle, (double*) devVec->v_, n, hv, idx, indexBase, beta);
+  spgpuDscat(handle, (double*) devVec->v_ + vectorId*devVec->pitch_, n, hv, idx, indexBase, beta);
   return SPGPU_SUCCESS;
 }
 

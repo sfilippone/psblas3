@@ -1492,11 +1492,13 @@ module psb_l_base_multivect_mod
     procedure, pass(x) :: gthzv_x  => l_base_mlv_gthzv_x
     procedure, pass(x) :: gthzbuf  => l_base_mlv_gthzbuf
     generic, public    :: gth      => gthab, gthzv, gthzm, gthzv_x, gthzbuf
+    procedure, pass(x) :: gthzbuf_col  => l_base_mlv_gthzbuf_col
     procedure, pass(y) :: sctb     => l_base_mlv_sctb
     procedure, pass(y) :: sctbr2   => l_base_mlv_sctbr2
     procedure, pass(y) :: sctb_x   => l_base_mlv_sctb_x
     procedure, pass(y) :: sctb_buf => l_base_mlv_sctb_buf
     generic, public    :: sct      => sctb, sctbr2, sctb_x, sctb_buf
+    procedure, pass(y) :: sctb_buf_col => l_base_mlv_sctb_buf_col
   end type psb_l_base_multivect_type
 
   interface psb_l_base_multivect
@@ -2430,6 +2432,32 @@ contains
   end subroutine l_base_mlv_gthzbuf
 
   !
+  !> Function  base_mlv_gthzbuf_col
+  !! \memberof  psb_l_base_multivect_type
+  !! \brief gather one column into the communication buffer
+  !!    combuf(ixb:ixb+n-1) = X(IDX(i:i+n-1), col)
+  !
+  subroutine l_base_mlv_gthzbuf_col(i, ixb, n, idx, col, x)
+    implicit none
+    integer(psb_ipk_)                 :: i, ixb, col
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    class(psb_l_base_multivect_type)  :: x
+
+    integer(psb_ipk_) :: k
+
+    if(.not. allocated(x%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'gthzbuf_col')
+      return
+    end if
+    if(idx%is_dev()) call idx%sync()
+    if(x%is_dev()) call x%sync()
+    do k = 1, n
+      x%combuf(ixb + k - 1) = x%v(idx%v(i + k - 1), col)
+    end do
+  end subroutine l_base_mlv_gthzbuf_col
+
+  !
   ! Scatter:
   ! Y(IDX(:), :) = beta*Y(IDX(:), :) + X(:)
   !
@@ -2508,6 +2536,44 @@ contains
     call y%sct(n, idx%v(i:), y%combuf(iyb:), beta)
     call y%set_host()
   end subroutine l_base_mlv_sctb_buf
+
+  !
+  !> Function  base_mlv_sctb_buf_col
+  !! \memberof  psb_l_base_multivect_type
+  !! \brief scatter the communication buffer into one column
+  !!    Y(IDX(i:i+n-1), col) = beta * Y(IDX(i:i+n-1), col) + combuf(iyb:iyb+n-1)
+  !
+  subroutine l_base_mlv_sctb_buf_col(i, iyb, n, idx, col, beta, y)
+    implicit none
+    integer(psb_ipk_)                 :: i, iyb, col
+    integer(psb_mpk_)                 :: n
+    class(psb_i_base_vect_type)       :: idx
+    integer(psb_lpk_)                    :: beta
+    class(psb_l_base_multivect_type)  :: y
+
+    integer(psb_ipk_) :: k
+
+    if(.not. allocated(y%combuf)) then
+      call psb_errpush(psb_err_alloc_dealloc_, 'sctb_buf_col')
+      return
+    end if
+    if(y%is_dev()) call y%sync()
+    if(idx%is_dev()) call idx%sync()
+    if(beta == lzero) then
+      do k = 1, n
+        y%v(idx%v(i + k - 1), col) = y%combuf(iyb + k - 1)
+      end do
+    else if(beta == lone) then
+      do k = 1, n
+        y%v(idx%v(i + k - 1), col) = y%v(idx%v(i + k - 1), col) + y%combuf(iyb + k - 1)
+      end do
+    else
+      do k = 1, n
+        y%v(idx%v(i + k - 1), col) = beta * y%v(idx%v(i + k - 1), col) + y%combuf(iyb + k - 1)
+      end do
+    end if
+    call y%set_host()
+  end subroutine l_base_mlv_sctb_buf_col
 
   !
   !> Function  base_device_wait:
