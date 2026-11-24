@@ -51,7 +51,7 @@ module psb_timers_mod
   integer(psb_ipk_), save      :: timer_depth = 0
   ! Indices   
   integer(psb_ipk_), parameter :: timer_tic_ = 1, timer_toc_ = 2
-  integer(psb_ipk_), parameter :: timer_x_ = 3, 
+  integer(psb_ipk_), parameter :: timer_x_ = 3 
   integer(psb_ipk_), parameter :: timer_sum_ = 4, timer_avg_ = 6
   integer(psb_ipk_), parameter :: timer_max_ = 5, timer_min_ = 7
   integer(psb_ipk_), parameter :: timer_entries_ = 7
