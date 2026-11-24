@@ -182,7 +182,7 @@ subroutine psb_s_pMPK_core(spmat, prec, vec_in, Z, offsetZ, Q, offsetQ, s, save_
   character(len=20) :: name = "psb_s_pMPK_core"
   real(psb_spk_), pointer :: aux(:)
   
-  logical, parameter      :: doTiming = .true.
+  logical, parameter      :: doTiming = .false.
   integer(psb_ipk_), save :: timer_session_depth
   integer(psb_ipk_), save :: timer_idx_cheb = -1, timer_idx_spmv = -1, timer_idx_papply = -1
 

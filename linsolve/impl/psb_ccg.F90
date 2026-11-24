@@ -132,7 +132,7 @@ subroutine psb_ccg_vect(a, prec, b, x, eps, desc_a, info, &
   character(len = *), parameter :: methdname = 'CG'
   
   ! Per-phase timers
-  logical, parameter :: doTiming = .true.
+  logical, parameter :: doTiming = .false.
   integer(psb_ipk_), save :: timer_session_depth
   integer(psb_ipk_), save :: timer_idx_axpby, timer_idx_papply, timer_idx_spmv, timer_idx_dot
 

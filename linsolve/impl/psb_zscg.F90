@@ -65,7 +65,7 @@ subroutine psb_zscg_vect(a, prec, b, x, s, eps, desc_a, info, &
 #endif
   
   ! Per-phase timers, printed at the end of the solve. The MPK may adds 'chebyshev', 'spmv' and 'precapply'.
-  logical, parameter :: doTiming = .true.
+  logical, parameter :: doTiming = .false.
   integer(psb_ipk_), save :: timer_session_depth
   integer(psb_ipk_), save :: timer_idx_axpby, timer_idx_mpk, timer_idx_dotloc, timer_idx_dotred, &
                             & timer_idx_GEMM, timer_idx_gramfact, timer_idx_gramsolve
