@@ -64,8 +64,26 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
   type(psb_d_vect_cuda), target             :: vect_cuda
 #endif
   
+  ! Per-phase timers, printed at the end of the solve. The MPK may adds 'chebyshev', 'spmv' and 'precapply'.
+  logical, parameter :: doTiming = .true.
+  integer(psb_ipk_), save :: timer_session_depth
+  integer(psb_ipk_), save :: timer_idx_axpby, timer_idx_mpk, timer_idx_dotloc, timer_idx_dotred, &
+                            & timer_idx_GEMM, timer_idx_gramfact, timer_idx_gramsolve
+
   info = psb_success_
   call psb_erractionsave(err_act)
+
+  if(doTiming) then
+    timer_session_depth = psb_enter_timer_session()
+    if(timer_session_depth == 1) call psb_init_timers(10_psb_ipk_)
+    timer_idx_axpby     = psb_get_timer_idx('axpby')
+    timer_idx_mpk       = psb_get_timer_idx('mpk')
+    timer_idx_dotloc    = psb_get_timer_idx('dot loc')
+    timer_idx_dotred    = psb_get_timer_idx('dot red')
+    timer_idx_GEMM      = psb_get_timer_idx('GEMM')
+    timer_idx_gramfact  = psb_get_timer_idx('gram fact')
+    timer_idx_gramsolve = psb_get_timer_idx('gram solve')
+  end if
   
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -240,6 +258,11 @@ subroutine psb_dscg_vect(a, prec, b, x, s, eps, desc_a, info, &
     goto 9999
   end if
 
+  if(doTiming) then
+    timer_session_depth = psb_exit_timer_session()
+    if(timer_session_depth == 0) call psb_print_timers(ctxt)
+  end if
+
   call psb_erractionrestore(err_act)
   return
 
@@ -254,9 +277,11 @@ contains
     allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, s + 1), aux_fa(4*n_col), stat = info)
 
     ! First matrix power kernel
+    if(doTiming) call psb_tic(timer_idx_mpk)
     call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                     & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
                     & mvec_temp = aux_mv, farr_temp = aux_fa)
+    if(doTiming) call psb_toc(timer_idx_mpk)
     if(info /= psb_success_) then 
       info = psb_err_from_subroutine_ 
       return
@@ -265,17 +290,24 @@ contains
     ! Loop until convergence (or maxiter)
     do itidx = 1, itmax_
       ! Compute matrix W and rhs for alpha
+      if(doTiming) call psb_tic(timer_idx_dotloc)
       call psb_gedots(P, V, temp_fa(:, 1 : s), desc_a, info, global = .false.)
       call psb_gedots(P, r, temp_fa(:, s + 1), desc_a, info, global = .false.)
+      if(doTiming) call psb_toc(timer_idx_dotloc)
+      if(doTiming) call psb_tic(timer_idx_dotred)
       call psb_sum(desc_a%get_context(), temp_fa)
+      if(doTiming) call psb_toc(timer_idx_dotred)
       W = temp_fa(:, 1 : s)
       alpha = temp_fa(:, s + 1)
 
       ! Factor matrix W (if soving with LU or Cholesky factorization)
+      if(doTiming) call psb_tic(timer_idx_gramfact)
       if(Gram_solver_ == lapackLU) call dgetrf(s, s, W, s, pW, info)
       if(Gram_solver_ == lapackCC) call dpotrf('L', s, W, s, info)
+      if(doTiming) call psb_toc(timer_idx_gramfact)
 
       ! Solve for alpha
+      if(doTiming) call psb_tic(timer_idx_gramsolve)
       select case(Gram_solver_)
         case(forwardGS);  call inner_solver_fgs_1D(W, alpha, FGS_sweeps_)
         case(lapackLU);   call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
@@ -284,24 +316,32 @@ contains
           info = psb_err_invalid_input_ 
           return
       end select
+      if(doTiming) call psb_toc(timer_idx_gramsolve)
 
       ! Update solution and residual
+      if(doTiming) call psb_tic(timer_idx_axpby)
       call psb_geaxpby(P, alpha, x, desc_a, info, upd_flag = .true.)
       call psb_geaxpby(V, -alpha, r, desc_a, info, upd_flag = .true.)
+      if(doTiming) call psb_toc(timer_idx_axpby)
 
       ! Check convergence. 
       if(psb_check_conv(methdfullname, itidx, x, r, desc_a, stopdat, info)) exit
       
       ! Matrix power kernel
+      if(doTiming) call psb_tic(timer_idx_mpk)
       call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
                     & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
                     & mvec_temp = aux_mv, farr_temp = aux_fa)
+      if(doTiming) call psb_toc(timer_idx_mpk)
 
       ! Compute rhs for beta
+      if(doTiming) call psb_tic(timer_idx_dotloc)
       call psb_gedots(P, Q, beta, desc_a, info, global = .true.)
+      if(doTiming) call psb_toc(timer_idx_dotloc)
       beta = -beta;
-
+      
       ! Solve for beta
+      if(doTiming) call psb_tic(timer_idx_gramsolve)
       select case(Gram_solver_)
         case(forwardGS);  call inner_solver_fgs_2D(W, beta, FGS_sweeps_)
         case(lapackLU);   call dgetrs('N', s, s, W, s, pW, beta, s, info)
@@ -310,12 +350,15 @@ contains
           info = psb_err_invalid_input_ 
           return
       end select
+      if(doTiming) call psb_toc(timer_idx_gramsolve)
 
       ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
+      if(doTiming) call psb_tic(timer_idx_axpby)
       call psb_geaxpby(P, beta, Z, desc_a, info, upd_flag = .true.)
       call psb_swap_multivect(P, Z, info) 
       call psb_geaxpby(V, beta, Q, desc_a, info, upd_flag = .true.)
       call psb_swap_multivect(V, Q, info)
+      if(doTiming) call psb_toc(timer_idx_axpby)
     end do
 
     deallocate(alpha, beta, W, pW, temp_fa, aux_fa, stat = info)
@@ -327,18 +370,24 @@ contains
   
     allocate(alpha(s), beta(s, s), W(s, s), pW(s), temp_fa(s, 2*s + 1), B2(s, s), c0(s), aux_fa(4*n_col), stat = info)
     ! First matrix power kernel
+    if(doTiming) call psb_tic(timer_idx_mpk)
     call psb_pMPK(a, prec, r, P, V, s, desc_a, info, base_type = base_type_, &
                     & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
                     & mvec_temp = aux_mv, farr_temp = aux_fa)
+    if(doTiming) call psb_toc(timer_idx_mpk)
     if(info /= psb_success_) then 
       info = psb_err_from_subroutine_ 
       return
     end if
 
     ! Compute first Gram system components
+    if(doTiming) call psb_tic(timer_idx_dotloc)
     call psb_gedots(P, V, temp_fa(:, 1 : s), desc_a, info, global = .false.)
     call psb_gedots(P, r, temp_fa(:, 2*s + 1), desc_a, info, global = .false.)
+    if(doTiming) call psb_toc(timer_idx_dotloc)
+    if(doTiming) call psb_tic(timer_idx_dotred)
     call psb_sum(desc_a%get_context(), temp_fa)
+    if(doTiming) call psb_toc(timer_idx_dotred)
 
     W = temp_fa(:, 1 : s)
     alpha = temp_fa(:, 2*s + 1)
@@ -346,10 +395,13 @@ contains
     ! Loop until convergence (or maxiter)
     do itidx = 1, itmax_
       ! Factor matrix W (if soving with LU or Cholesky factorization)
+      if(doTiming) call psb_tic(timer_idx_gramfact)
       if(Gram_solver_ == lapackLU) call dgetrf(s, s, W, s, pW, info)
       if(Gram_solver_ == lapackCC) call dpotrf('L', s, W, s, info)
+      if(doTiming) call psb_toc(timer_idx_gramfact)
 
       ! Solve for alpha
+      if(doTiming) call psb_tic(timer_idx_gramsolve)
       select case(Gram_solver_)
         case(forwardGS);  call inner_solver_fgs_1D(W, alpha, FGS_sweeps_)
         case(lapackLU);   call dgetrs('N', s, 1, W, s, pW, alpha, s, info)
@@ -358,30 +410,40 @@ contains
           info = psb_err_invalid_input_ 
           return
       end select
+      if(doTiming) call psb_toc(timer_idx_gramsolve)
 
       ! Update solution and residual
+      if(doTiming) call psb_tic(timer_idx_axpby)
       call psb_geaxpby(P, alpha, x, desc_a, info, upd_flag = .true.)
       call psb_geaxpby(V, -alpha, r, desc_a, info, upd_flag = .true.)
+      if(doTiming) call psb_toc(timer_idx_axpby)
 
       ! Check convergence
       if(psb_check_conv(methdfullname, itidx, x, r, desc_a, stopdat, info)) exit
 
       ! Matrix power kernel
+      if(doTiming) call psb_tic(timer_idx_mpk)
       call psb_pMPK(a, prec, r, Z, Q, s, desc_a, info, base_type = base_type_, &
                     & alpha = cheb_coeff(1), beta = cheb_coeff(2), gamma = cheb_coeff(3), &
                     & mvec_temp = aux_mv, farr_temp = aux_fa)
+      if(doTiming) call psb_toc(timer_idx_mpk)
 
       ! Compute dot products
+      if(doTiming) call psb_tic(timer_idx_dotloc)
       call psb_gedots(P, Q, temp_fa(:, 1 : s), desc_a, info, global = .false.)
       call psb_gedots(Z, Q, temp_fa(:, s+1 : 2*s), desc_a, info, global = .false.)
       call psb_gedots(Z, r, temp_fa(:, 2*s + 1), desc_a, info, global = .false.)
+      if(doTiming) call psb_toc(timer_idx_dotloc)
+      if(doTiming) call psb_tic(timer_idx_dotred)
       call psb_sum(desc_a%get_context(), temp_fa)
+      if(doTiming) call psb_toc(timer_idx_dotred)
 
       !Compute new rhs for beta
       B2 = -temp_fa(:, 1 : s)
 
       ! Solve for beta
       beta = B2
+      if(doTiming) call psb_tic(timer_idx_gramsolve)
       select case(Gram_solver_)
         case(forwardGS);  call inner_solver_fgs_2D(W, beta, FGS_sweeps_)
         case(lapackLU);   call dgetrs('N', s, s, W, s, pW, beta, s, info)
@@ -390,16 +452,21 @@ contains
           info = psb_err_invalid_input_ 
           return
       end select
+      if(doTiming) call psb_toc(timer_idx_gramsolve)
 
       ! Update P and V. Use of temp_mv in needed because internal dgemm constraint
+      if(doTiming) call psb_tic(timer_idx_axpby)
       call psb_geaxpby(P, beta, Z, desc_a, info, upd_flag = .true.)
       call psb_swap_multivect(P, Z, info) 
       call psb_geaxpby(V, beta, Q, desc_a, info, upd_flag = .true.)
       call psb_swap_multivect(V, Q, info)
+      if(doTiming) call psb_toc(timer_idx_axpby)
       
       !Compute new Gram matrix
       W = temp_fa(:, s+1 : 2*s)
+      if(doTiming) call psb_tic(timer_idx_GEMM)
       call dgemm('T', 'N', s, s, s, -done, beta, s, B2, s, done, W, s)
+      if(doTiming) call psb_toc(timer_idx_GEMM)
       
       !Compute new rhs for alpha
       alpha = temp_fa(:, 2*s + 1)
