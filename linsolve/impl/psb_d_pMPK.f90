@@ -181,8 +181,7 @@ subroutine psb_d_pMPK_core(spmat, prec, vec_in, Z, offsetZ, Q, offsetQ, s, save_
   character         :: base_type_
   character(len=20) :: name = "psb_d_pMPK_core"
   real(psb_dpk_), pointer :: aux(:)
-  ! Sub-timers of the MPK: registered on the first call after the solver
-  ! (re)initialises the timers, so the indices are the same in every solve
+  
   logical, parameter      :: doTiming = .true.
   integer(psb_ipk_), save :: timer_session_depth
   integer(psb_ipk_), save :: timer_idx_cheb = -1, timer_idx_spmv = -1, timer_idx_papply = -1
@@ -190,7 +189,7 @@ subroutine psb_d_pMPK_core(spmat, prec, vec_in, Z, offsetZ, Q, offsetQ, s, save_
   call psb_erractionsave(err_act)
   info = psb_success_
 
-  if (doTiming) then
+  if(doTiming) then
     timer_session_depth = psb_enter_timer_session()
     if(timer_session_depth == 1) call psb_init_timers(3_psb_ipk_)
     if((.not. psb_check_timer('precapply'))) then
@@ -255,32 +254,32 @@ contains
 
     ! Copy r in the first column of Q
     idx_Q = 1 + offsetQ
-    if (doTiming) call psb_tic(timer_idx_cheb)
+    if(doTiming) call psb_tic(timer_idx_cheb)
     call psb_geaxpby(done, vec_in, dzero, Q, idx_Q, desc, info)
-    if (doTiming) call psb_toc(timer_idx_cheb)
+    if(doTiming) call psb_toc(timer_idx_cheb)
 
     ! First iteration
     idx_Z = 1 + offsetZ
-    if (doTiming) call psb_tic(timer_idx_papply)
+    if(doTiming) call psb_tic(timer_idx_papply)
     call prec%apply(Q, idx_Q, Z, idx_Z, desc, info, work = aux)
-    if (doTiming) call psb_toc(timer_idx_papply)
+    if(doTiming) call psb_toc(timer_idx_papply)
     idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
-    if (doTiming) call psb_tic(timer_idx_spmv)
+    if(doTiming) call psb_tic(timer_idx_spmv)
     call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
-    if (doTiming) call psb_toc(timer_idx_spmv)
+    if(doTiming) call psb_toc(timer_idx_spmv)
     
     if(s == 1) return
 
     do i = 2, s
       idx_Z = idx_Z + 1
-      if (doTiming) call psb_tic(timer_idx_papply)
+      if(doTiming) call psb_tic(timer_idx_papply)
       call prec%apply(Q, idx_Q, Z, idx_Z, desc, info, work = aux)
-      if (doTiming) call psb_toc(timer_idx_papply)
+      if(doTiming) call psb_toc(timer_idx_papply)
       
       idx_Q = idx_Q + 1
-      if (doTiming) call psb_tic(timer_idx_spmv)
+      if(doTiming) call psb_tic(timer_idx_spmv)
       call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
-      if (doTiming) call psb_toc(timer_idx_spmv)
+      if(doTiming) call psb_toc(timer_idx_spmv)
     end do
   end subroutine psb_d_pMPK_monomial
 
@@ -300,42 +299,42 @@ contains
     
     ! Copy r in the first column of Q
     idx_Q = 1 + offsetQ
-    if (doTiming) call psb_tic(timer_idx_cheb)
+    if(doTiming) call psb_tic(timer_idx_cheb)
     call psb_geaxpby(done, vec_in, dzero, Q, idx_Q, desc, info)
-    if (doTiming) call psb_toc(timer_idx_cheb)
+    if(doTiming) call psb_toc(timer_idx_cheb)
     
     ! Inizialize first column of temp multivector
     ind_tmp = 1 
-    if (doTiming) call psb_tic(timer_idx_cheb)
+    if(doTiming) call psb_tic(timer_idx_cheb)
     call psb_geaxpby(done, vec_in, dzero, mvec_tmp, ind_tmp, desc, info)
-    if (doTiming) call psb_toc(timer_idx_cheb)
+    if(doTiming) call psb_toc(timer_idx_cheb)
 
     ! First iteration
     idx_Z = 1 + offsetZ
-    if (doTiming) call psb_tic(timer_idx_papply)
+    if(doTiming) call psb_tic(timer_idx_papply)
     call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info, work = aux)
-    if (doTiming) call psb_toc(timer_idx_papply)
+    if(doTiming) call psb_toc(timer_idx_papply)
     idx_Q = merge(idx_Q + 1, idx_Q, save_r) !If not save_r overwrite it with the first vector
-    if (doTiming) call psb_tic(timer_idx_spmv)
+    if(doTiming) call psb_tic(timer_idx_spmv)
     call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
-    if (doTiming) call psb_toc(timer_idx_spmv)
+    if(doTiming) call psb_toc(timer_idx_spmv)
 
     !Check first early exit
     if(s == 1) goto 9998
 
     ! First update of temp multivector + second iteration
     ind_tmp = ind_tmp + 1
-    if (doTiming) call psb_tic(timer_idx_cheb)
+    if(doTiming) call psb_tic(timer_idx_cheb)
     call psb_geaxpby(alpha, Q, idx_Q, -beta, mvec_tmp, ind_tmp - 1, dzero, mvec_tmp, ind_tmp, desc, info)
-    if (doTiming) call psb_toc(timer_idx_cheb)
+    if(doTiming) call psb_toc(timer_idx_cheb)
     idx_Z = idx_Z + 1
-    if (doTiming) call psb_tic(timer_idx_papply)
+    if(doTiming) call psb_tic(timer_idx_papply)
     call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info, work = aux)
-    if (doTiming) call psb_toc(timer_idx_papply)
+    if(doTiming) call psb_toc(timer_idx_papply)
     idx_Q = idx_Q + 1
-    if (doTiming) call psb_tic(timer_idx_spmv)
+    if(doTiming) call psb_tic(timer_idx_spmv)
     call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
-    if (doTiming) call psb_toc(timer_idx_spmv)
+    if(doTiming) call psb_toc(timer_idx_spmv)
 
     !Check second early exit
     if(s == 2) goto 9998
@@ -343,19 +342,19 @@ contains
     ! Loop for s > 2
     do i = 3, s
       ind_tmp = modulo(ind_tmp, 3) + 1
-      if (doTiming) call psb_tic(timer_idx_cheb)
+      if(doTiming) call psb_tic(timer_idx_cheb)
       call psb_geaxpby(2*alpha, Q, idx_Q, -2*beta, mvec_tmp, modulo(ind_tmp - 2, 3) + 1, &
                       & -gamma_, mvec_tmp, modulo(ind_tmp - 3, 3) + 1, mvec_tmp, ind_tmp, desc, info)
-      if (doTiming) call psb_toc(timer_idx_cheb)
+      if(doTiming) call psb_toc(timer_idx_cheb)
       idx_Z = idx_Z + 1
-      if (doTiming) call psb_tic(timer_idx_papply)
+      if(doTiming) call psb_tic(timer_idx_papply)
       call prec%apply(mvec_tmp, ind_tmp, Z, idx_Z, desc, info, work = aux)
-      if (doTiming) call psb_toc(timer_idx_papply)
+      if(doTiming) call psb_toc(timer_idx_papply)
 
       idx_Q = idx_Q + 1
-      if (doTiming) call psb_tic(timer_idx_spmv)
+      if(doTiming) call psb_tic(timer_idx_spmv)
       call psb_spmm(done, spmat, Z, idx_Z, dzero, Q, idx_Q, desc, info, work = aux)
-      if (doTiming) call psb_toc(timer_idx_spmv)
+      if(doTiming) call psb_toc(timer_idx_spmv)
     end do
   
   9998 if(.not. present(mvec_temp)) call psb_gefree(mvec_tmp, desc, info)

@@ -129,9 +129,24 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   logical                     :: do_cond
   character(len=20)           :: name
   character(len=*), parameter :: methdname='CG'
+  
+  ! Per-phase timers
+  logical, parameter :: doTiming = .true.
+  integer(psb_ipk_), save :: timer_session_depth
+  integer(psb_ipk_), save :: timer_idx_axpby, timer_idx_papply, timer_idx_spmv, timer_idx_dot
 
   info = psb_success_
   name = 'psb_scg'
+
+  if (doTiming) then
+    timer_session_depth = psb_enter_timer_session()
+    if(timer_session_depth == 1) call psb_init_timers(4_psb_ipk_)
+    timer_idx_axpby  = psb_get_timer_idx('axpby')
+    timer_idx_spmv   = psb_get_timer_idx('spmv')
+    timer_idx_papply = psb_get_timer_idx('precapply')
+    timer_idx_dot    = psb_get_timer_idx('dot')
+  end if
+
   call psb_erractionsave(err_act)
   debug_unit  = psb_get_debug_unit()
   debug_level = psb_get_debug_level()
@@ -263,11 +278,17 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
 
       it   = it + 1
       itx = itx + 1
-
+      
+      if (doTiming) call psb_tic(timer_idx_papply)
       call prec%apply(r,z,desc_a,info,work=aux)
+      if (doTiming) call psb_toc(timer_idx_papply)
       rho_old = rho
+      if (doTiming) call psb_tic(timer_idx_dot)
       rho     = psb_gedot(r,z,desc_a,info)
 
+      if (doTiming) call psb_toc(timer_idx_dot)
+
+      if (doTiming) call psb_tic(timer_idx_axpby)
       if (it == 1) then
         call psb_geaxpby(sone,z,szero,p,desc_a,info)
       else
@@ -280,9 +301,14 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
         beta = rho/rho_old
         call psb_geaxpby(sone,z,beta,p,desc_a,info)
       end if
+      if (doTiming) call psb_toc(timer_idx_axpby)
 
+      if (doTiming) call psb_tic(timer_idx_spmv)
       call psb_spmm(sone,a,p,szero,q,desc_a,info,work=aux)
+      if (doTiming) call psb_toc(timer_idx_spmv)
+      if (doTiming) call psb_tic(timer_idx_dot)
       sigma = psb_gedot(p,q,desc_a,info)
+      if (doTiming) call psb_toc(timer_idx_dot)
       if (sigma == szero) then
           if (debug_level >= psb_debug_ext_)&
                & write(debug_unit,*) me,' ',trim(name),&
@@ -302,9 +328,10 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
         end if
       end if
 
-
+      if (doTiming) call psb_tic(timer_idx_axpby)
       call psb_geaxpby(alpha,p,sone,x,desc_a,info)
       call psb_geaxpby(-alpha,q,sone,r,desc_a,info)
+      if (doTiming) call psb_toc(timer_idx_axpby)
 
       if (psb_check_conv(methdname,itx,x,r,desc_a,stopdat,info)) exit restart
       if (info /= psb_success_) Then 
@@ -343,6 +370,11 @@ subroutine psb_scg_vect(a,prec,b,x,eps,desc_a,info,&
   if (info /= psb_success_) then
     call psb_errpush(info,name)
     goto 9999
+  end if
+  
+  if(doTiming) then
+    timer_session_depth = psb_exit_timer_session()
+    if(timer_session_depth == 0) call psb_print_timers(ctxt)
   end if
 
   call psb_erractionrestore(err_act)
