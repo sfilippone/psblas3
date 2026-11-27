@@ -95,12 +95,14 @@ module psb_c_cuda_vect_mod
     procedure, pass(x) :: free_buffer  => c_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => c_cuda_maybe_free_buffer
     procedure, pass(x) :: dev_comm      => c_cuda_dev_comm
-    procedure, pass(x) :: dev_comm_buf  => c_cuda_dev_comm_buf
+    procedure, pass(x) :: comm_buf_ptr  => c_cuda_comm_buf_ptr
     procedure, pass(x) :: comm_buf_copy => c_cuda_comm_buf_copy
     procedure, pass(x) :: dev_comm_begin => c_cuda_dev_comm_begin
     procedure, pass(x) :: dev_comm_end   => c_cuda_dev_comm_end
+    procedure, pass(x) :: dev_comm_reserve => c_cuda_dev_comm_reserve
     procedure, pass(x) :: dot_v    => c_cuda_dot_v
     procedure, pass(x) :: dot_a    => c_cuda_dot_a
+    procedure, pass(x) :: dot3v    => c_cuda_dot3v
     procedure, pass(y) :: axpby_v  => c_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => c_cuda_axpby_a
     procedure, pass(z) :: upd_xyz  => c_cuda_upd_xyz
@@ -164,17 +166,9 @@ contains
     else
       call psb_realloc(n,x%combuf,info)
     end if
-    if (c_associated(x%dt_buf)) then 
-      if (x%dt_buf_sz < n) then
-        call freeFloatComplex(x%dt_buf)
-        x%dt_buf = c_null_ptr
-        x%dt_buf_sz = 0
-      end if
-    end if
-    if (.not.c_associated(x%dt_buf)) then
-      info       =  allocateFloatComplex(x%dt_buf,n)
-      x%dt_buf_sz = n
-    end if
+    ! DT_BUF (device staging of COMBUF) is allocated lazily by
+    ! c_cuda_dtbuf_need, only on the paths that use it: not needed with
+    ! UVA (pinned COMBUF) nor with the shared device buffer (CUDA-aware MPI)
     if (c_associated(x%i_buf)) then 
       if (x%i_buf_sz < n) then
         call freeInt(x%i_buf)
@@ -207,6 +201,26 @@ contains
     x%combuf_reg = (info == 0)
     if (info /= 0) write(0,*) 'Error from inner_register (combuf) ',info
   end subroutine c_cuda_combuf_pin
+
+  !
+  ! DT_BUF large enough to stage the whole COMBUF (offsets as in COMBUF);
+  ! the previous exchange is complete (device_wait), so it can be replaced.
+  !
+  subroutine c_cuda_dtbuf_need(x,info)
+    implicit none
+    class(psb_c_vect_cuda), intent(inout) :: x
+    integer, intent(out) :: info
+    integer :: n
+    info = 0
+    n = 0
+    if (allocated(x%combuf)) n = size(x%combuf)
+    if (c_associated(x%dt_buf).and.(x%dt_buf_sz >= n)) return
+    if (c_associated(x%dt_buf)) call freeFloatComplex(x%dt_buf)
+    x%dt_buf    = c_null_ptr
+    x%dt_buf_sz = 0
+    info = allocateFloatComplex(x%dt_buf,max(n,1))
+    if (info == 0) x%dt_buf_sz = max(n,1)
+  end subroutine c_cuda_dtbuf_need
 
   subroutine c_cuda_maybe_free_buffer(x,info)
     use psb_realloc_mod
@@ -395,7 +409,8 @@ contains
              & 0, n, i, ii%deviceVect, i,x%dt_c_buf, 1)
 
       else
-        info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect,&
+        call c_cuda_dtbuf_need(x,info)
+        if (info == 0) info = igathMultiVecDeviceFloatComplexVecIdx(x%deviceVect,&
              & 0, n, i, ii%deviceVect, i,x%dt_buf, 1)
         if (info == 0) &
              &  info = readFloatComplex(i,x%dt_buf,x%combuf(i:),n,1)
@@ -417,7 +432,8 @@ contains
           info = igathMultiVecDeviceFloatComplex(x%deviceVect,&
                & 0, n, i, x%i_buf, i,x%dc_buf, 1)
         else
-          info = igathMultiVecDeviceFloatComplex(x%deviceVect,&
+          call c_cuda_dtbuf_need(x,info)
+          if (info == 0) info = igathMultiVecDeviceFloatComplex(x%deviceVect,&
                & 0, n, i, x%i_buf, i,x%dt_buf, 1)
           if (info == 0) &
                &  info = readFloatComplex(i,x%dt_buf,x%combuf(i:),n,1)
@@ -459,6 +475,15 @@ contains
     x%dc_buf = c_null_ptr
   end subroutine c_cuda_dev_comm_end
 
+  subroutine c_cuda_dev_comm_reserve(x,hidx,wmode,warm)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_c_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: hidx(:)
+    logical, intent(out) :: wmode, warm
+    call psb_cuda_comm_reserve_halo(hidx,int((2*psb_sizeof_sp),psb_ipk_),wmode,warm)
+  end subroutine c_cuda_dev_comm_reserve
+
   function c_cuda_dev_comm(x) result(res)
     implicit none
     class(psb_c_vect_cuda), intent(in) :: x
@@ -466,12 +491,20 @@ contains
     res = x%dc_on
   end function c_cuda_dev_comm
 
-  function c_cuda_dev_comm_buf(x) result(res)
+  ! Shared device buffer while held (dev_comm_begin/end), else host COMBUF
+  function c_cuda_comm_buf_ptr(x) result(res)
     implicit none
-    class(psb_c_vect_cuda), intent(in) :: x
+    class(psb_c_vect_cuda), intent(in), target :: x
     type(c_ptr) :: res
-    res = x%dc_buf
-  end function c_cuda_dev_comm_buf
+    if (x%dc_on) then
+      res = x%dc_buf
+    else
+      res = c_null_ptr
+      if (allocated(x%combuf)) then
+        if (size(x%combuf) > 0) res = c_loc(x%combuf)
+      end if
+    end if
+  end function c_cuda_comm_buf_ptr
 
   subroutine c_cuda_comm_buf_copy(x,dst,src,n)
     implicit none
@@ -643,8 +676,9 @@ contains
         if (info == 0) info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_c_buf, 1,beta)
       else 
-        info = writeFloatComplex(i,y%dt_buf,y%combuf(i:),n,1)
-        info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
+        call c_cuda_dtbuf_need(y,info)
+        if (info == 0) info = writeFloatComplex(i,y%dt_buf,y%combuf(i:),n,1)
+        if (info == 0) info = iscatMultiVecDeviceFloatComplexVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_buf, 1,beta)
 
       end if
@@ -664,12 +698,16 @@ contains
           info = iscatMultiVecDeviceFloatComplex(y%deviceVect,&
                & 0, n, i, y%i_buf, i, y%dc_buf, 1,beta)
         else
-          info = writeFloatComplex(i,y%dt_buf,y%combuf(i:),n,1)
+          call c_cuda_dtbuf_need(y,info)
+          if (info == 0) info = writeFloatComplex(i,y%dt_buf,y%combuf(i:),n,1)
           if (info == 0) info = iscatMultiVecDeviceFloatComplex(y%deviceVect,&
                & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
         end if
       end if
     end select
+    ! The scatter wrote on the device: the device copy is now the valid one
+    ! (without this a vector that was in sync state kept a stale host copy)
+    call y%set_dev()
 !!$    write(0,*) 'Done sctb_buf'
 
   end subroutine c_cuda_sctb_buf
@@ -968,6 +1006,65 @@ contains
 
   end function c_cuda_dot_v
 
+  !
+  ! Fused local dot products y1.x, y2.x [, y3.x] in one kernel and one
+  ! device->host transfer (same meaning as the base dot3v: the y's are
+  ! conjugated in the complex case). Falls back to the base implementation
+  ! when an operand is not a CUDA vector.
+  !
+  subroutine c_cuda_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_c_vect_cuda), intent(inout)      :: x
+    class(psb_c_base_vect_type), intent(inout) :: y1, y2
+    integer(psb_ipk_), intent(in)              :: n
+    complex(psb_spk_), intent(out)                :: res(:)
+    class(psb_c_base_vect_type), intent(inout), optional :: y3
+    complex(c_float_complex)  :: r3(3)
+    integer(psb_ipk_) :: info
+    logical           :: on_dev
+
+    on_dev = .false.
+    select type(yy1 => y1)
+    type is (psb_c_vect_cuda)
+      select type(yy2 => y2)
+      type is (psb_c_vect_cuda)
+        if (present(y3)) then
+          select type(yy3 => y3)
+          type is (psb_c_vect_cuda)
+            on_dev = .true.
+            if (x%is_host())   call x%sync()
+            if (yy1%is_host()) call yy1%sync()
+            if (yy2%is_host()) call yy2%sync()
+            if (yy3%is_host()) call yy3%sync()
+            info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+                 & yy2%deviceVect,yy3%deviceVect)
+          end select
+        else
+          on_dev = .true.
+          if (x%is_host())   call x%sync()
+          if (yy1%is_host()) call yy1%sync()
+          if (yy2%is_host()) call yy2%sync()
+          info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+               & yy2%deviceVect,c_null_ptr)
+        end if
+      end select
+    end select
+
+    if (on_dev) then
+      if (info /= 0) then
+        info = psb_err_internal_error_
+        call psb_errpush(info,'c_cuda_dot3v')
+      end if
+      res(1) = r3(1)
+      res(2) = r3(2)
+      if (present(y3)) res(3) = r3(3)
+    else
+      res(1) = y1%dot(n,x)
+      res(2) = y2%dot(n,x)
+      if (present(y3)) res(3) = y3%dot(n,x)
+    end if
+
+  end subroutine c_cuda_dot3v
 
   function c_cuda_dot_a(n,x,y) result(res)
     implicit none 
@@ -975,10 +1072,10 @@ contains
     complex(psb_spk_), intent(in)           :: y(:)
     integer(psb_ipk_), intent(in)        :: n
     complex(psb_spk_)                :: res
-    complex(psb_spk_), external      :: cdot
-    
+    complex(psb_spk_), external      :: cdotc
+
     if (x%is_dev()) call x%sync()
-    res = cdot(n,y,1,x%v,1)
+    res = cdotc(n,y,1,x%v,1)
 
   end function c_cuda_dot_a
     

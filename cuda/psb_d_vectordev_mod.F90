@@ -269,6 +269,8 @@ module psb_d_vectordev_mod
     end function dotMultiVecDeviceDouble
   end interface
 
+  ! Fused y1.x, y2.x [, y3.x] (deviceVecY3 may be null), conjugating the
+  ! y's in the complex case, as y%dot(n,x): one kernel, one transfer
   interface dot3MultiVecDevice
     function dot3MultiVecDeviceDouble(res,n,deviceVecX,deviceVecY1,deviceVecY2,deviceVecY3) &
          & result(val) bind(c,name='dot3MultiVecDeviceDouble')

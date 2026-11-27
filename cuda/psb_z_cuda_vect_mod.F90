@@ -95,12 +95,14 @@ module psb_z_cuda_vect_mod
     procedure, pass(x) :: free_buffer  => z_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => z_cuda_maybe_free_buffer
     procedure, pass(x) :: dev_comm      => z_cuda_dev_comm
-    procedure, pass(x) :: dev_comm_buf  => z_cuda_dev_comm_buf
+    procedure, pass(x) :: comm_buf_ptr  => z_cuda_comm_buf_ptr
     procedure, pass(x) :: comm_buf_copy => z_cuda_comm_buf_copy
     procedure, pass(x) :: dev_comm_begin => z_cuda_dev_comm_begin
     procedure, pass(x) :: dev_comm_end   => z_cuda_dev_comm_end
+    procedure, pass(x) :: dev_comm_reserve => z_cuda_dev_comm_reserve
     procedure, pass(x) :: dot_v    => z_cuda_dot_v
     procedure, pass(x) :: dot_a    => z_cuda_dot_a
+    procedure, pass(x) :: dot3v    => z_cuda_dot3v
     procedure, pass(y) :: axpby_v  => z_cuda_axpby_v
     procedure, pass(y) :: axpby_a  => z_cuda_axpby_a
     procedure, pass(z) :: upd_xyz  => z_cuda_upd_xyz
@@ -164,17 +166,9 @@ contains
     else
       call psb_realloc(n,x%combuf,info)
     end if
-    if (c_associated(x%dt_buf)) then 
-      if (x%dt_buf_sz < n) then
-        call freeDoubleComplex(x%dt_buf)
-        x%dt_buf = c_null_ptr
-        x%dt_buf_sz = 0
-      end if
-    end if
-    if (.not.c_associated(x%dt_buf)) then
-      info       =  allocateDoubleComplex(x%dt_buf,n)
-      x%dt_buf_sz = n
-    end if
+    ! DT_BUF (device staging of COMBUF) is allocated lazily by
+    ! z_cuda_dtbuf_need, only on the paths that use it: not needed with
+    ! UVA (pinned COMBUF) nor with the shared device buffer (CUDA-aware MPI)
     if (c_associated(x%i_buf)) then 
       if (x%i_buf_sz < n) then
         call freeInt(x%i_buf)
@@ -207,6 +201,26 @@ contains
     x%combuf_reg = (info == 0)
     if (info /= 0) write(0,*) 'Error from inner_register (combuf) ',info
   end subroutine z_cuda_combuf_pin
+
+  !
+  ! DT_BUF large enough to stage the whole COMBUF (offsets as in COMBUF);
+  ! the previous exchange is complete (device_wait), so it can be replaced.
+  !
+  subroutine z_cuda_dtbuf_need(x,info)
+    implicit none
+    class(psb_z_vect_cuda), intent(inout) :: x
+    integer, intent(out) :: info
+    integer :: n
+    info = 0
+    n = 0
+    if (allocated(x%combuf)) n = size(x%combuf)
+    if (c_associated(x%dt_buf).and.(x%dt_buf_sz >= n)) return
+    if (c_associated(x%dt_buf)) call freeDoubleComplex(x%dt_buf)
+    x%dt_buf    = c_null_ptr
+    x%dt_buf_sz = 0
+    info = allocateDoubleComplex(x%dt_buf,max(n,1))
+    if (info == 0) x%dt_buf_sz = max(n,1)
+  end subroutine z_cuda_dtbuf_need
 
   subroutine z_cuda_maybe_free_buffer(x,info)
     use psb_realloc_mod
@@ -395,7 +409,8 @@ contains
              & 0, n, i, ii%deviceVect, i,x%dt_c_buf, 1)
 
       else
-        info = igathMultiVecDeviceDoubleComplexVecIdx(x%deviceVect,&
+        call z_cuda_dtbuf_need(x,info)
+        if (info == 0) info = igathMultiVecDeviceDoubleComplexVecIdx(x%deviceVect,&
              & 0, n, i, ii%deviceVect, i,x%dt_buf, 1)
         if (info == 0) &
              &  info = readDoubleComplex(i,x%dt_buf,x%combuf(i:),n,1)
@@ -417,7 +432,8 @@ contains
           info = igathMultiVecDeviceDoubleComplex(x%deviceVect,&
                & 0, n, i, x%i_buf, i,x%dc_buf, 1)
         else
-          info = igathMultiVecDeviceDoubleComplex(x%deviceVect,&
+          call z_cuda_dtbuf_need(x,info)
+          if (info == 0) info = igathMultiVecDeviceDoubleComplex(x%deviceVect,&
                & 0, n, i, x%i_buf, i,x%dt_buf, 1)
           if (info == 0) &
                &  info = readDoubleComplex(i,x%dt_buf,x%combuf(i:),n,1)
@@ -459,6 +475,15 @@ contains
     x%dc_buf = c_null_ptr
   end subroutine z_cuda_dev_comm_end
 
+  subroutine z_cuda_dev_comm_reserve(x,hidx,wmode,warm)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_z_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: hidx(:)
+    logical, intent(out) :: wmode, warm
+    call psb_cuda_comm_reserve_halo(hidx,int((2*psb_sizeof_dp),psb_ipk_),wmode,warm)
+  end subroutine z_cuda_dev_comm_reserve
+
   function z_cuda_dev_comm(x) result(res)
     implicit none
     class(psb_z_vect_cuda), intent(in) :: x
@@ -466,12 +491,20 @@ contains
     res = x%dc_on
   end function z_cuda_dev_comm
 
-  function z_cuda_dev_comm_buf(x) result(res)
+  ! Shared device buffer while held (dev_comm_begin/end), else host COMBUF
+  function z_cuda_comm_buf_ptr(x) result(res)
     implicit none
-    class(psb_z_vect_cuda), intent(in) :: x
+    class(psb_z_vect_cuda), intent(in), target :: x
     type(c_ptr) :: res
-    res = x%dc_buf
-  end function z_cuda_dev_comm_buf
+    if (x%dc_on) then
+      res = x%dc_buf
+    else
+      res = c_null_ptr
+      if (allocated(x%combuf)) then
+        if (size(x%combuf) > 0) res = c_loc(x%combuf)
+      end if
+    end if
+  end function z_cuda_comm_buf_ptr
 
   subroutine z_cuda_comm_buf_copy(x,dst,src,n)
     implicit none
@@ -643,8 +676,9 @@ contains
         if (info == 0) info = iscatMultiVecDeviceDoubleComplexVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_c_buf, 1,beta)
       else 
-        info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
-        info = iscatMultiVecDeviceDoubleComplexVecIdx(y%deviceVect,&
+        call z_cuda_dtbuf_need(y,info)
+        if (info == 0) info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
+        if (info == 0) info = iscatMultiVecDeviceDoubleComplexVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_buf, 1,beta)
 
       end if
@@ -664,12 +698,16 @@ contains
           info = iscatMultiVecDeviceDoubleComplex(y%deviceVect,&
                & 0, n, i, y%i_buf, i, y%dc_buf, 1,beta)
         else
-          info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
+          call z_cuda_dtbuf_need(y,info)
+          if (info == 0) info = writeDoubleComplex(i,y%dt_buf,y%combuf(i:),n,1)
           if (info == 0) info = iscatMultiVecDeviceDoubleComplex(y%deviceVect,&
                & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
         end if
       end if
     end select
+    ! The scatter wrote on the device: the device copy is now the valid one
+    ! (without this a vector that was in sync state kept a stale host copy)
+    call y%set_dev()
 !!$    write(0,*) 'Done sctb_buf'
 
   end subroutine z_cuda_sctb_buf
@@ -968,6 +1006,65 @@ contains
 
   end function z_cuda_dot_v
 
+  !
+  ! Fused local dot products y1.x, y2.x [, y3.x] in one kernel and one
+  ! device->host transfer (same meaning as the base dot3v: the y's are
+  ! conjugated in the complex case). Falls back to the base implementation
+  ! when an operand is not a CUDA vector.
+  !
+  subroutine z_cuda_dot3v(n,x,y1,y2,res,y3)
+    implicit none
+    class(psb_z_vect_cuda), intent(inout)      :: x
+    class(psb_z_base_vect_type), intent(inout) :: y1, y2
+    integer(psb_ipk_), intent(in)              :: n
+    complex(psb_dpk_), intent(out)                :: res(:)
+    class(psb_z_base_vect_type), intent(inout), optional :: y3
+    complex(c_double_complex)  :: r3(3)
+    integer(psb_ipk_) :: info
+    logical           :: on_dev
+
+    on_dev = .false.
+    select type(yy1 => y1)
+    type is (psb_z_vect_cuda)
+      select type(yy2 => y2)
+      type is (psb_z_vect_cuda)
+        if (present(y3)) then
+          select type(yy3 => y3)
+          type is (psb_z_vect_cuda)
+            on_dev = .true.
+            if (x%is_host())   call x%sync()
+            if (yy1%is_host()) call yy1%sync()
+            if (yy2%is_host()) call yy2%sync()
+            if (yy3%is_host()) call yy3%sync()
+            info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+                 & yy2%deviceVect,yy3%deviceVect)
+          end select
+        else
+          on_dev = .true.
+          if (x%is_host())   call x%sync()
+          if (yy1%is_host()) call yy1%sync()
+          if (yy2%is_host()) call yy2%sync()
+          info = dot3MultiVecDevice(r3,n,x%deviceVect,yy1%deviceVect,&
+               & yy2%deviceVect,c_null_ptr)
+        end if
+      end select
+    end select
+
+    if (on_dev) then
+      if (info /= 0) then
+        info = psb_err_internal_error_
+        call psb_errpush(info,'z_cuda_dot3v')
+      end if
+      res(1) = r3(1)
+      res(2) = r3(2)
+      if (present(y3)) res(3) = r3(3)
+    else
+      res(1) = y1%dot(n,x)
+      res(2) = y2%dot(n,x)
+      if (present(y3)) res(3) = y3%dot(n,x)
+    end if
+
+  end subroutine z_cuda_dot3v
 
   function z_cuda_dot_a(n,x,y) result(res)
     implicit none 
@@ -975,10 +1072,10 @@ contains
     complex(psb_dpk_), intent(in)           :: y(:)
     integer(psb_ipk_), intent(in)        :: n
     complex(psb_dpk_)                :: res
-    complex(psb_dpk_), external      :: zdot
-    
+    complex(psb_dpk_), external      :: zdotc
+
     if (x%is_dev()) call x%sync()
-    res = zdot(n,y,1,x%v,1)
+    res = zdotc(n,y,1,x%v,1)
 
   end function z_cuda_dot_a
     

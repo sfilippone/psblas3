@@ -92,10 +92,11 @@ module psb_i_cuda_vect_mod
     procedure, pass(x) :: free_buffer  => i_cuda_free_buffer
     procedure, pass(x) :: maybe_free_buffer  => i_cuda_maybe_free_buffer
     procedure, pass(x) :: dev_comm      => i_cuda_dev_comm
-    procedure, pass(x) :: dev_comm_buf  => i_cuda_dev_comm_buf
+    procedure, pass(x) :: comm_buf_ptr  => i_cuda_comm_buf_ptr
     procedure, pass(x) :: comm_buf_copy => i_cuda_comm_buf_copy
     procedure, pass(x) :: dev_comm_begin => i_cuda_dev_comm_begin
     procedure, pass(x) :: dev_comm_end   => i_cuda_dev_comm_end
+    procedure, pass(x) :: dev_comm_reserve => i_cuda_dev_comm_reserve
 
     final              :: i_cuda_vect_finalize
   end type psb_i_vect_cuda
@@ -146,17 +147,9 @@ contains
     else
       call psb_realloc(n,x%combuf,info)
     end if
-    if (c_associated(x%dt_buf)) then 
-      if (x%dt_buf_sz < n) then
-        call freeInt(x%dt_buf)
-        x%dt_buf = c_null_ptr
-        x%dt_buf_sz = 0
-      end if
-    end if
-    if (.not.c_associated(x%dt_buf)) then
-      info       =  allocateInt(x%dt_buf,n)
-      x%dt_buf_sz = n
-    end if
+    ! DT_BUF (device staging of COMBUF) is allocated lazily by
+    ! i_cuda_dtbuf_need, only on the paths that use it: not needed with
+    ! UVA (pinned COMBUF) nor with the shared device buffer (CUDA-aware MPI)
     if (c_associated(x%i_buf)) then 
       if (x%i_buf_sz < n) then
         call freeInt(x%i_buf)
@@ -189,6 +182,26 @@ contains
     x%combuf_reg = (info == 0)
     if (info /= 0) write(0,*) 'Error from inner_register (combuf) ',info
   end subroutine i_cuda_combuf_pin
+
+  !
+  ! DT_BUF large enough to stage the whole COMBUF (offsets as in COMBUF);
+  ! the previous exchange is complete (device_wait), so it can be replaced.
+  !
+  subroutine i_cuda_dtbuf_need(x,info)
+    implicit none
+    class(psb_i_vect_cuda), intent(inout) :: x
+    integer, intent(out) :: info
+    integer :: n
+    info = 0
+    n = 0
+    if (allocated(x%combuf)) n = size(x%combuf)
+    if (c_associated(x%dt_buf).and.(x%dt_buf_sz >= n)) return
+    if (c_associated(x%dt_buf)) call freeInt(x%dt_buf)
+    x%dt_buf    = c_null_ptr
+    x%dt_buf_sz = 0
+    info = allocateInt(x%dt_buf,max(n,1))
+    if (info == 0) x%dt_buf_sz = max(n,1)
+  end subroutine i_cuda_dtbuf_need
 
   subroutine i_cuda_maybe_free_buffer(x,info)
     use psb_realloc_mod
@@ -377,7 +390,8 @@ contains
              & 0, n, i, ii%deviceVect, i,x%dt_c_buf, 1)
 
       else
-        info = igathMultiVecDeviceIntVecIdx(x%deviceVect,&
+        call i_cuda_dtbuf_need(x,info)
+        if (info == 0) info = igathMultiVecDeviceIntVecIdx(x%deviceVect,&
              & 0, n, i, ii%deviceVect, i,x%dt_buf, 1)
         if (info == 0) &
              &  info = readInt(i,x%dt_buf,x%combuf(i:),n,1)
@@ -399,7 +413,8 @@ contains
           info = igathMultiVecDeviceInt(x%deviceVect,&
                & 0, n, i, x%i_buf, i,x%dc_buf, 1)
         else
-          info = igathMultiVecDeviceInt(x%deviceVect,&
+          call i_cuda_dtbuf_need(x,info)
+          if (info == 0) info = igathMultiVecDeviceInt(x%deviceVect,&
                & 0, n, i, x%i_buf, i,x%dt_buf, 1)
           if (info == 0) &
                &  info = readInt(i,x%dt_buf,x%combuf(i:),n,1)
@@ -441,6 +456,15 @@ contains
     x%dc_buf = c_null_ptr
   end subroutine i_cuda_dev_comm_end
 
+  subroutine i_cuda_dev_comm_reserve(x,hidx,wmode,warm)
+    use psb_cuda_env_mod
+    implicit none
+    class(psb_i_vect_cuda), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: hidx(:)
+    logical, intent(out) :: wmode, warm
+    call psb_cuda_comm_reserve_halo(hidx,int(psb_sizeof_ip,psb_ipk_),wmode,warm)
+  end subroutine i_cuda_dev_comm_reserve
+
   function i_cuda_dev_comm(x) result(res)
     implicit none
     class(psb_i_vect_cuda), intent(in) :: x
@@ -448,12 +472,20 @@ contains
     res = x%dc_on
   end function i_cuda_dev_comm
 
-  function i_cuda_dev_comm_buf(x) result(res)
+  ! Shared device buffer while held (dev_comm_begin/end), else host COMBUF
+  function i_cuda_comm_buf_ptr(x) result(res)
     implicit none
-    class(psb_i_vect_cuda), intent(in) :: x
+    class(psb_i_vect_cuda), intent(in), target :: x
     type(c_ptr) :: res
-    res = x%dc_buf
-  end function i_cuda_dev_comm_buf
+    if (x%dc_on) then
+      res = x%dc_buf
+    else
+      res = c_null_ptr
+      if (allocated(x%combuf)) then
+        if (size(x%combuf) > 0) res = c_loc(x%combuf)
+      end if
+    end if
+  end function i_cuda_comm_buf_ptr
 
   subroutine i_cuda_comm_buf_copy(x,dst,src,n)
     implicit none
@@ -625,8 +657,9 @@ contains
         if (info == 0) info = iscatMultiVecDeviceIntVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_c_buf, 1,beta)
       else 
-        info = writeInt(i,y%dt_buf,y%combuf(i:),n,1)
-        info = iscatMultiVecDeviceIntVecIdx(y%deviceVect,&
+        call i_cuda_dtbuf_need(y,info)
+        if (info == 0) info = writeInt(i,y%dt_buf,y%combuf(i:),n,1)
+        if (info == 0) info = iscatMultiVecDeviceIntVecIdx(y%deviceVect,&
              & 0, n, i, ii%deviceVect, i, y%dt_buf, 1,beta)
 
       end if
@@ -646,12 +679,16 @@ contains
           info = iscatMultiVecDeviceInt(y%deviceVect,&
                & 0, n, i, y%i_buf, i, y%dc_buf, 1,beta)
         else
-          info = writeInt(i,y%dt_buf,y%combuf(i:),n,1)
+          call i_cuda_dtbuf_need(y,info)
+          if (info == 0) info = writeInt(i,y%dt_buf,y%combuf(i:),n,1)
           if (info == 0) info = iscatMultiVecDeviceInt(y%deviceVect,&
                & 0, n, i, y%i_buf, i, y%dt_buf, 1,beta)
         end if
       end if
     end select
+    ! The scatter wrote on the device: the device copy is now the valid one
+    ! (without this a vector that was in sync state kept a stale host copy)
+    call y%set_dev()
 !!$    write(0,*) 'Done sctb_buf'
 
   end subroutine i_cuda_sctb_buf

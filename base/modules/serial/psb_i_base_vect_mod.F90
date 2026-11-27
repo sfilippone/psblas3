@@ -143,10 +143,11 @@ module psb_i_base_vect_mod
     ! Halo exchange directly on a device buffer (CUDA-aware MPI)
     !
     procedure, pass(x) :: dev_comm      => i_base_dev_comm
-    procedure, pass(x) :: dev_comm_buf  => i_base_dev_comm_buf
+    procedure, pass(x) :: comm_buf_ptr  => i_base_comm_buf_ptr
     procedure, pass(x) :: comm_buf_copy => i_base_comm_buf_copy
     procedure, pass(x) :: dev_comm_begin => i_base_dev_comm_begin
     procedure, pass(x) :: dev_comm_end   => i_base_dev_comm_end
+    procedure, pass(x) :: dev_comm_reserve => i_base_dev_comm_reserve
 
 
 
@@ -1038,18 +1039,22 @@ contains
   end function i_base_dev_comm
 
   !
-  !> Function  base_dev_comm_buf
+  !> Function  base_comm_buf_ptr
   !! \memberof  psb_i_base_vect_type
-  !! \brief  Device address of the communication buffer (same layout as
-  !!         COMBUF), meaningful only when dev_comm() is true.
+  !! \brief  Address of the communication buffer used by the current
+  !!         exchange (layout of COMBUF), handed to MPI by psi_swapdata.
+  !!         Base version: the host COMBUF.
   !!
-  function i_base_dev_comm_buf(x) result(res)
-    use iso_c_binding, only : c_ptr, c_null_ptr
+  function i_base_comm_buf_ptr(x) result(res)
+    use iso_c_binding, only : c_ptr, c_null_ptr, c_loc
     implicit none
-    class(psb_i_base_vect_type), intent(in) :: x
+    class(psb_i_base_vect_type), intent(in), target :: x
     type(c_ptr) :: res
     res = c_null_ptr
-  end function i_base_dev_comm_buf
+    if (allocated(x%combuf)) then
+      if (size(x%combuf) > 0) res = c_loc(x%combuf)
+    end if
+  end function i_base_comm_buf_ptr
 
   !
   !> Subroutine  base_comm_buf_copy
@@ -1082,6 +1087,23 @@ contains
     implicit none
     class(psb_i_base_vect_type), intent(inout) :: x
   end subroutine i_base_dev_comm_end
+
+  !
+  !> Subroutine  base_dev_comm_reserve
+  !! \memberof  psb_i_base_vect_type
+  !! \brief  Called at vector assembly with the halo exchange list HIDX of
+  !!         the descriptor: a device class can size its communication
+  !!         buffer here. WMODE/WARM drive the (experimental) halo warm-up,
+  !!         see psb_geasb. Base version: nothing.
+  !!
+  subroutine i_base_dev_comm_reserve(x,hidx,wmode,warm)
+    implicit none
+    class(psb_i_base_vect_type), intent(inout) :: x
+    integer(psb_ipk_), intent(in) :: hidx(:)
+    logical, intent(out) :: wmode, warm
+    wmode = .false.
+    warm  = .false.
+  end subroutine i_base_dev_comm_reserve
 
 
 end module psb_i_base_vect_mod

@@ -268,6 +268,19 @@ module psb_c_vectordev_mod
       type(c_ptr), value    :: deviceVecA, deviceVecB
     end function dotMultiVecDeviceFloatComplex
   end interface
+
+  ! Fused y1.x, y2.x [, y3.x] (deviceVecY3 may be null), conjugating the
+  ! y's in the complex case, as y%dot(n,x): one kernel, one transfer
+  interface dot3MultiVecDevice
+    function dot3MultiVecDeviceFloatComplex(res,n,deviceVecX,deviceVecY1,deviceVecY2,deviceVecY3) &
+         & result(val) bind(c,name='dot3MultiVecDeviceFloatComplex')
+      use iso_c_binding
+      integer(c_int)        :: val
+      integer(c_int), value :: n
+      complex(c_float_complex)        :: res(3)
+      type(c_ptr), value    :: deviceVecX, deviceVecY1, deviceVecY2, deviceVecY3
+    end function dot3MultiVecDeviceFloatComplex
+  end interface
     
   interface nrm2MultiVecDeviceComplex
     function nrm2MultiVecDeviceFloatComplex(res,n,deviceVecA) &

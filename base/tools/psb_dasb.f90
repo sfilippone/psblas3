@@ -131,6 +131,31 @@ subroutine psb_dasb_vect(x, desc_a, info, mold, scratch)
     end if
     call x%cnv(mold)
   end if
+  !
+  ! Device classes: size the halo communication buffer for this descriptor
+  ! now (setup), and, if the experimental halo warm-up is on, exchange the
+  ! halo once when some process meets neighbours never contacted before.
+  !
+  if (allocated(x%v).and.allocated(desc_a%v_halo_index%v)) then
+    if (allocated(desc_a%v_halo_index%v%v)) then
+      block
+        logical :: wmode, warm
+        integer(psb_ipk_) :: iwarm
+        call x%v%dev_comm_reserve(desc_a%v_halo_index%v%v,wmode,warm)
+        if (wmode) then
+          iwarm = 0
+          if (warm) iwarm = 1
+          call psb_max(ctxt,iwarm)
+          if (iwarm > 0) call psb_halo(x,desc_a,info)
+          if (info /= psb_success_) then
+            info=psb_err_from_subroutine_
+            call psb_errpush(info,name,a_err='psb_halo warm-up')
+            goto 9999
+          end if
+        end if
+      end block
+    end if
+  end if
   if (debug_level >= psb_debug_ext_) &
        & write(debug_unit,*) me,' ',trim(name),': end'
 
@@ -213,6 +238,29 @@ subroutine psb_dasb_vect_r2(x, desc_a, info, mold, scratch)
       info=psb_err_from_subroutine_
       call psb_errpush(info,name,a_err='psb_halo')
       goto 9999
+    end if
+  end if
+  ! Device classes: size the halo communication buffer (see psb_dasb_vect)
+  if (size(x) > 0) then
+    if (allocated(x(1)%v).and.allocated(desc_a%v_halo_index%v)) then
+      if (allocated(desc_a%v_halo_index%v%v)) then
+        block
+          logical :: wmode, warm
+          integer(psb_ipk_) :: iwarm
+          call x(1)%v%dev_comm_reserve(desc_a%v_halo_index%v%v,wmode,warm)
+          if (wmode) then
+            iwarm = 0
+            if (warm) iwarm = 1
+            call psb_max(ctxt,iwarm)
+            if (iwarm > 0) call psb_halo(x(1),desc_a,info)
+            if (info /= psb_success_) then
+              info=psb_err_from_subroutine_
+              call psb_errpush(info,name,a_err='psb_halo warm-up')
+              goto 9999
+            end if
+          end if
+        end block
+      end if
     end if
   end if
   if (debug_level >= psb_debug_ext_) &

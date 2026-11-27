@@ -193,25 +193,26 @@ subroutine psi_cswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
   include 'mpif.h'
 #endif
   !
-  ! MPI on the device communication buffer (CUDA-aware MPI), see cutil.c
+  ! MPI on the communication buffer of the vector, given by its address:
+  ! host COMBUF or a device buffer (CUDA-aware MPI), see cutil.c
   !
   interface
-    function psi_c_dev_isend(buf,first,count,dtype,dest,tag,comm,req) &
-         & result(res) bind(c,name='psi_c_dev_isend')
+    function psi_c_buf_isend(buf,first,count,dtype,dest,tag,comm,req) &
+         & result(res) bind(c,name='psi_c_buf_isend')
       import :: c_int, c_ptr
       type(c_ptr), value    :: buf
       integer(c_int), value :: first, count, dtype, dest, tag, comm
       integer(c_int)        :: req
       integer(c_int)        :: res
-    end function psi_c_dev_isend
-    function psi_c_dev_irecv(buf,first,count,dtype,src,tag,comm,req) &
-         & result(res) bind(c,name='psi_c_dev_irecv')
+    end function psi_c_buf_isend
+    function psi_c_buf_irecv(buf,first,count,dtype,src,tag,comm,req) &
+         & result(res) bind(c,name='psi_c_buf_irecv')
       import :: c_int, c_ptr
       type(c_ptr), value    :: buf
       integer(c_int), value :: first, count, dtype, src, tag, comm
       integer(c_int)        :: req
       integer(c_int)        :: res
-    end function psi_c_dev_irecv
+    end function psi_c_buf_irecv
   end interface
 
   type(psb_ctxt_type), intent(in)  :: ctxt
@@ -232,7 +233,8 @@ subroutine psi_cswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
   integer(psb_ipk_) :: err_act, i, idx_pt, totsnd_, totrcv_,&
        & snd_pt, rcv_pt, pnti, n
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
-       & albf,do_send,do_recv, dev_comm
+       & albf,do_send,do_recv
+  type(c_ptr) :: cbuf
   logical, parameter :: usersend=.false., debug=.false.
   character(len=20)  :: name
 
@@ -274,9 +276,11 @@ subroutine psi_cswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
     call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
     y%comid = mpi_request_null
-    ! Device buffer handed to MPI directly (CUDA-aware MPI), or host COMBUF
+    ! The vector chooses its communication buffer for this exchange: the
+    ! shared device buffer (CUDA-aware MPI) or the host COMBUF. Same layout,
+    ! MPI gets its address in both cases.
     call y%dev_comm_begin(ione*size(idx%v))
-    dev_comm = y%dev_comm()
+    cbuf = y%comm_buf_ptr()
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
@@ -290,16 +294,10 @@ subroutine psi_cswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
       if ((nerv>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
         p2ptag = psb_complex_swap_tag
-        if (dev_comm) then
-          iret = psi_c_dev_irecv(y%dev_comm_buf(),int(rcv_pt,c_int),&
-               & int(nerv,c_int),int(psb_mpi_c_spk_,c_int),&
-               & int(prcid(i),c_int),int(p2ptag,c_int),int(icomm,c_int),&
-               & y%comid(i,2))
-        else
-          call mpi_irecv(y%combuf(rcv_pt),nerv,&
-               & psb_mpi_c_spk_,prcid(i),&
-               & p2ptag, icomm,y%comid(i,2),iret)
-        end if
+        iret = psi_c_buf_irecv(cbuf,int(rcv_pt,c_int),&
+             & int(nerv,c_int),int(psb_mpi_c_spk_,c_int),&
+             & int(prcid(i),c_int),int(p2ptag,c_int),int(icomm,c_int),&
+             & y%comid(i,2))
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
@@ -340,16 +338,10 @@ subroutine psi_cswap_vidx_vect(ctxt,icomm,flag,beta,y,idx, &
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
       if ((nesd>0).and.(proc_to_comm /= me)) then 
-        if (dev_comm) then
-          iret = psi_c_dev_isend(y%dev_comm_buf(),int(snd_pt,c_int),&
-               & int(nesd,c_int),int(psb_mpi_c_spk_,c_int),&
-               & int(prcid(i),c_int),int(p2ptag,c_int),int(icomm,c_int),&
-               & y%comid(i,1))
-        else
-          call mpi_isend(y%combuf(snd_pt),nesd,&
-               & psb_mpi_c_spk_,prcid(i),&
-               & p2ptag,icomm,y%comid(i,1),iret)
-        end if
+        iret = psi_c_buf_isend(cbuf,int(snd_pt,c_int),&
+             & int(nesd,c_int),int(psb_mpi_c_spk_,c_int),&
+             & int(prcid(i),c_int),int(p2ptag,c_int),int(icomm,c_int),&
+             & y%comid(i,1))
       end if
 
       if(iret /= mpi_success) then

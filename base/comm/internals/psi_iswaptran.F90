@@ -185,6 +185,7 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
   use psb_desc_mod
   use psb_penv_mod
   use psb_i_base_vect_mod
+  use iso_c_binding, only : c_int, c_ptr
 #ifdef PSB_MPI_MOD
   use mpi
 #endif
@@ -192,6 +193,28 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
 #ifdef PSB_MPI_H
   include 'mpif.h'
 #endif
+  !
+  ! MPI on the communication buffer of the vector, given by its address:
+  ! host COMBUF or a device buffer (CUDA-aware MPI), see cutil.c
+  !
+  interface
+    function psi_c_buf_isend(buf,first,count,dtype,dest,tag,comm,req) &
+         & result(res) bind(c,name='psi_c_buf_isend')
+      import :: c_int, c_ptr
+      type(c_ptr), value    :: buf
+      integer(c_int), value :: first, count, dtype, dest, tag, comm
+      integer(c_int)        :: req
+      integer(c_int)        :: res
+    end function psi_c_buf_isend
+    function psi_c_buf_irecv(buf,first,count,dtype,src,tag,comm,req) &
+         & result(res) bind(c,name='psi_c_buf_irecv')
+      import :: c_int, c_ptr
+      type(c_ptr), value    :: buf
+      integer(c_int), value :: first, count, dtype, src, tag, comm
+      integer(c_int)        :: req
+      integer(c_int)        :: res
+    end function psi_c_buf_irecv
+  end interface
 
   type(psb_ctxt_type), intent(in)    :: ctxt
   integer(psb_mpk_), intent(in)      :: icomm
@@ -211,6 +234,7 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
        & snd_pt, rcv_pt, pnti
   logical :: swap_mpi, swap_sync, swap_send, swap_recv,&
        & albf,do_send,do_recv
+  type(c_ptr) :: cbuf
   logical, parameter :: usersend=.false., debug=.false.
   character(len=20)  :: name
 
@@ -253,6 +277,9 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
     call y%new_buffer(ione*size(idx%v),info)
     call y%new_comid(totxch,info)
     y%comid = mpi_request_null
+    ! Communication buffer chosen by the vector (device or host COMBUF)
+    call y%dev_comm_begin(ione*size(idx%v))
+    cbuf = y%comm_buf_ptr()
     call psb_realloc(totxch,prcid,info)
     ! First I post all the non blocking receives
     pnti   = 1
@@ -267,9 +294,10 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
       prcid(i) = psb_get_mpi_rank(ctxt,proc_to_comm)      
       if ((nesd>0).and.(proc_to_comm /= me)) then 
         if (debug) write(*,*) me,'Posting receive from',prcid(i),rcv_pt
-        call mpi_irecv(y%combuf(snd_pt),nesd,&
-             & psb_mpi_ipk_,prcid(i),&
-             & p2ptag, icomm,y%comid(i,2),iret)
+        iret = psi_c_buf_irecv(cbuf,int(snd_pt,c_int),&
+             & int(nesd,c_int),int(psb_mpi_ipk_,c_int),&
+             & int(prcid(i),c_int),int(p2ptag,c_int),int(icomm,c_int),&
+             & y%comid(i,2))
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
@@ -314,9 +342,10 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
       rcv_pt = 1+pnti+psb_n_elem_recv_
 
       if ((nerv>0).and.(proc_to_comm /= me)) then 
-        call mpi_isend(y%combuf(rcv_pt),nerv,&
-             & psb_mpi_ipk_,prcid(i),&
-             & p2ptag,icomm,y%comid(i,1),iret)
+        iret = psi_c_buf_isend(cbuf,int(rcv_pt,c_int),&
+             & int(nerv,c_int),int(psb_mpi_ipk_,c_int),&
+             & int(prcid(i),c_int),int(p2ptag,c_int),int(icomm,c_int),&
+             & y%comid(i,1))
       end if
 
       if(iret /= mpi_success) then
@@ -374,7 +403,8 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
                & 'Fatal error in swapdata: mismatch on self send',&
                & nerv,nesd
         end if
-        y%combuf(snd_pt:snd_pt+nesd-1) = y%combuf(rcv_pt:rcv_pt+nerv-1) 
+        ! Exchange with itself: on the host or on the device buffer
+        call y%comm_buf_copy(snd_pt,rcv_pt,nerv)
       end if
       pnti   = pnti + nerv + nesd + 3
     end do
@@ -406,6 +436,7 @@ subroutine psi_itran_vidx_vect(ctxt,icomm,flag,beta,y,idx,&
     !
     if (debug) write(*,*) me,' wait'
     call y%device_wait()
+    call y%dev_comm_end()
     if (debug) write(*,*) me,' free buffer'
     call y%maybe_free_buffer(info)
     if (info == 0) call y%free_comid(info)
